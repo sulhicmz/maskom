@@ -1,13 +1,14 @@
-import HomeOne from "@/components/homes/home-one";
+import HomeOneDark from "@/components/homes/home-one-dark";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "AIcraft - AI Application & Generator React Next js Template",
+  title: "Maskom - Solusi TI Terbaik untuk Bisnis Anda",
 };
+
 const page = () => {
   return (
     <Wrapper>
-      <HomeOne />
+      <HomeOneDark />
     </Wrapper>
   )
 }

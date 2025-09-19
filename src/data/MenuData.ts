@@ -1,4 +1,3 @@
-
 interface MenuItem {
     id: number;
     title: string;
@@ -31,6 +30,17 @@ const menu_data: MenuItem[] = [
     },
     {
         id: 3,
+        title: "Services",
+        link: "/services",
+        has_dropdown: true,
+        sub_menus: [
+            { link: "/services/network-wifi", title: "Network/WiFi Solutions" },
+            { link: "/services/website-development", title: "Website Development" },
+            { link: "/services/ai-automation", title: "AI Automation" },
+        ],
+    },
+    {
+        id: 4,
         title: "Use Case",
         link: "#",
         has_dropdown: true,
@@ -40,7 +50,7 @@ const menu_data: MenuItem[] = [
         ],
     },
     {
-        id: 4,
+        id: 5,
         title: "Pages",
         link: "#",
         has_dropdown: true,
@@ -55,7 +65,7 @@ const menu_data: MenuItem[] = [
         ],
     },
     {
-        id: 5,
+        id: 6,
         title: "Blog",
         link: "#",
         has_dropdown: true,
@@ -65,7 +75,7 @@ const menu_data: MenuItem[] = [
         ],
     },
     {
-        id: 6,
+        id: 7,
         has_dropdown: false,
         title: "Contact",
         link: "/contact",

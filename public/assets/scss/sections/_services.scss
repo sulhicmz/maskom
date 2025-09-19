@@ -1,0 +1,172 @@
+// Services Section Styles
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.service-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+ transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  // Glowing effect
+  &:before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00c3ff, #ffff00, #ff0080, #00c3ff);
+    background-size: 400% 400%;
+    z-index: -1;
+    border-radius: 10px;
+    animation: glow 20s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    border-color: #00c3ff;
+    
+    &:before {
+      opacity: 1;
+    }
+  }
+  
+  .service-icon {
+    margin-bottom: 1rem;
+    
+    img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+  }
+  
+  h3 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+ }
+  
+  p {
+    color: #ccc;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  
+  .read-more {
+    color: #00c3ff;
+    text-decoration: none;
+    font-weight: bold;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+ }
+}
+
+.service-details {
+  padding: 2rem 0;
+  
+  h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #00c3ff, #ffff00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .service-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 195, 255, 0.3);
+  }
+  
+  p {
+    color: #ccc;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+  
+  h2 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #00c3ff, #ffff00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    
+    li {
+      color: #ccc;
+      margin-bottom: 0.5rem;
+      padding-left: 1.5rem;
+      position: relative;
+      
+      &:before {
+        content: "✓";
+        color: #00c3ff;
+        position: absolute;
+        left: 0;
+        text-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+      }
+    }
+  }
+}
+
+// Dark theme specific styles
+.dark-theme {
+  .services-grid {
+    background: #0d0d0d;
+  }
+  
+  .service-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    
+    &:hover {
+      border-color: #00c3ff;
+      box-shadow: 0 0 15px rgba(0, 195, 255, 0.3);
+    }
+  }
+}
+
+// Keyframes for glowing animation
+@keyframes glow {
+  0% {
+    background-position: 0 0;
+    filter: blur(10px);
+  }
+  50% {
+    background-position: 400% 0;
+    filter: blur(15px);
+  }
+  100% {
+    background-position: 0 0;
+    filter: blur(10px);
+  }
+}
