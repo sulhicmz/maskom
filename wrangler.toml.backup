@@ -1,0 +1,39 @@
+name = "maskom-website"
+main = "src/worker/index.ts"
+compatibility_date = "2024-09-20"
+
+# Konfigurasi build
+[build]
+command = "npm run build"
+
+# Variabel lingkungan
+[vars]
+NODE_ENV = "production"
+API_URL = "https://maskom.co.id/api"
+
+# Konfigurasi untuk environment development
+[env.development]
+name = "maskom-website-dev"
+
+[env.development.vars]
+NODE_ENV = "development"
+API_URL = "http://localhost:3000/api"
+
+# Konfigurasi untuk environment preview
+[env.preview]
+name = "maskom-website-preview"
+
+[env.preview.vars]
+NODE_ENV = "preview"
+API_URL = "https://preview.maskom.co.id/api"
+
+# Routes untuk worker
+# Semua request ke /api/* akan dihandle oleh worker
+[[routes]]
+pattern = "maskom.co.id/api/*"
+zone_id = "your-zone-id-here"
+
+# Routes untuk preview
+[[routes]]
+pattern = "preview.maskom.co.id/api/*"
+zone_id = "your-zone-id-here"
