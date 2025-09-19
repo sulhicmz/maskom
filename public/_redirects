@@ -1,0 +1,10 @@
+# Konfigurasi redirect untuk Cloudflare Pages
+
+# Redirect www ke non-www
+https://www.maskom.co.id/* https://maskom.co.id/:splat 301
+
+# Redirect lama ke halaman baru jika diperlukan
+# /old-page /new-page 301
+
+# SPA fallback untuk client-side routing
+/* /index.html 200

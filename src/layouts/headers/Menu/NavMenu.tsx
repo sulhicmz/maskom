@@ -4,6 +4,7 @@ import menu_data from "@/data/MenuData";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { event } from "@/utils/analytics";
 
 const NavMenu = () => {
     const currentRoute = usePathname();
@@ -42,9 +43,25 @@ const NavMenu = () => {
         <ul>
             {menu_data.map((menu) => (
                 <li key={menu.id} className={`has-dropdown ${openSubmenus[menu.id] ? "submenu-open" : ""}`}>
-                    <Link href={menu.link} className={`${(isMenuItemActive(menu.link) || (menu.sub_menus && menu.sub_menus.some((sub_m) => sub_m.link && isSubMenuItemActive(sub_m.link)))) ? "active" : ""}`}>
+                    <Link
+                      href={menu.link}
+                      className={`${(isMenuItemActive(menu.link) || (menu.sub_menus && menu.sub_menus.some((sub_m) => sub_m.link && isSubMenuItemActive(sub_m.link)))) ? "active" : ""}`}
+                      onClick={() => event({
+                        action: 'click',
+                        category: 'Navigation',
+                        label: menu.title
+                      })}
+                    >
                         {menu.title}
-                        {menu.has_dropdown && <span className="dd-trigger" onClick={() => toggleSubMenu(menu.id)}>
+                        {menu.has_dropdown && <span className="dd-trigger" onClick={(e) => {
+                          e.preventDefault();
+                          toggleSubMenu(menu.id);
+                          event({
+                            action: 'click',
+                            category: 'Navigation',
+                            label: `${menu.title} dropdown`
+                          });
+                        }}>
                             <i className="far fa-angle-down"></i>
                         </span>}
                     </Link>
@@ -55,7 +72,15 @@ const NavMenu = () => {
                                 <ul className="submenu" style={{ display: openSubmenus[menu.id] ? "block" : "" }}>
                                     {menu.sub_menus.map((sub_m, i) => (
                                         <li key={i}>
-                                            <Link href={sub_m.link} className={`${sub_m.link && isSubMenuItemActive(sub_m.link) ? "active" : ""}`}>
+                                            <Link
+                                              href={sub_m.link}
+                                              className={`${sub_m.link && isSubMenuItemActive(sub_m.link) ? "active" : ""}`}
+                                              onClick={() => event({
+                                                action: 'click',
+                                                category: 'Navigation',
+                                                label: `${menu.title} - ${sub_m.title}`
+                                              })}
+                                            >
                                                 {sub_m.title}
                                             </Link>
                                         </li>

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://maskom.co.id/sitemap.xml
+
+# Performance optimization
+Cache-Control: public, max-age=31536000

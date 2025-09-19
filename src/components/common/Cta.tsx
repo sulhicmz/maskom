@@ -2,6 +2,7 @@ import cta_1 from "@/assets/images/gallery/robot2.png"
 import cta_2 from "@/assets/images/gallery/base2.png"
 import Image from "next/image"
 import Link from "next/link"
+import { event } from "@/utils/analytics"
 const Cta = () => {
    return (
       <section className="cta-section pb-120">
@@ -13,7 +14,17 @@ const Cta = () => {
                         <h2>End Writer’s Block Today</h2>
                         <p>It’s like having access to a team of copywriting experts writing powerful
                            copy for you in 1-click.</p>
-                        <Link href="/contact" className="theme-btn gradient-btn">Start Writing Free </Link>
+                        <Link
+                          href="/contact"
+                          className="theme-btn gradient-btn"
+                          onClick={() => event({
+                            action: 'click',
+                            category: 'CTA',
+                            label: 'Start Writing Free'
+                          })}
+                        >
+                          Start Writing Free
+                        </Link>
                      </div>
                   </div>
                   <div className="col-lg-6">

@@ -11,22 +11,20 @@ const Hero = () => {
                <div className="row justify-content-center">
                   <div className="col-lg-8">
                      <div className="hero-content text-center">
-                        <h1 className="heading-title wow fadeInDown">Best AI Writer for Creating <span>Blog
-                           Post & Articles</span></h1>
-                        <p className="wow fadeInUp para-one">Write unique & plagiarism-free content for
-                           blogs, articles, ads, products, websites &social <br /> media unlock the power
-                           of generative AI across every team.</p>
+                        <h1 className="heading-title wow fadeInDown">Solusi TI Terbaik untuk Bisnis Anda dengan <span>AI dan Teknologi Canggih</span></h1>
+                        <p className="wow fadeInUp para-one">Maskom menyediakan solusi TI terbaik untuk bisnis Anda, termasuk jaringan/WiFi, pengembangan website, dan otomatisasi AI. <br /> Tingkatkan efisiensi dan produktivitas bisnis Anda dengan teknologi terkini.</p>
                         <div className="hero-button wow fadeInDown">
-                           <Link href="/" className="theme-btn gradient-btn">Start Writing Free </Link>
+                           <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
                         </div>
-                        <p className="wow fadeInUp para-two">No credit card required</p>
+                        <p className="wow fadeInUp para-two">Solusi yang dapat disesuaikan dengan kebutuhan bisnis Anda</p>
                      </div>
                   </div>
                </div>
                <div className="row">
                   <div className="col-lg-12">
                      <div className="hero-one_image-box text-center wow fadeInUp">
-                        <Image src={dashboard_img} alt="dashboard image" />
+                        {/* Add lazy loading for the image */}
+                        <Image src={dashboard_img} alt="Dashboard Maskom" loading="lazy" />
                      </div>
                   </div>
                </div>
