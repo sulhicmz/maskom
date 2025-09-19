@@ -5,6 +5,7 @@ interface SidebarProps {
 }
 
 const Sidebar = React.memo(({ onModuleChange }: SidebarProps) => {
+  Sidebar.displayName = "Sidebar";
   return (
     <div className="sidebar bg-light p-3">
       <h5>Dashboard</h5>
@@ -27,6 +28,6 @@ const Sidebar = React.memo(({ onModuleChange }: SidebarProps) => {
       </ul>
     </div>
   );
-};
+});
 
 export default Sidebar;
