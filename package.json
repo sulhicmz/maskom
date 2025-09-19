@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -27,12 +28,14 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^15.5.3",
     "@types/isotope-layout": "^3.0.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-modal-video": "^1.2.3",
     "@types/react-responsive-masonry": "^2.6.0",
+    "cross-env": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.2.2",
     "typescript": "^5"

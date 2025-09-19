@@ -159,6 +159,12 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#support"><img src="assets/images/icon/headphone.png" />Support</a>
+              <li class="nav-item">
+                <a class="nav-link" href="#performance"><img src="assets/images/icon/settings.png" />Performance Optimization</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#known_issues"><img src="assets/images/icon/New folder/not-found.png" />Known Issues</a>
+              </li>
               </li>
             </ul>
             <!-- </nav> -->
@@ -589,6 +595,82 @@
                     <p style="color: red; font-weight: bold">
                       If you face any issue please contact us at
                       <a class="black-color" href="mailto:solverwp@gmail.com">Support Ticket</a>. We provide 15
+                <article id="performance" class="section-main doc-section">
+                  <section>
+                    <h3>Performance Optimization</h3>
+                    <p>
+                      We have implemented several performance optimization techniques to ensure fast loading times and smooth user experience.
+                    </p>
+                    <div class="steps-panel">
+                      <h4>Image Optimization</h4>
+                      <ul class="ordered-list">
+                        <li>Using Next.js Image component for automatic optimization</li>
+                        <li>Implementing lazy loading for all images</li>
+                        <li>Using modern image formats (WebP) when supported</li>
+                        <li>Properly sizing images for different breakpoints</li>
+                      </ul>
+                      
+                      <h4>Code Splitting</h4>
+                      <ul class="ordered-list">
+                        <li>Implementing dynamic imports for heavy components</li>
+                        <li>Using React.lazy and Suspense for route-based code splitting</li>
+                        <li>Splitting vendor libraries into separate chunks</li>
+                      </ul>
+                      
+                      <h4>Caching Strategy</h4>
+                      <ul class="ordered-list">
+                        <li>Implementing HTTP caching headers for static assets</li>
+                        <li>Using service workers for offline caching</li>
+                        <li>Implementing CDN for static assets distribution</li>
+                      </ul>
+                      
+                      <h4>Bundle Optimization</h4>
+                      <ul class="ordered-list">
+                        <li>Removing unused code with tree shaking</li>
+                        <li>Minifying JavaScript and CSS</li>
+                        <li>Analyzing and reducing bundle size with webpack bundle analyzer</li>
+                      </ul>
+                    </div>
+                  </section>
+                </article>
+                
+                <article id="known_issues" class="section-main doc-section">
+                  <section>
+                    <h3>Known Issues</h3>
+                    <p>
+                      This section lists known issues and their current status.
+                    </p>
+                    <div class="steps-panel">
+                      <h4>Routing Issue</h4>
+                      <ul class="ordered-list">
+                        <li><strong>Issue:</strong> Inconsistent naming of 404 route directory ([...not-faound] instead of [...not-found])</li>
+                        <li><strong>Status:</strong> ✅ Fixed</li>
+                        <li><strong>Solution:</strong> Directory has been renamed to [...not-found] and all references updated</li>
+                      </ul>
+                      
+                      <h4>Security Configuration</h4>
+                      <ul class="ordered-list">
+                        <li><strong>Issue:</strong> wrangler.toml uses placeholder for Cloudflare zone ID</li>
+                        <li><strong>Status:</strong> ⚠️ Requires Configuration</li>
+                        <li><strong>Solution:</strong> Replace placeholder with actual zone ID from Cloudflare dashboard</li>
+                      </ul>
+                      
+                      <h4>Environment Variables</h4>
+                      <ul class="ordered-list">
+                        <li><strong>Issue:</strong> Some sensitive environment variables use placeholder values</li>
+                        <li><strong>Status:</strong> ⚠️ Requires Configuration</li>
+                        <li><strong>Solution:</strong> Update .env.local with actual values for variables like EMAILJS_SERVICE_ID, CF_ACCOUNT_ID, etc.</li>
+                      </ul>
+                      
+                      <h4>Bundle Size</h4>
+                      <ul class="ordered-list">
+                        <li><strong>Issue:</strong> JavaScript bundle size may be too large for certain pages</li>
+                        <li><strong>Status:</strong> ⚠️ In Optimization</li>
+                        <li><strong>Solution:</strong> Use dynamic imports for large components, remove unused dependencies, implement more aggressive code splitting</li>
+                      </ul>
+                    </div>
+                  </section>
+                </article>
                       hours real-time support for our
                       customers.
                     </p>
