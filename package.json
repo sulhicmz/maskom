@@ -29,7 +29,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240925.0",
+    "@cloudflare/workers-types": "^4.20250919.0",
     "@eslint/eslintrc": "^3",
     "@types/isotope-layout": "^3.0.14",
     "@types/node": "^20",
@@ -40,6 +40,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.2.2",
     "typescript": "^5",
-    "wrangler": "^3.78.12"
+    "wrangler": "^3.114.14"
   }
 }
