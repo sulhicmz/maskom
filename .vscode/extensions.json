@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "cloudflare.vscode-cloudflare-tasks",
+    "cloudflare.wrangler",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-json",
+    "tamasfe.even-better-toml"
+  ]
+}

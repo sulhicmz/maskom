@@ -1,0 +1,25 @@
+# Konfigurasi caching headers untuk Cloudflare Pages
+
+# Cache static assets selama 1 tahun
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache CSS dan JS selama 1 tahun
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache font files selama 1 tahun
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache images selama 1 bulan
+/assets/images/*
+  Cache-Control: public, max-age=2592000
+
+# Cache HTML files selama 1 jam (untuk Next.js pages)
+/*
+  Cache-Control: public, max-age=3600

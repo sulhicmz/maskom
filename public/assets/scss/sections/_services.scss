@@ -61,7 +61,7 @@
     font-size: 1.5rem;
  }
   
-  p {
+ p {
     color: #ccc;
     margin-bottom: 1rem;
     font-size: 1rem;
@@ -133,6 +133,144 @@
         position: absolute;
         left: 0;
         text-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+      }
+    }
+  }
+}
+
+.technical-specs,
+.use-cases,
+.pricing-plans {
+  margin: 2rem 0;
+  
+  h2 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #00c3ff, #ffff00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.specs-grid,
+.cases-grid,
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.spec-item,
+.case-item,
+.plan-item {
+  background: rgba(26, 26, 0.7);
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    border-color: #00c3ff;
+  }
+  
+  .spec-icon,
+  .case-icon {
+    margin-bottom: 1rem;
+    text-align: center;
+    
+    i {
+      font-size: 2rem;
+      color: #00c3ff;
+      text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+    }
+  }
+  
+  .spec-content,
+  .case-content {
+    p {
+      color: #ccc;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+  
+  .plan-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    
+    h3 {
+      color: #fff;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .plan-price {
+      .currency {
+        font-size: 1rem;
+        color: #00c3ff;
+        vertical-align: super;
+      }
+      
+      .amount {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #fff;
+      }
+      
+      .period {
+        font-size: 0.9rem;
+        color: #ccc;
+      }
+    }
+  }
+  
+  .plan-features {
+    margin-bottom: 1.5rem;
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      
+      li {
+        color: #ccc;
+        margin-bottom: 0.5rem;
+        padding-left: 1.5rem;
+        position: relative;
+        
+        i {
+          color: #00c3ff;
+          position: absolute;
+          left: 0;
+          top: 0.2rem;
+        }
+      }
+    }
+ }
+  
+  .plan-action {
+    text-align: center;
+    
+    .theme-btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(90deg, #00c3ff, #0066ff);
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 195, 255, 0.3);
       }
     }
   }

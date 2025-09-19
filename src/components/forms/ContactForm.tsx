@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import emailjs from '@emailjs/browser';
 import { useRef } from 'react';
+import { event } from '@/utils/analytics';
 
 interface FormData {
    user_name: string;
@@ -35,6 +36,13 @@ const ContactForm = () => {
                notify();
                reset();
                console.log(result.text);
+               
+               // Track form submission as conversion
+               event({
+                 action: 'submit',
+                 category: 'Contact Form',
+                 label: 'Form Submission Success'
+               });
             }, (error) => {
                console.log(error.text);
             });

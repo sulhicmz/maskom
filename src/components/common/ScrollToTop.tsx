@@ -19,10 +19,6 @@ const ScrollToTop = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
    };
 
-   // useEffect(() => {
-   //    window.addEventListener("scroll", checkScrollTop);
-   //    return () => window.removeEventListener("scroll", checkScrollTop);
-   // }, []);
    useEffect(() => {
       const checkScrollTop = () => {
          if (!showScroll && window.pageYOffset > 400) {
@@ -34,12 +30,13 @@ const ScrollToTop = () => {
 
       window.addEventListener("scroll", checkScrollTop);
       return () => window.removeEventListener("scroll", checkScrollTop);
-   }, [checkScrollTop]);
+   }, [showScroll]);
 
    return (
       <>
+         {/* Add loading indicator for better UX */}
          <div onClick={scrollTop} className={`xc-back-to-top-wrapper ${sticky ? "xc-back-to-top-btn-show" : ""}`}>
-            <button id="xc_back-to-top" type="button" className="xc-back-to-top-btn">
+            <button id="xc_back-to-top" type="button" className="xc-back-to-top-btn" aria-label="Kembali ke atas">
                <i className="far fa-angle-down"></i>
                <span className="xc-back-to-top-progress"></span>
             </button>

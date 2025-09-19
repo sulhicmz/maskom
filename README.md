@@ -1,111 +1,53 @@
-# Maskom - Solusi TI Terbaik untuk Bisnis Anda
+# Maskom.co.id Website
 
-Ini adalah proyek [Next.js](https://nextjs.org) yang dibangun dengan [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Selamat datang di repositori situs web resmi Maskom.co.id! Proyek ini adalah situs web Next.js yang di-deploy menggunakan Cloudflare Pages dan memanfaatkan Cloudflare Workers untuk fungsionalitas tambahan.
 
-## Tentang Proyek
+## Gambaran Umum Proyek
 
-Proyek ini adalah situs web untuk Maskom, sebuah perusahaan yang menyediakan solusi TI terbaik untuk bisnis. Situs web ini dibangun dengan Next.js dan menggunakan template AIcraft sebagai dasar.
+Situs web Maskom.co.id dirancang untuk menampilkan layanan, portofolio, dan informasi kontak perusahaan. Dibangun dengan Next.js, React, dan Sass, situs ini dioptimalkan untuk kinerja tinggi dan pengalaman pengguna yang responsif.
 
-## Fitur Utama
+## Mulai Cepat
 
-- Tema gelap dengan efek menyala
-- Halaman layanan untuk:
-  - Solusi Jaringan/WiFi
-  - Pengembangan Website
-  - Otomatisasi AI
-- Halaman tentang kami
-- Halaman kontak
+Ikuti langkah-langkah ini untuk menjalankan proyek secara lokal:
 
-## Struktur Proyek
-
-```
-.
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.md
-│   │   ├── feature_request.md
-│   │   └── task.md
-│   └── workflows/
-│       └── ci.yml
-├── public/
-│   ├── assets/
-│   └── ...
-├── src/
-│   ├── app/
-│   ├── components/
-│   ├── data/
-│   ├── hooks/
-│   ├── layouts/
-│   └── styles/
-├── .gitignore
-├── CONTRIBUTING.md
-├── next.config.ts
-├── package.json
-├── README.md
-└── tsconfig.json
-```
-
-## Memulai
-
-Untuk menjalankan proyek ini secara lokal, ikuti langkah-langkah berikut:
-
-1.  **Klon Repositori**
+1.  **Kloning Repositori**:
     ```bash
     git clone https://github.com/your-username/maskom.co.id.git
     cd maskom.co.id
     ```
-
-2.  **Instal Dependensi**
+2.  **Instal Dependensi**:
     ```bash
     npm install
+    # atau
+    # yarn install
     ```
-
-3.  **Jalankan Server Pengembangan**
+3.  **Konfigurasi Variabel Lingkungan**:
+    Buat file `.env.local` di root proyek dan tambahkan variabel lingkungan yang diperlukan (lihat `doc/SETUP_GUIDE.md` untuk detail).
+4.  **Jalankan Server Pengembangan**:
     ```bash
     npm run dev
+    # atau
+    # yarn dev
     ```
+    Aplikasi akan berjalan di `http://localhost:3000`.
 
-    Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
+## Dokumentasi Detail
+
+Untuk informasi lebih lanjut tentang proyek ini, silakan lihat dokumen-dokumen berikut di direktori `doc/`:
+
+-   **[Panduan Setup](doc/SETUP_GUIDE.md)**: Persyaratan sistem, instalasi, dan konfigurasi lingkungan.
+-   **[Proses Deployment](doc/DEPLOYMENT_PROCESS.md)**: Prasyarat, proses build, deployment ke Cloudflare Pages, dan prosedur rollback.
+-   **[Dokumentasi Arsitektur](doc/ARCHITECTURE.md)**: Diagram arsitektur, struktur komponen, dan alur data.
+-   **[GitHub Workflow](doc/GITHUB_WORKFLOW.md)**: Strategi branching, proses Pull Request, dan pedoman code review.
+-   **[Panduan Troubleshooting](doc/TROUBLESHOOTING.md)**: Masalah umum dan solusinya.
+-   **[Prosedur Maintenance](doc/MAINTENANCE.md)**: Pembaruan dependensi, backup, monitoring, dan scaling.
+-   **[Kustomisasi Tema](doc/THEME_CUSTOMIZATION.md)**: Cara menyesuaikan tema gelap dan efek menyala.
+-   **[Konten Layanan](doc/SERVICE_CONTENT.md)**: Cara menambahkan atau memperbarui konten layanan.
 
 ## Pedoman Kontribusi
 
-Kami menyambut baik kontribusi dari semua orang. Untuk memastikan proses pengembangan yang lancar, silakan baca [Pedoman Kontribusi](./CONTRIBUTING.md) kami. Dokumen ini mencakup:
+Kami menyambut kontribusi! Silakan lihat **[GitHub Workflow](doc/GITHUB_WORKFLOW.md)** untuk detail tentang strategi branching, proses Pull Request, dan pedoman code review.
 
--   Gaya Kode dan Konvensi
--   Proses Pull Request
--   Konvensi Pesan Komit
--   Persyaratan Pengujian
+## Lisensi
 
-## Strategi Percabangan
-
-Kami menggunakan model percabangan **Git Flow**. Untuk detail lengkap tentang alur kerja, silakan merujuk ke bagian [Strategi Percabangan](./CONTRIBUTING.md#strategi-percabangan) di `CONTRIBUTING.md`.
-
--   `main`: Kode produksi.
--   `develop`: Pengembangan aktif.
--   `feature/*`: Fitur baru.
--   `release/*`: Persiapan rilis.
--   `hotfix/*`: Perbaikan bug produksi.
-
-## Manajemen Proyek
-
-Kami menggunakan **GitHub Projects** untuk mengelola alur kerja kami. Papan proyek kami memiliki kolom berikut:
-
--   **Backlog**: Ide dan tugas yang belum diprioritaskan.
--   **Todo**: Tugas yang siap untuk dikerjakan.
--   **In Progress**: Tugas yang sedang dikerjakan.
--   **Review**: Tugas yang menunggu tinjauan.
--   **Done**: Tugas yang telah selesai.
-
-### Label Masalah
-
-Kami menggunakan label untuk mengkategorikan dan memprioritaskan masalah:
-
--   **Prioritas**: `High`, `Medium`, `Low`
--   **Tipe**: `Bug`, `Feature`, `Enhancement`, `Documentation`
--   **Status**: `In Progress`, `Review Needed`, `Blocked`
-
-## Deploy di Vercel
-
-Cara termudah untuk men-deploy aplikasi Next.js Anda adalah dengan menggunakan [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) dari para pembuat Next.js.
-
-Lihat [dokumentasi deployment Next.js](https://nextjs.org/docs/app/building-your-application/deploying) kami untuk detail lebih lanjut.
+Proyek ini dilisensikan di bawah [MIT License](LICENSE).
