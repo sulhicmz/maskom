@@ -51,7 +51,7 @@ const menu_data: MenuItem[] = [
             { link: "/faq", title: "Faq's" },
             { link: "/login", title: "Login" },
             { link: "/sign-up", title: "Sign Up" },
-            { link: "/not-found", title: "404" },
+            { link: "/[...not-found]", title: "404" },
         ],
     },
     {
