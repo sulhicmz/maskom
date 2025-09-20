@@ -27,6 +27,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.16",
     "@eslint/eslintrc": "^3",
     "@next/bundle-analyzer": "^15.5.3",
     "@types/isotope-layout": "^3.0.14",
