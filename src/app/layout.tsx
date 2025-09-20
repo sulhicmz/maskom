@@ -1,5 +1,7 @@
 import "../styles/index.scss";
 
+export const runtime = 'edge';
+
 export default function RootLayout({
   children,
 }: {
