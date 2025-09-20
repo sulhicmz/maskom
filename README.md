@@ -50,4 +50,9 @@ This project is configured to deploy to Cloudflare Workers using [`@cloudflare/n
    The command bundles the latest build output and publishes it using the settings defined in `wrangler.toml`.
 
 Refer to [Cloudflare's deployment guide](https://developers.cloudflare.com/workers/wrangler/get-started/) for additional options such as environment-specific deploys.
+
 # Maskom
+
+## Live Website
+
+The Maskom Network website is deployed and accessible at: [https://maskom.sulhi-cmz.workers.dev](https://maskom.sulhi-cmz.workers.dev)
