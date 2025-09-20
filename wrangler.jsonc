@@ -1,6 +1,6 @@
 {
   // Entry point untuk Cloudflare Worker
-  "main": "src/index.ts",
+  "main": ".open-next/worker.js",
   "name": "maskom",
   "compatibility_date": "2025-09-19",
   "assets": {
