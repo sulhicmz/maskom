@@ -29,9 +29,25 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Cloudflare Workers
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is configured to deploy to Cloudflare Workers using [`@cloudflare/next-on-pages`](https://github.com/cloudflare/next-on-pages).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Build the worker-compatible bundle:
+
+   ```bash
+   npm run cf:build
+   ```
+
+   This generates the Worker entry point at `.vercel/output/static/_worker.js` and the static asset bundle used during deploy.
+
+2. Deploy the Worker with Wrangler:
+
+   ```bash
+   npm run cf:deploy
+   ```
+
+   The command bundles the latest build output and publishes it using the settings defined in `wrangler.toml`.
+
+Refer to [Cloudflare's deployment guide](https://developers.cloudflare.com/workers/wrangler/get-started/) for additional options such as environment-specific deploys.
 # Maskom
