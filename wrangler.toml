@@ -1,8 +1,7 @@
 name = "maskom"
-main = "dist/_worker.js"
-compatibility_date = "2024-09-19"
+main = ".open-next/worker.js"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]
-directory = "dist"
-bypass_cache = false
+directory = ".open-next/assets"
