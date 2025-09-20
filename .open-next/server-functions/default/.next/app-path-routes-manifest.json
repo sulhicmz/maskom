@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/[...not-faound]/page": "/[...not-faound]",
+  "/about/page": "/about",
+  "/blog-details/page": "/blog-details",
+  "/blog/page": "/blog",
+  "/contact/page": "/contact",
+  "/dashboard/page": "/dashboard",
+  "/faq/page": "/faq",
+  "/home-one-dark/page": "/home-one-dark",
+  "/home-three/page": "/home-three",
+  "/home-two/page": "/home-two",
+  "/login/page": "/login",
+  "/page": "/",
+  "/pricing/page": "/pricing",
+  "/team-details/page": "/team-details",
+  "/sign-up/page": "/sign-up",
+  "/team/page": "/team",
+  "/use-case-details/page": "/use-case-details",
+  "/use-cases/page": "/use-cases"
+}
