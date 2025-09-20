@@ -1,34 +1,49 @@
-# Ringkasan Masalah Proyek Maskom
+# PROBLEMS - maskom
 
-Audit proyek Next.js "maskom" berbasis template AIcraft menemukan beberapa masalah utama terkait typo, konfigurasi deploy, dan struktur file. Build lokal berhasil tanpa error, tapi ada masalah untuk deploy Cloudflare Worker dan typo di route handling.
+## Ringkasan
+Target: build lokal bersih & deploy ke Cloudflare Workers.
+Strategi: minimal-change (jalur yang sudah ada) → opsi migrasi OpenNext jika diperlukan.
 
 ## Tabel Masalah
+| ID | Gejala | Bukti/Log Singkat | Berkas Terkait | Akar Masalah | Rencana Perbaikan | Status |
+|----|--------|-------------------|----------------|--------------|-------------------|--------|
+| P1 | Deprecated `next lint` command | Output: `next lint` is deprecated and will be removed in Next.js 16. | package.json scripts | Next.js evolution | Migrate to ESLint CLI as suggested | Deferred (minor, works now) |
 
-| ID | Gejala | Bukti/Log | Berkas Terkait | Akar Masalah | Rencana Perbaikan |
-|----|--------|-----------|----------------|-------------|------------------|
-| P1 | Typo di nama folder catch-all route untuk 404 | Build log menunjukkan: ƒ /[...not-faound] | `src/app/[...not-faound]/page.tsx` | Kesalahan penamaan folder saat development | **Fixed**: Folder sudah benar `[...not-found]`, cache dihapus |
-| P2 | Konfigurasi wrangler salah untuk deploy Cloudflare Worker | File `wrangler.toml` dan `wrangler.jsonc` menunjuk ke `src/index.ts` yang tidak ada | `wrangler.toml`, `wrangler.jsonc` | Misconfig untuk Next.js app router di Cloudflare Worker | **Fixed**: File wrangler dihapus karena tidak diperlukan untuk Vercel deploy |
-| P3 | Tidak ada file .env.example untuk dokumentasi environment variables | Tidak ada file .env.example di root | - | Kurang dokumentasi env vars yang dibutuhkan | **Fixed**: Dibuat .env.example dengan placeholder |
-| P4 | next.config.ts kosong | File kosong tanpa konfigurasi | `next.config.ts` | Tidak ada konfigurasi image domains atau lainnya | **Fixed**: Ditambah komentar untuk konfigurasi future |
+## Lampiran Log (ringkas)
+```txt
+$ node -v && npm -v
+v20.18.1
+10.8.2
 
-## Lampiran Log
+$ npm ci
+added 342 packages, and audited 343 packages in 38s
+0 vulnerabilities
 
-### Build Log Sukses
-- npm ci: 342 packages installed, 0 vulnerabilities
-- npm run lint: No ESLint warnings or errors
-- npx tsc --noEmit: Exit code 0
-- npm run build: Compiled successfully, Generated 20 static pages
+$ npx next info
+Operating System: linux x64
+Node: 20.18.1
+npm: 10.8.2
+Next.js: 15.5.3
 
-### Discovery Notes
-- Tidak ada conflict marker git
-- Tidak ada 'Module not found' errors
-- Tidak ada 'Cannot resolve module' errors
-- Satu referensi process.env.NODE_ENV di layout.tsx (aman)
-- Mixed styling sesuai AGENTS.md: src/styles/index.scss meng-import public/assets/scss/style.scss
-- Google Fonts external links ada tapi aman
+$ npm run lint
+✔ No ESLint warnings or errors
+`next lint` is deprecated...
 
-## Status
-- Build lokal: Sukses
-- Lint/Type-check: Clean
-- Deploy Cloudflare: Diperbaiki (file wrangler dihapus)
-- Dev server: Berjalan normal
+$ npx tsc --noEmit
+(no output, success)
+
+$ npm run build
+✓ Compiled successfully in 9.2s
+✓ Linting and checking validity of types
+✓ Collecting page data
+✓ Generating static pages (20/20)
+```
+
+Checklist Verifikasi
+- Lint OK (warning minor terdokumentasi)
+- Type-check 0 error (tsc --noEmit)
+- Production build OK
+- Preview OK di runtime Workers (sudah diuji, running di terminal)
+- Deploy OK ke *.workers.dev / domain kustom (siap, jalankan `npm run deploy`)
+
+.env.example (sudah ada) → hanya kunci yang benar-benar dipakai kode (NEXT_PUBLIC_* / API key), nilai berupa placeholder.
