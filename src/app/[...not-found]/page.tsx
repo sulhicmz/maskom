@@ -5,7 +5,6 @@ export const metadata = {
   title: "404 || AIcraft - AI Application & Generator React Next js Template",
 };
 
-export const runtime = "edge";
 const page = () => {
   return (
     <Wrapper>
