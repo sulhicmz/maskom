@@ -20,12 +20,12 @@
   },
   "dynamicRoutes": [
     {
-      "page": "/[...not-faound]",
+      "page": "/[...not-found]",
       "regex": "^/(.+?)(?:/)?$",
       "routeKeys": {
-        "nxtPnotfaound": "nxtPnot-faound"
+        "nxtPnotfound": "nxtPnot-found"
       },
-      "namedRegex": "^/(?<nxtPnotfaound>.+?)(?:/)?$"
+      "namedRegex": "^/(?<nxtPnotfound>.+?)(?:/)?$"
     }
   ],
   "staticRoutes": [
