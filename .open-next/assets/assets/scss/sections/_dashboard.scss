@@ -1,0 +1,59 @@
+// Dashboard Styles
+
+.dashboard {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 20px 0;
+
+  .sidebar {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    h5 {
+      margin-bottom: 20px;
+    }
+
+    .nav-link {
+      cursor: pointer;
+      color: #007bff;
+
+      &:hover {
+        color: #0056b3;
+      }
+    }
+  }
+
+  .dashboard-content {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    min-height: 500px;
+
+    .wifi-monitor, .website-builder, .ai-automation {
+      h2 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .progress {
+        height: 20px;
+        margin-bottom: 20px;
+      }
+
+      .step-content {
+        margin-bottom: 20px;
+
+        h4 {
+          margin-bottom: 10px;
+        }
+      }
+
+      .step-navigation {
+        text-align: right;
+      }
+    }
+  }
+}

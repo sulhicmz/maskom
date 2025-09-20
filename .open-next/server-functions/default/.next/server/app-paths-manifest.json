@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/[...not-faound]/page": "app/[...not-faound]/page.js",
+  "/about/page": "app/about/page.js",
+  "/blog-details/page": "app/blog-details/page.js",
+  "/blog/page": "app/blog/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/faq/page": "app/faq/page.js",
+  "/home-one-dark/page": "app/home-one-dark/page.js",
+  "/home-three/page": "app/home-three/page.js",
+  "/home-two/page": "app/home-two/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/pricing/page": "app/pricing/page.js",
+  "/team-details/page": "app/team-details/page.js",
+  "/sign-up/page": "app/sign-up/page.js",
+  "/team/page": "app/team/page.js",
+  "/use-case-details/page": "app/use-case-details/page.js",
+  "/use-cases/page": "app/use-cases/page.js"
+}
