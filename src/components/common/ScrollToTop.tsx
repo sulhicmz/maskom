@@ -11,10 +11,6 @@ const ScrollToTop = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
    };
 
-   // useEffect(() => {
-   //    window.addEventListener("scroll", checkScrollTop);
-   //    return () => window.removeEventListener("scroll", checkScrollTop);
-   // }, []);
    useEffect(() => {
       const checkScrollTop = () => {
          if (!showScroll && window.pageYOffset > 400) {
