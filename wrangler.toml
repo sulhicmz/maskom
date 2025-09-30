@@ -1,84 +1,9 @@
-<<<<<<< HEAD
 name = "maskom"
 main = ".open-next/worker.js"
-compatibility_date = "2025-01-01"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2024-12-30"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+workers_dev = true
 
 [assets]
 directory = ".open-next/assets"
-=======
-name = "maskom-website"
-main = "src/worker/index.ts"
-compatibility_date = "2024-09-20"
-
-# Konfigurasi build
-[build]
-command = "npm run build"
-
-# Variabel lingkungan
-[vars]
-NODE_ENV = "production"
-API_URL = "https://maskom.co.id/api"
-
-# Konfigurasi untuk environment development
-[env.development]
-name = "maskom-website-dev"
-
-[env.development.vars]
-NODE_ENV = "development"
-API_URL = "http://localhost:3000/api"
-
-# Konfigurasi untuk environment preview
-[env.preview]
-name = "maskom-website-preview"
-
-[env.preview.vars]
-NODE_ENV = "preview"
-API_URL = "https://preview.maskom.co.id/api"
-
-# Routes untuk worker
-# Semua request ke /api/* akan dihandle oleh worker
-[[routes]]
-pattern = "maskom.co.id/api/*"
-# TODO: Ganti dengan zone ID yang sebenarnya dari Cloudflare dashboard
-zone_id = "xxxxxxxxxxxxxxxxxxxxxxxx" # Placeholder - isi dengan zone ID yang sebenarnya dari Cloudflare dashboard
-
-# Routes untuk preview
-[[routes]]
-pattern = "preview.maskom.co.id/api/*"
-# TODO: Ganti dengan zone ID yang sebenarnya dari Cloudflare dashboard
-zone_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Placeholder - isi dengan zone ID yang sebenarnya dari Cloudflare dashboard
-
-# Konfigurasi tambahan untuk routing yang lebih optimal
-# Menggunakan r2_buckets untuk menyimpan assets statis
-[[r2_buckets]]
 binding = "ASSETS"
-bucket_name = "maskom-assets"
-preview_bucket_name = "maskom-assets-preview"
-
-# Konfigurasi KV untuk caching dan session storage
-[[kv_namespaces]]
-binding = "MASKOM_KV"
-id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Placeholder - isi dengan KV namespace ID yang sebenarnya
-preview_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Placeholder - isi dengan KV namespace ID yang sebenarnya untuk preview
-
-# Konfigurasi keamanan tambahan
-# Menggunakan environment variables untuk konfigurasi sensitif
-[env.production]
-# Konfigurasi untuk environment production
-name = "maskom-website-prod"
-
-[env.production.vars]
-NODE_ENV = "production"
-API_URL = "https://maskom.co.id/api"
-
-# Konfigurasi untuk mengoptimalkan routing
-# Menambahkan route tambahan untuk static assets
-[[routes]]
-pattern = "maskom.co.id/assets/*"
-zone_id = "xxxxxxxxxxxxxxxxxxxxxxxx" # Placeholder - isi dengan zone ID yang sebenarnya dari Cloudflare dashboard
-
-# Menambahkan konfigurasi untuk caching
-[env.production.placement]
-mode = "smart"
->>>>>>> origin/development-iteration-1

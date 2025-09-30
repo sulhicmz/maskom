@@ -23,23 +23,23 @@ const nextConfig: NextConfig = {
         ...config.resolve.fallback,
         fs: false,
       };
-    }
-    
-    // Optimasi untuk Cloudflare Pages
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+
+      // Optimasi untuk Cloudflare Pages (khusus bundle client)
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
           },
         },
-      },
-    };
-    
+      };
+    }
+
     return config;
   },
   
