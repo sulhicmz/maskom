@@ -3,15 +3,14 @@ import Image from "next/image"
 
 const Process = () => {
    return (
-      <section className="works-process-section pb-75">
+      <section className="works-process-section pb-75" id="pendekatan">
          <div className="container">
             <div className="row">
                <div className="col-lg-12">
                   <div className="section-title text-center mb-55 wow fadeInDown">
-                     <span className="sub-title style-one">Working Process</span>
-                     <h2>How to Work</h2>
-                     <p>In a few seconds, our A.I. will generate amazing results that <br /> you can copy,
-                        paste & publish. , write creatively </p>
+                     <span className="sub-title style-one">Pendekatan Kami</span>
+                     <h2>Implementasi Cepat & Terukur</h2>
+                     <p>Maskom memastikan setiap fase berjalan kolaboratif bersama tim Anda, mulai dari asesmen, desain solusi, hingga pengelolaan harian.</p>
                   </div>
                </div>
             </div>

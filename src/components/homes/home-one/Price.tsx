@@ -3,7 +3,7 @@ import price_data from "@/data/PriceData";
 import Link from "next/link";
 import { useState } from "react";
 
-const tab_title: string[] = ["Monthly Plan", "Annual Plan"];
+const tab_title: string[] = ["Kontrak 12 Bulan", "Kontrak 36 Bulan"];
 
 const Price = () => {
 
@@ -15,16 +15,15 @@ const Price = () => {
    };
 
    return (
-      <section className="pricing-section">
+      <section className="pricing-section" id="paket">
          <div className="pricing-wrapper black-dark-bg pt-110 pb-80">
             <div className="container">
                <div className="row">
                   <div className="col-lg-12">
                      <div className="section-title text-center title-white mb-50 wow fadeInDown">
-                        <span className="sub-title style-one">Pricing Plan</span>
-                        <h2>Choose Your Best Plan</h2>
-                        <p>In a few seconds, our A.I. will generate amazing results that <br /> you can
-                           copy, paste & publish. , write creatively in </p>
+                        <span className="sub-title style-one">Paket Layanan</span>
+                        <h2>Pilih Skema Layanan Sesuai Kebutuhan Anda</h2>
+                        <p>Seluruh paket sudah termasuk instalasi, monitoring proaktif, dan dukungan engineer Maskom sesuai SLA yang disepakati.</p>
                      </div>
                   </div>
                </div>
@@ -54,8 +53,18 @@ const Price = () => {
                                        <div className="pricing-item style-one mb-40">
                                           <div className="pricing-head text-center">
                                              <span className="package">{item.sub_title}</span>
-                                             <h3><span className="currency">$</span>{item.price}.00</h3>
-                                             <Link href="/" className="theme-btn style-two">{item.btn}</Link>
+                                             {item.price_label ? (
+                                                <h3>{item.price_label}</h3>
+                                             ) : (
+                                                <h3>
+                                                   <span className="currency">{item.currency === "IDR" ? "Rp" : "$"}</span>
+                                                   {item.currency === "IDR"
+                                                      ? new Intl.NumberFormat("id-ID").format(item.price)
+                                                      : item.price.toFixed(2)}
+                                                </h3>
+                                             )}
+                                             {item.note && <p className="mt-10">{item.note}</p>}
+                                             <Link href="/contact" className="theme-btn style-two">{item.btn}</Link>
                                           </div>
                                           <div className="pricing-body">
                                              <ul className="check-list style-one">

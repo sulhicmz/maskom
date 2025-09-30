@@ -23,8 +23,8 @@ const ContactFormArea = () => {
                <div className="col-xl-7">
                   <div className="section-content-box mb-50 pl-xl-45 wow fadeInRight">
                      <div className="section-title mb-30">
-                        <span className="sub-title style-one">Contact Us</span>
-                        <h2>Don’t Hesitate to Contact <br /> With Us</h2>
+                        <span className="sub-title style-one">Hubungi Maskom</span>
+                        <h2>Kami Siap Membantu <br /> Kebutuhan Jaringan Anda</h2>
                      </div>
                      <ContactForm />
                   </div>
