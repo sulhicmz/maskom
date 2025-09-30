@@ -5,21 +5,18 @@ import dashboard_img from "@/assets/images/hero/dashboard-img.jpg"
 
 const Hero = () => {
    return (
-      <section className="hero-section">
+      <section className="hero-section" id="beranda">
          <div className="hero-wrapper bg_cover" style={{ backgroundImage: `url(/assets/images/hero/hero-bg-1.png)` }}>
             <div className="container">
                <div className="row justify-content-center">
                   <div className="col-lg-8">
                      <div className="hero-content text-center">
-                        <h1 className="heading-title wow fadeInDown">Best AI Writer for Creating <span>Blog
-                           Post & Articles</span></h1>
-                        <p className="wow fadeInUp para-one">Write unique & plagiarism-free content for
-                           blogs, articles, ads, products, websites &social <br /> media unlock the power
-                           of generative AI across every team.</p>
+                        <h1 className="heading-title wow fadeInDown">Infrastruktur Digital Andal Untuk <span>Bisnis Terkoneksi</span></h1>
+                        <p className="wow fadeInUp para-one">Maskom menghadirkan layanan internet dedicated, jaringan fiber, dan managed service yang menjaga operasional perusahaan selalu online dengan performa terbaik.</p>
                         <div className="hero-button wow fadeInDown">
-                           <Link href="/" className="theme-btn gradient-btn">Start Writing Free </Link>
+                           <Link href="/contact" className="theme-btn gradient-btn">Jadwalkan Demo</Link>
                         </div>
-                        <p className="wow fadeInUp para-two">No credit card required</p>
+                        <p className="wow fadeInUp para-two">Tim network engineer siap membantu 24/7</p>
                      </div>
                   </div>
                </div>

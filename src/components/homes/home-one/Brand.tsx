@@ -48,7 +48,7 @@ const Brand = () => {
             <div className="row">
                <div className="col-lg-12">
                   <div className="clients-text style-one text-center mb-30 wow fadeInDown">
-                     <p>20,000+ Professionals & Teams Choose AI</p>
+                     <p>Dipercaya oleh perusahaan lintas industri untuk menjaga konektivitas</p>
                   </div>
                </div>
             </div>
