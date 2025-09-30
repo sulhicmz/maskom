@@ -12,10 +12,10 @@ export default function RootLayout({
   const isDev = process.env.NODE_ENV === 'development'
 
   return (
-    <html lang="en" suppressHydrationWarning={isDev}>
+    <html lang="id" suppressHydrationWarning={isDev}>
       <head>
-        <meta name="keywords" content="AIcraft - AI Application & Generator" />
-        <meta name="description" content="Insurance, Health, Agency" />
+        <meta name="keywords" content="Maskom, layanan internet dedicated, fiber optic, managed service, maskom network" />
+        <meta name="description" content="Maskom menyediakan layanan konektivitas, managed service, dan solusi infrastruktur digital untuk bisnis di seluruh Indonesia." />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
         {/* For IE  */}
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />

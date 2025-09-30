@@ -53,18 +53,25 @@ const HeaderOne = ({ style }: ProfType) => {
                                     <NavMenu />
                                  </nav>
                                  <div className="nav-button d-block d-xl-none mt-30">
-                                    <Link href="/contact" className="theme-btn gradient-btn">Start Writing</Link>
+                                    <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
                                  </div>
                               </div>
                               <div className="ac-header-one__right-btn style-one d-flex">
                                  <div className="ac-dark-btn">
-                                    <Link href="/home-one-dark"><i className="fas fa-moon"></i></Link>
+                                    <Link
+                                       href="https://wa.me/628170006625"
+                                       target="_blank"
+                                       rel="noreferrer"
+                                       aria-label="Hubungi Maskom via WhatsApp"
+                                    >
+                                       <i className="fab fa-whatsapp"></i>
+                                    </Link>
                                  </div>
                                  <div className="ac-header-bnt-1">
-                                    <Link href="/login">Login</Link>
+                                    <Link href="/login">Portal Pelanggan</Link>
                                  </div>
                                  <div className="ac-header-bnt-2 d-none d-md-block">
-                                    <Link href="/contact" className="theme-btn gradient-btn">Start Writing</Link>
+                                    <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
                                  </div>
                                  <div onClick={() => setOffCanvas(true)} className={`navbar-toggler ${offCanvas ? "active" : ""}`}>
                                     <span></span>

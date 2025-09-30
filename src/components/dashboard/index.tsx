@@ -7,15 +7,15 @@ import WebsiteBuilder from "./WebsiteBuilder";
 import AIAutomation from "./AIAutomation";
 
 const Dashboard = () => {
-  const [activeModule, setActiveModule] = useState("wifi");
+  const [activeModule, setActiveModule] = useState("network");
 
   const renderModule = () => {
     switch (activeModule) {
-      case "wifi":
+      case "network":
         return <WiFiMonitor />;
-      case "website":
+      case "support":
         return <WebsiteBuilder />;
-      case "ai":
+      case "maintenance":
         return <AIAutomation />;
       default:
         return <WiFiMonitor />;

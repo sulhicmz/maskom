@@ -4,6 +4,7 @@ import Image from "next/image"
 const Feedback = () => {
    return (
       <section className="testimonial-section testimonial-shape-section p-r z-1 bg_cover pt-110 pb-90"
+         id="testimoni"
          style={{ backgroundImage: `url(/assets/images/bg/testimonial-bg.jpg)` }}>
          <div className="shape shape-one"><span className="circle"></span></div>
          <div className="shape shape-two"><span className="circle"></span></div>
@@ -11,10 +12,9 @@ const Feedback = () => {
             <div className="row justify-content-center">
                <div className="col-lg-6">
                   <div className="section-title title-white text-center mb-55 wow fadeInDown">
-                     <span className="sub-title style-one">Client Feedback</span>
-                     <h2>What `s Say Our Client</h2>
-                     <p>In a few seconds, our A.I. will generate amazing results that <br /> you can copy,
-                        paste & publish. , write creatively </p>
+                     <span className="sub-title style-one">Testimoni</span>
+                     <h2>Apa Kata Partner Kami</h2>
+                     <p>Perusahaan dari berbagai industri mengandalkan Maskom untuk memastikan jaringan dan operasional digital mereka berjalan mulus setiap hari.</p>
                   </div>
                </div>
             </div>

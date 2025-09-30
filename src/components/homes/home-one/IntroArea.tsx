@@ -11,7 +11,7 @@ const IntroArea = () => {
 
    return (
       <>
-         <section className="intro-section pb-120">
+         <section className="intro-section pb-120" id="tentang">
             <div className="container">
                <div className="intro-wrapper">
                   <div className="row align-items-center">
@@ -27,16 +27,14 @@ const IntroArea = () => {
                      <div className="col-xl-6">
                         <div className="section-content-box text-white mb-50 wow fadeInRight">
                            <div className="section-title mb-55">
-                              <span className="sub-title style-one">Amazing AI</span>
-                              <h2>Content Generation with <br /> Artificial Intelligence</h2>
+                              <span className="sub-title style-one">Tentang Maskom</span>
+                              <h2>Partner Infrastruktur Digital <br /> Untuk Bisnis Anda</h2>
                            </div>
-                           <p>Create duplicate that proselytes for business profiles, facebook
-                              advertisements, item portrayals, messages, points of arrival, social
-                              promotions, from there, the sky is the limit.</p>
+                           <p>Sejak 2004 Maskom membantu perusahaan di Indonesia membangun konektivitas yang stabil, aman, dan mudah dikelola. Kami memadukan jaringan fiber, sistem keamanan, serta layanan managed service agar tim Anda fokus pada inovasi bisnis.</p>
                            <ul className="circle-list style-one">
-                              <li>Make article that are finished in under 15 seconds.</li>
-                              <li>Save many hours with our AI intelligence article generator.</li>
-                              <li>Work on your duplicate with the article rewriter.</li>
+                              <li>Engineer bersertifikasi yang siap melakukan deployment di seluruh nusantara.</li>
+                              <li>Operasional jaringan dipantau dari Network Operation Center 24/7.</li>
+                              <li>Model kerjasama fleksibel: sewa perangkat, managed service, hingga revenue sharing.</li>
                            </ul>
                         </div>
                      </div>

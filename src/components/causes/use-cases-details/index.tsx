@@ -10,7 +10,7 @@ const UseCaseDetails = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="Use Case Details" sub_title="Use Case Details" />
+               <Breadcrumb title="Studi Kasus Maskom" sub_title="Solusi" />
                <UseCaseDetailsArea />
                <Cta />
             </div>

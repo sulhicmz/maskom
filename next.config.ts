@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-})
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   // Konfigurasi untuk Cloudflare Pages
@@ -44,7 +46,7 @@ const nextConfig: NextConfig = {
   },
   
   // Konfigurasi untuk Cloudflare Pages
- experimental: {
+  experimental: {
     // Menonaktifkan optimizeCss karena Cloudflare menangani ini
     optimizeCss: false,
   },
@@ -76,7 +78,7 @@ const nextConfig: NextConfig = {
     ];
   },
   
- // Konfigurasi tambahan untuk MCP (Model Context Protocol)
+  // Konfigurasi tambahan untuk MCP (Model Context Protocol)
   // Memastikan kompatibilitas dengan tools seperti GitHub dan Cloudflare
   env: {
     // Variabel lingkungan untuk MCP

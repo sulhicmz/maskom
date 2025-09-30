@@ -16,14 +16,12 @@ const FooterTwo = () => {
                            <div className="footer-logo mb-30">
                               <Link href="/"><Image src={logo} alt="Footer Logo" /></Link>
                            </div>
-                           <p>Automatically generate blog articles, website copy, landing pages & digital ads
-                              for your business in seconds. Unleash the most advanced AI writer to boost your
-                              traffic and productivity.</p>
+                           <p>Maskom mendukung transformasi digital dengan layanan konektivitas, keamanan jaringan, dan managed service yang andal untuk berbagai sektor industri.</p>
                            <ul className="social-link">
-                              <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                              <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                              <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                              <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
+                              <li><Link href="https://www.instagram.com/maskomnetwork" target="_blank" rel="noreferrer"><i className="fab fa-instagram"></i></Link></li>
+                              <li><Link href="https://www.linkedin.com/company/maskom-network" target="_blank" rel="noreferrer"><i className="fab fa-linkedin-in"></i></Link></li>
+                              <li><Link href="mailto:sales@maskom.co.id"><i className="far fa-envelope"></i></Link></li>
+                              <li><Link href="tel:+628170006625"><i className="fas fa-phone-alt"></i></Link></li>
                            </ul>
                         </div>
                      </div>
@@ -32,23 +30,23 @@ const FooterTwo = () => {
                      <div className="footer-widget footer_widget_nav_menu wow fadeInDown">
                         <div className="row">
                            <div className="col-md-6">
-                              <h4 className="footer-title">Quick Links</h4>
+                              <h4 className="footer-title">Navigasi</h4>
                               <ul className="mb-30">
-                                 <li><Link href="/blog-details">Blog Post & Articles</Link></li>
-                                 <li><Link href="/blog-details">Product Description</Link></li>
-                                 <li><Link href="/blog-details">Social Media Ads</Link></li>
-                                 <li><Link href="/team">Expert Team</Link></li>
-                                 <li><Link href="/pricing">Pricing Package</Link></li>
+                                 <li><Link href="/#solusi">Solusi</Link></li>
+                                 <li><Link href="/#pendekatan">Pendekatan</Link></li>
+                                 <li><Link href="/#paket">Harga</Link></li>
+                                 <li><Link href="/#testimoni">Testimoni</Link></li>
+                                 <li><Link href="/contact">Hubungi Kami</Link></li>
                               </ul>
                            </div>
                            <div className="col-md-6">
-                              <h4 className="footer-title">Company</h4>
+                              <h4 className="footer-title">Perusahaan</h4>
                               <ul className="mb-30">
-                                 <li><Link href="/about">About Us</Link></li>
-                                 <li><Link href="/pricing">Pricing</Link></li>
-                                 <li><Link href="/login">Login</Link></li>
-                                 <li><Link href="/sign-up">Sign Up</Link></li>
-                                 <li><Link href="/about">Privacy & Policy</Link></li>
+                                 <li><Link href="/about">Tentang Maskom</Link></li>
+                                 <li><Link href="/faq">FAQ</Link></li>
+                                 <li><Link href="/login">Portal Pelanggan</Link></li>
+                                 <li><Link href="/sign-up">Daftar Layanan</Link></li>
+                                 <li><Link href="https://maskom.co.id/privacy-policy/" target="_blank" rel="noreferrer">Kebijakan Privasi</Link></li>
                               </ul>
                            </div>
                         </div>
@@ -56,15 +54,15 @@ const FooterTwo = () => {
                   </div>
                   <div className="col-lg-3">
                      <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
-                        <h4 className="footer-title">News & Update</h4>
+                        <h4 className="footer-title">Berita & Update</h4>
                         <div className="newsletter-content">
                            <form onSubmit={(e) => e.preventDefault()}>
                               <div className="form-group mb-30">
-                                 <input type="email" placeholder="enter your email" name="email" required />
-                                 <button className="theme-btn style-one">Subscribe</button>
+                                 <input type="email" placeholder="Masukkan email Anda" name="email" required />
+                                 <button className="theme-btn style-one">Berlangganan</button>
                               </div>
                            </form>
-                           <p>Our latest news, articles, and resources, we will sent to your inbox weekly.</p>
+                           <p>Dapatkan insight terkini dari Maskom mengenai teknologi jaringan dan praktik terbaik pengelolaan infrastruktur.</p>
                         </div>
                      </div>
                   </div>
@@ -76,7 +74,7 @@ const FooterTwo = () => {
                <div className="row">
                   <div className="col-lg-12">
                      <div className="copyright-text text-center">
-                        <p>Copyright 2025 All Right Reserved</p>
+                        <p>© {new Date().getFullYear()} Maskom Network. All rights reserved.</p>
                      </div>
                   </div>
                </div>

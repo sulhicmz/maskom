@@ -2,7 +2,8 @@ import Wrapper from "@/layouts/Wrapper";
 import NotFound from "@/components/pages/error";
 
 export const metadata = {
-  title: "404 Not Found - AIcraft - AI Application & Generator React Next js Template",
+  title: "Maskom | Halaman Tidak Ditemukan",
+  description: "Halaman Maskom tidak dapat ditemukan. Gunakan navigasi untuk kembali ke beranda atau hubungi kami untuk bantuan.",
 };
 
 const page = () => {

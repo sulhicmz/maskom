@@ -8,21 +8,21 @@ const Sidebar = React.memo(({ onModuleChange }: SidebarProps) => {
   Sidebar.displayName = "Sidebar";
   return (
     <div className="sidebar bg-light p-3">
-      <h5>Dashboard</h5>
+      <h5>Portal Maskom</h5>
       <ul className="nav flex-column">
         <li className="nav-item">
-          <button className="nav-link btn btn-link" onClick={() => onModuleChange("wifi")}>
-            WiFi Monitor
+          <button className="nav-link btn btn-link" onClick={() => onModuleChange("network") }>
+            Monitoring Koneksi
           </button>
         </li>
         <li className="nav-item">
-          <button className="nav-link btn btn-link" onClick={() => onModuleChange("website")}>
-            Website Builder
+          <button className="nav-link btn btn-link" onClick={() => onModuleChange("support") }>
+            Tiket Dukungan
           </button>
         </li>
         <li className="nav-item">
-          <button className="nav-link btn btn-link" onClick={() => onModuleChange("ai")}>
-            AI Automation
+          <button className="nav-link btn btn-link" onClick={() => onModuleChange("maintenance") }>
+            Jadwal Pemeliharaan
           </button>
         </li>
       </ul>

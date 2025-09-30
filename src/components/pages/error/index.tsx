@@ -9,7 +9,7 @@ const NotFound = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="Page Not Found" sub_title="404" />
+               <Breadcrumb title="Halaman Tidak Ditemukan" sub_title="404" />
                <NotFoundArea />
             </div>
          </div>
