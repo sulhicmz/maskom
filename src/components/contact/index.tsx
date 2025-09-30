@@ -11,7 +11,7 @@ const Contact = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="Get in Touch With Us" sub_title="Contact" />
+               <Breadcrumb title="Hubungi Maskom" sub_title="Kontak" />
                <ContactFormArea />
                <ContactArea />
                <Cta />

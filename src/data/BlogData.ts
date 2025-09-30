@@ -16,17 +16,17 @@ const blog_data: DataType[] = [
       id: 1,
       page: "home_2",
       thumb: thumb_1,
-      tag: "Technology",
-      title: "Miko Acquires Majority Stake in AI Gaming Startup",
-      date: "23 Jan,2024"
+      tag: "Konektivitas",
+      title: "Meningkatkan Uptime Jaringan Kantor Cabang dengan SD-WAN",
+      date: "12 Mar 2024"
    },
    {
       id: 2,
       page: "home_2",
       thumb: thumb_2,
-      tag: "Image Generator",
-      title: "Miko Acquires Majority Stake in AI Gaming Startup",
-      date: "23 Jan,2024"
+      tag: "Managed Service",
+      title: "Checklist Implementasi Managed Wi-Fi di Lingkungan Retail",
+      date: "28 Feb 2024"
    },
 ];
 

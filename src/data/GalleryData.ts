@@ -20,33 +20,33 @@ interface DataType {
 const gallery_data: DataType[] = [
    {
       id: 1,
-      page:"home_2",
+      page: "home_2",
       img: [gallery_1, gallery_2],
-      category: "realistic illustration",
+      category: "Pusat Operasi Maskom",
    },
    {
       id: 2,
-      page:"home_2",
+      page: "home_2",
       img: [gallery_3, gallery_4],
-      category: "realistic oil",
+      category: "Implementasi di Lapangan",
    },
    {
       id: 3,
-      page:"home_2",
+      page: "home_2",
       img: [gallery_5, gallery_6],
-      category: "illustration cyberpunk oil",
+      category: "Kolaborasi dengan Pelanggan",
    },
    {
       id: 4,
-      page:"home_2",
+      page: "home_2",
       img: [gallery_7, gallery_8],
-      category: "cartoon threed illustration oil",
+      category: "Infrastruktur & Data Center",
    },
    {
       id: 5,
-      page:"home_2",
+      page: "home_2",
       img: [gallery_9, gallery_10],
-      category: "oil illustration cartoon realistic threed cyberpunk",
+      category: "Kegiatan Edukasi & Workshop",
    },
 ];
 

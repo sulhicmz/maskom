@@ -2,7 +2,8 @@ import TeamDetails from "@/components/pages/teams/team-details";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "Team Details AIcraft - AI Application & Generator React Next js Template",
+  title: "Profil Tim Maskom",
+  description: "Informasi lengkap mengenai pakar infrastruktur Maskom yang mendukung kesuksesan proyek Anda.",
 };
 const page = () => {
   return (

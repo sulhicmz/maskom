@@ -7,14 +7,13 @@ const Feature = () => {
             <div className="row align-items-center">
                <div className="col-lg-7">
                   <div className="section-title mb-50 wow fadeInLeft">
-                     <span className="sub-title style-one">Awesome Features</span>
-                     <h2>The AI Writer&apos;s Tools for Content Creators</h2>
+                     <span className="sub-title style-one">Nilai Utama</span>
+                     <h2>Fondasi Layanan Maskom</h2>
                   </div>
                </div>
                <div className="col-lg-5">
                   <div className="text-box text-end mb-50 wow fadeInRight">
-                     <p>We are committed to providing our customers with <br /> exceptional service while
-                        offering</p>
+                     <p>Kami berkomitmen menyediakan layanan yang proaktif, transparan, dan selalu siap berkembang mengikuti kebutuhan bisnis Anda.</p>
                   </div>
                </div>
             </div>

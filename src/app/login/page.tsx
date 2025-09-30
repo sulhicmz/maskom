@@ -2,7 +2,8 @@ import Login from "@/components/pages/Login";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "Login AIcraft - AI Application & Generator React Next js Template",
+  title: "Portal Pelanggan Maskom",
+  description: "Masuk ke portal pelanggan Maskom untuk memantau layanan dan tiket dukungan.",
 };
 const page = () => {
   return (

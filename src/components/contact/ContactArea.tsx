@@ -11,25 +11,25 @@ interface DataType {
 const contact_data: DataType[] = [
    {
       id: 1,
-      icon: "far fa-envelope-open",
-      title: "Contact Address",
-      info: (<><p>2118 Thornridge Cir. Syracuse, <br /> Connecticut 35624</p></>),
+      icon: "fas fa-map-marker-alt",
+      title: "Kantor Pusat",
+      info: (<><p>Maskom Network<br />Jakarta Selatan, DKI Jakarta</p></>),
    },
    {
       id: 2,
       icon: "far fa-envelope-open",
-      title: "Email Address",
+      title: "Email",
       info: (<>
-         <p><Link href="mailto:demo123@gmail.com">demo123@gmail.com</Link></p>
-         <p><Link href="mailto:demo123@gmail.com">exta123@gmail.com</Link></p>
+         <p><Link href="mailto:sales@maskom.co.id">sales@maskom.co.id</Link></p>
+         <p><Link href="mailto:support@maskom.co.id">support@maskom.co.id</Link></p>
       </>),
    },
    {
       id: 3,
-      icon: "far fa-envelope-open",
-      title: "Phon e Number",
-      info: (<><p><Link href="tel:000-222-333-444">000 - 222 - 333 - 444</Link></p>
-         <p><Link href="tel:000-222-333-444">000 - 222 - 333 - 444</Link></p></>),
+      icon: "fas fa-phone-alt",
+      title: "Telepon",
+      info: (<><p><Link href="tel:+628170006625">(+62) 817-000-6625</Link></p>
+         <p><Link href="https://wa.me/628170006625" target="_blank" rel="noreferrer">WhatsApp Business</Link></p></>),
    },
 ];
 

@@ -1,6 +1,13 @@
 import Link from "next/link";
 
-const tags: string[] = ["Ideas", "Image Generator", "Technology", "Intelligence"];
+const tags: string[] = [
+   "SD-WAN",
+   "Managed Wi-Fi",
+   "Keamanan",
+   "Cloud Connect",
+   "Monitoring",
+   "IoT",
+];
 
 const Tags = () => {
    return (

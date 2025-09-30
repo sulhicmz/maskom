@@ -18,53 +18,31 @@ const UseCaseDetailsArea = () => {
                            <Image src={cause_thumb_1} alt="Case Image" />
                         </div>
                         <div className="post-content wow fadeInUp">
-                           <h3 className="mb-25">Content Writing for Blog Post & Articles</h3>
-                           <p>Scuba drive are made out of photovoltaic cells that convert the sun’s
-                              energy into elect Photovoltaic cells are sandwiched between layers of
-                              semi-conducting materials such as silicon. Each layer has different
-                              electronic properties that energise. Forttitor auctor dapibus. Mauris
-                              tempor tortor non consectetur luctus. Ut sit amet porta metus. Cras a
-                              mivel odio mollis maximus non at nibhprofessor at Hampden-Sydney College
-                              in Virginia, looked up one of the more obscure Latin words, consectetur
-                              It is a long established fact that a reader will be distracted by the
-                              readable content of a page when looking at its layout. </p>
-                           <p>Each layer has different electronic properties that energise. Forttitor
-                              auctor dapibus. Mauris tempor tortor non consectetur luctus. Ut sit amet
-                              porta metus. Cras a mivel odio mollis maximus non at nibhprofessor at
-                              Hampden-Sydney College in Virginia, looked up one of the. </p>
+                           <h3 className="mb-25">Modernisasi jaringan ritel nasional Maskom</h3>
+                           <p>Maskom dipercaya oleh jaringan ritel dengan lebih dari 120 gerai di Jawa dan Sumatera untuk melakukan modernisasi konektivitas. Tantangan utama mitra kami adalah variasi infrastruktur di setiap lokasi, keterbatasan ruang perangkat, dan kebutuhan integrasi ke aplikasi POS, ERP, serta kamera keamanan yang berjalan 24/7.</p>
+                           <p>Tim Maskom merancang solusi end-to-end yang mencakup jaringan fiber sebagai koneksi utama, radio point-to-point untuk lokasi sulit, SD-WAN guna mengatur prioritas aplikasi, serta layanan managed Wi-Fi dan firewall terkelola. Seluruh layanan terhubung dengan Network Operation Center Maskom yang memonitor performa dan keamanan secara real-time.</p>
                            <WorkArea />
-                           <h4>Core Benefits of Blog Post & Articles</h4>
-                           <p>One touch of a red-hot stove is usually all we need to avoid that kind of
-                              discomfort in quis elit future. The same Duis aute irure dolor in
-                              reprehenderit .</p>
+                           <h4>Dampak utama implementasi</h4>
+                           <p>Setelah enam bulan implementasi bertahap, tim operasional mitra mencatat perbaikan signifikan pada stabilitas operasional kasir, aplikasi inventory, dan transaksi digital. Maskom juga menyediakan portal monitoring khusus untuk manajemen sehingga pengambilan keputusan dapat dilakukan berbasis data.</p>
                            <div className="row">
                               <div className="col-lg-6">
                                  <ul className="check-list style-one mb-25">
-                                    <li><i className="flaticon-check"></i>Facebook Post</li>
-                                    <li><i className="flaticon-check"></i>Youtube Descriptions</li>
-                                    <li><i className="flaticon-check"></i>Pinterest Descriptions</li>
+                                    <li><i className="flaticon-check"></i>Uptime rata-rata 99,76% di seluruh gerai sejak bulan ketiga.</li>
+                                    <li><i className="flaticon-check"></i>Waktu penanganan insiden kritikal turun dari 6 jam menjadi 90 menit.</li>
+                                    <li><i className="flaticon-check"></i>Pengelolaan perangkat dilakukan secara remote sehingga tidak perlu kunjungan rutin.</li>
                                  </ul>
                               </div>
                               <div className="col-lg-6">
                                  <ul className="check-list style-one mb-25">
-                                    <li><i className="flaticon-check"></i>Image Captions</li>
-                                    <li><i className="flaticon-check"></i>Linkedin Posts</li>
-                                    <li><i className="flaticon-check"></i>Tiktok Scripts</li>
+                                    <li><i className="flaticon-check"></i>Segmentasi jaringan khusus IoT dan POS meningkatkan keamanan pembayaran.</li>
+                                    <li><i className="flaticon-check"></i>Dashboard performa dan laporan SLA otomatis dikirim setiap pekan.</li>
+                                    <li><i className="flaticon-check"></i>Model kontrak fleksibel memungkinkan ekspansi 15 gerai baru tanpa instalasi ulang.</li>
                                  </ul>
                               </div>
                            </div>
-                           <p>Each layer has different electronic properties that energise. Forttitor
-                              auctor dapibus. Mauris tempor tortor non consectetur luctus. Ut sit amet
-                              porta metus. Cras a mivel odio mollis maximus non at nibhprofessor at
-                              Hampden</p>
-                           <figure className="mb-35"><Image src={cause_thumb_2} alt="case image" /></figure>
-                           <p>Each layer has different electronic properties that energise. Forttitor
-                              auctor dapibus. Mauris tempor tortor non consectetur luctus. Ut sit amet
-                              porta metus. Cras a mivel odio mollis maximus non at nibhprofessor at
-                              Hampden-Sydney College in Virginia, looked up one of the more obscure
-                              Latin words, consectetur It is a long established fact that a reader
-                              will be distracted by the readable content of a page when looking at its
-                              layout. </p>
+                           <p>Maskom tidak hanya menghadirkan konektivitas, tetapi juga tata kelola operasi. Setiap incident direkam dalam sistem tiket, dianalisis akar masalahnya, dan dibahas dalam monthly service review bersama tim pelanggan untuk memastikan peningkatan berkelanjutan.</p>
+                           <figure className="mb-35"><Image src={cause_thumb_2} alt="Dokumentasi implementasi Maskom" /></figure>
+                           <p>Melalui pendekatan kolaboratif dan dokumentasi teknis yang rapi, perusahaan ritel tersebut kini memiliki standar operasional jaringan yang dapat direplikasi ke cabang baru. Maskom siap memperluas layanan dengan integrasi analytic edge computing dan konektivitas ke pusat data cloud apabila dibutuhkan.</p>
                         </div>
                      </div>
                   </div>

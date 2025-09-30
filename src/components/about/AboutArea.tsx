@@ -29,24 +29,19 @@ const AboutArea = () => {
                <div className="col-xl-5">
                   <div className="section-content-box about-one_content-box wow fadeInRight">
                      <div className="section-title mb-50">
-                        <span className="sub-title style-one">Awesome Features</span>
-                        <h2>The AI Writer&apos;s Tools for Content Creators</h2>
+                        <span className="sub-title style-one">Tentang Kami</span>
+                        <h2>Menghubungkan Bisnis Indonesia Sejak 2004</h2>
                      </div>
-                     <p>An AI content generator is a type of software powered by artificial intelligence
-                        (AI) that is designed to <span>automatically</span> produce <span>written
-                           content.</span> These tools leverage various natural language processing
-                        (NLP) and machine learning techniques to understand language patterns, generate
-                        text, and mimic human-like writing. <span>AI content generators</span> can be
-                        used for a variety of purposes, ranging from creating blog posts and articles to
-                        generating marketing copy, product descriptions, and more.</p>
+                     <p>Maskom berdiri dengan visi menghadirkan infrastruktur digital yang andal untuk mendukung pertumbuhan bisnis. Kami memadukan jaringan fiber optik, radio, hingga konektivitas cloud untuk memastikan data penting perusahaan bergerak dengan aman dan cepat.</p>
+                     <p>Didukung tim engineer berpengalaman, Maskom menyediakan layanan konsultasi, implementasi, hingga pengelolaan harian melalui Network Operation Center. Pendekatan kami selalu kolaboratif agar solusi yang dihadirkan selaras dengan strategi teknologi informasi setiap organisasi.</p>
                      <div className="author-card d-flex align-items-center justify-content-between">
                         <div className="author-thumb-item d-flex align-items-center">
                            <div className="thumb">
                               <Image src={author} alt="Author image" />
                            </div>
                            <div className="content">
-                              <h5>Leslie Alexander</h5>
-                              <span className="position">CEO, AIcraft</span>
+                              <h5>Tim Maskom Network</h5>
+                              <span className="position">Partner Infrastruktur Digital Anda</span>
                            </div>
                         </div>
                         <div className="author-sign">

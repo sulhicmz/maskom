@@ -2,7 +2,8 @@ import Blog from "@/components/blogs/blog";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "Blog AIcraft - AI Application & Generator React Next js Template",
+  title: "Insight Maskom",
+  description: "Artikel dan berita terbaru seputar konektivitas, keamanan jaringan, dan layanan managed service Maskom.",
 };
 const page = () => {
   return (

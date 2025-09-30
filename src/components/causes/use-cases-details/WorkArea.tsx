@@ -32,36 +32,26 @@ const WorkArea = () => {
          </div>
          <div className="col-xl-6">
             <div className="content-box">
-               <h3 className="mb-30">How To Work Content Writing</h3>
+               <h3 className="mb-30">Langkah implementasi Maskom</h3>
                <div className="iconic-number-box style-two mb-30">
-                  <div className="number">
-                     01
-                  </div>
+                  <div className="number">01</div>
                   <div className="content">
-                     <h5>Select Writhing Template</h5>
-                     <p>Templates are pre-designed, that can guide the
-                        organization and layout of your writing, whether
-                     </p>
+                     <h5>Survey & assesment multi-gerai</h5>
+                     <p>Tim solution architect memetakan infrastruktur eksisting, kapasitas jaringan, dan kebutuhan aplikasi di lebih dari 120 lokasi ritel.</p>
                   </div>
                </div>
                <div className="iconic-number-box style-two mb-30">
-                  <div className="number">
-                     02
-                  </div>
+                  <div className="number">02</div>
                   <div className="content">
-                     <h5>Select Writhing Template</h5>
-                     <p>Describe Your Topic&quot; is a prompt or instruction often
-                        used to request a written explanation.</p>
+                     <h5>Desain arsitektur & pilot</h5>
+                     <p>Kami membuat blueprint konektivitas fiber dan radio, menyiapkan konfigurasi SD-WAN, serta melakukan pilot project pada 5 lokasi untuk validasi QoS.</p>
                   </div>
                </div>
                <div className="iconic-number-box style-two mb-30">
-                  <div className="number">
-                     03
-                  </div>
+                  <div className="number">03</div>
                   <div className="content">
-                     <h5>Generate Quality Content</h5>
-                     <p>Generating quality content is a crucial skill in
-                        various fields, including journalism, blogging</p>
+                     <h5>Operasi & continuous improvement</h5>
+                     <p>Network Operation Center memonitor SLA, menangani insiden, dan memberikan rekomendasi optimasi berdasarkan dashboard performa yang disepakati.</p>
                   </div>
                </div>
             </div>
