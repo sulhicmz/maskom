@@ -11,7 +11,7 @@ const Faq = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="A frequently Asked Questions" sub_title="FAQS" />
+               <Breadcrumb title="Pertanyaan Umum Maskom" sub_title="FAQ" />
                <FaqArea />
                <Cta />
                <FaqHome />

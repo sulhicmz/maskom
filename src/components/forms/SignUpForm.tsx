@@ -17,15 +17,15 @@ const SignUpForm = () => {
 
    const schema = yup
       .object({
-         name: yup.string().required().label("Name"),
+         name: yup.string().required().label("Nama"),
          email: yup.string().required().email().label("Email"),
-         password: yup.string().required().label("Password"),
+         password: yup.string().required().label("Kata sandi"),
       })
       .required();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
    const onSubmit = () => {
-      const notify = () => toast('Registration successfully', { position: 'top-center' });
+      const notify = () => toast('Registrasi berhasil dikirim', { position: 'top-center' });
       notify();
       reset();
    };
@@ -33,30 +33,47 @@ const SignUpForm = () => {
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="user-form">
          <div className="form-group">
-            <label>Name</label>
-            <input id="name" {...register("name")} className="form-control" type="text" placeholder="Nathaniel Lewis" />
+            <label>Nama lengkap</label>
+            <input
+               id="name"
+               {...register("name")}
+               className="form-control"
+               type="text"
+               placeholder="Contoh: Andi Wijaya"
+            />
             <p className="form_error">{errors.name?.message}</p>
          </div>
          <div className="form-group">
-            <label>Email</label>
-            <input id="name" {...register("email")} className="form-control" type="email" placeholder="demo@gmail.com" />
+            <label>Email kantor</label>
+            <input
+               id="email"
+               {...register("email")}
+               className="form-control"
+               type="email"
+               placeholder="nama@perusahaan.co.id"
+            />
             <p className="form_error">{errors.email?.message}</p>
          </div>
          <div className="form-group">
-            <label>Password</label>
-            <input type="password" {...register("password")} className="form-control"
-               placeholder="Enter your password" />
+            <label>Kata sandi</label>
+            <input
+               type="password"
+               {...register("password")}
+               className="form-control"
+               placeholder="Minimal 8 karakter"
+            />
             <p className="form_error">{errors.password?.message}</p>
          </div>
          <div className="form-group mb-25">
-            <button className="theme-btn style-one">Create account</button>
+            <button className="theme-btn style-one">Daftarkan akun</button>
          </div>
          <div className="form-group">
-            <button className="theme-btn style-one"><Image src={icon}
-               alt="google" />Continue with Google</button>
+            <button className="theme-btn style-one">
+               <Image src={icon} alt="google" />Daftar dengan Google Workspace
+            </button>
          </div>
          <div className="form-text text-center">
-            <span>Already have an account ? <Link href="/login">Log in</Link></span>
+            <span>Sudah memiliki akun? <Link href="/login">Masuk di sini</Link></span>
          </div>
       </form>
    )

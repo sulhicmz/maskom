@@ -1,6 +1,6 @@
 import Breadcrumb from "@/components/common/Breadcrumb"
 import HeaderOne from "@/layouts/headers/HeaderOne"
-import LoginArea from "../Login/LoginArea"
+import SignUpArea from "./SignUpArea"
 import FooterTwo from "@/layouts/footers/FooterTwo"
 
 const SignUp = () => {
@@ -9,8 +9,8 @@ const SignUp = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="Create Account" sub_title="Sign Up" />
-               <LoginArea />
+               <Breadcrumb title="Buat Akun Maskom" sub_title="Registrasi" />
+               <SignUpArea />
             </div>
          </div>
          <FooterTwo />

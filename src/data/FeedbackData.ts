@@ -82,37 +82,37 @@ const testi_data: DataType[] = [
       id: 1,
       page: "home_2",
       avatar: avatar_7,
-      name: "Esther Howard",
-      designation: "Product Designer",
-      desc: "They just disclosed the new lengthy structure article essayist 3.0, and I moved toward it with alert, The result is excellent instruments.",
+      name: "Dimas Prakoso",
+      designation: "Head of IT, Perusahaan Finansial",
+      desc: "Portal monitoring Maskom memudahkan kami mengaudit kualitas jaringan kantor cabang. Data historisnya sangat membantu saat evaluasi SLA dengan manajemen.",
       rating: "5.0"
    },
    {
       id: 2,
       page: "home_2",
       avatar: avatar_8,
-      name: "Esther Howard",
-      designation: "Product Designer",
-      desc: "They just disclosed the new lengthy structure article essayist 3.0, and I moved toward it with alert, The result is excellent instruments.",
-      rating: "5.0"
+      name: "Sylvia Hartono",
+      designation: "Operations Director, Hospitality",
+      desc: "Maskom sigap melakukan penyesuaian konfigurasi saat kami meluncurkan aplikasi check-in digital. Kolaborasi teknisnya terasa seperti satu tim.",
+      rating: "4.9"
    },
    {
       id: 3,
       page: "home_2",
       avatar: avatar_9,
-      name: "Esther Howard",
-      designation: "Product Designer",
-      desc: "They just disclosed the new lengthy structure article essayist 3.0, and I moved toward it with alert, The result is excellent instruments.",
+      name: "Akbar Maulana",
+      designation: "IT Security Lead, Fintech",
+      desc: "Managed firewall Maskom dilengkapi laporan yang jelas sehingga memudahkan kami memenuhi audit regulator. Tim mereka juga suportif saat uji penetrasi.",
       rating: "5.0"
    },
    {
       id: 4,
       page: "home_2",
       avatar: avatar_8,
-      name: "Esther Howard",
-      designation: "Product Designer",
-      desc: "They just disclosed the new lengthy structure article essayist 3.0, and I moved toward it with alert, The result is excellent instruments.",
-      rating: "5.0"
+      name: "Lina Sasmita",
+      designation: "Digital Product Manager",
+      desc: "Integrasi API Maskom membuat dashboard internal kami bisa menampilkan status koneksi real-time tanpa harus membuka banyak sistem.",
+      rating: "4.8"
    },
 ];
 

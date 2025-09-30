@@ -37,7 +37,7 @@ const BlogArea = () => {
                               <div className="entry-content">
                                  <h3 className="title"><Link href="/blog-details">{item.title}</Link></h3>
                                  <p>{item.desc}</p>
-                                 <Link href="/blog-details" className="read-more style-one"><span>READ MORE</span></Link>
+                                 <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                               </div>
                               <div className="post-meta-wrap">
                                  <div className="post-meta">

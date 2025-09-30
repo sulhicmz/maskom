@@ -18,7 +18,7 @@ const SignUpArea = () => {
                <div className="col-xl-6">
                   <div className="user-wrapper mb-50 wow fadeInRight">
                      <div className="form-title mb-35">
-                        <h3>Create an account</h3>
+                        <h3>Buat akun layanan Maskom</h3>
                      </div>
                      <SignUpForm />
                   </div>

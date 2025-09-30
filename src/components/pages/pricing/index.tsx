@@ -11,7 +11,7 @@ const Pricing = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="Pricing Plan" sub_title="Pricing Plan" />
+               <Breadcrumb title="Paket Layanan Maskom" sub_title="Harga" />
                <PricingArea />
                <Process />
                <Cta />

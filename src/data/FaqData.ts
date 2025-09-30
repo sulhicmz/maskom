@@ -30,52 +30,52 @@ const faq_data: DataType[] = [
    {
       id: 1,
       page: "home_2",
-      quesstion: "What are The Main Types of AI?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Apa saja komponen layanan managed service Maskom?",
+      answer: "Paket managed service mencakup penyediaan perangkat, instalasi, pemantauan, pemeliharaan, serta dukungan teknis terstruktur. Anda dapat memilih layanan tambahan seperti laporan compliance atau integrasi dengan sistem ITSM.",
    },
    {
       id: 2,
       page: "home_2",
-      quesstion: "How to Work Image Generator?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Bagaimana Maskom menjamin keamanan jaringan pelanggan?",
+      answer: "Kami menerapkan kebijakan firewall berlapis, segmentasi jaringan, enkripsi VPN, dan inspeksi trafik secara real-time. Audit keamanan dan penetration test dapat dijadwalkan sesuai kebutuhan.",
    },
    {
       id: 3,
       page: "home_2",
-      quesstion: "Is Image AI Used in Healthcare?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Bisakah Maskom membantu integrasi ke sistem monitoring internal?",
+      answer: "Ya. Maskom menyediakan API dan opsi SNMP/NetFlow sehingga data performa dapat diintegrasikan ke platform monitoring Anda. Tim kami akan membantu proses konfigurasi dan dokumentasi.",
    },
    {
       id: 4,
       page: "home_2",
-      quesstion: "Can Image AI Recognize Faces?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Apakah ada opsi layanan profesional proyek satu kali?",
+      answer: "Selain managed service, Maskom menyediakan professional service seperti site survey, fiber build-out, dan audit jaringan. Durasi dan ruang lingkup akan disesuaikan dengan kebutuhan proyek Anda.",
    },
 
-   // home_2
+   // home_3
    {
       id: 1,
       page: "home_3",
-      quesstion: "What are The Main Types of AI?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Siapa yang menjadi kontak utama selama implementasi?",
+      answer: "Setiap proyek Maskom memiliki project manager dan service delivery manager yang akan menjadi penghubung utama, mulai dari perencanaan hingga handover ke tim operasional.",
    },
    {
       id: 2,
       page: "home_3",
-      quesstion: "How to Work Image Generator?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Berapa lama waktu penyediaan layanan setelah kontrak ditandatangani?",
+      answer: "Waktu penyediaan bergantung pada kesiapan infrastruktur. Untuk area dengan jaringan Maskom, provisioning dapat selesai dalam 7-14 hari kerja setelah dokumen dan akses lokasi lengkap.",
    },
    {
       id: 3,
       page: "home_3",
-      quesstion: "Is Image AI Used in Healthcare?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Apakah Maskom menyediakan dokumentasi teknis lengkap?",
+      answer: "Kami memberikan dokumen arsitektur, konfigurasi perangkat, SOP operasional, serta catatan perubahan setiap kali ada update layanan. Seluruh dokumen tersedia di portal pelanggan.",
    },
    {
       id: 4,
       page: "home_3",
-      quesstion: "Can Image AI Recognize Faces?",
-      answer: "AI refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human intelligence, such as learning, problem-solving, and decision-making.",
+      quesstion: "Bagaimana proses terminasi atau migrasi layanan?",
+      answer: "Maskom menyiapkan prosedur terminasi yang mencakup pengembalian perangkat, penghapusan data sensitif, serta dukungan migrasi ke layanan baru agar operasional bisnis tetap berjalan.",
    },
 ];
 
