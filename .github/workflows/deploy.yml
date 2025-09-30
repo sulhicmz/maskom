@@ -22,8 +22,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build Next.js app
         run: npm run build
+
+      - name: Generate OpenNext bundle
+        run: npx opennextjs-cloudflare build --skipNextBuild
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3

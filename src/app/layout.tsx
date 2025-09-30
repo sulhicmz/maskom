@@ -1,8 +1,6 @@
 /* eslint-disable @next/next/no-page-custom-font */
 import "../styles/index.scss";
 
-export const runtime = 'edge';
-
 export default function RootLayout({
   children,
 }: {
