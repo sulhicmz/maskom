@@ -14,9 +14,9 @@ interface FormData {
 
 const schema = yup
    .object({
-      user_name: yup.string().required().label("Name"),
+      user_name: yup.string().required().label("Nama"),
       user_email: yup.string().required().email().label("Email"),
-      message: yup.string().required().label("Message"),
+      message: yup.string().required().label("Pesan"),
    })
    .required();
 
@@ -31,7 +31,7 @@ const ContactForm = () => {
          emailjs.sendForm('service_fuc95rb', 'template_9gahggu',
             form.current, '2xsKQqT3Wmfx0sYeF')
             .then((result) => {
-               const notify = () => toast('Message sent successfully', { position: 'top-center' });
+               const notify = () => toast('Pesan berhasil dikirim', { position: 'top-center' });
                notify();
                reset();
                console.log(result.text);
@@ -48,26 +48,26 @@ const ContactForm = () => {
          <div className="row">
             <div className="col-lg-6">
                <div className="form-group">
-                  <input type="text" {...register("user_name")} className="form-control" placeholder="Full Name" />
+                  <input type="text" {...register("user_name")} className="form-control" placeholder="Nama lengkap" />
                   <p className="form_error">{errors.user_name?.message}</p>
                </div>
             </div>
             <div className="col-lg-6">
                <div className="form-group">
-                  <input type="email" {...register("user_email")} className="form-control" placeholder="Email Address" />
+                  <input type="email" {...register("user_email")} className="form-control" placeholder="Email kantor" />
                   <p className="form_error">{errors.user_email?.message}</p>
                </div>
             </div>
             <div className="col-lg-12">
                <div className="form-group">
-                  <textarea {...register("message")} placeholder="Type Message"
+                  <textarea {...register("message")} placeholder="Tuliskan kebutuhan Anda"
                      className="form-control" cols={30} rows={8}></textarea>
                   <p className="form_error">{errors.message?.message}</p>
                </div>
             </div>
             <div className="col-lg-12">
                <div className="form-group">
-                  <button className="theme-btn gradient-btn">Send Messages</button>
+                  <button className="theme-btn gradient-btn">Kirim Pesan</button>
                </div>
             </div>
          </div>

@@ -5,12 +5,11 @@ const UseCaseDetailsSidebar = () => {
       <div className="col-lg-4">
          <div className="sidebar-nav-widget style-one mb-50 wow fadeInDown">
             <ul>
-               <li><Link href="/use-case-details" className="active">Blog Post & Articles</Link></li>
-               <li><Link href="/use-case-details">Product Description</Link></li>
-               <li><Link href="/use-case-details">Social Media Ads</Link></li>
-               <li><Link href="/use-case-details">Product Benefits</Link></li>
-               <li><Link href="/use-case-details">Advance Analytics</Link></li>
-               <li><Link href="/use-case-details">Blog Post & Articles</Link></li>
+               <li><Link href="/use-case-details" className="active">Integrasi Konektivitas Ritel Nasional</Link></li>
+               <li><Link href="/use-case-details">Managed Wi-Fi untuk F&B Chain</Link></li>
+               <li><Link href="/use-case-details">SD-WAN & Prioritas Aplikasi Logistik</Link></li>
+               <li><Link href="/use-case-details">Keamanan Jaringan Rumah Sakit</Link></li>
+               <li><Link href="/use-case-details">Interkoneksi Data Center & Cloud</Link></li>
             </ul>
          </div>
       </div>

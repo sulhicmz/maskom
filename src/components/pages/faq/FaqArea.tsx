@@ -3,7 +3,7 @@
 import inner_faq_data from "@/data/InnerFaqData";
 import { useState, useEffect } from "react";
 
-const tab_title: string[] = ["AI Content Generator", "AI Image Generator", "AI Video Generator"];
+const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
 const FaqArea = () => {
   const [activeTab, setActiveTab] = useState(0);
