@@ -18,7 +18,7 @@ const LoginArea = () => {
                <div className="col-lg-6">
                   <div className="user-wrapper mb-50 wow fadeInRight">
                      <div className="form-title text-center mb-35">
-                        <h3>Login to your account</h3>
+                        <h3>Masuk ke portal pelanggan</h3>
                      </div>
                      <LoginForm />
                   </div>

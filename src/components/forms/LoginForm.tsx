@@ -15,13 +15,13 @@ const LoginForm = () => {
    const schema = yup
       .object({
          email: yup.string().required().email().label("Email"),
-         password: yup.string().required().label("Password"),
+         password: yup.string().required().label("Kata sandi"),
       })
       .required();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
    const onSubmit = () => {
-      const notify = () => toast('Login successfully', { position: 'top-center' });
+      const notify = () => toast('Berhasil masuk ke portal', { position: 'top-center' });
       notify();
       reset();
    };
@@ -29,20 +29,31 @@ const LoginForm = () => {
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="user-form">
          <div className="form-group">
-            <label>Email</label>
-            <input id="email" {...register("email")} type="email" className="form-control" placeholder="demo@gmail.com" />
+            <label>Email terdaftar</label>
+            <input
+               id="email"
+               {...register("email")}
+               type="email"
+               className="form-control"
+               placeholder="nama@maskom.co.id"
+            />
             <p className="form_error">{errors.email?.message}</p>
          </div>
          <div className="form-group">
-            <label>Password <a href="#">Forgot？</a></label>
-            <input type="password" {...register("password")} className="form-control" placeholder="Enter your password" />
+            <label>Kata sandi <a href="#">Lupa?</a></label>
+            <input
+               type="password"
+               {...register("password")}
+               className="form-control"
+               placeholder="Masukkan kata sandi"
+            />
             <p className="form_error">{errors.password?.message}</p>
          </div>
          <div className="form-group">
-            <button className="theme-btn style-one">Login now</button>
+            <button className="theme-btn style-one">Masuk sekarang</button>
          </div>
          <div className="form-text text-center">
-            <span>Don&apos;t have an account ?<Link href="/sign-up">Sign up</Link></span>
+            <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
          </div>
       </form>
    )

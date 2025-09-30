@@ -10,10 +10,9 @@ const Cta = () => {
                <div className="row align-items-center">
                   <div className="col-lg-6">
                      <div className="cta-one_content-box wow fadeInLeft">
-                        <h2>End Writer’s Block Today</h2>
-                        <p>It’s like having access to a team of copywriting experts writing powerful
-                           copy for you in 1-click.</p>
-                        <Link href="/contact" className="theme-btn gradient-btn">Start Writing Free </Link>
+                        <h2>Bangun Infrastruktur Digital yang Tangguh</h2>
+                        <p>Maskom siap mendampingi perjalanan transformasi digital Anda mulai dari perencanaan hingga operasional sehari-hari.</p>
+                        <Link href="/contact" className="theme-btn gradient-btn">Konsultasi dengan Kami</Link>
                      </div>
                   </div>
                   <div className="col-lg-6">

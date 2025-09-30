@@ -16,27 +16,27 @@ const latest_news: DataType[] = [
    {
       id: 1,
       img: img_1,
-      title: "AI Could solve Labour Shortage",
-      date: "26 Aug, 2023",
+      title: "Maskom resmikan NOC generasi terbaru",
+      date: "05 Mar 2024",
    },
    {
       id: 2,
       img: img_2,
-      title: "Risks Going too Far, too Soon on AI",
-      date: "26 Aug, 2023",
+      title: "Kolaborasi Maskom dan penyedia data center lokal",
+      date: "22 Feb 2024",
    },
    {
       id: 3,
       img: img_3,
-      title: "Can the EU and its Allies Cooperate.",
-      date: "26 Aug, 2023",
+      title: "Program pelatihan network engineer bersertifikasi",
+      date: "10 Feb 2024",
    },
 ];
 
 const LatestNews = () => {
    return (
       <div className="sidebar-widget sidebar-recent-widget mb-35 wow fadeInUp">
-         <h3 className="widget-title">Latest News</h3>
+         <h3 className="widget-title">Berita Terbaru</h3>
          <div className="sidebar-widget-content">
             <ul className="recent-post-list">
                {latest_news.map((item) => (

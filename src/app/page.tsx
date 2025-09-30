@@ -2,7 +2,8 @@ import HomeOne from "@/components/homes/home-one";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "AIcraft - AI Application & Generator React Next js Template",
+  title: "Maskom | Solusi Konektivitas dan Managed Service",
+  description: "Maskom menghadirkan layanan konektivitas terkelola, infrastruktur jaringan, dan dukungan operasional 24/7 untuk mendukung transformasi digital bisnis.",
 };
 const page = () => {
   return (

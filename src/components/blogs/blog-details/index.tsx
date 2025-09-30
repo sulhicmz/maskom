@@ -10,7 +10,7 @@ const BlogDetails = () => {
       <HeaderOne style={true} />
       <div className="smooth-wrapper">
         <div id="smooth-content">
-          <Breadcrumb title="Blog Details" sub_title="Blog Details" />
+          <Breadcrumb title="Wawasan Maskom" sub_title="Artikel" />
           <BlogDetailsArea />
           <Cta />
         </div>

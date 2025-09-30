@@ -9,7 +9,7 @@ const Login = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="Login Account" sub_title="Login" />
+               <Breadcrumb title="Masuk Portal Maskom" sub_title="Login" />
                <LoginArea />
             </div>
          </div>
