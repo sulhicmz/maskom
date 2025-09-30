@@ -2,7 +2,8 @@ import UseCases from "@/components/causes/use-cases";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "Use Causes AIcraft - AI Application & Generator React Next js Template",
+  title: "Solusi Maskom",
+  description: "Lihat rangkaian solusi konektivitas dan managed service Maskom untuk berbagai sektor industri.",
 };
 const page = () => {
   return (

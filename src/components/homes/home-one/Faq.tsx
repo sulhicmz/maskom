@@ -13,7 +13,7 @@ const Faq = () => {
    const [activeId, setActiveId] = useState<number>(faq_data[0].id);
 
    return (
-      <section className="faqs-section pb-190 pt-110">
+      <section className="faqs-section pb-190 pt-110" id="faq">
          <div className="container">
             <div className="row">
                <div className="col-xl-6">
@@ -27,8 +27,8 @@ const Faq = () => {
                <div className="col-xl-6">
                   <div className="section-content-box pl-xl-45 mb-30">
                      <div className="section-title mb-55 wow fadeInDown">
-                        <span className="sub-title style-one">Faq</span>
-                        <h2>Frequently Asked <br /> Question</h2>
+                        <span className="sub-title style-one">Pertanyaan Umum</span>
+                        <h2>Hal yang Sering <br /> Ditanyakan Klien</h2>
                      </div>
                      <div className="accordion wow fadeInUp" id="accordionOne">
                         {faq_data.filter((items) => items.page === "home_1").map((item) => (

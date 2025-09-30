@@ -76,23 +76,23 @@ const feature_data: DataType[] = [
    {
       id: 1,
       page: "about",
-      icon: "flaticon-motion-sensor",
-      title: "Say buh-bye to writer’s block",
-      desc: "No more blinking cursor. With just some basic information, Smart Copy can write blog posts, product descriptions, and even poems in just a few seconds.",
+      icon: "flaticon-innovation",
+      title: "Solusi Terkustomisasi",
+      desc: "Kami merancang arsitektur jaringan dan keamanan sesuai karakteristik industri dan regulasi yang berlaku.",
    },
    {
       id: 2,
       page: "about",
-      icon: "flaticon-writing-tool",
-      title: "Write more compelling copy",
-      desc: "No more blinking cursor. With just some basic information, Smart Copy can write blog posts, product descriptions, and even poems in just a few seconds.",
+      icon: "flaticon-support",
+      title: "Dukungan 24/7",
+      desc: "Network Operation Center memantau performa layanan secara proaktif dan menyediakan engineer on-site saat diperlukan.",
    },
    {
       id: 3,
       page: "about",
-      icon: "flaticon-time",
-      title: "Save boatloads of time",
-      desc: "No more blinking cursor. With just some basic information, Smart Copy can write blog posts, product descriptions, and even poems in just a few seconds.",
+      icon: "flaticon-data-analytics",
+      title: "Transparansi Operasional",
+      desc: "Laporan performa, dashboard real-time, dan review berkala memastikan keputusan berbasis data.",
    },
 ];
 
