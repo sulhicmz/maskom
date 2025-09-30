@@ -1,58 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Maskom Network Website
 
-## Getting Started
+Maskom Network adalah situs pemasaran berbasis Next.js yang menonjolkan layanan konektivitas terkelola, keamanan jaringan, dan dukungan operasional Maskom di seluruh Indonesia. Template HTML bawaan telah dimodifikasi secara menyeluruh agar setiap halaman, data, dan komponen merefleksikan identitas serta proposisi Maskom.
 
-First, run the development server:
+## Arsitektur Singkat
 
+- **Framework**: Next.js 15 dengan direktori `app/` dan komponen React Server/Client sesuai kebutuhan interaksi.
+- **Sumber Konten**: Semua teks dan daftar diturunkan dari berkas TypeScript di `src/data/` untuk memudahkan kurasi konten.
+- **Gaya**: Menggabungkan SCSS tematik dari `public/assets/scss/` dengan utilitas Bootstrap 5.
+- **Asset**: Semua gambar diakses melalui alias `@/assets/*` yang terhubung ke `public/assets/`.
+
+## Menjalankan Secara Lokal
+
+1. Instal dependensi (gunakan opsi legacy bila diperlukan oleh lingkungan lokal):
+   ```bash
+   npm install --legacy-peer-deps
+   ```
+2. Jalankan server pengembangan:
+   ```bash
+   npm run dev
+   ```
+3. Buka [http://localhost:3000](http://localhost:3000) untuk melihat situs Maskom.
+
+## Memperbarui Konten
+
+- **Beranda & Halaman Turunan**: Teks dan daftar pada setiap modul dikontrol oleh data di `src/data/` (misal `FeatureData.ts`, `PriceData.ts`, `FaqData.ts`).
+- **Navigasi & Footer**: Perbarui tautan di `src/data/MenuData.ts` serta `src/layouts/footers/` agar konsisten dengan kanal resmi Maskom.
+- **Formulir**: Validasi dan integrasi EmailJS berada pada komponen `src/components/forms/`.
+
+## Pemeriksaan Kualitas
+
+Jalankan ESLint untuk memastikan standar kode konsisten:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy ke Cloudflare Workers
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Situs ini dikemas menggunakan [OpenNext untuk Cloudflare](https://github.com/opennextjs/opennext). Output build disalin ke direktori `.open-next/` lalu dipublikasikan via Wrangler.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Cloudflare Workers
-
-This project is configured to deploy to Cloudflare Workers using [`@cloudflare/next-on-pages`](https://github.com/cloudflare/next-on-pages).
-
-1. Build the worker-compatible bundle:
-
+1. Bangun ulang bundle Worker dan aset statis:
    ```bash
    npm run cf:build
    ```
-
-   This generates the Worker entry point at `.vercel/output/static/_worker.js` and the static asset bundle used during deploy.
-
-2. Deploy the Worker with Wrangler:
-
+   Perintah ini menghapus isi `.open-next/` lama dan membuat berkas `worker.js` beserta folder aset terbaru.
+2. Deploy ke lingkungan Workers.dev (atau zona yang dikonfigurasi di `wrangler.toml`):
    ```bash
    npm run cf:deploy
    ```
+   Wrangler akan membaca `wrangler.toml`, mengunggah skrip Worker, serta menyinkronkan aset dari `.open-next/assets`.
+3. Verifikasi hasil deploy dengan membuka URL `https://<nama-worker>.workers.dev` atau domain produksi Anda. Jika masih terlihat template lama:
+   - Pastikan langkah `npm run cf:build` telah dijalankan setelah perubahan konten.
+   - Hapus artefak lama secara manual (`rm -rf .open-next`) sebelum membangun ulang untuk memastikan tidak ada file cache.
+   - Gunakan `wrangler deploy --no-bundle` hanya jika Anda memiliki artefak hasil build terbaru.
+   - Gunakan `wrangler tail --once` untuk memastikan Worker terbaru sudah aktif tanpa error runtime.
 
-   The command bundles the latest build output and publishes it using the settings defined in `wrangler.toml`.
+### Skrip Tambahan
 
-Refer to [Cloudflare's deployment guide](https://developers.cloudflare.com/workers/wrangler/get-started/) for additional options such as environment-specific deploys.
+- **Pratinjau lokal Worker**:
+  ```bash
+  npm run cf:preview
+  ```
+  Perintah ini menjalankan `wrangler dev --local` menggunakan output terbaru dari `.open-next/`.
 
-# Maskom
+- **Analisis bundle Next.js**:
+  ```bash
+  npm run analyze
+  ```
 
-## Live Website
+## Troubleshooting
 
-The Maskom Network website is deployed and accessible at: [https://maskom.sulhi-cmz.workers.dev](https://maskom.sulhi-cmz.workers.dev)
+| Gejala | Penyebab Umum | Solusi |
+| --- | --- | --- |
+| Worker masih menampilkan template awal | Build lama masih tersimpan di `.open-next/` atau deploy dijalankan tanpa rebuild | Jalankan `rm -rf .open-next && npm run cf:build` sebelum `npm run cf:deploy`. Pastikan command berhasil tanpa error. |
+| Deploy gagal karena kredensial | Token API Cloudflare belum disetel | Ekspor `CLOUDFLARE_API_TOKEN` dan `CLOUDFLARE_ACCOUNT_ID` atau login melalui `wrangler login`. |
+| Asset tidak termuat | Binding `ASSETS` belum terhubung | Pastikan blok `[assets]` di `wrangler.toml` menunjuk ke `.open-next/assets` (sudah dikonfigurasi di repo). |
+
+## Lisensi
+
+Proyek ini menyesuaikan template komersial untuk kebutuhan internal Maskom. Hak cipta gambar dan konten berada pada Maskom Network.

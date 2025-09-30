@@ -28,7 +28,7 @@ const FaqArea = () => {
         <div className="row">
           <div className="col-lg-4">
             <div className="sidebar-nav-widget style-two mb-40">
-              <h6>Categories</h6>
+              <h6>Kategori Pertanyaan</h6>
               <ul className="nav nav-tabs">
                 {tab_title.map((tab, index) => (
                   <li key={index} className="nav-item">
@@ -71,7 +71,7 @@ const FaqArea = () => {
                   </div>
                 </div>
               ) : (
-                <p>No FAQs available for this category.</p>
+                <p>Belum ada pertanyaan pada kategori ini.</p>
               )}
             </div>
           </div>

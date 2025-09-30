@@ -13,7 +13,13 @@ const contact_data: DataType[] = [
       id: 1,
       icon: "fas fa-map-marker-alt",
       title: "Kantor Pusat",
-      info: (<><p>Maskom Network<br />Jakarta Selatan, DKI Jakarta</p></>),
+      info: (
+         <>
+            <p>Graha Maskom Network</p>
+            <p>Jl. Gatot Subroto No. 45</p>
+            <p>Jakarta Selatan 12950</p>
+         </>
+      ),
    },
    {
       id: 2,
