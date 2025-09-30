@@ -3,13 +3,13 @@
  * Handles API requests for maskom.co.id
  */
 
-export default {
-  async fetch(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
+const worker = {
+  async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    
+
     // Handle API routes
     if (url.pathname.startsWith('/api/')) {
-      return handleApiRequest(request, env, ctx);
+      return handleApiRequest(request);
     }
     
     // Default response for root
@@ -24,7 +24,7 @@ export default {
   },
 };
 
-async function handleApiRequest(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
+async function handleApiRequest(request: Request): Promise<Response> {
   const url = new URL(request.url);
   
   // Example API endpoint
@@ -39,3 +39,5 @@ async function handleApiRequest(request: Request, env: any, ctx: ExecutionContex
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+export default worker;
