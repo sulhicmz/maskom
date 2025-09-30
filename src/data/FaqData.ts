@@ -9,20 +9,20 @@ const faq_data: DataType[] = [
    {
       id: 1,
       page: "home_1",
-      quesstion: "What is Content Writing AI?",
-      answer: "Content writing AI refers to artificial intelligence systems, often powered by natural language processing (NLP) algorithms, that are designed to generate human-like text for various purposes, such as articles, blog posts, product descriptions, and more.",
+      quesstion: "Apa saja cakupan layanan Maskom?",
+      answer: "Kami menyediakan konektivitas fiber & wireless, managed Wi-Fi dan LAN, SD-WAN, keamanan jaringan, layanan NOC 24/7, hingga direct cloud connect sesuai kebutuhan bisnis Anda.",
    },
    {
       id: 2,
       page: "home_1",
-      quesstion: "Is Content Written by AI SEO-Friendly?",
-      answer: "Content writing AI refers to artificial intelligence systems, often powered by natural language processing (NLP) algorithms, that are designed to generate human-like text for various purposes, such as articles, blog posts, product descriptions, and more.",
+      quesstion: "Seberapa cepat proses instalasi jaringan?",
+      answer: "Estimasi instalasi tergantung kesiapan infrastruktur lokasi. Untuk area dengan jaringan Maskom, provisioning dapat selesai dalam 7-10 hari kerja termasuk aktivasi perangkat dan uji kelayakan layanan.",
    },
    {
       id: 3,
       page: "home_1",
-      quesstion: "How Does Content Writing AI Work?",
-      answer: "Content writing AI refers to artificial intelligence systems, often powered by natural language processing (NLP) algorithms, that are designed to generate human-like text for various purposes, such as articles, blog posts, product descriptions, and more.",
+      quesstion: "Bagaimana mekanisme dukungan teknis Maskom?",
+      answer: "Tim NOC kami memonitor jaringan secara proaktif dan siap menangani insiden melalui helpdesk 24/7. Untuk kasus kritikal, engineer on-site akan dikirim sesuai SLA yang disepakati.",
    },
 
    // home_2

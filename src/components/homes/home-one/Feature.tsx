@@ -13,20 +13,20 @@ const feature_list: DataType[] = [
    {
       id: 1,
       icon: "flaticon-communication",
-      title: "Write Better Content Faster",
-      desc: "Produce upgraded blog entry and articles to get natural traffic - making",
+      title: "Jaringan Siap Ekspansi",
+      desc: "Skalakan kapasitas bandwidth dan jumlah lokasi tanpa mengganti arsitektur dari awal.",
    },
    {
       id: 2,
-      icon: "flaticon-google",
-      title: "Say Google to the Black Page",
-      desc: "Produce upgraded blog entry and articles to get natural traffic - making",
+      icon: "flaticon-security",
+      title: "Keamanan Berlapis",
+      desc: "Proteksi firewall, anti-DDoS, dan segmentasi jaringan menjaga data kritikal tetap aman.",
    },
    {
       id: 3,
-      icon: "flaticon-communication",
-      title: "90+ Tools and Template",
-      desc: "Produce upgraded blog entry and articles to get natural traffic - making",
+      icon: "flaticon-support",
+      title: "Operasional Terpantau",
+      desc: "Monitoring proaktif, alert otomatis, dan tim support responsif siap membantu kapan pun.",
    },
 ];
 
@@ -38,8 +38,8 @@ const Feature = () => {
                <div className="col-xl-5">
                   <div className="section-content-box mb-50">
                      <div className="section-title mb-50 wow fadeInDown">
-                        <span className="sub-title style-one">Awesome Features</span>
-                        <h2>The AI Writer&apos;s Tools for <br /> Content Creators</h2>
+                        <span className="sub-title style-one">Mengapa Maskom</span>
+                        <h2>Keunggulan Layanan <br /> Konektivitas Maskom</h2>
                      </div>
                      <div className="iconic-info-list">
                         {feature_list.map((item) => (

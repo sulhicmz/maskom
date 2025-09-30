@@ -24,14 +24,12 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                            <div className="footer-logo mb-30">
                               <Link href="/"><Image src={style_2 ? logo_3 : style ? logo_2 : logo_1} alt="Footer Logo" /></Link>
                            </div>
-                           <p>Automatically generate blog articles, website copy, landing pages & digital ads
-                              for your business in seconds. Unleash the most advanced AI writer to boost your
-                              traffic and productivity.</p>
+                           <p>Maskom adalah penyedia layanan konektivitas dan managed service yang membantu perusahaan di Indonesia membangun infrastruktur digital yang aman, stabil, dan mudah dikelola.</p>
                            <ul className="social-link">
-                              <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                              <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                              <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                              <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
+                              <li><Link href="https://www.instagram.com" target="_blank" rel="noreferrer"><i className="fab fa-instagram"></i></Link></li>
+                              <li><Link href="https://www.linkedin.com" target="_blank" rel="noreferrer"><i className="fab fa-linkedin-in"></i></Link></li>
+                              <li><Link href="mailto:sales@maskom.co.id"><i className="far fa-envelope"></i></Link></li>
+                              <li><Link href="tel:+622129212888"><i className="fas fa-phone-alt"></i></Link></li>
                            </ul>
                         </div>
                      </div>
@@ -40,23 +38,23 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                      <div className="footer-widget footer_widget_nav_menu wow fadeInDown">
                         <div className="row">
                            <div className="col-md-6">
-                              <h4 className="footer-title">Quick Links</h4>
+                              <h4 className="footer-title">Navigasi</h4>
                               <ul className="mb-30">
-                                 <li><Link href="/blog-details">Blog Post & Articles</Link></li>
-                                 <li><Link href="/blog-details">Product Description</Link></li>
-                                 <li><Link href="/blog-details">Social Media Ads</Link></li>
-                                 <li><Link href="/team">Expert Team</Link></li>
-                                 <li><Link href="/pricing">Pricing Package</Link></li>
+                                 <li><Link href="/#solusi">Solusi</Link></li>
+                                 <li><Link href="/#pendekatan">Pendekatan</Link></li>
+                                 <li><Link href="/#paket">Harga</Link></li>
+                                 <li><Link href="/#testimoni">Testimoni</Link></li>
+                                 <li><Link href="/contact">Hubungi Kami</Link></li>
                               </ul>
                            </div>
                            <div className="col-md-6">
-                              <h4 className="footer-title">Company</h4>
+                              <h4 className="footer-title">Perusahaan</h4>
                               <ul className="mb-30">
-                                 <li><Link href="/about">About Us</Link></li>
-                                 <li><Link href="/pricing">Pricing</Link></li>
-                                 <li><Link href="/login">Login</Link></li>
-                                 <li><Link href="/sign-up">Sign Up</Link></li>
-                                 <li><Link href="/about">Privacy & Policy</Link></li>
+                                 <li><Link href="/about">Tentang Maskom</Link></li>
+                                 <li><Link href="/faq">FAQ</Link></li>
+                                 <li><Link href="/login">Portal Pelanggan</Link></li>
+                                 <li><Link href="/sign-up">Daftar Layanan</Link></li>
+                                 <li><Link href="https://maskom.co.id/privacy-policy/" target="_blank" rel="noreferrer">Kebijakan Privasi</Link></li>
                               </ul>
                            </div>
                         </div>
@@ -72,7 +70,7 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                                  <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
                               </div>
                            </form>
-                           <p>Our latest news, articles, and resources, we will sent to your inbox weekly.</p>
+                           <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
                         </div>
                      </div>
                   </div>
@@ -84,7 +82,7 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                <div className="row">
                   <div className="col-lg-12">
                      <div className="copyright-text text-center">
-                        <p>Copyright 2025 All Right Reserved</p>
+                        <p>© {new Date().getFullYear()} Maskom Network. All rights reserved.</p>
                      </div>
                   </div>
                </div>

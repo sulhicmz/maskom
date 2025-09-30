@@ -2,7 +2,8 @@ import Pricing from "@/components/pages/pricing";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "Pricing AIcraft - AI Application & Generator React Next js Template",
+  title: "Harga Layanan Maskom",
+  description: "Detail paket konektivitas dan managed service Maskom untuk berbagai kebutuhan bisnis.",
 };
 const page = () => {
   return (

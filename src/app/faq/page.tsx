@@ -2,7 +2,8 @@ import Faq from "@/components/pages/faq";
 import Wrapper from "@/layouts/Wrapper";
 
 export const metadata = {
-  title: "Faq AIcraft - AI Application & Generator React Next js Template",
+  title: "FAQ Maskom",
+  description: "Pertanyaan umum terkait layanan konektivitas dan managed service Maskom.",
 };
 const page = () => {
   return (

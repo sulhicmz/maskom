@@ -14,7 +14,7 @@ const About = () => {
          <HeaderOne style={true} />
          <div className="smooth-wrapper">
             <div id="smooth-content">
-               <Breadcrumb title="About AIcraft" sub_title="About" />
+               <Breadcrumb title="Tentang Maskom" sub_title="Tentang" />
                <AboutArea />
                <Feature />
                <Process />
