@@ -60,9 +60,11 @@ public/
 2. Gunakan `npm run deploy` untuk build dan deploy. Konfigurasi worker ada pada `wrangler.toml` dengan binding aset `ASSETS`. 【F:wrangler.toml†L1-L9】
 3. `open-next.config.ts` menggunakan konfigurasi default `defineCloudflareConfig()`. Sesuaikan bila membutuhkan binding tambahan. 【F:open-next.config.ts†L1-L3】
 
-## Dokumentasi Tambahan
-- [docs/ADR-0001-worker-stack.md](docs/ADR-0001-worker-stack.md) — keputusan arsitektur worker & Next.js
-- [doc/PERFORMANCE_OPTIMIZATION.md](doc/PERFORMANCE_OPTIMIZATION.md) — strategi optimasi performa
-- [doc/KNOWN_ISSUES.md](doc/KNOWN_ISSUES.md) — daftar isu yang perlu ditindaklanjuti
+## Dokumentasi & Operasi
+- [docs/architecture/ADR-0001-worker-stack.md](docs/architecture/ADR-0001-worker-stack.md) — keputusan arsitektur worker & Next.js
+- [docs/operations/performance-playbook.md](docs/operations/performance-playbook.md) — strategi optimasi performa terkini
+- [docs/operations/known-issues.md](docs/operations/known-issues.md) — daftar isu yang perlu ditindaklanjuti
+- [docs/operations/continuous-development.md](docs/operations/continuous-development.md) — panduan menjaga pengembangan berkelanjutan
+- [docs/history/2024-remediation-log.md](docs/history/2024-remediation-log.md) — catatan iterasi perbaikan sebelumnya
 
-Silakan perbarui dokumentasi ini apabila ada perubahan arsitektur, dependensi, atau proses operasional baru.
+Perbarui dokumentasi di atas setiap kali ada perubahan arsitektur, dependensi, atau proses operasional baru.
