@@ -2,11 +2,11 @@
 import price_data from "@/data/PriceData";
 import Link from "next/link";
 import { useState } from "react";
-import Image from "next/image"
+import Image from "next/image";
 
-import icon from "@/assets/images/icon/sub-icon.png"
+import icon from "@/assets/images/icon/sub-icon.png";
 
-const tab_title: string[] = ["Monthly Plan", "Annual Plan"];
+const tab_title: string[] = ["Langganan Bulanan", "Langganan Tahunan"];
 
 const Pricing = () => {
 
@@ -18,18 +18,18 @@ const Pricing = () => {
    };
 
    return (
-      <section className="pricing-section">
+      <section className="pricing-section" id="paket">
          <div className="pricing-bg-wrapper bg_cover pt-115 pb-80"
             style={{ backgroundImage: "url(/assets/images/bg/pricing-bg-2.jpg)" }}>
             <div className="container">
                <div className="row">
                   <div className="col-lg-12">
                      <div className="section-title text-white text-center mb-55 wow fadeInDown">
-                        <span className="sub-title"><Image src={icon} alt="icon" />
-                           Pricing Plan <Image src={icon} alt="icon" /></span>
-                        <h2>Choose Your Best Plan</h2>
-                        <p>In a few seconds, our A.I. will generate amazing results that<br />you can
-                           copy, paste & publish. , write creatively in </p>
+                        <span className="sub-title"><Image src={icon} alt="Ikon Maskom" />
+                           Paket Layanan <Image src={icon} alt="Ikon Maskom" /></span>
+                        <h2>Skema Managed Service untuk Operasional Cabang</h2>
+                        <p>Bandingkan paket monitoring jaringan Maskom yang mencakup instalasi, dukungan, dan pelaporan
+                           terkelola sesuai kebutuhan kantor cabang Anda.</p>
                      </div>
                   </div>
                </div>
@@ -59,7 +59,17 @@ const Pricing = () => {
                                        <div className="pricing-item style-three mb-40 wow fadeInUp">
                                           <div className="pricing-head text-center">
                                              <span className="package">{item.sub_title}</span>
-                                             <h3><span className="currency">$</span>{item.price}.00</h3>
+                                             {item.price_label ? (
+                                                <h3>{item.price_label}</h3>
+                                             ) : (
+                                                <h3>
+                                                   <span className="currency">{item.currency === "IDR" ? "Rp" : "$"}</span>
+                                                   {item.currency === "IDR"
+                                                      ? new Intl.NumberFormat("id-ID").format(item.price)
+                                                      : item.price.toFixed(2)}
+                                                </h3>
+                                             )}
+                                             {item.note && <p className="mt-10">{item.note}</p>}
                                           </div>
                                           <div className="pricing-body">
                                              <ul className="check-list style-one">
@@ -69,7 +79,7 @@ const Pricing = () => {
                                              </ul>
                                           </div>
                                           <div className="pricing-button text-center">
-                                             <Link href="/" className="theme-btn style-two">{item.btn}</Link>
+                                             <Link href="/contact" className="theme-btn style-two">{item.btn}</Link>
                                           </div>
                                        </div>
                                     </div>

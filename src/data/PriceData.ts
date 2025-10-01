@@ -141,10 +141,139 @@ const price_data: DataType[] = [
       ]
    },
 
-   // pricing page
+   // home_2
 
    {
       id: 3,
+      page: "home_2",
+      price_details: [
+         {
+            id: 1,
+            sub_title: "Starter Monitoring",
+            price: 4200000,
+            currency: "IDR",
+            btn: "Minta Proposal",
+            note: "Harga per lokasi per bulan",
+            feature: [
+               "Internet dedicated hingga 30 Mbps",
+               "Monitoring NOC 8x5",
+               "Pelaporan insiden bulanan",
+               "SLA respon 6 jam",
+            ],
+         },
+         {
+            id: 2,
+            sub_title: "Branch Reliability",
+            price: 6900000,
+            currency: "IDR",
+            btn: "Diskusikan Solusi",
+            note: "Harga per lokasi per bulan",
+            feature: [
+               "Bandwidth simetris hingga 80 Mbps",
+               "Managed router & Wi-Fi",
+               "Health check jaringan berkala",
+               "SLA respon 4 jam",
+            ],
+         },
+         {
+            id: 3,
+            sub_title: "Enterprise Safeguard",
+            price: 10400000,
+            currency: "IDR",
+            btn: "Atur Konsultasi",
+            note: "Harga per lokasi per bulan",
+            feature: [
+               "SD-WAN & firewall terkelola",
+               "Monitoring & incident response 24/7",
+               "Integrasi tiket ke sistem Anda",
+               "Review performa bulanan",
+            ],
+         },
+         {
+            id: 4,
+            sub_title: "Custom Project",
+            price: 0,
+            currency: "IDR",
+            price_label: "Hubungi Kami",
+            btn: "Rencanakan Bersama",
+            note: "Solusi multi-site & integrasi khusus",
+            feature: [
+               "Desain arsitektur sesuai industri",
+               "Hybrid link & backup terkelola",
+               "Service delivery manager dedikasi",
+               "Integrasi SOC & dashboard pelanggan",
+            ],
+         },
+      ]
+   },
+   {
+      id: 4,
+      page: "home_2",
+      price_details: [
+         {
+            id: 1,
+            sub_title: "Starter Monitoring",
+            price: 3840000,
+            currency: "IDR",
+            btn: "Minta Proposal",
+            note: "Pembayaran tahunan hemat 10%",
+            feature: [
+               "Internet dedicated hingga 30 Mbps",
+               "Monitoring NOC 8x5",
+               "Pelaporan insiden bulanan",
+               "SLA respon 6 jam",
+            ],
+         },
+         {
+            id: 2,
+            sub_title: "Branch Reliability",
+            price: 6210000,
+            currency: "IDR",
+            btn: "Diskusikan Solusi",
+            note: "Pembayaran tahunan hemat 10%",
+            feature: [
+               "Bandwidth simetris hingga 80 Mbps",
+               "Managed router & Wi-Fi",
+               "Health check jaringan berkala",
+               "SLA respon 4 jam",
+            ],
+         },
+         {
+            id: 3,
+            sub_title: "Enterprise Safeguard",
+            price: 9360000,
+            currency: "IDR",
+            btn: "Atur Konsultasi",
+            note: "Pembayaran tahunan hemat 10%",
+            feature: [
+               "SD-WAN & firewall terkelola",
+               "Monitoring & incident response 24/7",
+               "Integrasi tiket ke sistem Anda",
+               "Review performa bulanan",
+            ],
+         },
+         {
+            id: 4,
+            sub_title: "Custom Project",
+            price: 0,
+            currency: "IDR",
+            price_label: "Hubungi Kami",
+            btn: "Rencanakan Bersama",
+            note: "Solusi multi-site & integrasi khusus",
+            feature: [
+               "Desain arsitektur sesuai industri",
+               "Hybrid link & backup terkelola",
+               "Service delivery manager dedikasi",
+               "Integrasi SOC & dashboard pelanggan",
+            ],
+         },
+      ]
+   },
+
+   // pricing page
+
+   {
+      id: 5,
       page: "pricing",
       price_details: [
          {
@@ -207,7 +336,7 @@ const price_data: DataType[] = [
       ]
    },
    {
-      id: 4,
+      id: 6,
       page: "pricing",
       price_details: [
          {
