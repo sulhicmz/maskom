@@ -1,28 +1,25 @@
-# ADR 0001: Worker Stack Selection for maskom.co.id
+# ADR 0001: Deploy Next.js App ke Cloudflare Workers
 
 ## Status
-Accepted
+Accepted (dipertahankan)
 
-## Context
-The project requires building a fast, secure, SEO-friendly website for maskom.co.id with edge deployment capabilities. The existing repository contains a Next.js application, but for optimal performance and scalability at the edge, we need a serverless solution compatible with Cloudflare Workers.
+## Konteks
+Repositori ini sudah berisi aplikasi pemasaran Maskom berbasis Next.js App Router dengan integrasi komponen kompleks seperti Isotope, Swiper, EmailJS, dan SCSS kustom. Target deployment adalah Cloudflare Workers agar halaman dapat dilayani dari edge sambil tetap menggunakan fitur Next.js (routing App Router, metadata, optimasi gambar, dll.).
 
-## Decision
-We will use Cloudflare Workers with Hono framework for routing and a lightweight frontend stack (HTML/CSS/TypeScript) to build the website.
+## Keputusan
+Mempertahankan Next.js 15 App Router dan menggunakan [OpenNext untuk Cloudflare](https://github.com/opennextjs/opennext) sebagai jembatan build & deployment ke Cloudflare Workers.
 
 ## Rationale
-- **Performance**: Workers provide global edge deployment, reducing latency.
-- **Security**: Built-in WAF, DDoS protection, and TLS.
-- **Scalability**: Serverless architecture handles traffic spikes automatically.
-- **SEO**: Static generation with proper meta tags and sitemap.
-- **Compatibility**: Hono is lightweight and compatible with Workers runtime.
-- **Maintenance**: Simpler stack compared to full Next.js for this use case.
+- **Reuse kode eksisting** – Komponen, data statis, dan struktur `src/app` yang sudah ada dapat dipakai tanpa rewrite ke framework Worker lain. 【F:src/app/page.tsx†L1-L15】【F:src/components/homes/home-one/index.tsx†L1-L32】
+- **Kesesuaian fitur** – Next.js memberi kebutuhan SEO (metadata), optimasi gambar, dan struktur App Router yang cocok untuk konten pemasaran Maskom. 【F:src/app/layout.tsx†L1-L33】
+- **Integrasi Cloudflare resmi** – `opennextjs-cloudflare` menyediakan perintah build/preview/deploy siap pakai dan memanfaatkan konfigurasi di `wrangler.toml`. 【F:package.json†L7-L20】【F:wrangler.toml†L1-L9】
+- **Performa edge** – Cloudflare Workers men-deploy bundle JavaScript ke edge global dengan latency rendah dan runtime `nodejs_compat` sehingga dependensi seperti EmailJS tetap berjalan. 【F:wrangler.toml†L1-L6】【F:src/components/forms/ContactForm.tsx†L1-L58】
 
-## Alternatives Considered
-- Next.js with Vercel: Good for SSR, but not edge-native like Workers.
-- Pure HTML/CSS/JS: Too basic for dynamic routing.
-- Other Worker frameworks: itty-router is simpler, but Hono offers better TypeScript support.
+## Alternatif yang Dipertimbangkan
+- **Rewrite ke Hono/HTML statis** – Mengurangi fitur Next.js (routing dinamis, `next/image`, bundler) dan memaksa reimplementasi struktur komponen yang sudah kompleks.
+- **Deploy ke Vercel** – Mudah tetapi tidak memenuhi requirement infrastruktur Cloudflare & existing pipeline Workers.
 
-## Consequences
-- Migration from existing Next.js codebase if needed.
-- Focus on static assets and minimal server-side logic.
-- Use Wrangler for deployment and management.
+## Konsekuensi
+- Build harus selalu dijalankan melalui OpenNext (`npm run preview`/`npm run deploy`) agar struktur output mengikuti ekspektasi Workers. 【F:package.json†L7-L20】
+- Header keamanan & caching dikelola lewat `public/_headers`; konfigurasi harus disesuaikan tiap lingkungan. 【F:public/_headers†L1-L27】
+- Penggunaan runtime edge membuat beberapa API Node.js tidak tersedia; dependensi harus kompatibel dengan lingkungan Workers.
