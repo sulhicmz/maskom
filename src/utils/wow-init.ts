@@ -13,9 +13,14 @@ interface WOWOptions {
   scrollContainer?: null | string;
 }
 
+// Type definition for WOW.js since @types/wowjs is not available
+type WOWConstructor = new (options?: any) => {
+  init: () => void;
+};
+
 declare global {
   interface Window {
-    WOW: typeof import('wow.js').default;
+    WOW: WOWConstructor;
   }
 }
 
