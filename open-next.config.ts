@@ -1,12 +1,6 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
 export default defineCloudflareConfig({
-  // Optimize for edge runtime
-  edge: {
-    // Include additional packages that need to be available at runtime
-    packages: ["@emailjs/browser"],
-  },
-  
   // Optimize assets handling
   assets: {
     // Enable advanced caching headers
