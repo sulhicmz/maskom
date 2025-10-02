@@ -9,7 +9,8 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 # CORS Headers untuk membatasi origin yang diizinkan
-  Access-Control-Allow-Origin: https://maskom.co.id
+# Termasuk domain produksi dan domain preview untuk pengujian
+   Access-Control-Allow-Origin: https://maskom.co.id, https://maskom.sulhi.workers.dev, https://*.workers.dev
   Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
   Access-Control-Allow-Headers: Content-Type, Authorization
   Access-Control-Max-Age: 86400

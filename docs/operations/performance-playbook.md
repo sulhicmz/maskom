@@ -30,3 +30,18 @@ Dokumen ini merangkum praktik performa yang saat ini digunakan di Maskom serta r
 - Jalankan `npm run start` setelah build dan gunakan Lighthouse atau PageSpeed Insights untuk mengevaluasi Core Web Vitals.
 - Cloudflare menyediakan analitik melalui dashboard Workers; aktifkan log untuk melihat cache hit dan error edge.
 - Tambahkan pengujian regresi visual/performa (mis. menggunakan Playwright + Lighthouse CI) ketika pipeline CI/CD sudah siap.
+
+## 7. Optimasi Konfigurasi Cloudflare Workers
+- File `wrangler.toml` disetel untuk kompatibilitas dengan Next.js melalui OpenNext.
+- Gunakan environment-specific configurations untuk pengelolaan yang lebih baik antara development, preview, dan production.
+- Perbarui `account_id` dan `zone_id` dengan nilai yang sesuai sebelum deployment produksi.
+- Gunakan environment variables untuk mengatur konfigurasi yang berbeda antar environment.
+- Gunakan domain preview yang benar (`maskom.sulhi.workers.dev`) dalam konfigurasi CORS dan environment.
+- Gunakan middleware untuk menambahkan security dan cache headers sebelum request mencapai aplikasi.
+- Gunakan performance monitoring untuk melacak Core Web Vitals dan metrik penting lainnya.
+
+## 8. Praktik Keamanan & Konfigurasi Terbaru
+- Pindahkan semua kredensial hardcoded ke environment variables (lihat `src/config/env.ts` dan `src/components/forms/ContactForm.tsx`)
+- Gunakan validasi lingkungan untuk memastikan konfigurasi yang diperlukan tersedia sebelum runtime
+- Perbarui CORS headers untuk mendukung berbagai environment (development, preview, production)
+- Manfaatkan fitur konfigurasi OpenNext untuk mengoptimalkan bundle dan caching (lihat `open-next.config.ts`)

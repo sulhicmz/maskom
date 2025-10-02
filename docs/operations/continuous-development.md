@@ -18,6 +18,7 @@ Dokumen ini menjadi rujukan utama untuk menjaga pengembangan Maskom tetap efisie
 ## 4. Manajemen Rahasia dan Konfigurasi
 - Semua kredensial (EmailJS, API eksternal) harus dimuat dari environment variable. Perbarui `wrangler.toml` bila membutuhkan binding baru. 【F:wrangler.toml†L1-L9】【F:src/components/forms/ContactForm.tsx†L1-L58】
 - Jangan menulis kunci langsung di komponen. Jika membutuhkan nilai default untuk pengembangan, gunakan `.env.local` yang tidak dikomit.
+- Gunakan environment-specific variables di `wrangler.toml` untuk mengatur konfigurasi berbeda antara development, preview, dan production.
 
 ## 5. Deploy ke Cloudflare Workers
 1. Jalankan `npm run preview` untuk memverifikasi build OpenNext. 【F:package.json†L7-L20】

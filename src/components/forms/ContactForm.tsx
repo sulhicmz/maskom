@@ -28,8 +28,12 @@ const ContactForm = () => {
 
    const sendEmail = () => {
       if (form.current) {
-         emailjs.sendForm('service_fuc95rb', 'template_9gahggu',
-            form.current, '2xsKQqT3Wmfx0sYeF')
+         const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_fuc95rb';
+         const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_9gahggu';
+         const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '2xsKQqT3Wmfx0sYeF';
+
+         emailjs.sendForm(serviceId, templateId,
+            form.current, publicKey)
             .then((result) => {
                const notify = () => toast('Pesan berhasil dikirim', { position: 'top-center' });
                notify();
