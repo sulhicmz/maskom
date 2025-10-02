@@ -4,17 +4,17 @@ compatibility_date = "2024-01-01"
 
 [env.development]
 name = "maskom-dev"
-account_id = "your-account-id-here"
+account_id = "${CF_ACCOUNT_ID}"
 routes = ["https://maskom-dev.your-subdomain.workers.dev"]
 
 [env.preview]
 name = "maskom-preview"
-account_id = "your-account-id-here"
+account_id = "${CF_ACCOUNT_ID}"
 routes = ["https://maskom-preview.your-subdomain.workers.dev"]
 
 [env.production]
 name = "maskom"
-account_id = "your-account-id-here"
+account_id = "${CF_ACCOUNT_ID}"
 routes = [
   "https://maskom.sulhi.workers.dev",
   "https://maskom.co.id/*"

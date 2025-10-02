@@ -1,6 +1,9 @@
 #!/bin/bash
 # Deployment script for production environment
 
+echo "Installing dependencies..."
+npm install
+
 echo "Building for production environment..."
 npx @opennextjs/cloudflare build
 

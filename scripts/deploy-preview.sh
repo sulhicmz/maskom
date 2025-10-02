@@ -1,6 +1,9 @@
 #!/bin/bash
 # Deployment script for preview environment
 
+echo "Installing dependencies..."
+npm install
+
 echo "Building for preview environment..."
 npx @opennextjs/cloudflare build
 
