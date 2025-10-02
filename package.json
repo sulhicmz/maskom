@@ -28,6 +28,7 @@
     "react-toastify": "^11.0.5",
     "sass": "^1.85.1",
     "swiper": "^11.2.5",
+    "wow.js": "^1.2.2",
     "yup": "^1.6.1"
   },
   "devDependencies": {
