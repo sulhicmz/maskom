@@ -1,13 +1,16 @@
 # Maskom
 
-Maskom adalah situs pemasaran untuk layanan konektivitas dan managed service Maskom Network yang dibangun di atas Next.js App Router. Seluruh halaman utama ditulis dalam bahasa Indonesia dan memanfaatkan data statis TypeScript sehingga konten dapat diperbarui terpusat tanpa menyentuh komponen presentasi.
+Maskom adalah situs resmi maskom.co.id untuk layanan konektivitas dan managed service Maskom Network yang dibangun di atas Next.js App Router. Situs ini dirancang untuk memperkenalkan layanan konektivitas dedicated, managed service, dan solusi infrastruktur digital untuk bisnis di seluruh Indonesia. Seluruh halaman utama ditulis dalam bahasa Indonesia dan memanfaatkan data statis TypeScript sehingga konten dapat diperbarui terpusat tanpa menyentuh komponen presentasi.
 
 ## Fitur Utama
 - **Runtime edge** dengan `export const runtime = 'edge'` sehingga build Next.js dapat dijalankan di Cloudflare Workers. 【F:src/app/layout.tsx†L1-L33】
-- **Layout reusable** melalui `Wrapper` yang menambahkan `ScrollToTop` dan `ToastContainer` agar interaksi global tetap konsisten. 【F:src/layouts/Wrapper.tsx†L1-L15】
+- **Layout reusable** melalui `Wrapper` yang menambahkan `ScrollToTop`, `ToastContainer`, dan inisialisasi animasi WOW.js agar interaksi global tetap konsisten. 【F:src/layouts/Wrapper.tsx†L1-L27】
 - **Navigasi data-driven** dari `src/data/MenuData.ts` sehingga struktur menu dapat dimodifikasi tanpa perubahan komponen. 【F:src/data/MenuData.ts†L1-L38】
 - **Section berbasiskan data** (mis. proses kerja, paket harga, testimoni) yang dibaca dari berkas `src/data/*.ts`. 【F:src/components/homes/home-one/Process.tsx†L1-L37】【F:src/components/homes/home-one/Price.tsx†L1-L68】
-- **Integrasi pihak ketiga** untuk animasi (Swiper, Isotope), pengiriman email (EmailJS), serta notifikasi (React Toastify). 【F:src/components/homes/home-two/Gallery.tsx†L1-L69】【F:src/components/forms/ContactForm.tsx†L1-L58】
+- **Integrasi pihak ketiga** untuk animasi (Swiper, Isotope, WOW.js), pengiriman email (EmailJS), serta notifikasi (React Toastify). 【F:src/components/homes/home-two/Gallery.tsx†L1-L69】【F:src/components/forms/ContactForm.tsx†L1-L60】
+- **Manajemen lingkungan** terpusat melalui `src/config/env.ts` untuk mengelola konfigurasi antar environment dengan aman. 【F:src/config/env.ts†L1-L35】
+- **Monitoring performa** melalui `src/utils/performance-monitor.ts` untuk melacak Core Web Vitals dan metrik penting lainnya. 【F:src/utils/performance-monitor.ts†L1-L140】
+- **Middleware edge** untuk menambahkan security headers dan cache strategi pada request level. 【F:src/middleware.ts†L1-L70】
 
 ## Struktur Proyek
 ```
@@ -29,7 +32,7 @@ public/
 ## Persiapan Lingkungan
 1. Pastikan menggunakan Node.js 20.x dan npm 10.x (sesuai pipeline proyek).
 2. Instal dependensi: `npm install`
-3. Salin `.env.example` (jika tersedia) ke `.env.local` dan isi kredensial EmailJS produksi (`EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY`). Kredensial sementara saat ini masih ditulis langsung di `ContactForm`. 【F:src/components/forms/ContactForm.tsx†L1-L45】
+3. Salin `.env.example` ke `.env.local` dan isi kredensial EmailJS produksi (`NEXT_PUBLIC_EMAILJS_SERVICE_ID`, `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`, `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`). Kredensial sekarang dimuat dari environment variables. 【F:src/components/forms/ContactForm.tsx†L1-L45】【F:.env.example†L1-L9】
 4. Untuk pratinjau Cloudflare, instal Wrangler (`npm install -g wrangler`) bila belum tersedia.
 
 ## Perintah Pengembangan
@@ -43,6 +46,9 @@ public/
 | `npm run analyze` | Menjalankan `@next/bundle-analyzer` (memerlukan variabel `ANALYZE=true`) |
 | `npm run preview` | Build menggunakan OpenNext dan menjalankan pratinjau Workers |
 | `npm run deploy` | Build OpenNext dan deploy ke Cloudflare Workers |
+| `npm run deploy:dev` | Deploy ke environment development |
+| `npm run deploy:preview` | Deploy ke environment preview |
+| `npm run deploy:prod` | Deploy ke environment production |
 
 ## Panduan Konten & Data
 - Komponen rumah utama (`HomeOne`) memuat header, hero, benefit, proses, paket harga, testimoni, FAQ, hingga CTA dalam urutan yang sama dengan landing page produksi. 【F:src/components/homes/home-one/index.tsx†L1-L32】
@@ -59,6 +65,7 @@ public/
 1. Jalankan `npm run preview` untuk menghasilkan output OpenNext pada `.open-next/` dan memulai `wrangler dev` (membutuhkan login Wrangler).
 2. Gunakan `npm run deploy` untuk build dan deploy. Konfigurasi worker ada pada `wrangler.toml` dengan binding aset `ASSETS`. 【F:wrangler.toml†L1-L9】
 3. `open-next.config.ts` menggunakan konfigurasi default `defineCloudflareConfig()`. Sesuaikan bila membutuhkan binding tambahan. 【F:open-next.config.ts†L1-L3】
+4. Konfigurasi `wrangler.toml` mendukung environment-specific settings untuk development, preview, dan production, serta route configuration untuk domain yang digunakan.
 
 ## Dokumentasi & Operasi
 - [docs/architecture/ADR-0001-worker-stack.md](docs/architecture/ADR-0001-worker-stack.md) — keputusan arsitektur worker & Next.js

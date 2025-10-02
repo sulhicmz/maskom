@@ -1,9 +1,33 @@
 name = "maskom"
-main = ".open-next/worker.js"
-compatibility_date = "2024-12-30"
-compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
-workers_dev = true
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
 
-[assets]
-directory = ".open-next/assets"
-binding = "ASSETS"
+[env.development]
+name = "maskom-dev"
+account_id = "${CF_ACCOUNT_ID}"
+routes = ["https://maskom-dev.your-subdomain.workers.dev"]
+
+[env.preview]
+name = "maskom-preview"
+account_id = "${CF_ACCOUNT_ID}"
+routes = ["https://maskom-preview.your-subdomain.workers.dev"]
+
+[env.production]
+name = "maskom"
+account_id = "${CF_ACCOUNT_ID}"
+routes = [
+  "https://maskom.sulhi.workers.dev",
+  "https://maskom.co.id/*"
+]
+
+[env.production.vars]
+NEXT_PUBLIC_SITE_URL = "https://maskom.co.id"
+NEXT_PUBLIC_API_BASE_URL = "https://api.maskom.co.id"
+
+[env.development.vars]
+NEXT_PUBLIC_SITE_URL = "https://maskom-dev.your-subdomain.workers.dev"
+NEXT_PUBLIC_API_BASE_URL = "https://api-dev.maskom.co.id"
+
+[env.preview.vars]
+NEXT_PUBLIC_SITE_URL = "https://maskom-preview.your-subdomain.workers.dev"
+NEXT_PUBLIC_API_BASE_URL = "https://api-preview.maskom.co.id"
