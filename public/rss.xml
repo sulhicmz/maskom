@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Maskom Network Updates</title>
+    <description>Berita dan pembaruan terbaru dari Maskom Network tentang layanan konektivitas dan managed service di Indonesia</description>
+    <link>https://maskom.co.id</link>
+    <language>id-id</language>
+    <pubDate>Thu, 02 Oct 2025 00:00:00 +0700</pubDate>
+    <lastBuildDate>Thu, 02 Oct 2025 00:00:00 +0700</lastBuildDate>
+    <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+    <generator>Maskom Network CMS</generator>
+    <image>
+      <url>https://maskom.co.id/favicon.png</url>
+      <title>Maskom Network</title>
+      <link>https://maskom.co.id</link>
+    </image>
+    <item>
+      <title>Maskom Kembangkan Jangkauan Jaringan ke Wilayah Timur Indonesia</title>
+      <description>Maskom mengumumkan ekspansi jaringan konektivitas ke wilayah Indonesia Timur untuk mendukung transformasi digital pelaku usaha lokal.</description>
+      <link>https://maskom.co.id/news/maskom-kembangkan-jangkauan-jaringan</link>
+      <guid isPermaLink="true">https://maskom.co.id/news/maskom-kembangkan-jangkauan-jaringan</guid>
+      <pubDate>Thu, 02 Oct 2025 00:00:00 +0700</pubDate>
+    </item>
+    <item>
+      <title>Implementasi SD-WAN untuk Perusahaan Multinasional di Jakarta</title>
+      <description>Case study: Solusi SD-WAN terkelola Maskom meningkatkan efisiensi jaringan dan mengurangi biaya operasional perusahaan multinasional.</description>
+      <link>https://maskom.co.id/news/implementasi-sd-wan-perusahaan-multinasional</link>
+      <guid isPermaLink="true">https://maskom.co.id/news/implementasi-sd-wan-perusahaan-multinasional</guid>
+      <pubDate>Wed, 01 Oct 2025 00:00:00 +0700</pubDate>
+    </item>
+    <item>
+      <title>Peningkatan SLA Menjadi 99.99% untuk Layanan Dedicated Internet Access</title>
+      <description>Maskom meningkatkan standar ketersediaan jaringan untuk layanan DIA menjadi 99.99% dengan peningkatan infrastruktur redundan.</description>
+      <link>https://maskom.co.id/news/peningkatan-sla-layanan-dedicated-internet</link>
+      <guid isPermaLink="true">https://maskom.co.id/news/peningkatan-sla-layanan-dedicated-internet</guid>
+      <pubDate>Tue, 30 Sep 2025 00:00:00 +0700</pubDate>
+    </item>
+  </channel>
+</rss>

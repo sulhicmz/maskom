@@ -1,0 +1,141 @@
+<examples>
+  <example name="research_based_blog_post">
+    <description>Creating a fact-based blog post about technical topic</description>
+    <context>When writing technical content that requires verification</context>
+    <workflow>
+      <step>Use codebase_search to find existing technical content patterns</step>
+      <step>Research the topic using official documentation and reliable sources</step>
+      <step>Verify all technical claims against authoritative sources</step>
+      <step>Create content with proper citations and references</step>
+      <step>Ensure no assumptions are made about technical details</step>
+    </workflow>
+    <code language="markdown">
+      <![CDATA[
+# Understanding Cloudflare Workers
+
+## Introduction
+Cloudflare Workers is a serverless platform that allows developers to deploy JavaScript, 
+Wasm, and other code at the edge. According to Cloudflare's official documentation 
+(https://developers.cloudflare.com/workers/), this platform enables code execution 
+closer to users worldwide.
+
+## Key Features
+### Edge Computing
+Cloudflare Workers run on Cloudflare's global network of data centers, providing low 
+latency by executing code closer to end users. As stated in their technical overview, 
+this reduces round-trip time for requests significantly.
+
+### Serverless Architecture
+The platform follows a serverless model where developers don't need to manage 
+infrastructure. According to Cloudflare's architecture documentation, this allows 
+for automatic scaling based on demand.
+
+## References
+- Cloudflare Workers Documentation: https://developers.cloudflare.com/workers/
+- Technical Overview: https://developers.cloudflare.com/workers/about/
+      ]]>
+    </code>
+    <explanation>
+      This example shows proper research-based content with verified facts from 
+      official sources, proper citations, and no assumptions about technical details.
+    </explanation>
+  </example>
+
+  <example name="documentation_creation">
+    <description>Creating technical documentation for a feature</description>
+    <context>When documenting a feature or API that requires accuracy</context>
+    <workflow>
+      <step>Examine existing documentation patterns in the codebase</step>
+      <step>Research the feature from official sources and specifications</step>
+      <step>Verify all configuration options and parameters</step>
+      <step>Create structured documentation following established patterns</step>
+      <step>Include examples and troubleshooting information</step>
+    </workflow>
+    <code language="markdown">
+      <![CDATA[
+# API Integration Guide
+
+## Overview
+This guide explains how to integrate with the maskom.co.id API. All information 
+is based on the official API specification available in the repository.
+
+## Getting Started
+### Prerequisites
+- Valid API key from the developer portal
+- Basic understanding of REST APIs
+- HTTP client for making requests
+
+### Authentication
+The API uses Bearer token authentication. According to the API specification, 
+include the Authorization header with your requests:
+
+```
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Endpoints
+### GET /api/users
+Retrieves a list of users. Based on the API documentation, this endpoint 
+supports pagination parameters.
+
+## References
+- API Specification: /docs/api-specification.md
+- Authentication Guide: /docs/auth-guide.md
+      ]]>
+    </code>
+    <explanation>
+      This example demonstrates proper documentation creation with verified 
+      information from official sources and clear structure following established 
+      patterns.
+    </explanation>
+  </example>
+
+  <example name="seo_content_optimization">
+    <description>Creating SEO-optimized content without making assumptions</description>
+    <context>When creating content that needs search engine optimization</context>
+    <workflow>
+      <step>Research keyword data from reliable SEO tools and sources</step>
+      <step>Verify search trends and user intent information</step>
+      <step>Analyze competitor content from legitimate sources</step>
+      <step>Create content with natural keyword integration</step>
+      <step>Include proper meta information and structure</step>
+    </workflow>
+    <code language="markdown">
+      <![CDATA[
+# Complete Guide to Website Performance Optimization
+
+## Introduction
+Website performance optimization is crucial for user experience and search engine 
+ranking. According to Google's research (https://web.dev/learn-core-web-vitals/), 
+page speed significantly impacts user engagement and conversion rates.
+
+## Key Performance Metrics
+### Core Web Vitals
+Google's Core Web Vitals include three key metrics for measuring user experience:
+
+1. Largest Contentful Paint (LCP) - measures loading performance
+2. First Input Delay (FID) - measures interactivity  
+3. Cumulative Layout Shift (CLS) - measures visual stability
+
+These metrics were introduced in 2020 as part of Google's focus on user experience, 
+as documented in their official web vitals guide.
+
+## Best Practices
+### Image Optimization
+Optimizing images can reduce page load times by up to 60%, according to 
+various web performance studies. This includes:
+- Using modern formats like WebP
+- Implementing proper sizing and compression
+- Adding appropriate loading strategies
+
+## References
+- Google Web Vitals: https://web.dev/vitals/
+- PageSpeed Insights: https://pagespeed.web.dev/
+      ]]>
+    </code>
+    <explanation>
+      This example shows SEO-optimized content with verified statistics from 
+      authoritative sources and proper keyword integration without assumptions.
+    </explanation>
+  </example>
+</examples>
