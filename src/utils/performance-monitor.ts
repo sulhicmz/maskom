@@ -108,9 +108,9 @@ export class PerformanceMonitor {
     
     // Optional: Send metrics to a logging service
     // This could be integrated with Cloudflare Analytics or other services
-    if (typeof window !== 'undefined' && (window as any)._paq) {
+    if (typeof window !== 'undefined' && (window as Window & typeof globalThis & { _paq?: any })._paq) {
       // Example integration with Matomo or similar
-      // (window as any)._paq.push(['trackEvent', 'Performance', name, 'Value', value]);
+      // (window as Window & typeof globalThis & { _paq: any })._paq.push(['trackEvent', 'Performance', name, 'Value', value]);
     }
   }
   

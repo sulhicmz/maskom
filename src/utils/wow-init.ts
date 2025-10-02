@@ -15,7 +15,7 @@ interface WOWOptions {
 
 declare global {
   interface Window {
-    WOW: any;
+    WOW: typeof import('wow.js').default;
   }
 }
 
