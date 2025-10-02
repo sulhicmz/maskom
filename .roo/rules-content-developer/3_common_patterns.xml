@@ -1,0 +1,109 @@
+<common_patterns>
+  <pattern name="blog_post_structure">
+    <description>Standard structure for blog posts and articles</description>
+    <template>
+      <![CDATA[
+# Title
+
+## Introduction
+Brief overview of what the article covers and why it's important.
+
+## Main Content
+### Section 1
+Detailed information with proper explanations.
+
+### Section 2
+Additional details and examples.
+
+## Conclusion
+Summary of key points and potential next steps.
+
+## References
+- Source 1
+- Source 2
+- Official documentation links
+      ]]>
+    </template>
+  </pattern>
+
+  <pattern name="documentation_pattern">
+    <description>Structure for technical documentation</description>
+    <template>
+      <![CDATA[
+# Feature/Component Name
+
+## Overview
+Brief description of the feature/component.
+
+## Getting Started
+### Prerequisites
+What is needed to use this feature.
+
+### Installation/Setup
+Step-by-step instructions.
+
+## Usage
+Detailed usage examples and explanations.
+
+## Configuration
+Available options and settings.
+
+## Troubleshooting
+Common issues and solutions.
+
+## References
+- API documentation
+- Related resources
+      ]]>
+    </template>
+  </pattern>
+
+  <pattern name="marketing_content">
+    <description>Structure for promotional and marketing materials</description>
+    <template>
+      <![CDATA[
+# Headline
+
+## Value Proposition
+What makes this unique and valuable.
+
+## Key Benefits
+- Benefit 1 with explanation
+- Benefit 2 with explanation
+- Benefit 3 with explanation
+
+## Features and Details
+Detailed information about features.
+
+## Call to Action
+Clear next steps for the audience.
+
+## Supporting Information
+Additional details and references.
+      ]]>
+    </template>
+  </pattern>
+
+  <pattern name="research_based_content">
+    <description>Pattern for content requiring thorough research</description>
+    <approach>
+      <step>Identify reliable sources (official documentation, peer-reviewed articles)</step>
+      <step>Cross-reference information across multiple sources</step>
+      <step>Verify facts and data points</step>
+      <step>Document sources and citations</step>
+      <step>Present information objectively without assumptions</step>
+    </approach>
+  </pattern>
+
+  <pattern name="seo_optimized_content">
+    <description>Structure for search engine optimized content</description>
+    <elements>
+      <element name="title">Include primary keyword, under 60 characters</element>
+      <element name="meta_description">Include keyword, under 160 characters</element>
+      <element name="headings">Use H1, H2, H3 with keyword variations</element>
+      <element name="content">Natural keyword integration (1-2% density)</element>
+      <element name="internal_links">Link to related content within site</element>
+      <element name="external_links">Link to authoritative sources</element>
+    </elements>
+  </pattern>
+</common_patterns>

@@ -1,0 +1,102 @@
+<examples>
+  <example name="sprint_planning_example">
+    <description>Contoh Sprint Plan Ringkas</description>
+    <context>Awal sprint untuk website maskom.co.id</context>
+    <sprint_plan>
+      <item>Prioritas 1: Perbaikan CI/CD Workflow - Memperbaiki workflow yang sering gagal untuk memastikan deployment yang stabil</item>
+      <item>Prioritas 2: Inisialisasi Website v1 - Membangun landing page dasar dan struktur halaman utama</item>
+      <item>Prioritas 3: Setup Security Headers - Mengimplementasikan security headers untuk HTTPS, HSTS, dan WAF</item>
+      <item>Prioritas 4: Optimasi Performa - Mencapai target Lighthouse ≥ 90 dan Core Web Vitals sesuai standar</item>
+      <item>Prioritas 5: Setup GitHub Issues Template - Menyiapkan template untuk manajemen task, bug, dan feature</item>
+    </sprint_plan>
+    <explanation>
+      Sprint plan ini dibuat berdasarkan audit awal repository yang menunjukkan
+      beberapa workflow gagal dan kebutuhan untuk membangun foundation website.
+    </explanation>
+  </example>
+
+  <example name="issue_creation_example">
+    <description>Contoh pembuatan GitHub issue</description>
+    <context>Untuk task "Perbaikan CI/CD Workflow"</context>
+    <issue_title>fix: perbaiki CI/CD workflow yang sering gagal</issue_title>
+    <issue_body>
+      <problem>Beberapa workflow runs di branch main gagal, menyebabkan deployment tidak stabil.</problem>
+      <solution>Analisis workflow logs dan perbaiki konfigurasi yang menyebabkan kegagalan.</solution>
+      <acceptance_criteria>
+        <criterion>Semua workflow runs sukses tanpa error</criterion>
+        <criterion>Deployment ke Cloudflare Worker berhasil</criterion>
+        <criterion>Dokumentasi workflow diperbarui</criterion>
+      </acceptance_criteria>
+      <tasks>
+        <task>Cek logs workflow yang gagal</task>
+        <task>Identifikasi penyebab kegagalan</task>
+        <task>Perbaiki konfigurasi workflow</task>
+        <task>Test workflow yang diperbaiki</task>
+      </tasks>
+      <labels>bug, CI/CD, deployment</labels>
+    </issue_body>
+    <explanation>
+      Issue ini mengikuti template yang ditentukan dan mencakup semua informasi
+      penting untuk menyelesaikan tugas dengan jelas.
+    </explanation>
+  </example>
+
+  <example name="pr_creation_example">
+    <description>Contoh pembuatan Pull Request</description>
+    <context>Setelah menyelesaikan perbaikan CI/CD</context>
+    <pr_title>fix: resolve CI/CD workflow failures</pr_title>
+    <pr_body>
+      <description>
+        Perbaikan konfigurasi workflow yang menyebabkan kegagalan deployment.
+        Perubahan mencakup penyesuaian environment variables dan pembaruan dependencies.
+      </description>
+      <related_issues>Closes #123</related_issues>
+      <changes>
+        <file>.github/workflows/deploy.yml</file>
+        <file>package.json</file>
+        <file>README.md</file>
+      </changes>
+      <testing>
+        <step>Verifikasi workflow runs sukses di feature branch</step>
+        <step>Test deployment ke preview environment</step>
+        <step>Verifikasi Lighthouse score ≥ 90</step>
+      </testing>
+      <checklist>
+        <item>✓ Issue terhubung</item>
+        <item>✓ Lolos lint/build/test</item>
+        <item>✓ Lighthouse (preview) ≥ 90</item>
+        <item>✓ Security diverifikasi</item>
+        <item>✓ Dokumentasi/CHANGELOG diperbarui</item>
+      </checklist>
+    </pr_body>
+    <explanation>
+      PR ini mengikuti template dan mencakup semua informasi penting
+      untuk review dan verifikasi sebelum merge.
+    </explanation>
+  </example>
+
+  <example name="deployment_example">
+    <description>Contoh deployment workflow</description>
+    <context>Deploy perubahan ke production</context>
+    <steps>
+      <step>1. Build website: wrangler pages build</step>
+      <step>2. Deploy ke dev: wrangler pages deploy --branch dev</step>
+      <step>3. Test di environment dev - Lighthouse score: 92</step>
+      <step>4. Deploy ke production: wrangler pages deploy --branch main</step>
+      <step>5. Verifikasi deployment - Core Web Vitals: LCP=1.8s, CLS=0.05, INP=150ms</step>
+    </steps>
+    <results>
+      <lighthouse_score>92</lighthouse_score>
+      <core_web_vitals>
+        <lcp>1.8s</lcp>
+        <cls>0.05</cls>
+        <inp>150ms</inp>
+      </core_web_vitals>
+      <security_headers>HTTPS, HSTS, WAF aktif</security_headers>
+    </results>
+    <explanation>
+      Deployment berhasil dengan metrik kualitas yang melebihi target.
+      Semua security headers aktif dan performa memenuhi standar.
+    </explanation>
+  </example>
+</examples>

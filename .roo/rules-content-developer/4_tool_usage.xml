@@ -1,0 +1,91 @@
+<tool_usage_guide>
+  <tool_priorities>
+    <priority level="1">
+      <tool>codebase_search</tool>
+      <when>Always use first to find existing content patterns and style guides</when>
+      <why>Semantic search finds relevant content examples better than keywords</why>
+    </priority>
+    <priority level="2">
+      <tool>browser</tool>
+      <when>Researching topics and verifying facts from reliable sources</when>
+      <why>Access to current information and official documentation</why>
+    </priority>
+    <priority level="3">
+      <tool>read_file</tool>
+      <when>After identifying files with codebase_search to examine content examples</when>
+      <why>Get full context of existing content and style</why>
+    </priority>
+  </tool_priorities>
+
+  <tool_specific_guidance>
+    <tool name="browser">
+      <best_practices>
+        <practice>Always verify information from official sources</practice>
+        <practice>Cross-reference multiple authoritative sources</practice>
+        <practice>Check publication dates for currency of information</practice>
+      </best_practices>
+      <when_to_use>
+        - Researching technical topics from official documentation
+        - Verifying facts and statistics
+        - Finding current best practices and trends
+        - Accessing external references and sources
+      </when_to_use>
+    </tool>
+
+    <tool name="codebase_search">
+      <best_practices>
+        <practice>Search for content patterns and style guidelines in existing codebase</practice>
+        <practice>Look for similar content types to understand format and structure</practice>
+        <practice>Identify existing style guides and conventions</practice>
+      </best_practices>
+      <when_to_use>
+        - Finding examples of similar content types
+        - Understanding existing content structure and patterns
+        - Locating style guides and documentation standards
+      </when_to_use>
+    </tool>
+
+    <tool name="read_file">
+      <best_practices>
+        <practice>Examine existing content to understand style and format</practice>
+        <practice>Study successful content examples for reference</practice>
+        <practice>Identify patterns in successful content</practice>
+      </best_practices>
+      <when_to_use>
+        - Reviewing existing content examples
+        - Studying documentation patterns
+        - Understanding project-specific content requirements
+      </when_to_use>
+    </tool>
+
+    <tool name="ask_followup_question">
+      <best_practices>
+        <practice>Provide specific, actionable suggestions based on research</practice>
+        <practice>Ask for clarification when requirements are unclear</practice>
+        <practice>Request additional information to ensure accuracy</practice>
+      </best_practices>
+      <when_to_use>
+        - When content requirements are ambiguous
+        - When additional research is needed
+        - When clarification on target audience or purpose is required
+      </when_to_use>
+    </tool>
+  </tool_specific_guidance>
+
+  <research_workflow>
+    <step>Use codebase_search to find existing content patterns</step>
+    <step>Use browser to research topic from reliable sources</step>
+    <step>Use read_file to examine existing content examples</step>
+    <step>Cross-reference information from multiple sources</step>
+    <step>Verify all facts before including in content</step>
+    <step>Create content based on verified information</step>
+ </research_workflow>
+
+  <verification_steps>
+    <step>Check all technical information against official documentation</step>
+    <step>Verify statistics and data points from authoritative sources</step>
+    <step>Cross-reference claims with multiple reliable sources</step>
+    <step>Ensure no assumptions are made without verification</step>
+    <step>Validate all external links and references</step>
+ </verification_steps>
+</tool_usage_guide>

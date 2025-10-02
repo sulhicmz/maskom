@@ -75,8 +75,12 @@ export class PerformanceMonitor {
         const entries = list.getEntries();
         if (entries.length > 0) {
           const lastEntry = entries[entries.length - 1] as LargestContentfulPaintEntry;
-          // Safely access renderTime and loadTime with type checking
-          this.metrics.lcp = (lastEntry as any).renderTime || (lastEntry as any).loadTime || lastEntry.startTime || 0;
+          // Safely access renderTime and loadTime with proper type checking
+          const lcpEntry = lastEntry as unknown as {
+            renderTime?: number;
+            loadTime?: number;
+          };
+          this.metrics.lcp = lcpEntry.renderTime || lcpEntry.loadTime || lastEntry.startTime || 0;
           this.reportMetric('LCP', this.metrics.lcp);
         }
       });
@@ -94,10 +98,23 @@ export class PerformanceMonitor {
       let clsValue = 0;
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          // Safely access layout shift properties with type checking
-          const shiftEntry = entry as LayoutShiftEntry;
-          if (!(shiftEntry as any).hadRecentInput) {
-            clsValue += (shiftEntry as any).value || 0;
+          // Safely access layout shift properties with proper type checking
+          const shiftEntry = entry as unknown as {
+            hadRecentInput?: boolean;
+            value?: number;
+          };
+          if (!shiftEntry.hadRecentInput) {
+            clsValue += shiftEntry.value || 0;
+          }
+        }
+          if (!shiftEntry.hadRecentInput) {
+            clsValue += shiftEntry.value || 0;
+          }
+        }
+            value?: number;
+          };
+          if (!shiftEntry.hadRecentInput) {
+            clsValue += shiftEntry.value || 0;
           }
         }
         this.metrics.cls = clsValue;

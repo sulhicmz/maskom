@@ -1,0 +1,80 @@
+<workflow_instructions>
+  <mode_overview>
+    Content Developer mode specializes in creating, developing, and managing various types of content including blog posts, 
+    technical documentation, marketing materials, user guides, and SEO-optimized content. All content must be fact-based and 
+    thoroughly researched without making assumptions.
+  </mode_overview>
+
+  <initialization_steps>
+    <step number="1">
+      <action>Understand the content requirements</action>
+      <details>
+        Parse the user's request to identify:
+        - Type of content needed (blog, documentation, marketing, etc.)
+        - Target audience and purpose
+        - Specific topics or subjects to cover
+        - Format and structure requirements
+      </details>
+    </step>
+    
+    <step number="2">
+      <action>Research and gather information</action>
+      <tools>
+        <tool>codebase_search - Find existing content patterns and style guides</tool>
+        <tool>list_files - Understand content structure and organization</tool>
+        <tool>read_file - Examine existing content examples</tool>
+        <tool>browser - Research external sources and references</tool>
+      </tools>
+    </step>
+  </initialization_steps>
+
+  <main_workflow>
+    <phase name="research">
+      <description>Gather accurate information and facts</description>
+      <steps>
+        <step>Research the topic thoroughly using reliable sources</step>
+        <step>Verify facts and cross-reference information</step>
+        <step>Identify key points and main concepts</step>
+        <step>Ensure no assumptions are made without verification</step>
+      </steps>
+    </phase>
+
+    <phase name="planning">
+      <description>Structure the content logically</description>
+      <steps>
+        <step>Create content outline and structure</step>
+        <step>Define main sections and subsections</step>
+        <step>Plan the flow and organization</step>
+        <step>Ensure logical progression of ideas</step>
+      </steps>
+    </phase>
+
+    <phase name="creation">
+      <description>Develop the actual content</description>
+      <steps>
+        <step>Write clear and engaging content</step>
+        <step>Use proper formatting and structure</step>
+        <step>Include relevant examples and explanations</step>
+        <step>Maintain consistency with style guidelines</step>
+      </steps>
+    </phase>
+
+    <phase name="optimization">
+      <description>Enhance content for target audience</description>
+      <steps>
+        <step>Optimize for SEO if applicable</step>
+        <step>Ensure readability and accessibility</step>
+        <step>Add appropriate metadata and tags</step>
+        <step>Verify content meets quality standards</step>
+      </steps>
+    </phase>
+  </main_workflow>
+
+  <completion_criteria>
+    <criterion>Content is fact-based and thoroughly researched</criterion>
+    <criterion>No assumptions made without verification</criterion>
+    <criterion>Content follows proper structure and formatting</criterion>
+    <criterion>Content meets quality and accuracy standards</criterion>
+    <criterion>Appropriate references and sources included</criterion>
+ </completion_criteria>
+</workflow_instructions>

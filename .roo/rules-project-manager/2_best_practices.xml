@@ -1,0 +1,84 @@
+<best_practices>
+  <general_principles>
+    <principle priority="high">
+      <name>Technical Project Management</name>
+      <description>Manajemen proyek teknis untuk website maskom.co.id</description>
+      <rationale>Fokus pada kualitas teknis, bukan hanya manajemen administratif</rationale>
+      <example>
+        <scenario>Saat membuat sprint plan</scenario>
+        <good>Termasuk target teknis seperti Lighthouse score, Core Web Vitals, security headers</good>
+        <bad>Hanya fokus pada tugas dan deadline tanpa kualitas teknis</bad>
+      </example>
+    </principle>
+    
+    <principle priority="high">
+      <name>Quality First</name>
+      <description>Pastikan kualitas teknis sebelum fitur</description>
+      <rationale>Website harus memenuhi standar performa dan keamanan sejak awal</rationale>
+      <example>
+        <scenario>Saat mengembangkan fitur baru</scenario>
+        <good>Verifikasi Lighthouse ≥ 90, Core Web Vitals, security headers sebelum merge</good>
+        <bad>Lanjutkan ke fitur lain tanpa verifikasi kualitas</bad>
+      </example>
+    </principle>
+  </general_principles>
+
+  <github_conventions>
+    <convention category="branching">
+      <rule>Gunakan feature branch untuk semua perubahan</rule>
+      <examples>
+        <good>feature/login-page, bugfix/login-error, hotfix/security-patch</good>
+        <bad>langsung ke main branch</bad>
+      </examples>
+    </convention>
+    
+    <convention category="commits">
+      <rule>Gunakan conventional commits</rule>
+      <examples>
+        <good>feat: add login page, fix: resolve login error, docs: update README</good>
+        <bad>update, fix bug, changes</bad>
+      </examples>
+    </convention>
+    
+    <convention category="issues_prs">
+      <rule>Hubungkan semua PR ke issue terkait</rule>
+      <examples>
+        <good>PR dengan "Closes #123" atau "Related to #123"</good>
+        <bad>PR tanpa referensi ke issue</bad>
+      </examples>
+    </convention>
+  </github_conventions>
+
+  <common_pitfalls>
+    <pitfall>
+      <description>Melanggar workflow dan langsung push ke main</description>
+      <why_problematic>Main branch dilindungi, dan semua perubahan harus melalui review</why_problematic>
+      <correct_approach>Gunakan feature branch → PR → review → merge</correct_approach>
+    </pitfall>
+    
+    <pitfall>
+      <description>Mengabaikan audit GitHub sebelum mulai kerja</description>
+      <why_problematic>Bisa menyebabkan konflik dengan pekerjaan yang sedang berjalan</why_problematic>
+      <correct_approach>Selalu audit issues, PRs, projects, dan actions terlebih dahulu</correct_approach>
+    </pitfall>
+  </common_pitfalls>
+
+  <quality_checklist>
+    <category name="before_starting">
+      <item>Audit GitHub (issues, PRs, projects, actions)</item>
+      <item>Cek blocker dan dependensi</item>
+      <item>Verifikasi tidak ada PR terkait yang belum selesai</item>
+    </category>
+    <category name="during_implementation">
+      <item>Ikuti conventional commits</item>
+      <item>Gunakan feature branch</item>
+      <item>Update GitHub Project dan issue status</item>
+    </category>
+    <category name="before_completion">
+      <item>Verifikasi Lighthouse score ≥ 90</item>
+      <item>Verifikasi Core Web Vitals</item>
+      <item>Verifikasi security headers</item>
+      <item>Update dokumentasi</item>
+    </category>
+  </quality_checklist>
+</best_practices>

@@ -1,0 +1,92 @@
+<best_practices>
+  <general_principles>
+    <principle priority="high">
+      <name>Factual Accuracy</name>
+      <description>All content must be based on verified facts and reliable sources</description>
+      <rationale>Ensures credibility and trustworthiness of all content produced</rationale>
+      <example>
+        <scenario>When writing about technical topics</scenario>
+        <good>Research from official documentation and verified sources</good>
+        <bad>Make assumptions or guess technical details</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>No Assumptions</name>
+      <description>Never make assumptions without proper research and verification</description>
+      <rationale>Prevents dissemination of incorrect information and maintains quality</rationale>
+      <example>
+        <scenario>When unsure about specific details</scenario>
+        <good>Research and find reliable sources or state that information is unknown</good>
+        <bad>Guess or assume details to fill gaps</bad>
+      </example>
+    </principle>
+  </general_principles>
+
+  <content_conventions>
+    <convention category="structure">
+      <rule>Use clear headings and subheadings for organization</rule>
+      <examples>
+        <good>Proper hierarchical structure (H1, H2, H3, etc.)</good>
+        <bad>Random heading levels without logical structure</bad>
+      </examples>
+    </convention>
+    
+    <convention category="formatting">
+      <rule>Follow consistent formatting and style guidelines</rule>
+      <template>
+        # Title
+        ## Section
+        ### Subsection
+        
+        Regular paragraph text with proper spacing.
+        
+        - List item 1
+        - List item 2
+        - List item 3
+      </template>
+    </convention>
+
+    <convention category="research">
+      <rule>Always verify information from multiple reliable sources</rule>
+      <template>
+        When presenting facts:
+        - Cross-reference with official documentation
+        - Check multiple authoritative sources
+        - Include proper citations when needed
+      </template>
+    </convention>
+  </content_conventions>
+
+  <common_pitfalls>
+    <pitfall>
+      <description>Making assumptions about technical details or facts</description>
+      <why_problematic>Can lead to incorrect information and loss of credibility</why_problematic>
+      <correct_approach>Always research and verify before including any information</correct_approach>
+    </pitfall>
+
+    <pitfall>
+      <description>Using unverified or unreliable sources</description>
+      <why_problematic>Compromises the accuracy and trustworthiness of content</why_problematic>
+      <correct_approach>Use official documentation, peer-reviewed sources, and authoritative references</correct_approach>
+    </pitfall>
+  </common_pitfalls>
+
+  <quality_checklist>
+    <category name="before_starting">
+      <item>Define clear content objectives and target audience</item>
+      <item>Research topic thoroughly from reliable sources</item>
+      <item>Verify all facts and information</item>
+    </category>
+    <category name="during_implementation">
+      <item>Follow proper structure and formatting</item>
+      <item>Ensure all information is fact-based</item>
+      <item>Maintain consistent style and tone</item>
+    </category>
+    <category name="before_completion">
+      <item>Review all content for accuracy</item>
+      <item>Verify no assumptions were made</item>
+      <item>Check proper citations and references</item>
+    </category>
+  </quality_checklist>
+</best_practices>

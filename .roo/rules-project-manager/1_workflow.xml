@@ -1,0 +1,90 @@
+<workflow_instructions>
+  <mode_overview>
+    Project Manager mode untuk mengelola lifecycle proyek maskom.co.id.
+    Fokus pada manajemen teknis, deployment, dan kualitas website.
+  </mode_overview>
+
+  <initialization_steps>
+    <step number="1">
+      <action>Audit GitHub repository</action>
+      <details>
+        Lakukan pemeriksaan menyeluruh sebelum memulai pekerjaan baru:
+        - gh issue list --limit 100
+        - gh pr list --limit 50
+        - gh project list --owner sulhicmz
+        - gh run list --branch main
+      </details>
+    </step>
+    
+    <step number="2">
+      <action>Identifikasi blocker dan prioritas</action>
+      <details>
+        Cek apakah ada PR terkait yang belum selesai, issue yang menghalangi,
+        atau dependensi yang harus diselesaikan terlebih dahulu.
+      </details>
+    </step>
+  </initialization_steps>
+
+  <main_workflow>
+    <phase name="planning">
+      <description>Buat Sprint Plan dan dokumentasi perencanaan</description>
+      <steps>
+        <step>Buat issue baru atau update existing issue</step>
+        <step>Tambahkan ke GitHub Project yang sesuai</step>
+        <step>Tentukan acceptance criteria</step>
+      </steps>
+    </phase>
+
+    <phase name="execution">
+      <description>Eksekusi tugas sesuai dengan workflow</description>
+      <steps>
+        <step>Bekerja pada feature branch</step>
+        <step>Gunakan conventional commits</step>
+        <step>Ikuti standar koding dan dokumentasi</step>
+      </steps>
+    </phase>
+
+    <phase name="review">
+      <description>Review dan quality assurance</description>
+      <steps>
+        <step>Buat PR dengan format yang benar</step>
+        <step>Pastikan CI passing</step>
+        <step>Verifikasi Lighthouse score ≥ 90</step>
+        <step>Verifikasi security headers</step>
+      </steps>
+    </phase>
+
+    <phase name="deployment">
+      <description>Deploy dan monitoring</description>
+      <steps>
+        <step>Deploy ke Cloudflare Worker</step>
+        <step>Jalankan QA: Lighthouse, Core Web Vitals, logs</step>
+        <step>Update dokumentasi dan CHANGELOG</step>
+      </steps>
+    </phase>
+  </main_workflow>
+
+  <github_management>
+    <requirement>Cabang utama dilindungi, semua perubahan melalui PR</requirement>
+    <requirement>Gunakan GitHub Projects untuk roadmap dan backlog</requirement>
+    <requirement>Gunakan GitHub Issues untuk semua task, bug, feature</requirement>
+    <requirement>Hubungkan semua PR ke issue terkait</requirement>
+  </github_management>
+
+  <quality_standards>
+    <requirement>Lighthouse Overall ≥ 90</requirement>
+    <requirement>Core Web Vitals sesuai standar (LCP, CLS, INP)</requirement>
+    <requirement>TTFB Edge < 200ms</requirement>
+    <requirement>HTTPS, HSTS, WAF aktif</requirement>
+    <requirement>CI/CD otomatis dengan rollback cepat</requirement>
+  </quality_standards>
+
+  <completion_criteria>
+    <criterion>Sprint plan telah dibuat dan ditrack di GitHub</criterion>
+    <criterion>Issue/PR dibuat sesuai dengan standar</criterion>
+    <criterion>Perintah gh/wrangler dijalankan dengan hasil terdokumentasi</criterion>
+    <criterion>Hasil CI, preview link, dan metrik ditampilkan</criterion>
+    <criterion>Keputusan arsitektur dan dampak didokumentasikan</criterion>
+    <criterion>Langkah berikutnya diidentifikasi</criterion>
+ </completion_criteria>
+</workflow_instructions>

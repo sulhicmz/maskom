@@ -1,0 +1,110 @@
+<common_patterns>
+  <pattern name="sprint_planning">
+    <description>Pola untuk membuat sprint plan</description>
+    <template>
+      <title>Sprint Plan Ringkas (maks 5 item)</title>
+      <items>
+        <item>Prioritas 1: [Deskripsi singkat tugas]</item>
+        <item>Prioritas 2: [Deskripsi singkat tugas]</item>
+        <item>Prioritas 3: [Deskripsi singkat tugas]</item>
+        <item>Prioritas 4: [Deskripsi singkat tugas]</item>
+        <item>Prioritas 5: [Deskripsi singkat tugas]</item>
+      </items>
+      <acceptance_criteria>
+        <criterion>Setiap item memiliki issue di GitHub</criterion>
+        <criterion>Setiap item ditambahkan ke GitHub Project</criterion>
+        <criterion>Estimasi waktu dan effort ditentukan</criterion>
+      </acceptance_criteria>
+    </template>
+  </pattern>
+
+  <pattern name="issue_creation">
+    <description>Pola untuk membuat GitHub issue</description>
+    <template>
+      <title>[Jenis Tugas]: [Deskripsi Singkat]</title>
+      <body>
+        <section name="problem">
+          <description>Apa masalahnya atau apa yang perlu dibuat</description>
+        </section>
+        <section name="solution">
+          <description>Solusi yang diusulkan</description>
+        </section>
+        <section name="acceptance_criteria">
+          <criteria>Hal-hal yang harus terpenuhi untuk menyelesaikan issue</criteria>
+        </section>
+        <section name="tasks">
+          <list>Sub-tasks yang perlu diselesaikan</list>
+        </section>
+        <section name="labels">
+          <labels>bug, feature, enhancement, documentation, etc.</labels>
+        </section>
+      </body>
+    </template>
+  </pattern>
+
+  <pattern name="pr_creation">
+    <description>Pola untuk membuat Pull Request</description>
+    <template>
+      <title>[Jenis Commit]: [Deskripsi Singkat]</title>
+      <body>
+        <section name="description">
+          <description>Penjelasan tentang perubahan yang dibuat</description>
+        </section>
+        <section name="related_issues">
+          <links>Link ke issue terkait (Closes #123)</links>
+        </section>
+        <section name="changes">
+          <list>File atau komponen yang diubah</list>
+        </section>
+        <section name="testing">
+          <steps>Langkah-langkah untuk menguji perubahan</steps>
+        </section>
+        <section name="checklist">
+          <item>Issue terhubung</item>
+          <item>Lolos lint/build/test</item>
+          <item>Lighthouse (preview) ≥ 90</item>
+          <item>Security diverifikasi</item>
+          <item>Dokumentasi/CHANGELOG diperbarui</item>
+        </section>
+      </body>
+    </template>
+  </pattern>
+
+  <pattern name="deployment_workflow">
+    <description>Pola untuk deployment ke Cloudflare Worker</description>
+    <steps>
+      <step>Build website: wrangler pages build</step>
+      <step>Deploy ke dev: wrangler pages deploy --branch dev</step>
+      <step>Test di environment dev</step>
+      <step>Deploy ke production: wrangler pages deploy --branch main</step>
+      <step>Verifikasi deployment</step>
+    </steps>
+    <verification>
+      <item>Lighthouse score ≥ 90</item>
+      <item>Core Web Vitals passing</item>
+      <item>Security headers active</item>
+      <item>Performance metrics acceptable</item>
+    </verification>
+  </pattern>
+
+  <pattern name="quality_assurance">
+    <description>Pola untuk quality assurance</description>
+    <lighthouse_targets>
+      <performance>≥ 90</performance>
+      <accessibility>≥ 90</accessibility>
+      <best_practices>≥ 90</best_practices>
+      <seo>≥ 90</seo>
+    </lighthouse_targets>
+    <core_web_vitals>
+      <lcp>≤ 2.5s</lcp>
+      <cls>≤ 0.1</cls>
+      <inp>≤ 200ms</inp>
+    </core_web_vitals>
+    <security_requirements>
+      <https>aktif</https>
+      <hsts>aktif</hsts>
+      <waf>aktif</waf>
+      <csp>aktif</csp>
+    </security_requirements>
+  </pattern>
+</common_patterns>

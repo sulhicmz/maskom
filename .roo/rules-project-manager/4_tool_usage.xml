@@ -1,0 +1,86 @@
+<tool_usage_guide>
+  <tool_priorities>
+    <priority level="1">
+      <tool>execute_command</tool>
+      <when>Untuk perintah GitHub CLI dan Wrangler</when>
+      <why>Memeriksa status repository dan melakukan deployment</why>
+    </priority>
+    <priority level="2">
+      <tool>read_file</tool>
+      <when>Memeriksa konfigurasi dan dokumentasi</when>
+      <why>Memahami struktur dan konfigurasi proyek</why>
+    </priority>
+    <priority level="3">
+      <tool>write_to_file</tool>
+      <when>Memperbarui dokumentasi dan konfigurasi</when>
+      <why>Menyimpan perubahan penting ke file</why>
+    </priority>
+  </tool_priorities>
+
+  <github_cli_usage>
+    <command name="gh_issue_list">
+      <syntax>gh issue list --repo sulhicmz/maskom --limit 100</syntax>
+      <purpose>Cek open issues sebelum memulai pekerjaan</purpose>
+      <output>Daftar issue dengan status dan assignee</output>
+    </command>
+    
+    <command name="gh_pr_list">
+      <syntax>gh pr list --repo sulhicmz/maskom --limit 50</syntax>
+      <purpose>Cek open PR sebelum memulai pekerjaan</purpose>
+      <output>Daftar PR dengan status dan reviewer</output>
+    </command>
+    
+    <command name="gh_project_list">
+      <syntax>gh project list --owner sulhicmz</syntax>
+      <purpose>Cek project board untuk tracking</purpose>
+      <output>Daftar project dengan status dan ID</output>
+    </command>
+    
+    <command name="gh_run_list">
+      <syntax>gh run list --repo sulhicmz/maskom --branch main</syntax>
+      <purpose>Cek status CI/CD pipeline</purpose>
+      <output>Daftar workflow runs dengan status dan durasi</output>
+    </command>
+    
+    <command name="gh_issue_create">
+      <syntax>gh issue create --title "[title]" --body "[body]" --repo sulhicmz/maskom</syntax>
+      <purpose>Buat issue baru</purpose>
+      <output>Link ke issue yang dibuat</output>
+    </command>
+    
+    <command name="gh_pr_create">
+      <syntax>gh pr create --title "[title]" --body "[body]" --repo sulhicmz/maskom</syntax>
+      <purpose>Buat pull request baru</purpose>
+      <output>Link ke PR yang dibuat</output>
+    </command>
+  </github_cli_usage>
+
+  <wrangler_usage>
+    <command name="wrangler_pages_build">
+      <syntax>wrangler pages build</syntax>
+      <purpose>Build website untuk deployment</purpose>
+      <output>Artifacts siap untuk deployment</output>
+    </command>
+    
+    <command name="wrangler_pages_deploy">
+      <syntax>wrangler pages deploy --branch [branch]</syntax>
+      <purpose>Deploy ke Cloudflare Pages</purpose>
+      <output>URL deployment dan status</output>
+    </command>
+  </wrangler_usage>
+
+  <lighthouse_usage>
+    <command name="lighthouse_audit">
+      <syntax>lighthouse [url] --output=json --output-path=report.json</syntax>
+      <purpose>Audit performa website</purpose>
+      <output>JSON report dengan metrik Lighthouse</output>
+    </command>
+  </lighthouse_usage>
+
+  <best_practices>
+    <practice>Selalu gunakan --repo flag untuk menghindari kebingungan</practice>
+    <practice>Cek output dari perintah sebelum melanjutkan ke langkah berikutnya</practice>
+    <practice>Dokumentasikan hasil perintah penting dalam output akhir</practice>
+    <practice>Gunakan --limit flag untuk mengontrol jumlah output</practice>
+  </best_practices>
+</tool_usage_guide>
