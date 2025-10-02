@@ -1,97 +1,33 @@
 name = "maskom"
-main = ".open-next/worker.js"
-compatibility_date = "2025-01-01"
-compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
-workers_dev = true
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
 
-# Build configuration
-[build]
-command = "npm run build"
-
-# Define the assets configuration explicitly for optimization
-[assets]
-directory = ".open-next/assets"
-binding = "ASSETS"
-
-# Environment variables
-[vars]
-NODE_ENV = "production"
-MCP_ENABLED = "true"
-MCP_API_URL = "/api/mcp"
-
-# Add any other global environment variables here
-# API_URL = "https://maskom.co.id/api"
-
-# Environment variables that should be set as secrets
-# EMAILJS_SERVICE_ID
-# EMAILJS_TEMPLATE_ID  
-# EMAILJS_PUBLIC_KEY
-
-# Environment-specific configurations
 [env.development]
 name = "maskom-dev"
-account_id = "d82dfc100c4c41a50546254e1d91dcfc"  # Replace with your actual account ID
-
-[env.development.vars]
-NODE_ENV = "development"
-MCP_API_URL = "/api/mcp"
-# Add development-specific variables here
+account_id = "your-account-id-here"
+routes = ["https://maskom-dev.your-subdomain.workers.dev"]
 
 [env.preview]
 name = "maskom-preview"
-account_id = "d82dfc100c4c41a50546254e1d91dcfc"  # Replace with your actual account ID
+account_id = "your-account-id-here"
+routes = ["https://maskom-preview.your-subdomain.workers.dev"]
 
 [env.production]
 name = "maskom"
-account_id = "d82dfc100c4c41a50546254e1d91dcfc"  # Replace with your actual account ID
-
-[env.preview.vars]
-NODE_ENV = "preview"
-MCP_API_URL = "/api/mcp"
-# Add preview-specific variables here
+account_id = "your-account-id-here"
+routes = [
+  "https://maskom.sulhi.workers.dev",
+  "https://maskom.co.id/*"
+]
 
 [env.production.vars]
-NODE_ENV = "production"
-MCP_API_URL = "/api/mcp"
-# Add production-specific variables here
+NEXT_PUBLIC_SITE_URL = "https://maskom.co.id"
+NEXT_PUBLIC_API_BASE_URL = "https://api.maskom.co.id"
 
-# Routes for the production environment
-# Uncomment and configure these when ready to deploy to your own domain
-[[env.production.routes]]
-pattern = "www.maskom.co.id/*"
-zone_id = "6c8f7c1b9d1f140d458e2e6682280261"  # Replace with your actual zone ID
+[env.development.vars]
+NEXT_PUBLIC_SITE_URL = "https://maskom-dev.your-subdomain.workers.dev"
+NEXT_PUBLIC_API_BASE_URL = "https://api-dev.maskom.co.id"
 
-[[env.production.routes]]
-pattern = "maskom.co.id/*"
-zone_id = "6c8f7c1b9d1f140d458e2e6682280261"  # Replace with your actual zone ID
-
-# Additional routes can be added as needed
-# [[env.production.routes]]
-# pattern = "api.maskom.co.id/*"
-# zone_id = "your-zone-id-here"
-
-# Preview domain for development and testing
-# [[env.production.routes]]
-# pattern = "maskom.sulhi.workers.dev/*"
-# zone_id = "your-zone-id-here"
-
-# Define durable objects if needed
-# [[durable_objects.bindings]]
-# name = "MY_DURABLE_OBJECT"
-# class_name = "MyDurableObject"
-
-# KV namespace bindings if needed
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "your-namespace-id"
-
-# R2 bucket bindings if needed
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
-
-# D1 database bindings if needed
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "my-database"
-# database_id = "your-database-id"
+[env.preview.vars]
+NEXT_PUBLIC_SITE_URL = "https://maskom-preview.your-subdomain.workers.dev"
+NEXT_PUBLIC_API_BASE_URL = "https://api-preview.maskom.co.id"

@@ -20,7 +20,6 @@ interface LargestContentfulPaintEntry extends PerformanceEntry {
 // Extend PerformanceEntry to include CLS-specific properties
 interface LayoutShiftEntry extends PerformanceEntry {
   hadRecentInput?: boolean;
-  value?: number;
 }
 
 export class PerformanceMonitor {
@@ -101,17 +100,6 @@ export class PerformanceMonitor {
           // Safely access layout shift properties with proper type checking
           const shiftEntry = entry as unknown as {
             hadRecentInput?: boolean;
-            value?: number;
-          };
-          if (!shiftEntry.hadRecentInput) {
-            clsValue += shiftEntry.value || 0;
-          }
-        }
-          if (!shiftEntry.hadRecentInput) {
-            clsValue += shiftEntry.value || 0;
-          }
-        }
-            value?: number;
           };
           if (!shiftEntry.hadRecentInput) {
             clsValue += shiftEntry.value || 0;
