@@ -1,9 +1,6 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
 export default defineCloudflareConfig({
-  // Enable compression to reduce bundle size
-  compression: "brotli",
-  
   // Optimize for edge runtime
   edge: {
     // Include additional packages that need to be available at runtime
