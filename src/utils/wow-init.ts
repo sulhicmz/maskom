@@ -14,7 +14,7 @@ interface WOWOptions {
 }
 
 // Type definition for WOW.js since @types/wowjs is not available
-type WOWConstructor = new (options?: any) => {
+type WOWConstructor = new (options?: Record<string, unknown>) => {
   init: () => void;
 };
 
