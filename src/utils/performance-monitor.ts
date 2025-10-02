@@ -17,11 +17,6 @@ interface LargestContentfulPaintEntry extends PerformanceEntry {
   loadTime?: number;
 }
 
-// Extend PerformanceEntry to include CLS-specific properties
-interface LayoutShiftEntry extends PerformanceEntry {
-  hadRecentInput?: boolean;
-}
-
 export class PerformanceMonitor {
   private metrics: PerformanceMetrics = {};
   private observer?: PerformanceObserver;
