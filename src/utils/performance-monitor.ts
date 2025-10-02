@@ -11,6 +11,18 @@ interface PerformanceMetrics {
   navigation?: number; // Total navigation time
 }
 
+// Extend PerformanceEntry to include LCP-specific properties
+interface LargestContentfulPaintEntry extends PerformanceEntry {
+  renderTime?: number;
+  loadTime?: number;
+}
+
+// Extend PerformanceEntry to include CLS-specific properties
+interface LayoutShiftEntry extends PerformanceEntry {
+  hadRecentInput?: boolean;
+  value?: number;
+}
+
 export class PerformanceMonitor {
   private metrics: PerformanceMetrics = {};
   private observer?: PerformanceObserver;
@@ -20,21 +32,25 @@ export class PerformanceMonitor {
   }
   
   private initMetrics(): void {
-    // Track FCP (First Contentful Paint)
-    this.trackFCP();
-    
-    // Track LCP (Largest Contentful Paint)
-    this.trackLCP();
-    
-    // Track CLS (Cumulative Layout Shift)
-    this.trackCLS();
-    
-    // Track TTFB (Time to First Byte)
-    this.trackTTFB();
+    try {
+      // Track FCP (First Contentful Paint)
+      this.trackFCP();
+      
+      // Track LCP (Largest Contentful Paint)
+      this.trackLCP();
+      
+      // Track CLS (Cumulative Layout Shift)
+      this.trackCLS();
+      
+      // Track TTFB (Time to First Byte)
+      this.trackTTFB();
+    } catch (error) {
+      console.warn('Performance monitoring initialization failed:', error);
+    }
   }
   
   private trackFCP(): void {
-    if ('paint' in performance) {
+    if (typeof PerformanceObserver !== 'undefined' && 'observe' in PerformanceObserver.prototype) {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (entry.name === 'first-contentful-paint') {
@@ -45,48 +61,69 @@ export class PerformanceMonitor {
         }
       });
       
-      observer.observe({ entryTypes: ['paint'] });
+      try {
+        observer.observe({ entryTypes: ['paint'] });
+      } catch (error) {
+        console.warn('FCP observation failed:', error);
+      }
     }
   }
   
   private trackLCP(): void {
-    if ('LargestContentfulPaint' in PerformanceObserver?.prototype) {
+    if (typeof PerformanceObserver !== 'undefined' && 'observe' in PerformanceObserver.prototype) {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        this.metrics.lcp = lastEntry.renderTime || lastEntry.loadTime;
-        this.reportMetric('LCP', this.metrics.lcp);
+        if (entries.length > 0) {
+          const lastEntry = entries[entries.length - 1] as LargestContentfulPaintEntry;
+          // Safely access renderTime and loadTime with type checking
+          this.metrics.lcp = (lastEntry as any).renderTime || (lastEntry as any).loadTime || lastEntry.startTime || 0;
+          this.reportMetric('LCP', this.metrics.lcp);
+        }
       });
       
-      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+      try {
+        observer.observe({ entryTypes: ['largest-contentful-paint'] });
+      } catch (error) {
+        console.warn('LCP observation failed:', error);
+      }
     }
   }
   
   private trackCLS(): void {
-    if ('layoutShift' in PerformanceEntry?.prototype) {
+    if (typeof PerformanceObserver !== 'undefined' && 'observe' in PerformanceObserver.prototype) {
       let clsValue = 0;
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
+          // Safely access layout shift properties with type checking
+          const shiftEntry = entry as LayoutShiftEntry;
+          if (!(shiftEntry as any).hadRecentInput) {
+            clsValue += (shiftEntry as any).value || 0;
           }
         }
         this.metrics.cls = clsValue;
         this.reportMetric('CLS', clsValue);
       });
       
-      observer.observe({ entryTypes: ['layout-shift'] });
+      try {
+        observer.observe({ entryTypes: ['layout-shift'] });
+      } catch (error) {
+        console.warn('CLS observation failed:', error);
+      }
     }
   }
   
   private trackTTFB(): void {
     // TTFB is available from navigation entries
-    if (typeof PerformanceObserver !== 'undefined') {
-      const navEntries = performance.getEntriesByType('navigation');
-      if (navEntries.length > 0) {
-        const navEntry = navEntries[0] as PerformanceNavigationTiming;
-        this.metrics.ttfb = navEntry.responseStart - navEntry.requestStart;
-        this.reportMetric('TTFB', this.metrics.ttfb);
+    if (typeof PerformanceObserver !== 'undefined' && typeof performance !== 'undefined') {
+      try {
+        const navEntries = performance.getEntriesByType('navigation');
+        if (navEntries.length > 0) {
+          const navEntry = navEntries[0] as PerformanceNavigationTiming;
+          this.metrics.ttfb = navEntry.responseStart - navEntry.requestStart;
+          this.reportMetric('TTFB', this.metrics.ttfb);
+        }
+      } catch (error) {
+        console.warn('TTFB measurement failed:', error);
       }
     }
   }
