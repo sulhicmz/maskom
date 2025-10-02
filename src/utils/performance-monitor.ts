@@ -95,6 +95,7 @@ export class PerformanceMonitor {
           // Safely access layout shift properties with proper type checking
           const shiftEntry = entry as unknown as {
             hadRecentInput?: boolean;
+            value?: number;
           };
           if (!shiftEntry.hadRecentInput) {
             clsValue += shiftEntry.value || 0;
