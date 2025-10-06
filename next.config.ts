@@ -5,6 +5,8 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+const assetPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\/$/, "");
+
 const nextConfig: NextConfig = {
   // Konfigurasi untuk Cloudflare Pages
   output: 'standalone',
@@ -52,7 +54,7 @@ const nextConfig: NextConfig = {
   },
   
   // Konfigurasi untuk asset prefixes
-  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://maskom.co.id' : undefined,
+  assetPrefix: assetPrefix || undefined,
   
   // Implementasi caching strategies untuk static assets
   async headers() {
