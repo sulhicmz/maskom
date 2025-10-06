@@ -1,13 +1,5 @@
-import testi_data from "@/data/FeedbackData";
-
-const getInitials = (name: string) => {
-   return name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? "")
-      .join("");
-};
+import testi_data from "@/data/FeedbackData"
+import Image from "next/image"
 
 const Feedback = () => {
    return (
@@ -33,12 +25,12 @@ const Feedback = () => {
                         <div className="testimonial-content">
                            <div className="author-info-wrap d-flex justify-content-between">
                               <div className="author-thumb-item mb-15">
-                                 <div className="thumb thumb-initials">
-                                    {getInitials(item.name)}
+                                 <div className="thumb">
+                                    <Image src={item.avatar} alt="author thumb" />
                                  </div>
                                  <div className="content">
                                     <h6>{item.name}</h6>
-                                    <span className="position">{item.title} · {item.company}</span>
+                                    <span className="position">{item.designation}</span>
                                  </div>
                               </div>
                               <div className="ratings">

@@ -5,10 +5,9 @@ Maskom adalah situs pemasaran untuk layanan konektivitas dan managed service Mas
 ## Fitur Utama
 - **Runtime edge** dengan `export const runtime = 'edge'` sehingga build Next.js dapat dijalankan di Cloudflare Workers. Beberapa halaman menggunakan runtime nodejs untuk kompatibilitas dengan OpenNext Cloudflare deployment. 【F:src/app/layout.tsx†L1-L33】
 - **Layout reusable** melalui `Wrapper` yang menambahkan `ScrollToTop` dan `ToastContainer` agar interaksi global tetap konsisten. 【F:src/layouts/Wrapper.tsx†L1-L15】
-- **Homepage bertema gelap** (`HomeOneDark`) menjadi landing default Maskom dan menyorot Solusi → Pendekatan → Dukungan dengan copy terbaru. 【F:src/app/page.tsx†L1-L15】【F:src/components/homes/home-one-dark/index.tsx†L1-L28】
-- **Navigasi data-driven** dari `src/data/MenuData.ts` sehingga struktur menu dapat dimodifikasi tanpa perubahan komponen. 【F:src/data/MenuData.ts†L1-L42】
+- **Navigasi data-driven** dari `src/data/MenuData.ts` sehingga struktur menu dapat dimodifikasi tanpa perubahan komponen. 【F:src/data/MenuData.ts†L1-L38】
 - **Section berbasiskan data** (mis. proses kerja, paket harga, testimoni) yang dibaca dari berkas `src/data/*.ts`. 【F:src/components/homes/home-one/Process.tsx†L1-L37】【F:src/components/homes/home-one/Price.tsx†L1-L68】
-- **Integrasi pihak ketiga** untuk pengiriman email (EmailJS) dan notifikasi (React Toastify). 【F:src/components/forms/ContactForm.tsx†L1-L58】
+- **Integrasi pihak ketiga** untuk animasi (Swiper, Isotope), pengiriman email (EmailJS), serta notifikasi (React Toastify). 【F:src/components/homes/home-two/Gallery.tsx†L1-L69】【F:src/components/forms/ContactForm.tsx†L1-L58】
 
 ## Struktur Proyek
 ```
@@ -46,8 +45,9 @@ public/
 | `npm run deploy` | Build OpenNext dan deploy ke Cloudflare Workers |
 
 ## Panduan Konten & Data
-- Komponen rumah utama (`HomeOne`) menyusun urutan Solusi → Pendekatan → Dukungan → Keunggulan → Paket Layanan → Testimoni → FAQ → CTA, sementara `HomeOneDark` menggunakan susunan yang sama dengan variasi styling. 【F:src/components/homes/home-one/index.tsx†L1-L31】【F:src/components/homes/home-one-dark/index.tsx†L1-L26】
+- Komponen rumah utama (`HomeOne`) memuat header, hero, benefit, proses, paket harga, testimoni, FAQ, hingga CTA dalam urutan yang sama dengan landing page produksi. 【F:src/components/homes/home-one/index.tsx†L1-L32】
 - Data proses, paket harga, dan konten lain diseleksi dengan filter `page` sehingga dapat digunakan ulang di halaman lain (mis. halaman pricing). 【F:src/components/homes/home-one/Process.tsx†L17-L31】【F:src/data/PriceData.ts†L1-L112】
+- Komponen `Gallery` menggunakan Isotope untuk filter kategori dan membutuhkan DOM karena dipasang di sisi klien. Pastikan `window` tersedia sebelum inisialisasi. 【F:src/components/homes/home-two/Gallery.tsx†L1-L61】
 - Navigasi sticky dan tombol kembali ke atas memanfaatkan hook `UseSticky` untuk mendeteksi scroll >200px. 【F:src/hooks/UseSticky.ts†L1-L28】【F:src/components/common/ScrollToTop.tsx†L1-L32】
 
 ## Styling & Aset

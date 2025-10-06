@@ -1,15 +1,15 @@
-import HeaderOne from "@/layouts/headers/HeaderOne";
-import FooterOne from "@/layouts/footers/FooterOne";
-import Hero from "../home-one/Hero";
-import Cta from "../home-one/Cta";
-import Faq from "../home-one/Faq";
-import Feedback from "../home-one/Feedback";
-import IntroArea from "../home-one/IntroArea";
-import Feature from "../home-one/Feature";
-import TrustedBy from "../home-one/TrustedBy";
-import Price from "../home-one/Price";
-import Process from "../home-one/Process";
-import Cause from "../home-one/Cause";
+import HeaderOne from "@/layouts/headers/HeaderOne"
+import FooterOne from "@/layouts/footers/FooterOne"
+import Hero from "../home-one/Hero"
+import Brand from "./Brand"
+import Cta from "../home-one/Cta"
+import Faq from "../home-one/Faq"
+import Feedback from "../home-one/Feedback"
+import IntroArea from "../home-one/IntroArea"
+import Feature from "../home-one/Feature"
+import Price from "../home-one/Price"
+import Process from "../home-one/Process"
+import Cause from "../home-one/Cause"
 
 const HomeOneDark = () => {
    return (
@@ -19,12 +19,12 @@ const HomeOneDark = () => {
             <div className="smooth-wrapper">
                <div id="smooth-content">
                   <Hero />
-                  <TrustedBy />
+                  <Brand />
                   <Cause />
                   <Process />
-                  <IntroArea />
-                  <Feature />
                   <Price />
+                  <Feature />
+                  <IntroArea />
                   <Feedback />
                   <Faq />
                   <Cta />
