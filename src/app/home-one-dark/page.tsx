@@ -6,12 +6,12 @@ export const runtime = 'nodejs';
 export const metadata = {
   title: "Home One Dark AIcraft - AI Application & Generator React Next js Template",
 };
-const page = => {
+const Page = () => {
   return (
     <Wrapper>
       <HomeOneDark />
     </Wrapper>
-  )
-}
+  );
+};
 
-export default page
+export default Page;
