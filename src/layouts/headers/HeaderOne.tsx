@@ -57,9 +57,6 @@ const HeaderOne = ({ style }: ProfType) => {
                                  </div>
                               </div>
                               <div className="ac-header-one__right-btn style-one d-flex">
-                                 <div className="ac-dark-btn">
-                                    <Link href="/home-one-dark"><i className="fas fa-moon"></i></Link>
-                                 </div>
                                  <div className="ac-header-bnt-1">
                                     <Link href="/login">Portal Pelanggan</Link>
                                  </div>
