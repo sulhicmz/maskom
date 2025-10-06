@@ -31,18 +31,24 @@ const menu_data: MenuItem[] = [
     },
     {
         id: 4,
-        title: "Harga",
-        link: "/#paket",
+        title: "Dukungan",
+        link: "/#dukungan",
         has_dropdown: false,
     },
     {
         id: 5,
+        title: "Paket Layanan",
+        link: "/#paket",
+        has_dropdown: false,
+    },
+    {
+        id: 6,
         title: "Testimoni",
         link: "/#testimoni",
         has_dropdown: false,
     },
     {
-        id: 6,
+        id: 7,
         has_dropdown: false,
         title: "Kontak",
         link: "/contact",

@@ -42,9 +42,9 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                               <ul className="mb-30">
                                  <li><Link href="/#solusi">Solusi</Link></li>
                                  <li><Link href="/#pendekatan">Pendekatan</Link></li>
-                                 <li><Link href="/#paket">Harga</Link></li>
+                                 <li><Link href="/#dukungan">Dukungan</Link></li>
+                                 <li><Link href="/#paket">Paket Layanan</Link></li>
                                  <li><Link href="/#testimoni">Testimoni</Link></li>
-                                 <li><Link href="/contact">Hubungi Kami</Link></li>
                               </ul>
                            </div>
                            <div className="col-md-6">
@@ -62,12 +62,12 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                   </div>
                   <div className="col-lg-3">
                      <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
-                        <h4 className="footer-title">News & Update</h4>
+                        <h4 className="footer-title">Berita &amp; Pembaruan</h4>
                         <div className="newsletter-content">
                            <form onSubmit={(e) => e.preventDefault()}>
                               <div className="form-group mb-30">
-                                 <input type="email" placeholder="enter your email" name="email" required />
-                                 <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
+                                 <input type="email" placeholder="Masukkan email kerja" name="email" required />
+                                 <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Berlangganan</button>
                               </div>
                            </form>
                            <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>

@@ -61,7 +61,7 @@ const HeaderOne = ({ style }: ProfType) => {
                                     <Link href="/login">Portal Pelanggan</Link>
                                  </div>
                                  <div className="ac-header-bnt-2 d-none d-md-block">
-                                    <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
+                                    <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Konektivitas</Link>
                                  </div>
                                  <div onClick={() => setOffCanvas(true)} className={`navbar-toggler ${offCanvas ? "active" : ""}`}>
                                     <span></span>
