@@ -12,7 +12,7 @@ const Cta = () => {
                      <div className="cta-one_content-box wow fadeInLeft">
                         <h2>Siap Tingkatkan Kualitas Konektivitas Anda?</h2>
                         <p>Diskusikan kebutuhan jaringan dan managed service bersama konsultan Maskom. Kami bantu rancang solusi paling efisien.</p>
-                        <Link href="/contact" className="theme-btn gradient-btn">Hubungi Maskom</Link>
+                        <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Konektivitas</Link>
                      </div>
                   </div>
                   <div className="col-lg-6">

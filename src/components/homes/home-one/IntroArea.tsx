@@ -11,7 +11,7 @@ const IntroArea = () => {
 
    return (
       <>
-         <section className="intro-section pb-120" id="tentang">
+         <section className="intro-section pb-120" id="dukungan">
             <div className="container">
                <div className="intro-wrapper">
                   <div className="row align-items-center">
@@ -27,14 +27,14 @@ const IntroArea = () => {
                      <div className="col-xl-6">
                         <div className="section-content-box text-white mb-50 wow fadeInRight">
                            <div className="section-title mb-55">
-                              <span className="sub-title style-one">Tentang Maskom</span>
-                              <h2>Partner Infrastruktur Digital <br /> Untuk Bisnis Anda</h2>
+                              <span className="sub-title style-one">Dukungan Maskom</span>
+                              <h2>Tim Operasional Yang Menjaga Jaringan <br /> Tetap Terkendali</h2>
                            </div>
-                           <p>Sejak 2004 Maskom membantu perusahaan di Indonesia membangun konektivitas yang stabil, aman, dan mudah dikelola. Kami memadukan jaringan fiber, sistem keamanan, serta layanan managed service agar tim Anda fokus pada inovasi bisnis.</p>
+                           <p>Maskom tidak hanya memasang jaringan. Engineer kami mendampingi mulai dari tahap desain, menyiapkan SOP incident, hingga memberikan laporan kesehatan jaringan berkala agar keputusan TI Anda selalu berbasis data.</p>
                            <ul className="circle-list style-one">
-                              <li>Engineer bersertifikasi yang siap melakukan deployment di seluruh nusantara.</li>
-                              <li>Operasional jaringan dipantau dari Network Operation Center 24/7.</li>
-                              <li>Model kerjasama fleksibel: sewa perangkat, managed service, hingga revenue sharing.</li>
+                              <li>Network Operation Center memonitor 24/7 dengan SLA respons hingga 2 jam.</li>
+                              <li>Engineer bersertifikasi siap onsite di lebih dari 40 kota besar di Indonesia.</li>
+                              <li>Review performa dan rekomendasi optimasi dikirim rutin ke tim Anda.</li>
                            </ul>
                         </div>
                      </div>
