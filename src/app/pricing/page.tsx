@@ -1,6 +1,8 @@
 import Pricing from "@/components/pages/pricing";
 import Wrapper from "@/layouts/Wrapper";
 
+export const runtime = 'nodejs';
+
 export const metadata = {
   title: "Harga Layanan Maskom",
   description: "Detail paket konektivitas dan managed service Maskom untuk berbagai kebutuhan bisnis.",
