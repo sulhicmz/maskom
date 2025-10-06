@@ -5,8 +5,6 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-const assetPrefix = process.env.NEXT_PUBLIC_ASSET_PREFIX?.replace(/\/$/, "");
-
 const nextConfig: NextConfig = {
   // Konfigurasi untuk Cloudflare Pages
   output: 'standalone',
@@ -52,9 +50,6 @@ const nextConfig: NextConfig = {
     // Menonaktifkan optimizeCss karena Cloudflare menangani ini
     optimizeCss: false,
   },
-  
-  // Konfigurasi untuk asset prefixes
-  assetPrefix: assetPrefix || undefined,
   
   // Implementasi caching strategies untuk static assets
   async headers() {
