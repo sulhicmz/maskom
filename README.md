@@ -3,7 +3,7 @@
 Maskom adalah situs pemasaran untuk layanan konektivitas dan managed service Maskom Network yang dibangun di atas Next.js App Router. Seluruh halaman utama ditulis dalam bahasa Indonesia dan memanfaatkan data statis TypeScript sehingga konten dapat diperbarui terpusat tanpa menyentuh komponen presentasi.
 
 ## Fitur Utama
-- **Runtime edge** dengan `export const runtime = 'edge'` sehingga build Next.js dapat dijalankan di Cloudflare Workers. 【F:src/app/layout.tsx†L1-L33】
+- **Runtime edge** dengan `export const runtime = 'edge'` sehingga build Next.js dapat dijalankan di Cloudflare Workers. Beberapa halaman menggunakan runtime nodejs untuk kompatibilitas dengan OpenNext Cloudflare deployment. 【F:src/app/layout.tsx†L1-L33】
 - **Layout reusable** melalui `Wrapper` yang menambahkan `ScrollToTop` dan `ToastContainer` agar interaksi global tetap konsisten. 【F:src/layouts/Wrapper.tsx†L1-L15】
 - **Navigasi data-driven** dari `src/data/MenuData.ts` sehingga struktur menu dapat dimodifikasi tanpa perubahan komponen. 【F:src/data/MenuData.ts†L1-L38】
 - **Section berbasiskan data** (mis. proses kerja, paket harga, testimoni) yang dibaca dari berkas `src/data/*.ts`. 【F:src/components/homes/home-one/Process.tsx†L1-L37】【F:src/components/homes/home-one/Price.tsx†L1-L68】

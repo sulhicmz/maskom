@@ -1,6 +1,8 @@
 import Faq from "@/components/pages/faq";
 import Wrapper from "@/layouts/Wrapper";
 
+export const runtime = 'nodejs';
+
 export const metadata = {
   title: "FAQ Maskom",
   description: "Pertanyaan umum terkait layanan konektivitas dan managed service Maskom.",

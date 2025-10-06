@@ -1,0 +1,44 @@
+# Code Owners for Maskom Repository
+
+# Format:
+#   - Pattern: File pattern to match
+#   - Owner: Username or team name
+
+# Root and core files
+* @sulhi
+
+# Frontend components
+/src/components/**/* @sulhi
+
+# Data files
+/src/data/**/* @sulhi
+
+# Layout files
+/src/layouts/**/* @sulhi
+
+# App routing
+/src/app/**/* @sulhi
+
+# Hooks and utilities
+/src/hooks/**/* @sulhi
+
+# Styling
+/src/styles/**/* @sulhi
+/public/assets/**/* @sulhi
+
+# Testing
+**/*.test.* @sulhi
+**/*.spec.* @sulhi
+
+# Configuration files
+package.json @sulhi
+package-lock.json @sulhi
+tsconfig.json @sulhi
+.eslintrc* @sulhi
+next.config.ts @sulhi
+wrangler.toml @sulhi
+open-next.config.ts @sulhi
+
+# GitHub specific files
+.github/**/* @sulhi
+docs/**/* @sulhi
