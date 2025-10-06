@@ -3,7 +3,8 @@
 ## HIGH Priority
 - [x] Refactor EmailJS credentials from `src/components/forms/ContactForm.tsx` to environment variables. (Security Risk)
 - [x] Update `README.md` to reflect that EmailJS credentials are now environment variables.
-- [ ] Commit uncommitted changes to `README.md` and `todo.md`.
+- [x] Commit uncommitted changes to `README.md` and `todo.md`.
+- [ ] Commit uncommitted changes to `todo.md` and push to remote.
 
 ## MEDIUM Priority
 - [x] Review and update dependencies for outdated or vulnerable packages.
