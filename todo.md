@@ -9,6 +9,7 @@
 
 ## MEDIUM Priority
 - [x] Review and update dependencies for outdated or vulnerable packages.
+- [x] Remove unused template pages and related dependencies to reduce the bundle size.
 - [ ] Update documentation to note the dark theme is now the default homepage experience.
 
 ## LOW Priority
