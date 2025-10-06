@@ -12,10 +12,12 @@ The following pages have been updated to use `export const runtime = 'nodejs';`:
 - /about
 - /contact
 - /dashboard
+- /home-two
 - /blog
 - /blog-details
 - /faq
 - /home-one-dark
+- /home-three
 - /login
 - /sign-up
 - /pricing
@@ -34,9 +36,3 @@ The root layout (/src/app/layout.tsx) remains with edge runtime to maintain the 
 
 ## OpenNext Configuration
 The configuration in open-next.config.ts remains as default, using `defineCloudflareConfig()` which is the recommended approach for Cloudflare deployment.
-
-## Asset Prefix & Static Assets
-
-- `next.config.ts` intentionally omits `assetPrefix` so that generated CSS/JS references stay relative (e.g. `/_next/static/...`).
-- Production builds deployed to Cloudflare Workers have been verified via `curl https://maskom.sulhi.workers.dev` to confirm all assets resolve relative to the worker host.
-- If a canonical domain requires a CDN prefix in the future, prefer configuring it at the CDN level rather than hardcoding `assetPrefix`, to keep previews and staging environments functional.

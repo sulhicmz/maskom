@@ -51,7 +51,7 @@ const Offcanvas = () => {
                         ))}
                      </ul>
                   </div>
-                  <div><Link href="/contact" className="btn-five w-100 tran3s" data-bs-dismiss="offcanvas">Konsultasi Konektivitas</Link></div>
+                  <div><Link href="/contact" className="btn-five w-100 tran3s" data-bs-dismiss="offcanvas">Hubungi Kami</Link></div>
                   <div className="address-block mt-50">
                      <h4 className="title pb-15">Maskom Network</h4>
                      <p>Jakarta Selatan, DKI Jakarta<br />Indonesia</p>
