@@ -5,24 +5,38 @@ interface StickyState {
    sticky: boolean;
 }
 
-const UseSticky = (): StickyState => {
+const UseSticky = (offset = 200): StickyState => {
    const [sticky, setSticky] = useState(false);
 
-   const stickyHeader = (): void => {
-      if (window.scrollY > 200) {
-         setSticky(true);
-      } else {
-         setSticky(false);
-      }
-   };
-
    useEffect(() => {
-      window.addEventListener("scroll", stickyHeader);
+      if (typeof window === "undefined") {
+         return undefined;
+      }
 
-      return (): void => {
-         window.removeEventListener("scroll", stickyHeader);
+      let frame = 0;
+
+      const updateSticky = () => {
+         frame = 0;
+         const shouldStick = window.scrollY > offset;
+         setSticky((prev) => (prev === shouldStick ? prev : shouldStick));
       };
-   }, []);
+
+      const handleScroll = () => {
+         if (frame) return;
+         frame = window.requestAnimationFrame(updateSticky);
+      };
+
+      updateSticky();
+      window.addEventListener("scroll", handleScroll, { passive: true });
+
+      return () => {
+         if (frame) {
+            window.cancelAnimationFrame(frame);
+         }
+         window.removeEventListener("scroll", handleScroll);
+      };
+   }, [offset]);
+
    return {
       sticky,
    };
