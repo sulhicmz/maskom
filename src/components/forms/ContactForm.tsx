@@ -28,8 +28,12 @@ const ContactForm = () => {
 
    const sendEmail = () => {
       if (form.current) {
-         emailjs.sendForm('service_fuc95rb', 'template_9gahggu',
-            form.current, '2xsKQqT3Wmfx0sYeF')
+         emailjs.sendForm(
+            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
+            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
+            form.current,
+            process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || ''
+         )
             .then((result) => {
                const notify = () => toast('Pesan berhasil dikirim', { position: 'top-center' });
                notify();
