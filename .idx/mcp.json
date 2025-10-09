@@ -39,9 +39,7 @@
       "args": [
         "-y",
         "@notionhq/notion-mcp-server"
-      ],
-      "env": {
-      }
+      ]
     },
     "playwright": {
       "command": "npx",
@@ -65,8 +63,6 @@
       "args": [
         "/home/user/.local/share/Roo-Code/MCP/github-server/build/index.js"
       ],
-      "env": {
-      },
       "alwaysAllow": [
         "list_repos",
         "stream_events",
