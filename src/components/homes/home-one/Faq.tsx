@@ -3,9 +3,9 @@ import faq_data from "@/data/FaqData"
 import Image from "next/image"
 import { useState } from "react"
 
-import faq_1 from "@/assets/images/contact/contact-1.jpg"
-import faq_2 from "@/assets/images/contact/contact-2.jpg"
-import faq_3 from "@/assets/images/contact/contact-3.jpg"
+import faq_1 from "@/assets/images/contact/contact-1.svg"
+import faq_2 from "@/assets/images/contact/contact-2.svg"
+import faq_3 from "@/assets/images/contact/contact-3.svg"
 import faq_shape from "@/assets/images/contact/shape-1.png"
 
 const Faq = () => {

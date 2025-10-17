@@ -1,14 +1,14 @@
 import { StaticImageData } from "next/image";
 
-import avatar_1 from "@/assets/images/testimonial/thumb-1.jpg"
-import avatar_2 from "@/assets/images/testimonial/thumb-2.jpg"
-import avatar_3 from "@/assets/images/testimonial/thumb-3.jpg"
-import avatar_4 from "@/assets/images/testimonial/thumb-4.jpg"
-import avatar_5 from "@/assets/images/testimonial/thumb-5.jpg"
-import avatar_6 from "@/assets/images/testimonial/thumb-6.jpg"
-import avatar_7 from "@/assets/images/testimonial/thumb-7.jpg"
-import avatar_8 from "@/assets/images/testimonial/thumb-8.jpg"
-import avatar_9 from "@/assets/images/testimonial/thumb-9.jpg"
+import avatar_1 from "@/assets/images/testimonial/thumb-1.svg"
+import avatar_2 from "@/assets/images/testimonial/thumb-2.svg"
+import avatar_3 from "@/assets/images/testimonial/thumb-3.svg"
+import avatar_4 from "@/assets/images/testimonial/thumb-4.svg"
+import avatar_5 from "@/assets/images/testimonial/thumb-5.svg"
+import avatar_6 from "@/assets/images/testimonial/thumb-6.svg"
+import avatar_7 from "@/assets/images/testimonial/thumb-7.svg"
+import avatar_8 from "@/assets/images/testimonial/thumb-8.svg"
+import avatar_9 from "@/assets/images/testimonial/thumb-9.svg"
 
 interface DataType {
    id: number;

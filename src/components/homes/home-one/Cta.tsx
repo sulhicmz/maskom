@@ -1,5 +1,5 @@
-import cta_1 from "@/assets/images/gallery/robot2.png"
-import cta_2 from "@/assets/images/gallery/base2.png"
+import cta_1 from "@/assets/images/gallery/robot2.svg"
+import cta_2 from "@/assets/images/gallery/base2.svg"
 import Image from "next/image"
 import Link from "next/link"
 const Cta = () => {

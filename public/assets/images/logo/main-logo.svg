@@ -1,0 +1,17 @@
+<svg width="174" height="59" viewBox="0 0 174 59" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+    .text {
+        font-family: "Poppins", sans-serif;
+        font-size: 40px;
+        font-weight: bold;
+    }
+</style>
+<path d="M20 59V0H40L60 29.5L80 0H100V59H80V29.5L60 59L40 29.5V59H20Z" fill="url(#paint0_linear_1_2)"/>
+<text x="90" y="45" class="text" fill="white">Maskom</text>
+<defs>
+<linearGradient id="paint0_linear_1_2" x1="60" y1="0" x2="60" y2="59" gradientUnits="userSpaceOnUse">
+<stop stop-color="#007BFF"/>
+<stop offset="1" stop-color="#0056b3"/>
+</linearGradient>
+</defs>
+</svg>

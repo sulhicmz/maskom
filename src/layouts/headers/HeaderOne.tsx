@@ -5,8 +5,8 @@ import Image from "next/image"
 import { useState, useEffect } from "react";
 import UseSticky from "@/hooks/UseSticky";
 
-import logo_1 from "@/assets/images/logo/main-logo.png";
-import logo_2 from "@/assets/images/logo/white-logo.png";
+import logo_1 from "@/assets/images/logo/main-logo.svg";
+import logo_2 from "@/assets/images/logo/white-logo.svg";
 
 interface ProfType {
    style: boolean;

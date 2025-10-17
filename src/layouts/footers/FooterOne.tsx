@@ -2,9 +2,9 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import logo_1 from "@/assets/images/logo/main-logo.png"
-import logo_2 from "@/assets/images/logo/secondary-logo.png"
-import logo_3 from "@/assets/images/logo/white-logo.png"
+import logo_1 from "@/assets/images/logo/main-logo.svg";
+import logo_2 from "@/assets/images/logo/secondary-logo.svg";
+import logo_3 from "@/assets/images/logo/white-logo.svg";
 
 interface ProfType {
    style: boolean;

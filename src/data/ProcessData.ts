@@ -1,7 +1,7 @@
 import { StaticImageData } from "next/image";
 
-import work_1 from "@/assets/images/gallery/work-1.jpg"
-import work_2 from "@/assets/images/gallery/work-2.jpg"
+import work_1 from "@/assets/images/gallery/work-1.svg"
+import work_2 from "@/assets/images/gallery/work-2.svg"
 
 interface DataType {
    id: number;
