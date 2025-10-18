@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import dashboard_img from "@/assets/images/hero/dashboard-img.jpg"
+import dashboard_img from "@/assets/images/hero/dashboard.svg"
 
 const Hero = () => {
    return (

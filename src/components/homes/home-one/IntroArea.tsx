@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useState } from 'react';
 import VideoPopup from "@/modals/VideoPopup"
 
-import video_thumb from "@/assets/images/gallery/video-1.jpg"
+import video_thumb from "@/assets/images/gallery/video-1.svg"
 
 const IntroArea = () => {
 

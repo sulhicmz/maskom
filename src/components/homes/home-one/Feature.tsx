@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import feature_img from "@/assets/images/gallery/feature-img.jpg"
+import feature_img from "@/assets/images/gallery/feature-img.svg"
 
 interface DataType {
    id: number;

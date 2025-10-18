@@ -1,0 +1,11 @@
+<svg width="174" height="59" viewBox="0 0 174 59" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+    .text {
+        font-family: "Poppins", sans-serif;
+        font-size: 40px;
+        font-weight: bold;
+    }
+</style>
+<path d="M20 59V0H40L60 29.5L80 0H100V59H80V29.5L60 59L40 29.5V59H20Z" fill="#007BFF"/>
+<text x="90" y="45" class="text" fill="#007BFF">Maskom</text>
+</svg>

@@ -4,13 +4,13 @@ import { Autoplay, Navigation } from 'swiper/modules';
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link"
 
-import brand_1 from "@/assets/images/clients/logo1_1.png"
-import brand_2 from "@/assets/images/clients/logo1_2.png"
-import brand_3 from "@/assets/images/clients/logo1_3.png"
-import brand_4 from "@/assets/images/clients/logo1_4.png"
-import brand_5 from "@/assets/images/clients/logo1_5.png"
-import brand_6 from "@/assets/images/clients/logo1_6.png"
-import brand_7 from "@/assets/images/clients/logo1_7.png"
+import brand_1 from "@/assets/images/clients/logo1_1.svg"
+import brand_2 from "@/assets/images/clients/logo1_2.svg"
+import brand_3 from "@/assets/images/clients/logo1_3.svg"
+import brand_4 from "@/assets/images/clients/logo1_4.svg"
+import brand_5 from "@/assets/images/clients/logo1_5.svg"
+import brand_6 from "@/assets/images/clients/logo1_6.svg"
+import brand_7 from "@/assets/images/clients/logo1_7.svg"
 
 const setting = {
    slidesPerView: 6,
