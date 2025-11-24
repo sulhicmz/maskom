@@ -43,6 +43,18 @@ const menu_data: MenuItem[] = [
     },
     {
         id: 6,
+        title: "Perusahaan",
+        link: "#",
+        has_dropdown: true,
+        sub_menus: [
+            { link: "/about", title: "Tentang Kami" },
+            { link: "/faq", title: "FAQ" },
+            { link: "/login", title: "Portal Pelanggan" },
+            { link: "/sign-up", title: "Daftar Layanan" },
+        ],
+    },
+    {
+        id: 7,
         has_dropdown: false,
         title: "Kontak",
         link: "/contact",

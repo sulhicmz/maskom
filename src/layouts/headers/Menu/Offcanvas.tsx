@@ -4,13 +4,6 @@ import Link from "next/link";
 import menu_data from "@/data/MenuData";
 import logo from "@/assets/images/logo/logo_02.svg";
 
-const companyLinks = [
-   { title: "Tentang Maskom", href: "/about" },
-   { title: "FAQ", href: "/faq" },
-   { title: "Portal Pelanggan", href: "/login" },
-   { title: "Daftar Layanan", href: "/sign-up" },
-];
-
 const socialLinks = [
    { icon: "fab fa-instagram", href: "https://www.instagram.com" },
    { icon: "fab fa-linkedin-in", href: "https://www.linkedin.com" },
@@ -39,14 +32,17 @@ const Offcanvas = () => {
                               <Link href={menu.link} data-bs-dismiss="offcanvas">
                                  {menu.title}
                               </Link>
-                           </li>
-                        ))}
-                        <li className="nav-item mt-3 text-uppercase fw-semibold text-muted">Perusahaan</li>
-                        {companyLinks.map((menu) => (
-                           <li key={menu.href} className="nav-item">
-                              <Link href={menu.href} data-bs-dismiss="offcanvas">
-                                 {menu.title}
-                              </Link>
+                              {menu.has_dropdown && menu.sub_menus && (
+                                 <ul className="style-none">
+                                    {menu.sub_menus.map((sub_menu, i) => (
+                                       <li key={i} className="nav-item">
+                                          <Link href={sub_menu.link} data-bs-dismiss="offcanvas">
+                                             {sub_menu.title}
+                                          </Link>
+                                       </li>
+                                    ))}
+                                 </ul>
+                              )}
                            </li>
                         ))}
                      </ul>
