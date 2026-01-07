@@ -3,8 +3,8 @@ import { toast } from 'react-toastify';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import emailjs from '@emailjs/browser';
 import { useRef } from 'react';
+import { emailService } from '@/services/email';
 
 interface FormData {
    user_name: string;
@@ -26,24 +26,26 @@ const ContactForm = () => {
 
    const form = useRef<HTMLFormElement>(null);
 
-   const sendEmail = () => {
-      if (form.current) {
-         emailjs.sendForm(
-            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
-            process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
-            form.current,
-            process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || ''
-         )
-            .then((result) => {
-               const notify = () => toast('Pesan berhasil dikirim', { position: 'top-center' });
-               notify();
-               reset();
-               console.log(result.text);
-            }, (error) => {
-               console.log(error.text);
-            });
-      } else {
+   const sendEmail = async () => {
+      if (!form.current) {
          console.error("Form reference is null");
+         return;
+      }
+
+      const formData = new FormData(form.current);
+      const templateParams = {
+         user_name: formData.get('user_name') as string,
+         user_email: formData.get('user_email') as string,
+         message: formData.get('message') as string
+      };
+
+      const result = await emailService.sendEmail({ templateParams });
+
+      if (result.success) {
+         toast.success('Pesan berhasil dikirim', { position: 'top-center' });
+         reset();
+      } else {
+         toast.error('Gagal mengirim pesan. Silakan coba lagi.', { position: 'top-center' });
       }
    };
 

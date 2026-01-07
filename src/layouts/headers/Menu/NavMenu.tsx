@@ -3,25 +3,13 @@
 import menu_data from "@/data/MenuData";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useBreakpoint } from "@/hooks/UseSticky";
 
 const NavMenu = () => {
     const currentRoute = usePathname();
-    const [isBreakpointOn, setIsBreakpointOn] = useState(false);
+    const { isBreakpointOn } = useBreakpoint();
     const [openSubmenus, setOpenSubmenus] = useState<{ [key: number]: boolean }>({});
-
-    useEffect(() => {
-        const handleResize = () => {
-            setIsBreakpointOn(window.innerWidth < 1200);
-        };
-
-        window.addEventListener("resize", handleResize);
-        handleResize();
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
 
     const toggleSubMenu = (id: number) => {
         setOpenSubmenus((prev) => ({

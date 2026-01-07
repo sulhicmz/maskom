@@ -2,8 +2,8 @@
 import NavMenu from "./Menu/NavMenu"
 import Link from "next/link"
 import Image from "next/image"
-import { useState, useEffect } from "react";
-import UseSticky from "@/hooks/UseSticky";
+import { useState } from "react";
+import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 
 import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/white-logo.svg";
@@ -14,21 +14,8 @@ interface ProfType {
 const HeaderOne = ({ style }: ProfType) => {
 
    const { sticky } = UseSticky();
+   const { isBreakpointOn } = useBreakpoint();
    const [offCanvas, setOffCanvas] = useState<boolean>(false);
-   const [isBreakpointOn, setIsBreakpointOn] = useState(false);
-
-   useEffect(() => {
-      const handleResize = () => {
-         setIsBreakpointOn(window.innerWidth < 1200);
-      };
-
-      window.addEventListener("resize", handleResize);
-      handleResize();
-
-      return () => {
-         window.removeEventListener("resize", handleResize);
-      };
-   }, []);
 
    return (
       <>
