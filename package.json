@@ -20,7 +20,7 @@
     "@emailjs/browser": "^4.4.1",
     "@hookform/resolvers": "^5.2.2",
     "bootstrap": "^5.3.8",
-    "next": "15.5.2",
+    "next": "^15.5.9",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-hook-form": "^7.70.0",
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@next/bundle-analyzer": "^15.5.4",
-    "@opennextjs/cloudflare": "^1.9.1",
+    "@opennextjs/cloudflare": "^1.14.8",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
