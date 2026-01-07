@@ -1,10 +1,12 @@
 import emailjs from '@emailjs/browser';
 import type { IEmailService, EmailSendParams, EmailSendResult } from './types';
+import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
 
 class EmailService implements IEmailService {
     private serviceId: string;
     private templateId: string;
     private publicKey: string;
+    private circuitBreaker: CircuitBreaker;
 
     constructor() {
         this.serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
@@ -14,6 +16,12 @@ class EmailService implements IEmailService {
         if (!this.serviceId || !this.templateId || !this.publicKey) {
             console.warn('EmailJS credentials not configured in environment variables');
         }
+
+        this.circuitBreaker = new CircuitBreaker({
+            failureThreshold: 5,
+            resetTimeoutMs: 60000,
+            monitoringPeriodMs: 60000
+        });
     }
 
     async sendEmail(params: EmailSendParams): Promise<EmailSendResult> {
@@ -25,12 +33,24 @@ class EmailService implements IEmailService {
         }
 
         try {
-            const result = await emailjs.send(
-                this.serviceId,
-                this.templateId,
-                params.templateParams,
-                this.publicKey
-            );
+            const result = await this.circuitBreaker.execute(async () => {
+                const retryResult = await withRetry(
+                    () => this.sendEmailWithTimeout(params),
+                    {
+                        maxAttempts: 3,
+                        baseDelayMs: 1000,
+                        maxDelayMs: 10000,
+                        backoffMultiplier: 2,
+                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+                    }
+                );
+
+                if (!retryResult.success || !retryResult.data) {
+                    throw retryResult.error || new Error('Email send failed after retries');
+                }
+
+                return retryResult.data;
+            });
 
             return {
                 success: true,
@@ -43,6 +63,26 @@ class EmailService implements IEmailService {
                 error: error instanceof Error ? error.message : 'Unknown error'
             };
         }
+    }
+
+    private async sendEmailWithTimeout(params: EmailSendParams) {
+        return withTimeout(
+            emailjs.send(
+                this.serviceId,
+                this.templateId,
+                params.templateParams,
+                this.publicKey
+            ),
+            { timeoutMs: 10000, timeoutError: 'EmailJS request timed out' }
+        );
+    }
+
+    getCircuitBreakerState() {
+        return this.circuitBreaker.getState();
+    }
+
+    resetCircuitBreaker() {
+        this.circuitBreaker.reset();
     }
 }
 
