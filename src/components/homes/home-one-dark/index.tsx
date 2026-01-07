@@ -2,14 +2,30 @@ import HeaderOne from "@/layouts/headers/HeaderOne"
 import FooterOne from "@/layouts/footers/FooterOne"
 import Hero from "../home-one/Hero"
 import Brand from "./Brand"
-import Cta from "../home-one/Cta"
-import Faq from "../home-one/Faq"
-import Feedback from "../home-one/Feedback"
-import IntroArea from "../home-one/IntroArea"
-import Feature from "../home-one/Feature"
-import Price from "../home-one/Price"
-import Process from "../home-one/Process"
 import Cause from "../home-one/Cause"
+import dynamic from "next/dynamic"
+
+const Process = dynamic(() => import("../home-one/Process"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const Price = dynamic(() => import("../home-one/Price"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const Feature = dynamic(() => import("../home-one/Feature"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const IntroArea = dynamic(() => import("../home-one/IntroArea"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const Feedback = dynamic(() => import("../home-one/Feedback"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const Faq = dynamic(() => import("../home-one/Faq"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const Cta = dynamic(() => import("../home-one/Cta"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
 
 const HomeOneDark = () => {
    return (

@@ -80,3 +80,7 @@ const faq_data: DataType[] = [
 ];
 
 export default faq_data;
+
+export const home_1_faq = faq_data.filter((item) => item.page === "home_1");
+export const home_2_faq = faq_data.filter((item) => item.page === "home_2");
+export const home_3_faq = faq_data.filter((item) => item.page === "home_3");

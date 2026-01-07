@@ -1,5 +1,5 @@
 "use client"
-import faq_data from "@/data/FaqData"
+import { home_1_faq } from "@/data/FaqData"
 import Image from "next/image"
 import { useState } from "react"
 
@@ -10,7 +10,7 @@ import faq_shape from "@/assets/images/contact/shape-1.png"
 
 const Faq = () => {
 
-   const [activeId, setActiveId] = useState<number>(faq_data[0].id);
+   const [activeId, setActiveId] = useState<number>(home_1_faq[0].id);
 
    return (
       <section className="faqs-section pb-190 pt-110" id="faq">
@@ -30,8 +30,8 @@ const Faq = () => {
                         <span className="sub-title style-one">Pertanyaan Umum</span>
                         <h2>Hal yang Sering <br /> Ditanyakan Klien</h2>
                      </div>
-                     <div className="accordion wow fadeInUp" id="accordionOne">
-                        {faq_data.filter((items) => items.page === "home_1").map((item) => (
+                      <div className="accordion wow fadeInUp" id="accordionOne">
+                         {home_1_faq.map((item) => (
                            <div key={item.id} className="accordion-card style-one mb-15">
                               <div className="accordion-header">
                                  <h6 onClick={() => setActiveId(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >

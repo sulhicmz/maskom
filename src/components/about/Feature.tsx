@@ -1,6 +1,7 @@
-import feature_data from "@/data/FeatureData"
+import { about_feature } from "@/data/FeatureData"
+import React from "react"
 
-const Feature = () => {
+const Feature = React.memo(() => {
    return (
       <section className="features-section pb-70">
          <div className="container">
@@ -18,7 +19,7 @@ const Feature = () => {
                </div>
             </div>
             <div className="row justify-content-center">
-               {feature_data.filter((items) => items.page === "about").map((item) => (
+               {about_feature.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
                      <div className="iconic-info-box style-four mb-40 wow fadeInUp">
                         <div className="icon">
@@ -35,6 +36,8 @@ const Feature = () => {
          </div>
       </section>
    )
-}
+})
+
+Feature.displayName = "Feature"
 
 export default Feature

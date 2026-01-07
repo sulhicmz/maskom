@@ -1,5 +1,5 @@
 "use client"
-import price_data from "@/data/PriceData";
+import { pricing_price } from "@/data/PriceData";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -42,7 +42,7 @@ const PricingArea = () => {
                </div>
             </div>
             <div className="tab-content wow fadeInDown">
-               {price_data.filter((prices) => prices.page === "pricing").map((items, index) => (
+               {pricing_price.map((items, index) => (
                   <div key={items.id} className={`tab-pane fade ${activeTab === index ? 'show active' : ''}`}>
                      <div className="row">
                         {items.price_details.map((item) => (

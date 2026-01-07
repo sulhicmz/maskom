@@ -117,3 +117,6 @@ const testi_data: DataType[] = [
 ];
 
 export default testi_data;
+
+export const home_1_feedback = testi_data.filter((item) => item.page === "home_1");
+export const home_2_feedback = testi_data.filter((item) => item.page === "home_2");

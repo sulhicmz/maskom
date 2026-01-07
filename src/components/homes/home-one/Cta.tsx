@@ -2,7 +2,9 @@ import cta_1 from "@/assets/images/gallery/robot2.svg"
 import cta_2 from "@/assets/images/gallery/base2.svg"
 import Image from "next/image"
 import Link from "next/link"
-const Cta = () => {
+import React from "react"
+
+const Cta = React.memo(() => {
    return (
       <section className="cta-section" id="hubungi">
          <div className="container">
@@ -26,6 +28,8 @@ const Cta = () => {
          </div>
       </section>
    )
-}
+})
+
+Cta.displayName = "Cta"
 
 export default Cta

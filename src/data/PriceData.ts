@@ -272,3 +272,6 @@ const price_data: DataType[] = [
 ];
 
 export default price_data;
+
+export const home_1_price = price_data.filter((item) => item.page === "home_1");
+export const pricing_price = price_data.filter((item) => item.page === "pricing");

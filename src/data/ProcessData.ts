@@ -40,3 +40,5 @@ const process_data: DataType[] = [
 ];
 
 export default process_data;
+
+export const home_1_process = process_data.filter((item) => item.page === "home_1");

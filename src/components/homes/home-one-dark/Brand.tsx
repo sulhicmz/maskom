@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link"
+import React from "react"
 
 import brand_1 from "@/assets/images/clients/logo1_1.svg"
 import brand_2 from "@/assets/images/clients/logo1_2.svg"
@@ -41,7 +42,7 @@ const setting = {
 };
 
 const brand_data: StaticImageData[] = [brand_1, brand_2, brand_3, brand_4, brand_5, brand_6, brand_7, brand_2]
-const Brand = () => {
+const Brand = React.memo(() => {
    return (
       <section className="clients-section">
          <div className="container">
@@ -64,6 +65,8 @@ const Brand = () => {
          </div>
       </section>
    )
-}
+})
+
+Brand.displayName = "Brand"
 
 export default Brand

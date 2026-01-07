@@ -52,3 +52,5 @@ const cause_data: DataType[] = [
 ];
 
 export default cause_data;
+
+export const home_1_cause = cause_data.filter((item) => item.page === "home_1");

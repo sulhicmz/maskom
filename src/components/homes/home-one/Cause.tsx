@@ -1,7 +1,8 @@
-import cause_data from "@/data/CauseData"
+import { home_1_cause } from "@/data/CauseData"
 import Link from "next/link"
+import React from "react"
 
-const Cause = () => {
+const Cause = React.memo(() => {
    return (
       <section className="use-cases-section pt-105 pb-85" id="solusi">
          <div className="container">
@@ -15,7 +16,7 @@ const Cause = () => {
                </div>
             </div>
             <div className="row">
-               {cause_data.filter((items) => items.page === "home_1").map((item) => (
+               {home_1_cause.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
                      <div className="iconic-info-box style-one text-center mb-25 wow fadeInUp">
                         <div className="icon">
@@ -32,6 +33,8 @@ const Cause = () => {
          </div>
       </section>
    )
-}
+})
+
+Cause.displayName = "Cause"
 
 export default Cause

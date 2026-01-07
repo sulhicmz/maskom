@@ -97,3 +97,6 @@ const feature_data: DataType[] = [
 ];
 
 export default feature_data;
+
+export const home_3_feature = feature_data.filter((item) => item.page === "home_3");
+export const about_feature = feature_data.filter((item) => item.page === "about");

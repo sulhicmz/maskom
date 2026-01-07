@@ -1,7 +1,8 @@
-import process_data from "@/data/ProcessData"
+import { home_1_process } from "@/data/ProcessData"
 import Image from "next/image"
+import React from "react"
 
-const Process = () => {
+const Process = React.memo(() => {
    return (
       <section className="works-process-section pb-75" id="pendekatan">
          <div className="container">
@@ -15,7 +16,7 @@ const Process = () => {
                </div>
             </div>
             <div className="row justify-content-center">
-               {process_data.filter((items) => items.page === "home_1").map((item) => (
+               {home_1_process.map((item) => (
                   <div key={item.id} className="col-xl-4 col-md-6 col-sm-6">
                      <div className="ac-process-item mb-40 wow fadeInUp">
                         <div className="process-inner-content">
@@ -35,6 +36,8 @@ const Process = () => {
          </div>
       </section>
    )
-}
+})
+
+Process.displayName = "Process"
 
 export default Process
