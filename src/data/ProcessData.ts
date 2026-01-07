@@ -2,6 +2,7 @@ import { StaticImageData } from "next/image";
 
 import work_1 from "@/assets/images/gallery/work-1.svg"
 import work_2 from "@/assets/images/gallery/work-2.svg"
+import { filterItems } from "@/utils/dataFilters";
 
 interface DataType {
    id: number;
@@ -41,4 +42,4 @@ const process_data: DataType[] = [
 
 export default process_data;
 
-export const home_1_process = process_data.filter((item) => item.page === "home_1");
+export const home_1_process = filterItems(process_data, "home_1");

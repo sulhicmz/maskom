@@ -1,3 +1,5 @@
+import { filterItems } from "@/utils/dataFilters";
+
 interface DataType {
    id: number;
    page: string;
@@ -53,4 +55,4 @@ const cause_data: DataType[] = [
 
 export default cause_data;
 
-export const home_1_cause = cause_data.filter((item) => item.page === "home_1");
+export const home_1_cause = filterItems(cause_data, "home_1");

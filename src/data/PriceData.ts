@@ -1,3 +1,5 @@
+import { filterItems } from "@/utils/dataFilters";
+
 interface DataType {
    id: number;
    page: string;
@@ -273,5 +275,5 @@ const price_data: DataType[] = [
 
 export default price_data;
 
-export const home_1_price = price_data.filter((item) => item.page === "home_1");
-export const pricing_price = price_data.filter((item) => item.page === "pricing");
+export const home_1_price = filterItems(price_data, "home_1");
+export const pricing_price = filterItems(price_data, "pricing");

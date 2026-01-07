@@ -1,3 +1,5 @@
+import { filterItems } from "@/utils/dataFilters";
+
 interface DataType {
    id: number;
    page: string;
@@ -98,5 +100,5 @@ const feature_data: DataType[] = [
 
 export default feature_data;
 
-export const home_3_feature = feature_data.filter((item) => item.page === "home_3");
-export const about_feature = feature_data.filter((item) => item.page === "about");
+export const home_3_feature = filterItems(feature_data, "home_3");
+export const about_feature = filterItems(feature_data, "about");

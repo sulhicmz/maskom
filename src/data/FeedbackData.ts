@@ -9,6 +9,7 @@ import avatar_6 from "@/assets/images/testimonial/thumb-6.svg"
 import avatar_7 from "@/assets/images/testimonial/thumb-7.svg"
 import avatar_8 from "@/assets/images/testimonial/thumb-8.svg"
 import avatar_9 from "@/assets/images/testimonial/thumb-9.svg"
+import { filterItems } from "@/utils/dataFilters";
 
 interface DataType {
    id: number;
@@ -118,5 +119,5 @@ const testi_data: DataType[] = [
 
 export default testi_data;
 
-export const home_1_feedback = testi_data.filter((item) => item.page === "home_1");
-export const home_2_feedback = testi_data.filter((item) => item.page === "home_2");
+export const home_1_feedback = filterItems(testi_data, "home_1");
+export const home_2_feedback = filterItems(testi_data, "home_2");

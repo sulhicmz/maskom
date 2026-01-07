@@ -29,7 +29,11 @@ maskom/
 ```
 Data Files (src/data/*.ts)
     ↓
-Components (filter by page property)
+Filter Utilities (src/utils/dataFilters.ts) - Type-safe filtering
+    ↓
+Pre-filtered Exports (page-specific data)
+    ↓
+Components (use pre-filtered data)
     ↓
 Pages/Sections
     ↓
@@ -44,13 +48,15 @@ Layout/Wrapper
 - ✅ TypeScript interfaces for data structures
 - ✅ Environment variables for sensitive data
 - ✅ Clean file organization by category
+- ✅ Centralized filter utilities for type-safe data operations
+- ✅ Pre-filtered data exports at build time
 
 ### Anti-Patterns (Fix)
-- ❌ Business logic in presentation components (ContactForm)
-- ❌ Direct third-party library usage without abstraction
-- ❌ Duplicate code across components (resize handlers)
-- ❌ Hardcoded filter logic in multiple places
-- ❌ Missing service layer for external APIs
+- ❌ Business logic in presentation components (ContactForm) - FIXED
+- ❌ Direct third-party library usage without abstraction - FIXED
+- ❌ Duplicate code across components (resize handlers) - FIXED
+- ❌ Hardcoded filter logic in multiple places - FIXED
+- ❌ Missing service layer for external APIs - FIXED
 
 ## Key Dependencies
 
@@ -58,8 +64,9 @@ Layout/Wrapper
 - **Deployment**: OpenNext for Cloudflare Workers
 - **UI Libraries**: Bootstrap 5, Swiper, Isotope
 - **Forms**: React Hook Form, Yup validation
-- **Email**: EmailJS (via service abstraction)
+- **Email**: EmailJS (via service abstraction with resilience patterns)
 - **Animations**: WOW.js, React Toastify
+- **Data Filtering**: Custom utility functions with TypeScript generics
 
 ## Technical Constraints
 

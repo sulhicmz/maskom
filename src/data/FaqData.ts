@@ -1,3 +1,5 @@
+import { filterItems } from "@/utils/dataFilters";
+
 interface DataType {
    id: number;
    page: string;
@@ -81,6 +83,6 @@ const faq_data: DataType[] = [
 
 export default faq_data;
 
-export const home_1_faq = faq_data.filter((item) => item.page === "home_1");
-export const home_2_faq = faq_data.filter((item) => item.page === "home_2");
-export const home_3_faq = faq_data.filter((item) => item.page === "home_3");
+export const home_1_faq = filterItems(faq_data, "home_1");
+export const home_2_faq = filterItems(faq_data, "home_2");
+export const home_3_faq = filterItems(faq_data, "home_3");
