@@ -28,7 +28,6 @@ const ContactForm = () => {
 
    const sendEmail = async () => {
       if (!form.current) {
-         console.error("Form reference is null");
          return;
       }
 
