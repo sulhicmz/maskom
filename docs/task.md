@@ -8,6 +8,63 @@
 
 ---
 
+## Task 11: Critical Path Testing - Navigation & Layout Components
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Test Engineering
+
+**Problem**:
+- NavMenu component handles critical navigation logic but had no test coverage
+- HeaderOne component manages offcanvas state and responsive behavior but was untested
+- VideoPopup component handles modal state but lacked test coverage
+- ScrollToTop and Wrapper components had no test coverage
+- These components are critical for user experience and navigation flow
+
+**Solution**:
+1. Created comprehensive test suite for NavMenu (15 tests)
+2. Created comprehensive test suite for HeaderOne (13 tests)
+3. Created comprehensive test suite for VideoPopup (6 tests)
+4. Created comprehensive test suite for ScrollToTop (7 tests)
+5. Created comprehensive test suite for Wrapper (5 tests)
+6. All tests follow AAA pattern and test behavior, not implementation
+7. Tests cover rendering, state management, event handling, and edge cases
+
+**Success Criteria**:
+- [x] NavMenu has 15 comprehensive tests
+- [x] HeaderOne has 13 comprehensive tests
+- [x] VideoPopup has 6 comprehensive tests
+- [x] ScrollToTop has 7 comprehensive tests
+- [x] Wrapper has 5 comprehensive tests
+- [x] All 187 tests passing (100% success rate)
+- [x] Lint passed without errors
+- [x] Zero regressions in existing functionality
+
+**Related Files**:
+- Created: `src/layouts/headers/Menu/__tests__/NavMenu.test.tsx`
+- Created: `src/layouts/headers/__tests__/HeaderOne.test.tsx`
+- Created: `src/modals/__tests__/VideoPopup.test.tsx`
+- Created: `src/components/common/__tests__/ScrollToTop.test.tsx`
+- Created: `src/layouts/__tests__/Wrapper.test.tsx`
+
+**Test Coverage Summary**:
+- NavMenu: Submenu toggle, active route detection, dropdown triggers
+- HeaderOne: Offcanvas state, responsive behavior, sticky navigation
+- VideoPopup: Open/close state, videoId handling, modal props
+- ScrollToTop: Click handler, scroll behavior, visibility state
+- Wrapper: Children rendering, subcomponent rendering
+
+**Notes**:
+- All 187 tests passing (100% success rate)
+- Lint passed without errors
+- Tests follow AAA (Arrange-Act-Assert) pattern
+- External dependencies properly mocked (react-modal-video, next/image, next/link)
+- Descriptive test names covering scenarios + expectations
+- One assertion focus per test
+- Happy paths and edge cases both tested
+
+---
+
 ## Task 8: Critical Path Testing - Form Components & Data Filters
 
 **Status**: ✅ Completed
