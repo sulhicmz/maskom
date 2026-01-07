@@ -63,3 +63,4 @@ const inner_blog_data: DataType[] = [
 ];
 
 export default inner_blog_data;
+export type { DataType };

@@ -1,26 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import inner_blog_data from "@/data/InnerBlogData"
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
+import { usePagination } from "@/hooks/usePagination"
 
 const BlogArea = () => {
 
    const blog = inner_blog_data;
-
    const itemsPerPage = 3;
-   const [itemOffset, setItemOffset] = useState(0);
-   const endOffset = itemOffset + itemsPerPage;
-   const currentItems = blog.slice(itemOffset, endOffset);
-   const pageCount = Math.ceil(blog.length / itemsPerPage);
-   // click to request another page.
-   const handlePageClick = (event: any) => {
-      const newOffset = (event.selected * itemsPerPage) % blog.length;
-      setItemOffset(newOffset);
-   };
+
+   const { currentItems, pageCount, handlePageClick } = usePagination({
+      data: blog,
+      itemsPerPage,
+   });
 
    return (
       <section className="blogs-section pt-120 pb-90">

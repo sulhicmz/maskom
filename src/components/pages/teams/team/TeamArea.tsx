@@ -1,25 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import team_data from "@/data/TeamData"
 import Image from "next/image"
 import Link from "next/link"
+import { usePagination } from "@/hooks/usePagination"
 
 const TeamArea = () => {
 
    const team = team_data;
-
    const itemsPerPage = 8;
-   const [itemOffset, setItemOffset] = useState(0);
-   const endOffset = itemOffset + itemsPerPage;
-   const currentItems = team.slice(itemOffset, endOffset);
-   const pageCount = Math.ceil(team.length / itemsPerPage);
-   // click to request another page.
-   const handlePageClick = (event: any) => {
-      const newOffset = (event.selected * itemsPerPage) % team.length;
-      setItemOffset(newOffset);
-   };
+
+   const { currentItems, pageCount, handlePageClick } = usePagination({
+      data: team,
+      itemsPerPage,
+   });
 
    return (
       <section className="team-section pt-120 pb-120">

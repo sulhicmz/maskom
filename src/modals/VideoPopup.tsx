@@ -1,12 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import ModalVideo from "react-modal-video";
+
+interface VideoPopupProps {
+  isVideoOpen: boolean;
+  setIsVideoOpen: (value: boolean) => void;
+  videoId?: string;
+}
 
 const VideoPopup = ({
   isVideoOpen,
   setIsVideoOpen,
-  videoId = "bgMEvrd2E", 
-  
-}:any ) => {
+  videoId = "bgMEvrd2", 
+}: VideoPopupProps) => {
   return (
     <>
       <ModalVideo
