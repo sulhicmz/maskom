@@ -15,12 +15,12 @@ const Cta = () => {
                         <Link href="/contact" className="theme-btn gradient-btn">Konsultasi dengan Kami</Link>
                      </div>
                   </div>
-                  <div className="col-lg-6">
-                     <div className="cta-one_image-box p-r z-1 text-xl-end">
-                        <Image src={cta_1} className="image-one" alt="" />
-                        <Image src={cta_2} className="image-two" alt="" />
-                     </div>
-                  </div>
+                   <div className="col-lg-6">
+                      <div className="cta-one_image-box p-r z-1 text-xl-end">
+                         <Image src={cta_1} className="image-one" alt="Robot AI yang mendukung infrastruktur digital" />
+                         <Image src={cta_2} className="image-two" alt="Dasar platform teknologi modern" />
+                      </div>
+                   </div>
                </div>
             </div>
          </div>

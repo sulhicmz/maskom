@@ -19,43 +19,55 @@ const HeaderOne = ({ style }: ProfType) => {
 
    return (
       <>
-         <header className={`transparent-header ${style ? "navigation-white" : ""}`}>
-            <div className={`header-navigation navigation-default ${isBreakpointOn ? "breakpoint-on d-block d-xl-none" : ""} ${sticky ? "sticky" : ""}`} >
-               <div onClick={() => setOffCanvas(false)} className={`nav-overlay ${offCanvas ? "active" : ""} `}></div>
+          <header className={`transparent-header ${style ? "navigation-white" : ""}`}>
+             <div className={`header-navigation navigation-default ${isBreakpointOn ? "breakpoint-on d-block d-xl-none" : ""} ${sticky ? "sticky" : ""}`} >
+                <button
+                  onClick={() => setOffCanvas(false)}
+                  className={`nav-overlay ${offCanvas ? "active" : ""} `}
+                  aria-label="Close navigation menu"
+                  aria-hidden={!offCanvas}
+                  tabIndex={offCanvas ? 0 : -1}
+                ></button>
                <div className="ac-header-one__main">
                   <div className="container">
                      <div className="ac-header-one__main-wrapper">
-                        <div className="ac-header-one__left">
-                           <div className="ac-header-one__logo">
-                              <Link href="/"><Image src={style ? logo_2 : logo_1} alt="logo" /></Link>
-                           </div>
-                        </div>
-                        <div className="ac-header-one__right">
-                           <div className="ac-header-one__right-menu d-flex align-items-center">
-                              <div className={`ac-nav-menu ${offCanvas ? "menu-on" : ""}`}>
-                                 <div className="site-branding d-block d-xl-none text-center mb-30">
-                                    <Link href="/"><Image src={logo_1} alt="logo" /></Link>
-                                 </div>
-                                 <nav className="main-menu">
-                                    <NavMenu />
-                                 </nav>
-                                 <div className="nav-button d-block d-xl-none mt-30">
-                                    <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
-                                 </div>
-                              </div>
-                              <div className="ac-header-one__right-btn style-one d-flex">
-                                 <div className="ac-header-bnt-1">
-                                    <Link href="/login">Portal Pelanggan</Link>
-                                 </div>
-                                 <div className="ac-header-bnt-2 d-none d-md-block">
-                                    <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
-                                 </div>
-                                 <div onClick={() => setOffCanvas(true)} className={`navbar-toggler ${offCanvas ? "active" : ""}`}>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                 </div>
-                              </div>
+                         <div className="ac-header-one__left">
+                            <div className="ac-header-one__logo">
+                               <Link href="/"><Image src={style ? logo_2 : logo_1} alt="Maskom - Logo Utama" /></Link>
+                            </div>
+                         </div>
+                         <div className="ac-header-one__right">
+                            <div className="ac-header-one__right-menu d-flex align-items-center">
+                               <div className={`ac-nav-menu ${offCanvas ? "menu-on" : ""}`} id="primary-nav">
+                                  <div className="site-branding d-block d-xl-none text-center mb-30">
+                                     <Link href="/"><Image src={logo_1} alt="Maskom - Logo Utama" /></Link>
+                                  </div>
+                                  <nav className="main-menu" aria-label="Primary navigation">
+                                     <NavMenu />
+                                  </nav>
+                                  <div className="nav-button d-block d-xl-none mt-30">
+                                     <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
+                                  </div>
+                               </div>
+                               <div className="ac-header-one__right-btn style-one d-flex">
+                                  <div className="ac-header-bnt-1">
+                                     <Link href="/login">Portal Pelanggan</Link>
+                                  </div>
+                                  <div className="ac-header-bnt-2 d-none d-md-block">
+                                     <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
+                                  </div>
+                                  <button
+                                    onClick={() => setOffCanvas(!offCanvas)}
+                                    className={`navbar-toggler ${offCanvas ? "active" : ""}`}
+                                    aria-label="Toggle navigation menu"
+                                    aria-expanded={offCanvas}
+                                    aria-controls="primary-nav"
+                                  >
+                                     <span></span>
+                                     <span></span>
+                                     <span></span>
+                                  </button>
+                               </div>
                            </div>
                         </div>
                      </div>

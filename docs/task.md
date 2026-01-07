@@ -444,6 +444,106 @@
 
 ---
 
+## Task 15: UI/UX Accessibility Improvements - Semantic HTML & ARIA Attributes
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX Engineering
+
+**Problem**:
+- Interactive elements using div/span instead of semantic button elements (anti-pattern)
+- Missing ARIA attributes for navigation and form accessibility
+- Form fields using placeholder as labels (anti-pattern for accessibility)
+- No proper error message linking for screen readers
+- Missing loading states on form submission
+- Generic or empty alt text on images
+
+**Solution**:
+1. HeaderOne.tsx: Converted nav-overlay div and navbar-toggler div to semantic buttons
+2. HeaderOne.tsx: Added proper ARIA attributes (aria-label, aria-expanded, aria-controls, aria-hidden)
+3. HeaderOne.tsx: Improved logo alt text from "logo" to "Maskom - Logo Utama"
+4. NavMenu.tsx: Converted span dropdown trigger to semantic button
+5. NavMenu.tsx: Added ARIA attributes (aria-expanded, aria-label, aria-controls)
+6. NavMenu.tsx: Added keyboard navigation support (handleKeyDown for Enter/Space keys)
+7. ContactForm.tsx: Added proper label elements with sr-only class for screen readers
+8. ContactForm.tsx: Added aria-describedby linking error messages to inputs
+9. ContactForm.tsx: Added aria-invalid and aria-live for form validation announcements
+10. ContactForm.tsx: Added loading state with visual feedback ("Mengirim...")
+11. ContactForm.tsx: Added noValidate to form for better custom validation
+12. Cta.tsx: Added descriptive alt text for decorative images
+
+**Success Criteria**:
+- [x] All interactive elements now use semantic HTML (button instead of div/span)
+- [x] Navigation has proper ARIA attributes for screen readers
+- [x] Forms have proper labels linked to inputs
+- [x] Error messages are linked to inputs with aria-describedby
+- [x] Form validation uses aria-live for announcements
+- [x] Loading states provide visual feedback
+- [x] All images have descriptive alt text
+- [x] All 217 tests passing (100% success rate)
+- [x] Lint passed without errors
+- [x] Zero regressions in existing functionality
+
+**Related Files**:
+- Updated: `src/layouts/headers/HeaderOne.tsx` - Semantic buttons and ARIA attributes
+- Updated: `src/layouts/headers/Menu/NavMenu.tsx` - Dropdown accessibility improvements
+- Updated: `src/components/forms/ContactForm.tsx` - Complete form accessibility overhaul
+- Updated: `src/components/common/Cta.tsx` - Descriptive alt text
+- Updated: `src/layouts/headers/__tests__/HeaderOne.test.tsx` - Updated test for new alt text
+
+**Accessibility Improvements**:
+- **Semantic HTML**: All interactive elements now use proper semantic HTML elements
+  - div → button for navigation toggler and overlay
+  - span → button for dropdown triggers
+- **ARIA Attributes**: Added comprehensive ARIA attributes for screen readers
+  - aria-label, aria-expanded, aria-controls for navigation states
+  - aria-describedby linking error messages to form fields
+  - aria-invalid indicating form validation status
+  - aria-live for form submission announcements
+  - aria-hidden, tabIndex for overlay visibility management
+- **Form Labels**: Replaced placeholder-only labeling with proper label elements
+  - Visible labels for all form inputs
+  - sr-only class for screen reader-only labels
+  - Proper id/id attribute linking
+- **Keyboard Navigation**: Added keyboard support for interactive elements
+  - Enter and Space key handlers for dropdown toggles
+  - Proper focus management with tabIndex
+- **User Feedback**: Enhanced user experience with loading states
+  - Visual feedback during form submission ("Mengirim...")
+  - Disabled button state during submission
+  - aria-busy attribute for screen readers
+- **Image Accessibility**: Improved alt text for all images
+  - Descriptive alt text replacing generic/empty attributes
+  - Context-aware descriptions for decorative images
+
+**Testing**:
+- All 217 tests passing (100% success rate)
+- HeaderOne.test updated for new alt text
+- No breaking changes to existing test suite
+
+**Notes**:
+- All 217 tests passing (100% success rate)
+- Lint passed without errors
+- Changes follow UI/UX Engineering principles:
+  - User-Centric: Better experience for keyboard and screen reader users
+  - Accessibility (a11y): Full WCAG compliance improvements
+  - Semantic Structure: Meaningful HTML elements throughout
+  - Consistency: Follows design system and codebase patterns
+  - Zero regressions: All existing functionality preserved
+- Components now fully accessible via keyboard navigation
+- Screen reader users receive proper context and announcements
+- Forms provide clear error messages linked to specific fields
+- Visual loading states improve perceived performance
+
+**WCAG Compliance Improvements**:
+- Success Criterion 2.4.6: Headings and labels (Level AA)
+- Success Criterion 2.4.7: Focus visible (improved with semantic buttons)
+- Success Criterion 3.3.2: Labels or instructions (form labels added)
+- Success Criterion 3.3.3: Error suggestion (error linking added)
+- Success Criterion 4.1.2: Name, role, value (ARIA attributes added)
+
+---
+
 ## Task 14: Data Validation - Application Boundary & Schema Design
 
 **Status**: ✅ Completed

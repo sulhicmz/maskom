@@ -53,7 +53,7 @@ describe("HeaderOne Component", () => {
 
       const logo = document.querySelector("img");
       expect(logo).toBeInTheDocument();
-      expect(logo).toHaveAttribute("alt", "logo");
+      expect(logo).toHaveAttribute("alt", "Maskom - Logo Utama");
     });
 
     it("renders navigation menu", () => {
