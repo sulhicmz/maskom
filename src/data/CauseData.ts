@@ -1,14 +1,7 @@
 import { filterItems } from "@/utils/dataFilters";
+import { CauseItem } from "@/types/data";
 
-interface DataType {
-   id: number;
-   page: string;
-   icon: string
-   title: string;
-   desc: string;
-}
-
-const cause_data: DataType[] = [
+const cause_data: CauseItem[] = [
    {
       id: 1,
       page: "home_1",

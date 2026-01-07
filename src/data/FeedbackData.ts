@@ -1,4 +1,5 @@
-import { StaticImageData } from "next/image";
+import { filterItems } from "@/utils/dataFilters";
+import { FeedbackItem } from "@/types/data";
 
 import avatar_1 from "@/assets/images/testimonial/thumb-1.svg"
 import avatar_2 from "@/assets/images/testimonial/thumb-2.svg"
@@ -9,19 +10,8 @@ import avatar_6 from "@/assets/images/testimonial/thumb-6.svg"
 import avatar_7 from "@/assets/images/testimonial/thumb-7.svg"
 import avatar_8 from "@/assets/images/testimonial/thumb-8.svg"
 import avatar_9 from "@/assets/images/testimonial/thumb-9.svg"
-import { filterItems } from "@/utils/dataFilters";
 
-interface DataType {
-   id: number;
-   page: string;
-   avatar: StaticImageData;
-   name: string;
-   designation: string;
-   desc: string;
-   rating: string;
-}
-
-const testi_data: DataType[] = [
+const testi_data: FeedbackItem[] = [
    {
       id: 1,
       page: "home_1",
@@ -80,7 +70,7 @@ const testi_data: DataType[] = [
    // home_2
 
    {
-      id: 1,
+      id: 7,
       page: "home_2",
       avatar: avatar_7,
       name: "Dimas Prakoso",
@@ -89,7 +79,7 @@ const testi_data: DataType[] = [
       rating: "5.0"
    },
    {
-      id: 2,
+      id: 8,
       page: "home_2",
       avatar: avatar_8,
       name: "Sylvia Hartono",
@@ -98,7 +88,7 @@ const testi_data: DataType[] = [
       rating: "4.9"
    },
    {
-      id: 3,
+      id: 9,
       page: "home_2",
       avatar: avatar_9,
       name: "Akbar Maulana",
@@ -107,7 +97,7 @@ const testi_data: DataType[] = [
       rating: "5.0"
    },
    {
-      id: 4,
+      id: 10,
       page: "home_2",
       avatar: avatar_8,
       name: "Lina Sasmita",

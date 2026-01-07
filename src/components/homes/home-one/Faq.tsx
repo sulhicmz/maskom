@@ -35,8 +35,8 @@ const Faq = () => {
                            <div key={item.id} className="accordion-card style-one mb-15">
                               <div className="accordion-header">
                                  <h6 onClick={() => setActiveId(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >
-                                    {item.quesstion}
-                                 </h6>
+                                     {item.question}
+                                  </h6>
                               </div>
                               <div id="collapse1" className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}>
                                  <div className="accordion-content">

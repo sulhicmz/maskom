@@ -444,6 +444,94 @@
 
 ---
 
+## Task 14: Data Validation - Application Boundary & Schema Design
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture
+
+**Problem**:
+- Data integrity issues across multiple data files (duplicate IDs, type inconsistencies)
+- Interfaces scattered in individual data files instead of centralized type definitions
+- No runtime validation of data structure integrity
+- Typos in field names (quesstion in FaqData.ts)
+- No validation for field constraints (rating 0-5, price >= 0)
+- Duplicate ID values violate uniqueness constraints
+
+**Solution**:
+1. Create centralized type definitions module in src/types/data/
+2. Create data validation utility module with runtime validation
+3. Fix typo in FaqData.ts (quesstion -> question)
+4. Fix duplicate ID issues in FeedbackData.ts
+5. Add validation functions to ensure data integrity
+6. Add tests for validation utilities
+
+**Success Criteria**:
+- [x] Centralized type definitions created
+- [x] Data validation utilities created
+- [x] Fixed typo in FaqData.ts (quesstion -> question)
+- [x] Fixed duplicate ID issues in data files
+- [x] Runtime validation for data integrity
+- [x] All tests passing with zero regressions
+- [x] Lint passed without errors
+- [x] Build completed successfully
+
+**Related Files**:
+- Created: `src/types/data/index.ts` - Centralized type definitions
+- Created: `src/utils/dataValidation.ts` - Data validation utilities
+- Created: `src/utils/__tests__/dataValidation.test.ts` - Tests for validation
+- Updated: `src/data/FaqData.ts` - Fixed typo, use centralized types
+- Updated: `src/data/FeedbackData.ts` - Fixed duplicate IDs, use centralized types
+- Updated: `src/data/PriceData.ts` - Use centralized types
+- Updated: `src/data/FeatureData.ts` - Use centralized types
+- Updated: `src/data/ProcessData.ts` - Use centralized types
+- Updated: `src/data/CauseData.ts` - Use centralized types
+- Updated: `src/data/MenuData.ts` - Use centralized types
+- Updated: `src/components/homes/home-one/Faq.tsx` - Fixed property reference
+
+**Data Integrity Issues Fixed**:
+- FeedbackData: Fixed duplicate IDs (id 1, 4, 8 appeared multiple times across pages)
+  - Changed home_2 IDs from 1, 2, 3, 4 to 7, 8, 9, 10
+- FaqData: Fixed typo (quesstion -> question) in type and data
+- All data files: Now use centralized type definitions from src/types/data/index.ts
+
+**Validation Utilities Created**:
+- `validateFeedbackItem`: Validates feedback items with rating constraint (0-5)
+- `validateFaqItem`: Validates FAQ items with required fields
+- `validatePriceDetailItem`: Validates price details with non-negative price constraint
+- `validatePriceItem`: Validates price items and nested details
+- `validateFeatureItem`: Validates feature items with required fields
+- `validateProcessItem`: Validates process items with required fields
+- `validateCauseItem`: Validates cause items with required fields
+- `validateMenuItem`: Validates menu items with dropdown consistency
+- `checkDuplicateIds`: Detects duplicate IDs across pages
+- `validateDataArray`: Validates entire data arrays
+
+**Test Coverage**:
+- 30 comprehensive tests covering all validation functions
+- Tests for happy paths and error scenarios
+- Edge case testing (empty strings, negative values, invalid IDs)
+- Duplicate detection testing
+- Array validation testing
+
+**Notes**:
+- Build completed successfully (18 pages generated)
+- Lint passed without errors
+- All 247 tests passing (30 new validation tests + 217 existing)
+- Data validation ensures integrity at application boundary
+- Type definitions centralized for better maintainability
+- Runtime validation catches data integrity issues early
+- Zero regressions in existing functionality
+
+**Architecture Improvements**:
+- Single source of truth for data type definitions
+- Type safety enforced at both compile-time and runtime
+- Easier to add new data validation rules
+- Better developer experience with centralized imports
+- Consistent data structure across all data files
+
+---
+
 ## Task 7: Integration Hardening - EmailService Resilience
 
 **Status**: ✅ Completed

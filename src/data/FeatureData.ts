@@ -1,14 +1,7 @@
 import { filterItems } from "@/utils/dataFilters";
+import { FeatureItem } from "@/types/data";
 
-interface DataType {
-   id: number;
-   page: string;
-   icon: string;
-   title: string;
-   desc: string;
-}
-
-const feature_data: DataType[] = [
+const feature_data: FeatureItem[] = [
    {
       id: 1,
       page: "home_3",

@@ -23,6 +23,7 @@ maskom/
 3. **Path Aliases**: `@/*` → `./src/*`, `@/assets/*` → `./public/assets/*`
 4. **Client/Server Separation**: Components use `"use client"` directive appropriately
 5. **Edge Runtime**: Support for both edge and nodejs_compat runtimes for Cloudflare Workers
+6. **Data Integrity**: Centralized type definitions and runtime validation for all data structures
 
 ## Data Flow Pattern
 
@@ -50,6 +51,8 @@ Layout/Wrapper
 - ✅ Clean file organization by category
 - ✅ Centralized filter utilities for type-safe data operations
 - ✅ Pre-filtered data exports at build time
+- ✅ Centralized type definitions in `src/types/data/`
+- ✅ Runtime data validation with comprehensive test coverage
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED

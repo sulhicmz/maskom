@@ -1,14 +1,5 @@
 
-interface MenuItem {
-    id: number;
-    title: string;
-    link: string;
-    has_dropdown: boolean;
-    sub_menus?: {
-        link: string;
-        title: string;
-    }[];
-}
+import { MenuItem } from "@/types/data";
 
 const menu_data: MenuItem[] = [
     {
