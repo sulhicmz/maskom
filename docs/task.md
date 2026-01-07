@@ -484,3 +484,57 @@
 - CSP 'unsafe-inline' retained for Next.js client-side hydration (required by framework)
 - Error handling follows "Fail Secure" principle - errors don't expose sensitive data
 - Changes follow "Secrets are Sacred" principle - no secrets committed to repository
+
+---
+
+## Task 10: Bundle & Asset Optimization - CSS & Component Loading
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Performance Engineering
+
+**Problem**:
+- Swiper CSS imported as full bundle (loading unused modules)
+- WOW.js animate.css (60KB) imported but WOW.js library never initialized
+- Brand and Cause components loaded synchronously despite being below-the-fold
+- Unnecessary CSS overhead affecting bundle size and load performance
+
+**Solution**:
+1. Replaced `swiper/css/bundle` with modular imports: `swiper/css`, `swiper/css/navigation`, `swiper/css/autoplay`
+2. Removed unused `animate.css` (60KB) from WOW.js vendor directory
+3. Added dynamic imports for Brand and Cause components (previously statically loaded)
+4. Verified all changes with comprehensive testing
+
+**Success Criteria**:
+- [x] Swiper CSS optimized to load only required modules
+- [x] Removed 60KB unused animate.css
+- [x] Brand and Cause components now lazy-loaded
+- [x] All 141 tests passing with zero regressions
+- [x] Lint passed without errors
+- [x] Build completed successfully
+
+**Related Files**:
+- Updated: `src/styles/index.scss` - Removed animate.css import, optimized Swiper CSS imports
+- Updated: `src/components/homes/home-one-dark/index.tsx` - Added dynamic imports for Brand and Cause
+
+**Performance Impact**:
+- **CSS Reduction**: Eliminated 60KB unused animate.css
+- **Module Loading**: Swiper CSS now only loads Autoplay and Navigation modules (reduced from full bundle)
+- **Code Splitting**: Brand and Cause components now split into separate chunks, loaded on-demand
+- **First Load**: Maintained 273 kB gzipped vendor bundle size (no increase)
+
+**Notes**:
+- All 141 tests passing (100% success rate)
+- Lint passed without errors
+- Build completed successfully in 2.5s
+- Zero regressions in existing functionality
+- Optimizations follow Performance Engineering principles: measure first, target actual bottlenecks, maintain code quality
+- Changes are sustainable and follow existing codebase patterns
+
+**Future Optimization Opportunities** (not completed):
+- Image optimization: Compress large hero images (636KB dashboard-img.jpg, 335KB hero-bg-2.png, 124KB hero-bg-1.png, 119KB hero-bg-3.png, 146KB dashboard-new.jpg)
+- FontAwesome tree-shaking: Load only 15 used icons instead of full 2.4M SVG (requires @fortawesome package migration)
+- SCSS modernization: Replace deprecated @import with @use (requires extensive refactoring)
+- Remove unused vendor libraries: jQuery, isotope, magnific-popup (legacy files, not imported)
+
+---

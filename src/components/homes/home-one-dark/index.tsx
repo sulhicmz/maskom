@@ -1,10 +1,14 @@
 import HeaderOne from "@/layouts/headers/HeaderOne"
 import FooterOne from "@/layouts/footers/FooterOne"
 import Hero from "../home-one/Hero"
-import Brand from "./Brand"
-import Cause from "../home-one/Cause"
 import dynamic from "next/dynamic"
 
+const Brand = dynamic(() => import("./Brand"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
+const Cause = dynamic(() => import("../home-one/Cause"), {
+   loading: () => <div className="skeleton-loader"></div>
+})
 const Process = dynamic(() => import("../home-one/Process"), {
    loading: () => <div className="skeleton-loader"></div>
 })
