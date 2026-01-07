@@ -1,9 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import HeaderOne from "../HeaderOne";
+import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 
-const mockUseSticky = jest.fn(() => ({ sticky: false }));
-const mockUseBreakpoint = jest.fn(() => ({ isBreakpointOn: false }));
+jest.mock("@/hooks/UseSticky");
+const mockedUseSticky = UseSticky as jest.Mock;
+const mockedUseBreakpoint = useBreakpoint as jest.Mock;
 
 jest.mock("next/image", () => {
   return function Image({ src, alt }: { src: string; alt: string }) {
@@ -22,17 +24,11 @@ jest.mock("next/link", () => {
   };
 });
 
-jest.mock("@/hooks/UseSticky", () => ({
-  __esModule: true,
-  default: jest.fn(() => ({ sticky: false })),
-  useBreakpoint: jest.fn(() => ({ isBreakpointOn: false })),
-}));
-
 describe("HeaderOne Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseSticky.mockReturnValue({ sticky: false });
-    mockUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+    mockedUseSticky.mockReturnValue({ sticky: false });
+    mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
   });
 
   describe("Rendering", () => {
@@ -85,8 +81,8 @@ describe("HeaderOne Component", () => {
 
   describe("Sticky Behavior", () => {
     it("applies sticky class when sticky state is true", () => {
-      mockUseSticky.mockReturnValue({ sticky: true });
-      mockUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+      mockedUseSticky.mockReturnValue({ sticky: true });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
       render(<HeaderOne style={false} />);
 
@@ -104,8 +100,8 @@ describe("HeaderOne Component", () => {
 
   describe("Responsive Behavior", () => {
     it("applies breakpoint-on class when isBreakpointOn is true", () => {
-      mockUseSticky.mockReturnValue({ sticky: false });
-      mockUseBreakpoint.mockReturnValue({ isBreakpointOn: true });
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: true });
 
       render(<HeaderOne style={false} />);
 
@@ -125,8 +121,8 @@ describe("HeaderOne Component", () => {
 
   describe("Offcanvas State Management", () => {
     it("toggles navbar toggler active class based on offcanvas state", () => {
-      mockUseSticky.mockReturnValue({ sticky: false });
-      mockUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
       const { rerender } = render(<HeaderOne style={false} />);
 
@@ -138,8 +134,8 @@ describe("HeaderOne Component", () => {
     });
 
     it("applies menu-on class to nav menu when offcanvas is open", () => {
-      mockUseSticky.mockReturnValue({ sticky: false });
-      mockUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
       const { rerender } = render(<HeaderOne style={false} />);
       

@@ -61,6 +61,80 @@ Layout/Wrapper
 - ❌ Hardcoded filter logic in multiple places - FIXED
 - ❌ Missing service layer for external APIs - FIXED
 
+### Integration Patterns (Maintain)
+
+All external service integrations follow these resilience patterns:
+
+#### Resilience Layers
+
+```
+Service Layer (EmailService, etc.)
+    ↓
+Circuit Breaker (prevents cascading failures)
+    ↓
+Retry with Exponential Backoff (handles transient failures)
+    ↓
+Timeout Protection (prevents indefinite hangs)
+    ↓
+External API (EmailJS, etc.)
+```
+
+#### 1. Timeout Protection
+
+- **Purpose**: Prevent indefinite waits on slow/unresponsive services
+- **Implementation**: `withTimeout()` wrapper with configurable timeout
+- **Default Timeout**: 10 seconds for EmailJS requests
+- **Error**: TimeoutError with descriptive message
+- **Location**: `src/utils/resilience/timeout.ts`
+
+#### 2. Retry with Exponential Backoff
+
+- **Purpose**: Handle transient failures (network issues, temporary outages)
+- **Implementation**: `withRetry()` wrapper with exponential backoff
+- **Configuration**:
+  - Max Attempts: 3 (1 initial + 2 retries)
+  - Base Delay: 1,000ms (1 second)
+  - Max Delay: 10,000ms (10 seconds)
+  - Backoff Multiplier: 2x
+  - Retryable Patterns: /network/i, /timeout/i, /ECONN/i
+- **Location**: `src/utils/resilience/retry.ts`
+
+#### 3. Circuit Breaker
+
+- **Purpose**: Stop calling failing services to prevent cascading failures
+- **Implementation**: `CircuitBreaker` class with state machine
+- **States**:
+  - **Closed**: Normal operation, requests flow through
+  - **Open**: Requests rejected immediately after threshold
+  - **Half-Open**: Test request to check recovery
+- **Configuration**:
+  - Failure Threshold: 5 consecutive failures
+  - Reset Timeout: 60,000ms (60 seconds)
+  - Monitoring Period: 60,000ms (60 seconds)
+- **Location**: `src/utils/resilience/circuitBreaker.ts`
+
+#### 4. Service Abstraction
+
+- **Purpose**: Decouple business logic from external API implementations
+- **Implementation**: Interface-based service layer with dependency injection
+- **Benefits**:
+  - Easy to mock for testing
+  - Simple to swap implementations (e.g., EmailJS → SendGrid)
+  - Centralized error handling and logging
+- **Location**: `src/services/email/EmailService.ts`
+
+#### Error Handling
+
+- **ResilienceError**: Custom error type with `isTimeout` and `isRetryable` flags
+- **Logging**: Non-sensitive error messages only (no secrets or stack traces)
+- **User Experience**: Graceful degradation with informative error messages
+
+#### Monitoring
+
+- **Circuit Breaker State**: Accessible via `getCircuitBreakerState()`
+- **Manual Reset**: Available via `resetCircuitBreaker()` (use with caution)
+- **Metrics**: Future enhancement for success rates, failure patterns
+
 ## Key Dependencies
 
 - **Framework**: Next.js 15 (App Router)

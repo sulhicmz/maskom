@@ -27,7 +27,8 @@ describe("Wrapper Component", () => {
     it("renders ScrollToTop component", () => {
       render(<Wrapper><></></Wrapper>);
 
-      expect(screen.getByTestId("scroll-to-top")).toBeInTheDocument();
+      const scrollButton = document.getElementById("xc_back-to-top");
+      expect(scrollButton).toBeInTheDocument();
     });
 
     it("renders ToastContainer component", () => {
@@ -44,7 +45,8 @@ describe("Wrapper Component", () => {
       );
 
       expect(screen.getByTestId("child-content")).toBeInTheDocument();
-      expect(screen.getByTestId("scroll-to-top")).toBeInTheDocument();
+      const scrollButton = document.getElementById("xc_back-to-top");
+      expect(scrollButton).toBeInTheDocument();
       expect(screen.getByTestId("toast-container")).toBeInTheDocument();
     });
   });
