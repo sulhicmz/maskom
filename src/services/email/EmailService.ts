@@ -57,10 +57,11 @@ class EmailService implements IEmailService {
                 text: result.text
             };
         } catch (error) {
-            console.error('Email send failed:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Email send failed:', errorMessage);
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Unknown error'
+                error: errorMessage
             };
         }
     }

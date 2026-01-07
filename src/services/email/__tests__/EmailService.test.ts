@@ -185,7 +185,7 @@ describe('EmailService', () => {
 
             await emailServiceInstance.sendEmail(validParams);
 
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Email send failed:', expect.any(Error));
+            expect(consoleErrorSpy).toHaveBeenCalledWith('Email send failed:', 'Network error');
             consoleErrorSpy.mockRestore();
             jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
         });
