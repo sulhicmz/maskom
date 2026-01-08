@@ -42,10 +42,10 @@ const LatestNews = () => {
                {latest_news.map((item) => (
                   <li key={item.id} className="post-thumbnail-content d-flex align-items-center">
                      <Image src={item.img} alt="post thumb" />
-                     <div className="post-title-date">
-                        <h6><Link href="/blog-details">{item.title}</Link></h6>
-                        <span className="posted-on"><Link href="#">{item.date}</Link></span>
-                     </div>
+                      <div className="post-title-date">
+                         <h6><Link href="/blog-details">{item.title}</Link></h6>
+                         <span className="posted-on"><time>{item.date}</time></span>
+                      </div>
                   </li>
                ))}
             </ul>

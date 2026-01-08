@@ -39,16 +39,16 @@ const LoginForm = () => {
             />
             <p className="form_error">{errors.email?.message}</p>
          </div>
-         <div className="form-group">
-            <label>Kata sandi <a href="#">Lupa?</a></label>
-            <input
-               type="password"
-               {...register("password")}
-               className="form-control"
-               placeholder="Masukkan kata sandi"
-            />
-            <p className="form_error">{errors.password?.message}</p>
-         </div>
+          <div className="form-group">
+             <label>Kata sandi <button type="button" className="btn-link">Lupa?</button></label>
+             <input
+                type="password"
+                {...register("password")}
+                className="form-control"
+                placeholder="Masukkan kata sandi"
+             />
+             <p className="form_error">{errors.password?.message}</p>
+          </div>
          <div className="form-group">
             <button className="theme-btn style-one">Masuk sekarang</button>
          </div>

@@ -34,19 +34,19 @@ const BlogArea = () => {
                                  <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                               </div>
                               <div className="post-meta-wrap">
-                                 <div className="post-meta">
-                                    <span><Link href="#"><i className="flaticon-clock"></i>{item.date}</Link></span>
-                                    <span><Link href="#"><i className="flaticon-user-2"></i>{item.user}</Link></span>
-                                    <span><Link href="#"><i className="flaticon-price-tag"></i>{item.tag}</Link></span>
-                                 </div>
+                               <div className="post-meta">
+                                  <span><time><i className="flaticon-clock"></i>{item.date}</time></span>
+                                  <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
+                                  <span><span><i className="flaticon-price-tag"></i>{item.tag}</span></span>
+                               </div>
                                  <div className="post-share">
                                     <div className="share-btn"><i className="flaticon-share"></i></div>
-                                    <ul className="social-link">
-                                       <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                                       <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                                       <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                                       <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
-                                    </ul>
+                                     <ul className="social-link">
+                                        <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                        <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                        <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                        <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                                     </ul>
                                  </div>
                               </div>
                            </div>

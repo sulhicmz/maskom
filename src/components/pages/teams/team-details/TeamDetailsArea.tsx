@@ -1,5 +1,4 @@
 import Image from "next/image"
-import Link from "next/link"
 
 import thumb from "@/assets/images/team/team-single-1.jpg"
 
@@ -32,12 +31,12 @@ const TeamDetailsArea = () => {
                            Pellentesque hendrerit placerat, accumsan libero ut, posuere sapien. Mauris
                            ipsum nulla, aliquet vligula eu, semper semper metus. Pellentesque hendrerit
                            placerat.</p>
-                        <ul className="social-link">
-                           <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                           <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                           <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                           <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
-                        </ul>
+                         <ul className="social-link">
+                            <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                            <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                            <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                            <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                         </ul>
                      </div>
                   </div>
                </div>

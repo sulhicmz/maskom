@@ -22,12 +22,12 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: DataType }) => {
                         </div>
                         <div className="post-content wow fadeInUp">
                            <h3 className="title">{single_blog?.title ? single_blog.title : "Strategi Maskom menjaga pengalaman pelanggan omni-channel"}</h3>
-                           <div className="post-meta mb-35">
-                              <span><Link href="#"><i className="far fa-calendar-alt"></i>15
-                                 Mar 2024</Link></span>
-                              <span><Link href="#"><i className="far fa-user-circle"></i>{single_blog?.user ?? "Tim Editorial Maskom"}</Link></span>
-                              <span><Link href=""><i className="far fa-tag"></i>{single_blog?.tag ?? "Managed Service"}</Link></span>
-                           </div>
+                            <div className="post-meta mb-35">
+                               <time><i className="far fa-calendar-alt"></i>15
+                                  Mar 2024</time>
+                               <span><i className="far fa-user-circle"></i>{single_blog?.user ?? "Tim Editorial Maskom"}</span>
+                               <span><i className="far fa-tag"></i>{single_blog?.tag ?? "Managed Service"}</span>
+                            </div>
                            <p>Maskom mendampingi jaringan retail nasional dalam menjaga konsistensi pengalaman pelanggan antara toko fisik dan kanal digital. Seluruh kasir, aplikasi loyalty, layanan click & collect, hingga dashboard manajemen dihubungkan melalui jaringan managed service yang dipantau 24/7.</p>
                            <p>Dengan pendekatan tersebut, tim IT pelanggan tidak lagi mengelola perangkat secara manual per gerai. Maskom menghadirkan otomatisasi konfigurasi, segmentasi VLAN, serta laporan kesehatan jaringan yang dapat diakses kapan saja melalui portal pelanggan.</p>
                            <blockquote className="mb-35">
@@ -49,22 +49,22 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: DataType }) => {
                               <Image src={thumb_2} alt="post thumbnail" />
                            </figure>
                            <p>Maskom secara berkala melakukan simulasi insiden, menguji cadangan koneksi, serta melakukan fine tuning kebijakan QoS sesuai pola lalu lintas terbaru. Ke depan, kami menyiapkan integrasi analitik untuk membaca tren perilaku pelanggan di dalam toko.</p>
-                           <div className="ac-postbox-tag">
-                              <div className="ac-postbox-cats d-flex">
-                                 <span><i className="flaticon-price-tag"></i></span>
-                                 <Link href="#">Managed Service,</Link>
-                                 <Link href="#"> Konektivitas</Link>
-                              </div>
-                              <div className="ac-postbox-tags">
-                                 <div className="share-btn"><i className="flaticon-share"></i></div>
-                                 <ul className="social-link">
-                                    <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                                    <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                                    <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                                    <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
-                                 </ul>
-                              </div>
-                           </div>
+                            <div className="ac-postbox-tag">
+                               <div className="ac-postbox-cats d-flex">
+                                  <span><i className="flaticon-price-tag"></i></span>
+                                  <span>Managed Service,</span>
+                                  <span> Konektivitas</span>
+                               </div>
+                               <div className="ac-postbox-tags">
+                                  <div className="share-btn"><i className="flaticon-share"></i></div>
+                                  <ul className="social-link">
+                                     <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                     <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                     <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                     <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                                  </ul>
+                               </div>
+                            </div>
                         </div>
                      </article>
 

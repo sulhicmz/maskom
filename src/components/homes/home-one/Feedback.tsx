@@ -34,9 +34,9 @@ const Feedback = React.memo(() => {
                                     <span className="position">{item.designation}</span>
                                  </div>
                               </div>
-                              <div className="ratings">
-                                 <span><i className="fas fa-star"></i><a href="#">({item.rating})</a></span>
-                              </div>
+                               <div className="ratings">
+                                  <span><i className="fas fa-star"></i>({item.rating})</span>
+                               </div>
                            </div>
                            <p>{item.desc}</p>
                         </div>

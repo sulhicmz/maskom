@@ -2,7 +2,6 @@
 import ReactPaginate from "react-paginate";
 import team_data from "@/data/TeamData"
 import Image from "next/image"
-import Link from "next/link"
 import { usePagination } from "@/hooks/usePagination"
 
 const TeamArea = () => {
@@ -34,12 +33,12 @@ const TeamArea = () => {
                               <div className="icon">
                                  <i className="flaticon-plus-positive-add-mathematical-symbol"></i>
                               </div>
-                              <ul className="social-link">
-                                 <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                                 <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                                 <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                                 <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
-                              </ul>
+                               <ul className="social-link">
+                                  <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                  <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                  <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                  <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                               </ul>
                            </div>
                         </div>
                      </div>

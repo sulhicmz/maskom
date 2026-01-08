@@ -18,10 +18,10 @@ const Cta = React.memo(() => {
                      </div>
                   </div>
                   <div className="col-lg-6">
-                     <div className="cta-one_image-box p-r z-1 text-xl-end">
-                        <Image src={cta_1} className="image-one" alt="" />
-                        <Image src={cta_2} className="image-two" alt="" />
-                     </div>
+                      <div className="cta-one_image-box p-r z-1 text-xl-end">
+                         <Image src={cta_1} className="image-one" alt="Robot ilustrasi layanan konektivitas Maskom" />
+                         <Image src={cta_2} className="image-two" alt="Base ilustrasi infrastruktur jaringan" />
+                      </div>
                   </div>
                </div>
             </div>

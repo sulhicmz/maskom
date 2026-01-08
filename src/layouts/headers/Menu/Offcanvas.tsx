@@ -16,11 +16,11 @@ const Offcanvas = () => {
       <>
          <div className="offcanvas offcanvas-end sidebar-nav" tabIndex={-1} id="sideNav" aria-labelledby="staticBackdropLabel">
             <div className="offcanvas-header p0">
-               <div className="logo order-lg-0">
-                  <Link href="/" className="d-flex align-items-center" data-bs-dismiss="offcanvas">
-                     <Image src={logo} alt="" />
-                  </Link>
-               </div>
+                <div className="logo order-lg-0">
+                   <Link href="/" className="d-flex align-items-center" data-bs-dismiss="offcanvas" aria-label="Ke halaman utama">
+                      <Image src={logo} alt="Maskom - Logo Utama" />
+                   </Link>
+                </div>
                <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div className="wrapper mt-10 h-100">

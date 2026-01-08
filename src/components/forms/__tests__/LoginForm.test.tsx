@@ -128,11 +128,11 @@ describe('LoginForm', () => {
     expect(signupLink.closest('a')).toHaveAttribute('href', '/sign-up');
   });
 
-  it('should render forgot password link', () => {
+  it('should render forgot password button', () => {
     render(<LoginForm />);
 
-    const forgotLink = screen.getByText('Lupa?');
-    expect(forgotLink).toBeInTheDocument();
-    expect(forgotLink.closest('a')).toHaveAttribute('href', '#');
+    const forgotButton = screen.getByText('Lupa?');
+    expect(forgotButton).toBeInTheDocument();
+    expect(forgotButton.closest('button')).toBeInTheDocument();
   });
 });
