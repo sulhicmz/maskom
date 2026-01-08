@@ -8,7 +8,241 @@
 
 ---
 
-## Task 11: Critical Path Testing - Navigation & Layout Components
+## Task 17: Accessibility - Empty Alt Text & Invalid Links
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Accessibility Engineering
+
+**Problem**:
+- 9 instances of empty alt text on images across multiple components
+- 29 instances of empty href="#" links that create invalid navigation
+- Missing descriptive alt text violates WCAG accessibility guidelines
+- Empty href="#" links break keyboard navigation and screen reader expectations
+
+**Locations**:
+- `src/components/homes/home-one/Cta.tsx` (2 empty alt text)
+- `src/layouts/headers/Menu/Offcanvas.tsx` (1 empty alt text)
+- `src/components/pages/sign-up/SignUpArea.tsx` (2 empty alt text)
+- `src/components/pages/Login/LoginArea.tsx` (2 empty alt text)
+- `src/components/blogs/blog-details/BlogComment.tsx` (2 empty alt text)
+- `src/components/pages/teams/team/TeamArea.tsx` (4 empty href="#" links)
+- `src/components/blogs/blog/BlogArea.tsx` (8 empty href="#" links)
+- `src/components/blogs/blog-details/BlogDetailsArea.tsx` (8 empty href="#" links)
+- `src/components/homes/home-one/Feedback.tsx` (1 empty href="#" link)
+- `src/components/pages/teams/team-details/TeamDetailsArea.tsx` (4 empty href="#" links)
+- `src/components/forms/LoginForm.tsx` (1 empty href="#" link)
+- `src/components/blogs/blog-sidebar/LatestNews.tsx` (1 empty href="#" link)
+- `src/components/blogs/blog-sidebar/Tags.tsx` (5 empty href="#" links)
+- `src/components/blogs/blog-details/BlogComment.tsx` (2 empty href="#" links)
+
+**Solution**:
+1. Add descriptive alt text to all images (9 instances)
+2. Replace empty href="#" links with:
+   - Proper page links for navigation (e.g., /login, /blog)
+   - `role="button"` and appropriate onClick handlers for interactive elements
+   - Remove invalid links that have no purpose
+3. Add ARIA attributes where needed for button-like links
+
+**Success Criteria**:
+- [ ] All 9 empty alt text instances replaced with descriptive text
+- [ ] All 29 empty href="#" links resolved with proper URLs or button role
+- [ ] Lighthouse accessibility score improves
+- [ ] All existing tests pass
+- [ ] Lint passes without errors
+
+**Impact**:
+- Improved accessibility for screen reader users
+- Better SEO with descriptive image alt text
+- Enhanced keyboard navigation experience
+- WCAG 2.1 AA compliance improvements
+
+---
+
+## Task 18: Test Coverage - Dashboard & Blog Components
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Test Engineering
+
+**Problem**:
+- Dashboard components (WiFiMonitor, WebsiteBuilder, AIAutomation) have zero test coverage
+- Blog sidebar components (Category, LatestNews, Tags) lack test coverage
+- Page-level components (about, contact, use-cases) have no tests
+- 40+ component files without any test coverage
+- Risk of regressions in untested components
+
+**Locations**:
+- `src/components/dashboard/WiFiMonitor.tsx` (mock data, no tests)
+- `src/components/dashboard/WebsiteBuilder.tsx` (no tests)
+- `src/components/dashboard/AIAutomation.tsx` (no tests)
+- `src/components/dashboard/Sidebar.tsx` (no tests)
+- `src/components/blogs/blog-sidebar/Category.tsx` (no tests)
+- `src/components/blogs/blog-sidebar/LatestNews.tsx` (no tests)
+- `src/components/blogs/blog-sidebar/Tags.tsx` (no tests)
+- `src/components/about/AboutArea.tsx` (no tests)
+- `src/components/contact/ContactArea.tsx` (no tests)
+- `src/components/causes/use-cases-details/UseCaseDetailsArea.tsx` (no tests)
+
+**Solution**:
+1. Create test suite for dashboard components (mock data rendering, module switching)
+2. Create test suite for blog sidebar components (rendering, link navigation)
+3. Create test suite for page-level components (rendering, content display)
+4. Follow AAA pattern (Arrange-Act-Assert) for all tests
+5. Test behavior, not implementation details
+
+**Success Criteria**:
+- [ ] Dashboard components have comprehensive tests (15+ tests total)
+- [ ] Blog sidebar components have comprehensive tests (12+ tests total)
+- [ ] Page-level components have basic coverage tests (10+ tests total)
+- [ ] All new tests pass (100% success rate)
+- [ ] Lint passes without errors
+- [ ] Test coverage increases by at least 15%
+
+**Test Coverage Focus**:
+- WiFiMonitor: Mock data rendering, status display, device list rendering
+- WebsiteBuilder & AIAutomation: Component rendering, basic UI elements
+- Category, LatestNews, Tags: Data rendering, link generation, list display
+- Page components: Layout rendering, content display, component integration
+
+---
+
+## Task 19: Production Code Quality - Mock Data & Placeholders
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Code Quality
+
+**Problem**:
+- WiFiMonitor component contains hardcoded mock data (should use real API or props)
+- BlogComment component has hardcoded comment data (should be data-driven)
+- Dashboard components are placeholders without actual functionality
+- Production code contains "TODO" patterns and incomplete implementations
+- FooterOne newsletter form has no backend integration (dead code)
+
+**Locations**:
+- `src/components/dashboard/WiFiMonitor.tsx` (lines 1-4, hardcoded mockDevices array)
+- `src/components/blogs/blog-details/BlogComment.tsx` (hardcoded comments, not data-driven)
+- `src/components/dashboard/WebsiteBuilder.tsx` (placeholder component)
+- `src/components/dashboard/AIAutomation.tsx` (placeholder component)
+- `src/layouts/footers/FooterOne.tsx` (newsletter form has no submit handler beyond e.preventDefault)
+
+**Solution**:
+1. Extract mock data to separate data files following existing patterns (src/data/)
+2. Make components data-driven with prop-based data injection
+3. Create proper TypeScript interfaces for dashboard data structures
+4. Add proper form handling or remove dead code (newsletter form)
+5. Add loading states for future API integration
+6. Document integration points for future real API connections
+
+**Success Criteria**:
+- [ ] Mock data extracted to src/data/DashboardData.ts
+- [ ] Components accept data via props instead of hardcoded values
+- [ ] BlogComment data-driven with TypeScript interfaces
+- [ ] FooterOne newsletter form either removed or properly integrated
+- [ ] All existing tests pass
+- [ ] Lint passes without errors
+- [ ] Zero regressions in component rendering
+
+**Architecture Improvements**:
+- Consistent with existing data-driven patterns (FeedbackData, PriceData, etc.)
+- Centralized data management for easier updates
+- Type-safe data structures with TypeScript
+- Clear separation of data and presentation
+- Easier to integrate with real APIs in future
+
+---
+
+## Task 20: Code Duplication - Sidebar & Footer Patterns
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Code Deduplication
+
+**Problem**:
+- Similar footer component patterns (FooterOne, FooterTwo) with duplicate code
+- Repeated social media link patterns across multiple components
+- Breadcrumb component could be made more reusable with dynamic content
+- Duplicate layout wrapper patterns in page components (Login, SignUp, etc.)
+
+**Locations**:
+- `src/layouts/footers/FooterOne.tsx` (96 lines)
+- `src/layouts/footers/FooterTwo.tsx` (similar structure, potential duplication)
+- `src/components/pages/Login/index.tsx` (layout wrapper)
+- `src/components/pages/sign-up/index.tsx` (identical layout wrapper)
+- `src/components/pages/faq/index.tsx` (similar layout wrapper)
+- Social media link patterns repeated in multiple components
+
+**Solution**:
+1. Create reusable SocialLinks component to reduce duplication
+2. Extract common page layout wrapper into PageLayout component
+3. Consolidate footer variations using prop-based customization
+4. Create data file for social media links and navigation items
+5. Follow existing data-driven patterns for menu items
+
+**Success Criteria**:
+- [ ] SocialLinks component created and used across multiple locations
+- [ ] PageLayout component extracted to reduce duplication in 5+ page components
+- [ ] Footer components share common base with prop-based customization
+- [ ] Social media links centralized in data file
+- [ ] All existing tests pass
+- [ ] Lint passes without errors
+- [ ] Zero regressions in component behavior
+
+**Refactoring Benefits**:
+- Reduced code duplication (~50-100 lines)
+- Single source of truth for social links
+- Easier to update social links globally
+- Consistent page layouts across application
+- Better maintainability and DRY principles
+
+---
+
+## Task 21: Performance - Lazy Loading Critical Components
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Performance Engineering
+
+**Problem**:
+- Dashboard modules (WiFiMonitor, WebsiteBuilder, AIAutomation) loaded synchronously
+- Blog sidebar components loaded on every blog page
+- Footer components loaded upfront (could be lazy loaded)
+- Large components below the fold not lazy loaded
+- Opportunity to improve initial page load and reduce bundle size
+
+**Locations**:
+- `src/components/dashboard/index.tsx` (all modules loaded synchronously)
+- `src/components/blogs/blog/index.tsx` (BlogSidebar not lazy loaded)
+- Page components with heavy footers (could lazy load footer)
+- Blog details page with heavy components
+
+**Solution**:
+1. Add dynamic imports for dashboard modules using Next.js dynamic()
+2. Lazy load BlogSidebar component on blog pages
+3. Consider lazy loading footer components on mobile
+4. Add loading states for lazy-loaded components
+5. Measure performance impact with Lighthouse
+6. Ensure lazy loading doesn't negatively impact SEO
+
+**Success Criteria**:
+- [ ] Dashboard modules lazy loaded with loading states
+- [ ] BlogSidebar lazy loaded on blog pages
+- [ ] Lighthouse performance score improves or maintained
+- [ ] Initial bundle size reduced by measurable amount
+- [ ] All existing tests pass
+- [ ] Lint passes without errors
+- [ ] Zero perceptible delay for users (proper loading states)
+
+**Performance Impact**:
+- Reduced initial bundle size
+- Faster time-to-interactive
+- Better perceived performance
+- Lower memory usage on initial load
+- Improved mobile performance
+
+---
+
 
 **Status**: ✅ Completed
 **Priority**: HIGH
