@@ -440,7 +440,64 @@
 
 ---
 
-**Last Updated**: 2025-01-07
+---
+
+## Task 16: Critical Doc Fix - Package Manager & Node.js Version
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Documentation
+
+**Problem**:
+- AGENTS.md contained misleading yarn references (yarn lint:fix, yarn build, yarn start)
+- Project uses npm (package-lock.json exists, not yarn.lock)
+- AGENTS.md mentioned incorrect dependency installation command (npm install --legacy-peer-deps)
+- README.md specified incorrect Node.js version requirement (20.x instead of >=22.0.0)
+
+**Solution**:
+1. Fixed AGENTS.md to use correct npm commands:
+   - Changed `yarn lint:fix` → `npm run lint:fix`
+   - Changed `yarn build` → `npm run build`
+   - Changed `yarn start` → `npm run start`
+   - Changed `npm install --legacy-peer-deps` → `npm install`
+   - Added `npm run lint` command
+2. Fixed README.md Node.js version requirement:
+   - Changed `Node.js 20.x dan npm 10.x` → `Node.js >= 22.0.0 dan npm versi terkini`
+3. Verified all documented commands work correctly
+
+**Success Criteria**:
+- [x] AGENTS.md uses correct npm commands
+- [x] No yarn references remain in development documentation
+- [x] README.md specifies correct Node.js version requirement (>=22.0.0)
+- [x] All documented commands verified to work
+- [x] Zero confusion for developers about package manager
+- [x] Documentation matches actual package.json scripts
+
+**Related Files**:
+- Updated: `AGENTS.md` - Fixed package manager references
+- Updated: `README.md` - Fixed Node.js version requirement
+
+**Documentation Improvements**:
+- **Accuracy**: All commands now match package.json scripts
+- **Clarity**: No confusion between yarn and npm
+- **Consistency**: Documentation aligns with actual project configuration
+- **Verification**: All commands tested and confirmed working
+
+**Impact**:
+- Developers can now copy-paste commands without errors
+- Prevents time wasted on troubleshooting wrong commands
+- Reduces onboarding friction for new developers
+- Documentation now matches implementation (Single Source of Truth principle)
+
+**Notes**:
+- All npm commands verified working (lint, lint:fix, build, start)
+- Project uses npm (package-lock.json confirms this)
+- No breaking changes to functionality (only documentation fixes)
+- Changes follow "Single Source of Truth" principle - docs now match code
+
+---
+
+**Last Updated**: 2025-01-08
 
 ---
 
