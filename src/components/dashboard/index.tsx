@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import WiFiMonitor from "./WiFiMonitor";
 import WebsiteBuilder from "./WebsiteBuilder";
 import AIAutomation from "./AIAutomation";
+import DashboardData from "@/data/DashboardData";
 
 const Dashboard = () => {
   const [activeModule, setActiveModule] = useState("wifi");
@@ -12,13 +13,13 @@ const Dashboard = () => {
   const renderModule = () => {
     switch (activeModule) {
       case "wifi":
-        return <WiFiMonitor />;
+        return <WiFiMonitor devices={DashboardData.wifiDevices} />;
       case "website":
-        return <WebsiteBuilder />;
+        return <WebsiteBuilder templates={DashboardData.websiteTemplates} />;
       case "ai":
-        return <AIAutomation />;
+        return <AIAutomation steps={DashboardData.aiAutomationSteps} />;
       default:
-        return <WiFiMonitor />;
+        return <WiFiMonitor devices={DashboardData.wifiDevices} />;
     }
   };
 

@@ -62,3 +62,30 @@ export interface CauseItem extends BaseDataItem {
   title: string;
   desc: string;
 }
+
+export interface WiFiDevice {
+  id: number;
+  name: string;
+  ip: string;
+  status: "Online" | "Offline";
+}
+
+export interface WebsiteTemplate {
+  id: number;
+  name: string;
+  preview: string;
+}
+
+export interface AIStep {
+  id: number;
+  title: string;
+  content: string;
+}
+
+export interface BlogCommentItem {
+  id: number;
+  avatar: StaticImageData;
+  name: string;
+  date: string;
+  content: string;
+}

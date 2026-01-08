@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { AIStep } from "@/types/data";
 
-const steps = [
-  { id: 1, title: "Choose Automation Type", content: "Select chatbot, recommendations, or workflow." },
-  { id: 2, title: "Configure Settings", content: "Set up parameters and integrations." },
-  { id: 3, title: "Test and Deploy", content: "Test the automation and go live." },
-];
+interface AIAutomationProps {
+  steps: AIStep[];
+}
 
-const AIAutomation = () => {
+const AIAutomation = ({ steps }: AIAutomationProps) => {
   const [currentStep, setCurrentStep] = useState(1);
 
   const nextStep = () => {

@@ -60,20 +60,18 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                         </div>
                      </div>
                   </div>
-                  <div className="col-lg-3">
-                     <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
-                        <h4 className="footer-title">News & Update</h4>
-                        <div className="newsletter-content">
-                           <form onSubmit={(e) => e.preventDefault()}>
-                              <div className="form-group mb-30">
-                                 <input type="email" placeholder="enter your email" name="email" required />
-                                 <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
-                              </div>
-                           </form>
-                           <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
-                        </div>
-                     </div>
-                  </div>
+                   <div className="col-lg-3">
+                      <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
+                         <h4 className="footer-title">News & Update</h4>
+                         <div className="newsletter-content">
+                            <div className="form-group mb-30">
+                               <input type="email" placeholder="enter your email" name="email" required />
+                               <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
+                            </div>
+                            <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
+                         </div>
+                      </div>
+                   </div>
                </div>
             </div>
          </div>
