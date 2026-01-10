@@ -66,6 +66,7 @@ Layout/Wrapper
 - ❌ Missing service layer for external APIs - FIXED
 - ❌ Validation logic duplication (20+ identical functions) - FIXED
 - ❌ Missing error boundaries for component error handling - FIXED
+- ❌ Inline authentication logic in LoginForm/SignUpForm - FIXED
 
 ### Integration Patterns (Maintain)
 
@@ -127,7 +128,20 @@ External API (EmailJS, etc.)
   - Easy to mock for testing
   - Simple to swap implementations (e.g., EmailJS → SendGrid)
   - Centralized error handling and logging
-- **Location**: `src/services/email/EmailService.ts`
+- **Locations**: `src/services/email/EmailService.ts`, `src/services/auth/AuthService.ts`
+
+#### 5. Authentication Service Pattern
+
+- **Purpose**: Abstract authentication logic from presentation components
+- **Implementation**: Interface-based service with mock implementation
+- **API Methods**:
+  - `login(credentials)`: Authenticate user with email and password
+  - `register(userData)`: Register new user account
+  - `logout()`: Clear current user session
+  - `getCurrentUser()`: Get currently authenticated user
+- **Current Implementation**: Mock authentication (ready for real backend integration)
+- **Location**: `src/services/auth/AuthService.ts`
+- **Forms Using Service**: LoginForm, SignUpForm
 
 #### Error Handling
 
@@ -181,6 +195,7 @@ External API (EmailJS, etc.)
 - **UI Libraries**: Bootstrap 5, Swiper, Isotope
 - **Forms**: React Hook Form, Yup validation
 - **Email**: EmailJS (via service abstraction with resilience patterns)
+- **Authentication**: AuthService (mock implementation with ready-to-use interfaces)
 - **Animations**: WOW.js, React Toastify
 - **Data Filtering**: Custom utility functions with TypeScript generics
 - **Error Handling**: React Error Boundary with custom fallback UI

@@ -3,6 +3,12 @@ jest.mock('react-toastify', () => ({
   toast: jest.fn(() => ({ __t: Date.now() })),
 }));
 
+jest.mock('@/services/auth', () => ({
+  authService: {
+    register: jest.fn(),
+  },
+}));
+
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SignUpForm from '../SignUpForm';
@@ -10,6 +16,8 @@ import SignUpForm from '../SignUpForm';
 describe('SignUpForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { authService } = require('@/services/auth');
+    authService.register.mockResolvedValue({ success: true, message: 'Registrasi berhasil dikirim' });
   });
 
   it('should render form fields correctly', () => {

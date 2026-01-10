@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
+import { authService } from '@/services/auth';
 
 import icon from "@/assets/images/icon/google.png"
 
@@ -24,10 +25,19 @@ const SignUpForm = () => {
       .required();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = () => {
-      const notify = () => toast('Registrasi berhasil dikirim', { position: 'top-center' });
-      notify();
-      reset();
+   const onSubmit = async (data: FormData) => {
+      const result = await authService.register({
+         name: data.name,
+         email: data.email,
+         password: data.password,
+      });
+
+      if (result.success) {
+         toast(result.message, { position: 'top-center' });
+         reset();
+      } else {
+         toast(result.error, { position: 'top-center' });
+      }
    };
 
    return (
