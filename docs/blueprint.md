@@ -54,6 +54,7 @@ Layout/Wrapper
 - ✅ Centralized type definitions in `src/types/data/`
 - ✅ Runtime data validation with comprehensive test coverage
 - ✅ Validation factory pattern with configuration-based validators (eliminates code duplication)
+- ✅ Error boundaries with graceful error handling and recovery options
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -62,6 +63,7 @@ Layout/Wrapper
 - ❌ Hardcoded filter logic in multiple places - FIXED
 - ❌ Missing service layer for external APIs - FIXED
 - ❌ Validation logic duplication (20+ identical functions) - FIXED
+- ❌ Missing error boundaries for component error handling - FIXED
 
 ### Integration Patterns (Maintain)
 
@@ -179,6 +181,68 @@ External API (EmailJS, etc.)
 - **Email**: EmailJS (via service abstraction with resilience patterns)
 - **Animations**: WOW.js, React Toastify
 - **Data Filtering**: Custom utility functions with TypeScript generics
+- **Error Handling**: React Error Boundary with custom fallback UI
+
+## Error Handling Pattern
+
+```
+ErrorBoundary (src/components/common/ErrorBoundary.tsx)
+    ↓
+Wrapper Component (src/layouts/Wrapper.tsx) - Wraps all page content
+    ↓
+Pages and Components
+```
+
+### Error Boundary Implementation
+
+- **Purpose**: Catch and handle component errors gracefully without crashing entire page
+- **Implementation**: React class component with componentDidCatch lifecycle method
+- **Location**: `src/components/common/ErrorBoundary.tsx` and integrated in `src/layouts/Wrapper.tsx`
+- **Fallback UI**: User-friendly error page with recovery options
+- **Error Logging**: Console logging with error ID for debugging
+- **Error Recovery**: Two options - Reload page or Try Again (reset state)
+- **Contact Link**: Direct link to contact page for persistent issues
+
+#### Features
+
+- **Error ID Generation**: Unique error ID format (ERR-TIMESTAMP-RANDOM)
+- **Safe Error Logging**: Only logs error.message, error.stack, and componentStack (no sensitive data)
+- **Custom Fallback Support**: Allows custom fallback UI via prop
+- **Accessibility**: Proper heading hierarchy and button roles
+- **User-Friendly Messages**: Clear, non-technical error messages in Indonesian
+
+#### Error Recovery Options
+
+1. **Muat Ulang Halaman (Reload Page)**: Refreshes entire page
+2. **Coba Lagi (Try Again)**: Resets error state and re-renders children
+3. **Hubungi Kami (Contact Us)**: Link to contact page for persistent issues
+
+#### Testing
+
+- 25 comprehensive tests covering:
+  - Normal rendering without errors
+  - Error catching and fallback display
+  - Error ID generation and uniqueness
+  - Reset functionality
+  - Custom fallback prop
+  - Edge cases (null, undefined, empty fragment children)
+  - Accessibility (headings, button roles)
+  - Error logging verification
+
+#### Usage Example
+
+```typescript
+import ErrorBoundary from "@/components/common/ErrorBoundary";
+
+<ErrorBoundary>
+    <PageContent />
+</ErrorBoundary>
+
+// With custom fallback
+<ErrorBoundary fallback={<CustomErrorPage />}>
+    <PageContent />
+</ErrorBoundary>
+```
 
 ## Technical Constraints
 
