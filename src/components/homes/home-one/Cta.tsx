@@ -2,7 +2,9 @@ import cta_1 from "@/assets/images/gallery/robot2.svg"
 import cta_2 from "@/assets/images/gallery/base2.svg"
 import Image from "next/image"
 import Link from "next/link"
-const Cta = () => {
+import React from "react"
+
+const Cta = React.memo(() => {
    return (
       <section className="cta-section" id="hubungi">
          <div className="container">
@@ -16,16 +18,18 @@ const Cta = () => {
                      </div>
                   </div>
                   <div className="col-lg-6">
-                     <div className="cta-one_image-box p-r z-1 text-xl-end">
-                        <Image src={cta_1} className="image-one" alt="" />
-                        <Image src={cta_2} className="image-two" alt="" />
-                     </div>
+                      <div className="cta-one_image-box p-r z-1 text-xl-end">
+                         <Image src={cta_1} className="image-one" alt="Robot ilustrasi layanan konektivitas Maskom" />
+                         <Image src={cta_2} className="image-two" alt="Base ilustrasi infrastruktur jaringan" />
+                      </div>
                   </div>
                </div>
             </div>
          </div>
       </section>
    )
-}
+})
+
+Cta.displayName = "Cta"
 
 export default Cta

@@ -10,10 +10,10 @@ const SignUpArea = () => {
          <div className="container">
             <div className="row align-items-center">
                <div className="col-xl-6">
-                  <div className="signup-image-box p-r z-1 mb-50 wow fadeInLeft">
-                     <Image src={login_img1} className="image-one" alt="" />
-                     <Image src={login_img2} className="image-two" alt="" />
-                  </div>
+                   <div className="signup-image-box p-r z-1 mb-50 wow fadeInLeft">
+                      <Image src={login_img1} className="image-one" alt="Ilustrasi robot layanan digital Maskom" />
+                      <Image src={login_img2} className="image-two" alt="Base ilustrasi platform digital" />
+                   </div>
                </div>
                <div className="col-xl-6">
                   <div className="user-wrapper mb-50 wow fadeInRight">

@@ -1,9 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
+import React from "react"
 
 import dashboard_img from "@/assets/images/hero/dashboard.svg"
 
-const Hero = () => {
+const Hero = React.memo(() => {
    return (
       <section className="hero-section" id="beranda">
          <div className="hero-wrapper bg_cover" style={{ backgroundImage: `url(/assets/images/hero/hero-bg-1.png)` }}>
@@ -31,6 +32,8 @@ const Hero = () => {
          </div>
       </section>
    )
-}
+})
+
+Hero.displayName = "Hero"
 
 export default Hero

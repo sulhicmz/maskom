@@ -1,12 +1,7 @@
-interface DataType {
-   id: number;
-   page: string;
-   icon: string;
-   title: string;
-   desc: string;
-}
+import { filterItems } from "@/utils/dataFilters";
+import { FeatureItem } from "@/types/data";
 
-const feature_data: DataType[] = [
+const feature_data: FeatureItem[] = [
    {
       id: 1,
       page: "home_3",
@@ -97,3 +92,6 @@ const feature_data: DataType[] = [
 ];
 
 export default feature_data;
+
+export const home_3_feature = filterItems(feature_data, "home_3");
+export const about_feature = filterItems(feature_data, "about");

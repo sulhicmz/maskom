@@ -1,26 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react";
 import ReactPaginate from "react-paginate";
+import dynamic from "next/dynamic"
 import inner_blog_data from "@/data/InnerBlogData"
-import BlogSidebar from "../blog-sidebar/BlogSidebar"
+import { usePagination } from "@/hooks/usePagination"
+
+const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
+  loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
+})
 
 const BlogArea = () => {
 
    const blog = inner_blog_data;
-
    const itemsPerPage = 3;
-   const [itemOffset, setItemOffset] = useState(0);
-   const endOffset = itemOffset + itemsPerPage;
-   const currentItems = blog.slice(itemOffset, endOffset);
-   const pageCount = Math.ceil(blog.length / itemsPerPage);
-   // click to request another page.
-   const handlePageClick = (event: any) => {
-      const newOffset = (event.selected * itemsPerPage) % blog.length;
-      setItemOffset(newOffset);
-   };
+
+   const { currentItems, pageCount, handlePageClick } = usePagination({
+      data: blog,
+      itemsPerPage,
+   });
 
    return (
       <section className="blogs-section pt-120 pb-90">
@@ -40,19 +38,19 @@ const BlogArea = () => {
                                  <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                               </div>
                               <div className="post-meta-wrap">
-                                 <div className="post-meta">
-                                    <span><Link href="#"><i className="flaticon-clock"></i>{item.date}</Link></span>
-                                    <span><Link href="#"><i className="flaticon-user-2"></i>{item.user}</Link></span>
-                                    <span><Link href="#"><i className="flaticon-price-tag"></i>{item.tag}</Link></span>
-                                 </div>
+                               <div className="post-meta">
+                                  <span><time><i className="flaticon-clock"></i>{item.date}</time></span>
+                                  <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
+                                  <span><span><i className="flaticon-price-tag"></i>{item.tag}</span></span>
+                               </div>
                                  <div className="post-share">
                                     <div className="share-btn"><i className="flaticon-share"></i></div>
-                                    <ul className="social-link">
-                                       <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                                       <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                                       <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                                       <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
-                                    </ul>
+                                     <ul className="social-link">
+                                        <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                        <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                        <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                        <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                                     </ul>
                                  </div>
                               </div>
                            </div>

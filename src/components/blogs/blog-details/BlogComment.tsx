@@ -1,63 +1,39 @@
-import Image from "next/image"
-import Link from "next/link"
+import Image from "next/image";
+import { BlogCommentItem } from "@/types/data";
 
-import comment_1 from "@/assets/images/blog/comment-1.jpg"
-import comment_2 from "@/assets/images/blog/comment-2.jpg"
+interface BlogCommentProps {
+  comments: BlogCommentItem[];
+}
 
-const BlogComment = () => {
+const BlogComment = ({ comments }: BlogCommentProps) => {
    return (
       <div className="ac-postbox_comment mb-55 wow fadeInUp">
-         <h3 className="ac-comment-title">2 Comments</h3>
+         <h3 className="ac-comment-title">{comments.length} Comments</h3>
          <ul>
-            <li>
-               <div className="ac-postbox__comment-box">
-                  <div className="ac-postbox__comment-info d-flex">
-                     <div className="ac-postbox__comment-avater mr-25">
-                        <Image src={comment_1} alt="" />
+            {comments.map((comment, index) => (
+               <li key={comment.id} className={index > 0 ? "children" : ""}>
+                  <div className="ac-postbox__comment-box">
+                     <div className="ac-postbox__comment-info d-flex">
+                        <div className="ac-postbox__comment-avater mr-25">
+                           <Image src={comment.avatar} alt={`Avatar ${comment.name}`} />
+                        </div>
+                        <div className="ac-postbox__comment-name">
+                           <h5>{comment.name}</h5>
+                           <span className="post-meta">{comment.date}</span>
+                        </div>
                      </div>
-                     <div className="ac-postbox__comment-name">
-                        <h5>Martin Kukish</h5>
-                        <span className="post-meta">27 Aug, 2023</span>
-                     </div>
-                  </div>
-                  <div className="ac-postbox__comment-text">
-                     <p>amet porta metus. Cras a mivel odio mollis maximus non at
-                        nibhprofessor at Hampden-Sydney College in Virginia, looked
-                        up one of the more obscure Latin words, consectetur It is a
-                        long established fact that a reader
-                     </p>
-                     <div className="ac-postbox__comment-reply">
-                        <Link href="#">Reply</Link>
+                     <div className="ac-postbox__comment-text">
+                        <p>{comment.content}</p>
+                        <div className="ac-postbox__comment-reply">
+                           <button type="button">Reply</button>
+                        </div>
                      </div>
                   </div>
-               </div>
-            </li>
-            <li className="children">
-               <div className="ac-postbox__comment-box">
-                  <div className="ac-postbox__comment-info d-flex">
-                     <div className="ac-postbox__comment-avater mr-20">
-                        <Image src={comment_2} alt="" />
-                     </div>
-                     <div className="ac-postbox__comment-name">
-                        <h5>Wade Warren</h5>
-                        <span className="post-meta">27 Aug, 2023</span>
-                     </div>
-                  </div>
-                  <div className="ac-postbox__comment-text">
-                     <p>amet porta metus. Cras a mivel odio mollis maximus non at
-                        nibhprofessor at Hampden-Sydney College in Virginia, looked
-                        up one of the more obscure Latin words, consectetur It is a
-                        long established fact that a reader
-                     </p>
-                     <div className="ac-postbox__comment-reply">
-                        <Link href="#">Reply</Link>
-                     </div>
-                  </div>
-               </div>
-            </li>
-         </ul>
-      </div>
-   )
+               </li>
+            ))}
+          </ul>
+       </div>
+    );
 }
 
 export default BlogComment

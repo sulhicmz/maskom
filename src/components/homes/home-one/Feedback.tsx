@@ -1,7 +1,8 @@
-import testi_data from "@/data/FeedbackData"
+import { home_1_feedback } from "@/data/FeedbackData"
 import Image from "next/image"
+import React from "react"
 
-const Feedback = () => {
+const Feedback = React.memo(() => {
    return (
       <section className="testimonial-section testimonial-shape-section p-r z-1 bg_cover pt-110 pb-90"
          id="testimoni"
@@ -19,7 +20,7 @@ const Feedback = () => {
                </div>
             </div>
             <div className="row">
-               {testi_data.filter((items) => items.page === "home_1").map((item) => (
+               {home_1_feedback.map((item) => (
                   <div key={item.id} className="col-xl-4 col-md-6 col-sm-12">
                      <div className="testimonial-item style-one mb-30 wow fadeInDown">
                         <div className="testimonial-content">
@@ -33,9 +34,9 @@ const Feedback = () => {
                                     <span className="position">{item.designation}</span>
                                  </div>
                               </div>
-                              <div className="ratings">
-                                 <span><i className="fas fa-star"></i><a href="#">({item.rating})</a></span>
-                              </div>
+                               <div className="ratings">
+                                  <span><i className="fas fa-star"></i>({item.rating})</span>
+                               </div>
                            </div>
                            <p>{item.desc}</p>
                         </div>
@@ -46,6 +47,8 @@ const Feedback = () => {
          </div>
       </section>
    )
-}
+})
+
+Feedback.displayName = "Feedback"
 
 export default Feedback

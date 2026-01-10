@@ -1,18 +1,10 @@
-import { StaticImageData } from "next/image";
+import { filterItems } from "@/utils/dataFilters";
+import { ProcessItem } from "@/types/data";
 
 import work_1 from "@/assets/images/gallery/work-1.svg"
 import work_2 from "@/assets/images/gallery/work-2.svg"
 
-interface DataType {
-   id: number;
-   page: string;
-   img: StaticImageData
-   count: string
-   title: string;
-   desc: string;
-}
-
-const process_data: DataType[] = [
+const process_data: ProcessItem[] = [
    {
       id: 1,
       page: "home_1",
@@ -40,3 +32,5 @@ const process_data: DataType[] = [
 ];
 
 export default process_data;
+
+export const home_1_process = filterItems(process_data, "home_1");

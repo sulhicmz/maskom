@@ -1,46 +1,57 @@
-const mockDevices = [
-  { id: 1, name: "Device 1", ip: "192.168.1.10", status: "Online" },
-  { id: 2, name: "Device 2", ip: "192.168.1.11", status: "Offline" },
-];
+import { WiFiDevice } from "@/types/data";
 
-const WiFiMonitor = () => {
-  return (
-    <div className="wifi-monitor">
-      <h2>WiFi Monitor</h2>
-      <div className="row">
-        <div className="col-md-6">
-          <h4>Network Status</h4>
-          <p>SSID: Maskom WiFi</p>
-          <p>Connected Devices: 2</p>
-        </div>
-        <div className="col-md-6">
-          <h4>Alerts</h4>
-          <ul>
-            <li>Device 2 offline</li>
-          </ul>
-        </div>
-      </div>
-      <h4>Connected Devices</h4>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>IP</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mockDevices.map(device => (
-            <tr key={device.id}>
-              <td>{device.name}</td>
-              <td>{device.ip}</td>
-              <td>{device.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+interface WiFiMonitorProps {
+  devices: WiFiDevice[];
+  ssid?: string;
+}
+
+const WiFiMonitor = ({ devices, ssid = "Maskom WiFi" }: WiFiMonitorProps) => {
+  const offlineDevices = devices.filter(d => d.status === "Offline");
+  const onlineCount = devices.filter(d => d.status === "Online").length;
+
+   return (
+      <section className="wifi-monitor" aria-label="WiFi Network Monitor">
+         <h2>WiFi Monitor</h2>
+         <div className="row">
+            <div className="col-md-6">
+               <h3>Network Status</h3>
+               <p>SSID: {ssid}</p>
+               <p aria-live="polite">Connected Devices: {onlineCount}</p>
+            </div>
+            <div className="col-md-6">
+               <h3>Alerts</h3>
+               <ul aria-live="polite" aria-atomic="true">
+                  {offlineDevices.length > 0 ? (
+                     offlineDevices.map(device => (
+                        <li key={device.id} className="alert-item">{device.name} offline</li>
+                     ))
+                  ) : (
+                     <li>No alerts</li>
+                  )}
+               </ul>
+            </div>
+         </div>
+         <h3>Connected Devices</h3>
+         <table className="table" aria-label="Connected Devices Table">
+            <thead>
+               <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">IP Address</th>
+                  <th scope="col">Status</th>
+               </tr>
+            </thead>
+            <tbody>
+               {devices.map(device => (
+                  <tr key={device.id}>
+                     <td>{device.name}</td>
+                     <td>{device.ip}</td>
+                     <td aria-label={`Device status: ${device.status}`}>{device.status}</td>
+                  </tr>
+               ))}
+            </tbody>
+         </table>
+      </section>
+   );
 };
 
 export default WiFiMonitor;

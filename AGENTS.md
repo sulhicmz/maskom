@@ -15,9 +15,10 @@ This file provides guidance to agents when working with code in this repository.
 
 ## Development Commands
 
-- **Lint with Auto-fix**: `yarn lint:fix` (mentioned in docs but not in package.json scripts)
-- **Install Dependencies**: Use `npm install --legacy-peer-deps` for compatibility
-- **Local Build**: `yarn build` followed by `yarn start` for production testing
+- **Lint**: `npm run lint`
+- **Lint with Auto-fix**: `npm run lint:fix`
+- **Install Dependencies**: Use `npm install`
+- **Local Build**: `npm run build` followed by `npm run start` for production testing
 
 ## Configuration Notes
 

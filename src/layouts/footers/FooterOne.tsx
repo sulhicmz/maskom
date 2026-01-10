@@ -1,6 +1,9 @@
 "use client"
 import Image from "next/image"
 import Link from "next/link"
+import SocialLinks from "@/components/common/SocialLinks"
+import { navigationSections, socialLinks } from "@/data/SocialMediaData"
+import { memo } from "react"
 
 import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/secondary-logo.svg";
@@ -11,7 +14,7 @@ interface ProfType {
    style_2: boolean;
 }
 
-const FooterOne = ({ style, style_2 }: ProfType) => {
+const FooterOne = memo(({ style, style_2 }: ProfType) => {
    return (
 
       <footer className={`${style ? "footer-v2" : "footer-default bg_cover pt-80"}`}>
@@ -25,55 +28,42 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                               <Link href="/"><Image src={style_2 ? logo_3 : style ? logo_2 : logo_1} alt="Footer Logo" /></Link>
                            </div>
                            <p>Maskom adalah penyedia layanan konektivitas dan managed service yang membantu perusahaan di Indonesia membangun infrastruktur digital yang aman, stabil, dan mudah dikelola.</p>
-                           <ul className="social-link">
-                              <li><Link href="https://www.instagram.com" target="_blank" rel="noreferrer"><i className="fab fa-instagram"></i></Link></li>
-                              <li><Link href="https://www.linkedin.com" target="_blank" rel="noreferrer"><i className="fab fa-linkedin-in"></i></Link></li>
-                              <li><Link href="mailto:sales@maskom.co.id"><i className="far fa-envelope"></i></Link></li>
-                              <li><Link href="tel:+622129212888"><i className="fas fa-phone-alt"></i></Link></li>
-                           </ul>
+                           <SocialLinks links={socialLinks} />
                         </div>
                      </div>
                   </div>
                   <div className="col-lg-5">
                      <div className="footer-widget footer_widget_nav_menu wow fadeInDown">
                         <div className="row">
-                           <div className="col-md-6">
-                              <h4 className="footer-title">Navigasi</h4>
-                              <ul className="mb-30">
-                                 <li><Link href="/#solusi">Solusi</Link></li>
-                                 <li><Link href="/#pendekatan">Pendekatan</Link></li>
-                                 <li><Link href="/#paket">Harga</Link></li>
-                                 <li><Link href="/#testimoni">Testimoni</Link></li>
-                                 <li><Link href="/contact">Hubungi Kami</Link></li>
-                              </ul>
-                           </div>
-                           <div className="col-md-6">
-                              <h4 className="footer-title">Perusahaan</h4>
-                              <ul className="mb-30">
-                                 <li><Link href="/about">Tentang Maskom</Link></li>
-                                 <li><Link href="/faq">FAQ</Link></li>
-                                 <li><Link href="/login">Portal Pelanggan</Link></li>
-                                 <li><Link href="/sign-up">Daftar Layanan</Link></li>
-                                 <li><Link href="https://maskom.co.id/privacy-policy/" target="_blank" rel="noreferrer">Kebijakan Privasi</Link></li>
-                              </ul>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-                  <div className="col-lg-3">
-                     <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
-                        <h4 className="footer-title">News & Update</h4>
-                        <div className="newsletter-content">
-                           <form onSubmit={(e) => e.preventDefault()}>
-                              <div className="form-group mb-30">
-                                 <input type="email" placeholder="enter your email" name="email" required />
-                                 <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
+                           {navigationSections.map((section, index) => (
+                              <div key={index} className="col-md-6">
+                                 <h4 className="footer-title">{section.title}</h4>
+                                 <ul className="mb-30">
+                                    {section.items.map((item, itemIndex) => (
+                                       <li key={itemIndex}>
+                                          <Link href={item.url} target={item.target || '_self'} rel={item.target === '_blank' ? 'noreferrer' : undefined}>
+                                             {item.label}
+                                          </Link>
+                                        </li>
+                                    ))}
+                                 </ul>
                               </div>
-                           </form>
-                           <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
+                           ))}
                         </div>
                      </div>
                   </div>
+                   <div className="col-lg-3">
+                       <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
+                          <h4 className="footer-title">News & Update</h4>
+                          <div className="newsletter-content">
+                             <div className="form-group mb-30">
+                                <input type="email" placeholder="enter your email" name="email" required />
+                                <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
+                             </div>
+                             <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
+                          </div>
+                       </div>
+                     </div>
                </div>
             </div>
          </div>
@@ -90,6 +80,8 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
          </div>
       </footer>
    )
-}
+})
+
+FooterOne.displayName = "FooterOne"
 
 export default FooterOne

@@ -27,7 +27,7 @@ public/
 > Catatan: Path alias `@/*` menunjuk ke `./src/*` dan `@/assets/*` ke `./public/assets/*` sebagaimana didefinisikan di `tsconfig.json`. 【F:tsconfig.json†L4-L26】
 
 ## Persiapan Lingkungan
-1. Pastikan menggunakan Node.js 20.x dan npm 10.x (sesuai pipeline proyek).
+1. Pastikan menggunakan Node.js >= 22.0.0 dan npm versi terkini (sesuai package.json engines).
 2. Instal dependensi: `npm install`
 3. Salin `.env.example` (jika tersedia) ke `.env.local` dan isi kredensial EmailJS produksi (`NEXT_PUBLIC_EMAILJS_SERVICE_ID`, `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`, `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`). Kredensial EmailJS sekarang dimuat dari variabel lingkungan.
 4. Untuk pratinjau Cloudflare, instal Wrangler (`npm install -g wrangler`) bila belum tersedia.

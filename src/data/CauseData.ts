@@ -1,12 +1,7 @@
-interface DataType {
-   id: number;
-   page: string;
-   icon: string
-   title: string;
-   desc: string;
-}
+import { filterItems } from "@/utils/dataFilters";
+import { CauseItem } from "@/types/data";
 
-const cause_data: DataType[] = [
+const cause_data: CauseItem[] = [
    {
       id: 1,
       page: "home_1",
@@ -52,3 +47,5 @@ const cause_data: DataType[] = [
 ];
 
 export default cause_data;
+
+export const home_1_cause = filterItems(cause_data, "home_1");

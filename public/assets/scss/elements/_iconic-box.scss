@@ -47,7 +47,7 @@
     }
     &.style-two{
         display: flex;
-        align-items: start;
+        align-items: flex-start;
         & .icon{
             flex: 0 0 auto;
             width: 65px;
@@ -71,7 +71,7 @@
     }
     &.style-three{
         display: flex;
-        align-items: start;
+        align-items: flex-start;
         & .icon{
             flex: 0 0 auto;
             width: 65px;

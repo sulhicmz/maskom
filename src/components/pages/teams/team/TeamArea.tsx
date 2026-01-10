@@ -1,25 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import team_data from "@/data/TeamData"
 import Image from "next/image"
-import Link from "next/link"
+import { usePagination } from "@/hooks/usePagination"
 
 const TeamArea = () => {
 
    const team = team_data;
-
    const itemsPerPage = 8;
-   const [itemOffset, setItemOffset] = useState(0);
-   const endOffset = itemOffset + itemsPerPage;
-   const currentItems = team.slice(itemOffset, endOffset);
-   const pageCount = Math.ceil(team.length / itemsPerPage);
-   // click to request another page.
-   const handlePageClick = (event: any) => {
-      const newOffset = (event.selected * itemsPerPage) % team.length;
-      setItemOffset(newOffset);
-   };
+
+   const { currentItems, pageCount, handlePageClick } = usePagination({
+      data: team,
+      itemsPerPage,
+   });
 
    return (
       <section className="team-section pt-120 pb-120">
@@ -40,12 +33,12 @@ const TeamArea = () => {
                               <div className="icon">
                                  <i className="flaticon-plus-positive-add-mathematical-symbol"></i>
                               </div>
-                              <ul className="social-link">
-                                 <li><Link href="#"><i className="fab fa-facebook-f"></i></Link></li>
-                                 <li><Link href="#"><i className="fab fa-twitter"></i></Link></li>
-                                 <li><Link href="#"><i className="fab fa-linkedin-in"></i></Link></li>
-                                 <li><Link href="#"><i className="fab fa-instagram"></i></Link></li>
-                              </ul>
+                               <ul className="social-link">
+                                  <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                  <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                  <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                  <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                               </ul>
                            </div>
                         </div>
                      </div>

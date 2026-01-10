@@ -1,4 +1,5 @@
 import Image from "next/image";
+import React from "react";
 
 import feature_img from "@/assets/images/gallery/feature-img.svg"
 
@@ -30,7 +31,7 @@ const feature_list: DataType[] = [
    },
 ];
 
-const Feature = () => {
+const Feature = React.memo(() => {
    return (
       <section className="features-section pt-120 pb-70">
          <div className="container">
@@ -65,6 +66,8 @@ const Feature = () => {
          </div>
       </section>
    )
-}
+})
+
+Feature.displayName = "Feature"
 
 export default Feature

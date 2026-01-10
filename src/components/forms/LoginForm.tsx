@@ -27,34 +27,39 @@ const LoginForm = () => {
    };
 
    return (
-      <form onSubmit={handleSubmit(onSubmit)} className="user-form">
+      <form onSubmit={handleSubmit(onSubmit)} className="user-form" noValidate>
          <div className="form-group">
-            <label>Email terdaftar</label>
+            <label htmlFor="login_email">Email terdaftar</label>
             <input
-               id="email"
+               id="login_email"
                {...register("email")}
                type="email"
                className="form-control"
                placeholder="nama@maskom.co.id"
+               aria-invalid={!!errors.email}
+               aria-describedby="login_email_error"
             />
-            <p className="form_error">{errors.email?.message}</p>
+            <p id="login_email_error" className="form_error" role="alert">{errors.email?.message}</p>
          </div>
-         <div className="form-group">
-            <label>Kata sandi <a href="#">Lupa?</a></label>
-            <input
-               type="password"
-               {...register("password")}
-               className="form-control"
-               placeholder="Masukkan kata sandi"
-            />
-            <p className="form_error">{errors.password?.message}</p>
-         </div>
-         <div className="form-group">
-            <button className="theme-btn style-one">Masuk sekarang</button>
-         </div>
-         <div className="form-text text-center">
-            <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
-         </div>
+           <div className="form-group">
+              <label htmlFor="login_password">Kata sandi <button type="button" className="btn-link">Lupa?</button></label>
+              <input
+                 id="login_password"
+                 type="password"
+                 {...register("password")}
+                 className="form-control"
+                 placeholder="Masukkan kata sandi"
+                 aria-invalid={!!errors.password}
+                 aria-describedby="login_password_error"
+              />
+              <p id="login_password_error" className="form_error" role="alert">{errors.password?.message}</p>
+           </div>
+          <div className="form-group">
+             <button className="theme-btn style-one">Masuk sekarang</button>
+          </div>
+          <div className="form-text text-center">
+             <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
+          </div>
       </form>
    )
 }

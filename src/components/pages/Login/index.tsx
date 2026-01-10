@@ -1,20 +1,11 @@
-import Breadcrumb from "@/components/common/Breadcrumb"
-import HeaderOne from "@/layouts/headers/HeaderOne"
+import PageLayout from "@/components/common/PageLayout"
 import LoginArea from "./LoginArea"
-import FooterTwo from "@/layouts/footers/FooterTwo"
 
 const Login = () => {
    return (
-      <div className="ac-page-wrapper">
-         <HeaderOne style={true} />
-         <div className="smooth-wrapper">
-            <div id="smooth-content">
-               <Breadcrumb title="Masuk Portal Maskom" sub_title="Login" />
-               <LoginArea />
-            </div>
-         </div>
-         <FooterTwo />
-      </div>
+      <PageLayout breadcrumbTitle="Masuk Portal Maskom" breadcrumbSubTitle="Login">
+         <LoginArea />
+      </PageLayout>
    )
 }
 

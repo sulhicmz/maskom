@@ -1,19 +1,7 @@
-interface DataType {
-   id: number;
-   page: string;
-   price_details: {
-      id: number;
-      sub_title: string;
-      price: number;
-      btn: string;
-      feature: string[];
-      currency?: string;
-      price_label?: string;
-      note?: string;
-   }[]
-}
+import { filterItems } from "@/utils/dataFilters";
+import { PriceItem } from "@/types/data";
 
-const price_data: DataType[] = [
+const price_data: PriceItem[] = [
    {
       id: 1,
       page: "home_1",
@@ -272,3 +260,6 @@ const price_data: DataType[] = [
 ];
 
 export default price_data;
+
+export const home_1_price = filterItems(price_data, "home_1");
+export const pricing_price = filterItems(price_data, "pricing");

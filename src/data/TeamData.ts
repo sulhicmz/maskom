@@ -1,4 +1,4 @@
-import { StaticImageData } from "next/image";
+import { TeamMember } from "@/types/data";
 
 import team_1 from "@/assets/images/team/team-1.jpg"
 import team_2 from "@/assets/images/team/team-2.jpg"
@@ -9,14 +9,7 @@ import team_6 from "@/assets/images/team/team-6.jpg"
 import team_7 from "@/assets/images/team/team-7.jpg"
 import team_8 from "@/assets/images/team/team-8.jpg"
 
-interface DataType {
-   id: number;
-   img: StaticImageData;
-   title: string;
-   designation: string;
-}
-
-const team_data: DataType[] = [
+const team_data: TeamMember[] = [
    {
       id: 1,
       img: team_1,

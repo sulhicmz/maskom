@@ -5,6 +5,8 @@ interface StickyState {
    sticky: boolean;
 }
 
+const BREAKPOINT = 1200;
+
 const UseSticky = (offset = 200): StickyState => {
    const [sticky, setSticky] = useState(false);
 
@@ -42,4 +44,27 @@ const UseSticky = (offset = 200): StickyState => {
    };
 }
 
-export default UseSticky
+export const useBreakpoint = (breakpoint: number = BREAKPOINT) => {
+   const [isBreakpointOn, setIsBreakpointOn] = useState(false);
+
+   useEffect(() => {
+      if (typeof window === "undefined") {
+         return undefined;
+      }
+
+      const handleResize = () => {
+         setIsBreakpointOn(window.innerWidth < breakpoint);
+      };
+
+      window.addEventListener("resize", handleResize);
+      handleResize();
+
+      return () => {
+         window.removeEventListener("resize", handleResize);
+      };
+   }, [breakpoint]);
+
+   return { isBreakpointOn };
+};
+
+export default UseSticky;

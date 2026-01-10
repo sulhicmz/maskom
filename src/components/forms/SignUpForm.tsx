@@ -31,38 +31,45 @@ const SignUpForm = () => {
    };
 
    return (
-      <form onSubmit={handleSubmit(onSubmit)} className="user-form">
+      <form onSubmit={handleSubmit(onSubmit)} className="user-form" noValidate>
          <div className="form-group">
-            <label>Nama lengkap</label>
+            <label htmlFor="signup_name">Nama lengkap</label>
             <input
-               id="name"
+               id="signup_name"
                {...register("name")}
                className="form-control"
                type="text"
                placeholder="Contoh: Andi Wijaya"
+               aria-invalid={!!errors.name}
+               aria-describedby="signup_name_error"
             />
-            <p className="form_error">{errors.name?.message}</p>
+            <p id="signup_name_error" className="form_error" role="alert">{errors.name?.message}</p>
          </div>
          <div className="form-group">
-            <label>Email kantor</label>
+            <label htmlFor="signup_email">Email kantor</label>
             <input
-               id="email"
+               id="signup_email"
                {...register("email")}
                className="form-control"
                type="email"
                placeholder="nama@perusahaan.co.id"
+               aria-invalid={!!errors.email}
+               aria-describedby="signup_email_error"
             />
-            <p className="form_error">{errors.email?.message}</p>
+            <p id="signup_email_error" className="form_error" role="alert">{errors.email?.message}</p>
          </div>
          <div className="form-group">
-            <label>Kata sandi</label>
+            <label htmlFor="signup_password">Kata sandi</label>
             <input
+               id="signup_password"
                type="password"
                {...register("password")}
                className="form-control"
                placeholder="Minimal 8 karakter"
+               aria-invalid={!!errors.password}
+               aria-describedby="signup_password_error"
             />
-            <p className="form_error">{errors.password?.message}</p>
+            <p id="signup_password_error" className="form_error" role="alert">{errors.password?.message}</p>
          </div>
          <div className="form-group mb-25">
             <button className="theme-btn style-one">Daftarkan akun</button>

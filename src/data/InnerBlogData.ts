@@ -1,20 +1,10 @@
-import { StaticImageData } from "next/image";
+import { InnerBlogPost } from "@/types/data";
 
 import blog_thumb1 from "@/assets/images/blog/blog-3.jpg"
 import blog_thumb2 from "@/assets/images/blog/blog-4.jpg"
 import blog_thumb3 from "@/assets/images/blog/blog-5.jpg"
 
-interface DataType {
-   id: number,
-   thumb: StaticImageData;
-   title: string;
-   desc: string;
-   date: string;
-   user: string;
-   tag: string;
-}
-
-const inner_blog_data: DataType[] = [
+const inner_blog_data: InnerBlogPost[] = [
    {
       id: 1,
       thumb: blog_thumb1,
