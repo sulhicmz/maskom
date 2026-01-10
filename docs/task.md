@@ -8,6 +8,137 @@
 
 ---
 
+## Task 33: Rate Limiting Integration - EmailService Resilience Layer
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Integration Engineering
+
+**Problem**:
+- Rate limiting utility (`src/utils/rateLimiter.ts`) existed but was not integrated into EmailService
+- EmailService did not enforce rate limits on outgoing emails
+- ContactForm and other components had no protection against abuse
+- Rate limiting was an optional utility that required manual implementation by consumers
+- Resilience pattern chain was incomplete (missing rate limiting layer)
+
+**Locations**:
+- `src/services/email/EmailService.ts` - Missing rate limiting integration
+- `src/services/email/types.ts` - Missing EmailSendOptions interface
+- `src/components/forms/ContactForm.tsx` - Missing rate limit error handling
+- `src/utils/rateLimiter.ts` - Existing utility not used by EmailService
+- `docs/api.md` - Missing rate limiting documentation
+- `docs/api/email-service.md` - Missing rate limiting documentation
+
+**Solution**:
+1. Updated `IEmailService` interface to accept optional `EmailSendOptions` parameter
+2. Added `EmailSendOptions` interface with `skipRateLimit` and `identifier` options
+3. Integrated `emailRateLimiter` into EmailService sendEmail method
+4. Added rate limit check before circuit breaker (first layer of resilience chain)
+5. Added rate limit attempt recording after successful email send
+6. Updated `EmailSendResult` to include `rateLimited` flag for proper error handling
+7. Updated ContactForm to handle rate-limited error responses with appropriate toast messages
+8. Updated API documentation (`docs/api.md` and `docs/api/email-service.md`) with:
+   - Rate limiting configuration (5 attempts/min, 5min cooldown)
+   - New `EmailSendOptions` interface documentation
+   - Rate limit error response example
+   - Updated request flow diagram with rate limiting
+   - Error scenarios including rate limiting
+   - Usage examples with rate limiting options
+
+**Success Criteria**:
+- [x] Rate limiting integrated into EmailService as first resilience layer
+- [x] EmailService accepts EmailSendOptions with skipRateLimit and identifier
+- [x] ContactForm handles rateLimited error flag properly
+- [x] API documentation updated with rate limiting details
+- [x] All 664 tests passing (100% success rate)
+- [x] Lint passes without errors (5 intentional warnings for test img tags)
+- [x] Build completed successfully (18 pages generated)
+- [x] Zero regressions in existing functionality
+- [x] Rate limiting follows integration engineering principles
+
+**Related Files**:
+- Updated: `src/services/email/types.ts` - Added EmailSendOptions, updated EmailSendResult
+- Updated: `src/services/email/EmailService.ts` - Integrated rate limiting
+- Updated: `src/components/forms/ContactForm.tsx` - Added rate limit error handling
+- Updated: `docs/api.md` - Added rate limiting documentation
+- Updated: `docs/api/email-service.md` - Added comprehensive rate limiting docs
+
+**Resilience Chain (Updated)**:
+```
+User Action
+    ↓
+EmailService.sendEmail(params, options?)
+    ↓
+Rate Limit Check (NEW - rejects if exceeded)
+    ↓
+Circuit Breaker Check (rejects if open)
+    ↓
+Retry with Exponential Backoff (up to 3 attempts)
+    ↓
+Timeout Protection (prevent indefinite hangs)
+    ↓
+External API (EmailJS)
+```
+
+**Rate Limiting Configuration**:
+- **Email Limiter**: 5 attempts per 60 seconds, 5 minute cooldown
+- **Identifier**: User email address by default (customizable)
+- **Skip Option**: `skipRateLimit: true` for admin operations (use with caution)
+- **Behavior**:
+  - First 5 attempts: Allowed
+  - Exceeding limit: Blocked with countdown message
+  - Automatic reset after 5 minute cooldown
+
+**Error Handling**:
+- **Rate Limited Response**: `{ success: false, error: "Too many attempts...", rateLimited: true }`
+- **ContactForm**: Shows specific toast message for rate limiting with countdown
+- **Fallback**: Clear error message with remaining time shown to users
+
+**Testing**:
+- All 664 tests passing (100% success rate)
+- EmailService tests still passing (15 tests)
+- Rate limiter tests still passing (19 tests)
+- Build completed successfully (18 pages generated)
+- Lint passed without errors (5 intentional warnings for test img tags)
+
+**Documentation Updates**:
+- **docs/api.md**:
+  - Updated EmailService API contract with EmailSendOptions
+  - Added rate limiting as layer 0 in resilience configuration
+  - Added rate limit error response example (429 Too Many Requests)
+- **docs/api/email-service.md**:
+  - Added comprehensive rate limiting section
+  - Updated request flow diagram
+  - Added EmailSendOptions interface documentation
+  - Added rate limiting usage examples
+  - Updated error scenarios with rate limiting
+  - Added troubleshooting for rate limit errors
+  - Updated timeouts and performance impact sections
+
+**Integration Engineering Principles Applied**:
+- **Contract First**: API contracts updated before implementation
+- **Resilience**: All four layers now in place (rate limiting, circuit breaker, retry, timeout)
+- **Consistency**: Predictable patterns for rate limiting with other resilience patterns
+- **Backward Compatibility**: No breaking changes to existing consumers
+- **Self-Documenting**: Comprehensive API documentation with examples
+- **Idempotency**: Rate limiter state management is idempotent (check/record)
+
+**Impact**:
+- EmailService now protected from abuse via rate limiting
+- Consistent API for all email sending operations
+- Components using EmailService automatically benefit from rate limiting
+- Zero breaking changes to existing code
+- Complete resilience chain: Rate Limiting → Circuit Breaker → Retry → Timeout → API
+
+**Future Enhancements**:
+1. Backend rate limiting with Redis or database for multi-instance deployments
+2. Distributed rate limiting for horizontal scaling
+3. Rate limit headers in API responses (X-RateLimit-Limit, X-RateLimit-Remaining)
+4. Metrics and monitoring for rate limit violations
+5. Configurable rate limits via environment variables
+
+---
+
 ## Task 32: Asset Optimization - Unused FontAwesome & Vendor File Removal
 
 **Status**: ✅ Completed

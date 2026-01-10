@@ -28,9 +28,9 @@ This document provides comprehensive API specifications for all external service
 
 #### Send Email
 
-**Method**: `sendEmail(params: EmailSendParams): Promise<EmailSendResult>`
+**Method**: `sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult>`
 
-**Description**: Sends an email using configured EmailJS template with built-in resilience patterns (timeout, retry, circuit breaker).
+**Description**: Sends an email using configured EmailJS template with built-in resilience patterns (rate limiting, timeout, retry, circuit breaker).
 
 **Authentication**: Uses environment variables for service credentials
 
@@ -42,10 +42,16 @@ This document provides comprehensive API specifications for all external service
 
 ```typescript
 interface EmailSendParams {
-    fromName: string;      // Sender's name (required)
-    fromEmail: string;     // Sender's email address (required, validated)
-    subject: string;       // Email subject line (required)
-    message: string;       // Email message content (required)
+    templateParams: {
+        user_name: string;   // Sender's name (required)
+        user_email: string;  // Sender's email address (required, validated)
+        message: string;      // Email message content (required)
+    };
+}
+
+interface EmailSendOptions {
+    skipRateLimit?: boolean;  // Skip rate limit check (for admin use)
+    identifier?: string;     // Custom identifier for rate limiting (defaults to user_email)
 }
 ```
 
@@ -72,6 +78,16 @@ interface EmailSendResult {
 #### Error Responses
 
 All error responses follow the [Error Response Standards](#error-response-standards).
+
+**429 Too Many Requests**
+
+```json
+{
+    "success": false,
+    "error": "Too many attempts. Please try again in X seconds.",
+    "rateLimited": true
+}
+```
 
 **400 Bad Request**
 
@@ -113,7 +129,18 @@ All error responses follow the [Error Response Standards](#error-response-standa
 
 ### Resilience Configuration
 
-The EmailService implements three-layer resilience:
+The EmailService implements four-layer resilience:
+
+#### 0. Rate Limiting
+
+- **Max Attempts**: 5 per 60 seconds (per identifier)
+- **Cooldown**: 5 minutes (300,000ms) after limit exceeded
+- **Identifier**: User email address (customizable via options)
+- **Behavior**:
+  - First 5 attempts: Allowed
+  - Exceeding limit: Blocked with countdown message
+  - Automatic reset after cooldown period
+- **Skip Option**: `skipRateLimit: true` for admin operations (use with caution)
 
 #### 1. Timeout Protection
 
