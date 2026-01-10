@@ -135,3 +135,27 @@ export interface NavigationSection {
   title: string;
   items: NavigationItem[];
 }
+
+export type RelationshipType = "one-to-one" | "one-to-many" | "many-to-one" | "many-to-many";
+
+export interface DataRelationship {
+  sourceCollection: string;
+  targetCollection: string;
+  sourceField: string;
+  targetField: string;
+  type: RelationshipType;
+  optional?: boolean;
+}
+
+export interface RelationshipValidationError {
+  relationship: DataRelationship;
+  error: string;
+  sourceItemId?: string;
+  targetId?: string;
+}
+
+export interface ReferentialIntegrityResult {
+  isValid: boolean;
+  errors: RelationshipValidationError[];
+  relationshipsValidated: number;
+}
