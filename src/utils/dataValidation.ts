@@ -48,7 +48,7 @@ export interface EnumFieldConfig {
   allowedValues: readonly unknown[];
 }
 
-export interface ArrayFieldConfig<T> {
+export interface ArrayFieldConfig {
   key: string;
   required: boolean;
   itemValidator?: (item: unknown, index: number) => string | null;
@@ -59,7 +59,7 @@ export interface ValidationConfig<T> {
   stringFields?: StringFieldConfig[];
   numberFields?: NumberFieldConfig[];
   enumFields?: EnumFieldConfig[];
-  arrayFields?: ArrayFieldConfig<T extends unknown[] ? T[number] : never>[];
+  arrayFields?: ArrayFieldConfig[];
   customRules?: Array<(item: T) => string | null>;
   baseValidation?: boolean;
 }
@@ -215,7 +215,7 @@ export const validatePriceDetailItem = createValidator<PriceDetailItem>({
     {
       key: "feature",
       required: true,
-      itemValidator: (feature, index) => {
+      itemValidator: (feature: unknown, index: number) => {
         if (typeof feature !== "string" || feature.trim() === "") {
           return `PriceDetailItem[1]: feature[${index}] must be a non-empty string`;
         }
@@ -258,7 +258,7 @@ export const validatePriceItem = createValidator<PriceItem>({
     {
       key: "price_details",
       required: true,
-      itemValidator: (detail) => {
+      itemValidator: (detail: unknown) => {
         const result = validatePriceDetailItem(detail as PriceDetailItem);
         return result.errors.length > 0 ? result.errors[0] : null;
       },
@@ -458,7 +458,7 @@ export const validateInnerFaqItem = createValidator<InnerFaqItem>({
     {
       key: "faq_details",
       required: true,
-      itemValidator: (detail) => {
+      itemValidator: (detail: unknown) => {
         const result = validateFaqDetail(detail as FaqDetail);
         return result.errors.length > 0 ? result.errors[0] : null;
       },
@@ -517,7 +517,7 @@ export const validateNavigationSection = createValidator<NavigationSection>({
     {
       key: "items",
       required: true,
-      itemValidator: (navItem) => {
+      itemValidator: (navItem: unknown) => {
         const result = validateNavigationItem(navItem as NavigationItem);
         return result.errors.length > 0 ? result.errors[0] : null;
       },
