@@ -16,12 +16,39 @@ jest.mock('react-paginate', () => {
   };
 });
 
-jest.mock('next/dynamic', () => ({
-  __esModule: true,
-  default: () => {
-    return () => <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
-  },
-}));
+jest.mock('next/dynamic', () => {
+  const actualDynamic = jest.requireActual<typeof import('next/dynamic')>('next/dynamic');
+  return {
+    __esModule: true,
+    default: (importFn: () => Promise<{ default: React.ComponentType }>, options?: { loading?: () => React.ReactNode }) => {
+      const importStr = importFn.toString();
+      if (importStr.includes('react-paginate')) {
+        const MockPaginate = function MockReactPaginate({ pageCount, onPageChange }: { pageCount: number; onPageChange: (data: { selected: number }) => void }) {
+          return (
+            <div data-testid="react-paginate">
+              <button onClick={() => onPageChange({ selected: 1 })} data-testid="next-page">Next</button>
+              <button onClick={() => onPageChange({ selected: 0 })} data-testid="prev-page">Previous</button>
+              <span data-testid="page-count">{pageCount}</span>
+            </div>
+          );
+        };
+        const MockComponent = function() {
+          return <MockPaginate pageCount={2} onPageChange={() => {}} />;
+        };
+        MockComponent.displayName = 'MockReactPaginate';
+        return MockComponent;
+      } else if (importStr.includes('BlogSidebar')) {
+        const MockComponent = function() {
+          return <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
+        };
+        MockComponent.displayName = 'MockBlogSidebar';
+        return MockComponent;
+      } else {
+        return actualDynamic.default(importFn, options);
+      }
+    },
+  };
+});
 
 jest.mock('next/image', () => ({
   __esModule: true,

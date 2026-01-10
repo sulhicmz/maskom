@@ -9,7 +9,25 @@ import Feedback from "./Feedback"
 import Faq from "./Faq"
 import Cta from "./Cta"
 import FooterOne from "@/layouts/footers/FooterOne"
-import Brand from "./Brand"
+import dynamic from "next/dynamic"
+
+const Brand = dynamic(() => import("./Brand"), {
+  loading: () => (
+    <section className="clients-section">
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="clients-text style-one text-center mb-30 wow fadeInDown">
+              <p>Dipercaya oleh perusahaan lintas industri untuk menjaga konektivitas</p>
+            </div>
+          </div>
+        </div>
+        <div className="clients-slider wow fadeInUp" style={{ minHeight: '100px' }}></div>
+      </div>
+    </section>
+  ),
+  ssr: false
+})
 
 const HomeOne = () => {
    return (

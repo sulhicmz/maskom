@@ -1,10 +1,14 @@
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import ReactPaginate from "react-paginate";
 import dynamic from "next/dynamic"
 import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
+
+const ReactPaginate = dynamic(() => import("react-paginate"), {
+  ssr: false,
+  loading: () => <div className="ac-pagination"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
+})
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
