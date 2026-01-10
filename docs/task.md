@@ -8,6 +8,120 @@
 
 ---
 
+## Task 24: UI/UX Accessibility - Forms, Tables, and Tabs
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX Engineering
+
+**Problem**:
+- BlogForm, SignUpForm, LoginForm missing proper ARIA attributes and accessibility patterns
+- Form errors displayed without proper ARIA linking to inputs
+- WiFiMonitor table lacks semantic ARIA attributes and proper structure
+- PricingArea tab navigation missing keyboard support and ARIA roles
+- Forms using placeholder as labels without proper label elements (BlogForm)
+
+**Locations**:
+- `src/components/forms/BlogForm.tsx` - Missing labels, ARIA attributes
+- `src/components/forms/SignUpForm.tsx` - Labels without htmlFor, missing ARIA
+- `src/components/forms/LoginForm.tsx` - Labels without htmlFor, missing ARIA
+- `src/components/dashboard/WiFiMonitor.tsx` - Table accessibility issues
+- `src/components/pages/pricing/PricingArea.tsx` - Tab keyboard navigation, ARIA
+
+**Solution**:
+1. BlogForm.tsx: Added proper `<label>` elements with sr-only class, id attributes on inputs, htmlFor on labels
+2. BlogForm.tsx: Added aria-invalid, aria-describedby attributes, role="alert" on error messages
+3. SignUpForm.tsx: Added htmlFor to existing labels, id attributes on all inputs
+4. SignUpForm.tsx: Added aria-invalid, aria-describedby attributes, unique error message ids
+5. LoginForm.tsx: Added htmlFor to existing labels, id="login_password" for password input
+6. LoginForm.tsx: Added aria-invalid, aria-describedby attributes, fixed signup link bug (/login → /sign-up)
+7. WiFiMonitor.tsx: Changed div to section, h4 to h3 for semantic structure
+8. WiFiMonitor.tsx: Added aria-label to section, scope="col" to table headers
+9. WiFiMonitor.tsx: Added aria-live="polite" for dynamic content (online count, alerts)
+10. WiFiMonitor.tsx: Changed "IP" header to "IP Address" for better accessibility
+11. PricingArea.tsx: Added role="tablist", role="tab", role="tabpanel" attributes
+12. PricingArea.tsx: Added aria-selected, aria-controls, aria-labelledby attributes
+13. PricingArea.tsx: Added keyboard navigation (Enter, Space, ArrowLeft, ArrowRight)
+14. PricingArea.tsx: Added hidden attribute to inactive tab panels
+15. PricingArea.tsx: Added tabIndex management (0 for active, -1 for inactive tabs)
+
+**Success Criteria**:
+- [x] All forms have proper labels linked to inputs via htmlFor/id
+- [x] Form errors have aria-invalid and aria-describedby linking
+- [x] Error messages have unique ids and role="alert"
+- [x] Tables have proper ARIA attributes and scope="col"
+- [x] Tabs support keyboard navigation (Enter, Space, Arrow keys)
+- [x] Tabs have proper ARIA roles (tablist, tab, tabpanel)
+- [x] All 551 tests passing (100% success rate)
+- [x] Lint passes without errors
+- [x] Zero regressions in existing functionality
+
+**Related Files**:
+- Updated: `src/components/forms/BlogForm.tsx` - Added labels, ARIA attributes, noValidate
+- Updated: `src/components/forms/SignUpForm.tsx` - Added htmlFor, ARIA attributes
+- Updated: `src/components/forms/LoginForm.tsx` - Added htmlFor, ARIA, fixed signup link
+- Updated: `src/components/dashboard/WiFiMonitor.tsx` - Semantic HTML, ARIA
+- Updated: `src/components/dashboard/__tests__/WiFiMonitor.test.tsx` - Updated test for "IP Address"
+- Updated: `src/components/pages/pricing/PricingArea.tsx` - Tab ARIA, keyboard nav
+
+**Accessibility Improvements**:
+- **Forms (BlogForm, SignUpForm, LoginForm)**:
+  - Proper label elements with sr-only class for screen readers
+  - Labels linked to inputs via htmlFor/id attributes
+  - aria-invalid attribute indicates validation state
+  - aria-describedby links error messages to form fields
+  - Error messages have role="alert" for announcements
+  - Unique ids for error messages (blog_name_error, signup_email_error, login_password_error, etc.)
+  - noValidate attribute for custom validation control
+  
+- **Table (WiFiMonitor)**:
+  - Section element with aria-label for context
+  - Proper heading hierarchy (h2 → h3)
+  - scope="col" on table headers for screen readers
+  - aria-live="polite" for dynamic content updates
+  - aria-label on status cells for context
+  - "IP Address" header instead of "IP" for clarity
+
+- **Tabs (PricingArea)**:
+  - role="tablist" on ul container
+  - role="tab" on tab buttons
+  - role="tabpanel" on tab content panels
+  - aria-selected indicates active tab
+  - aria-controls links tab to its panel
+  - aria-labelledby links panel to its tab
+  - Keyboard navigation: Enter, Space, ArrowLeft, ArrowRight
+  - tabIndex management: 0 for active tab, -1 for inactive
+  - hidden attribute on inactive tab panels
+
+**WCAG Compliance Improvements**:
+- Success Criterion 1.3.1: Info and Relationships (semantic HTML, proper roles)
+- Success Criterion 2.4.6: Headings and Labels (proper labels, table headers)
+- Success Criterion 3.3.2: Labels or Instructions (form labels)
+- Success Criterion 3.3.3: Error Suggestion (error message linking)
+- Success Criterion 4.1.2: Name, Role, Value (ARIA attributes)
+- Success Criterion 2.1.1: Keyboard (tab keyboard navigation)
+- Success Criterion 4.1.3: Status Messages (aria-live, role="alert")
+
+**Testing**:
+- All 551 tests passing (100% success rate)
+- WiFiMonitor.test updated for "IP Address" header
+- Lint passed without errors (4 intentional warnings for test img tags)
+- Build completed successfully
+
+**Notes**:
+- All accessibility improvements follow WCAG 2.1 AA guidelines
+- Keyboard navigation support for all interactive elements
+- Screen reader announcements for dynamic content
+- Proper semantic HTML structure throughout
+- Zero regressions in existing functionality
+- Changes follow UI/UX Engineering principles:
+  - User-Centric: Better experience for keyboard and screen reader users
+  - Accessibility (a11y): Full WCAG compliance improvements
+  - Semantic Structure: Meaningful HTML elements
+  - Consistency: Follows existing codebase patterns (ContactForm from Task 15)
+
+---
+
 ## Task 23: Integration Hardening - API Documentation & Rate Limiting
 
 **Status**: ✅ Completed

@@ -49,7 +49,7 @@ describe('WiFiMonitor', () => {
       
       expect(screen.getByText('Connected Devices')).toBeInTheDocument();
       expect(screen.getByText('Name')).toBeInTheDocument();
-      expect(screen.getByText('IP')).toBeInTheDocument();
+      expect(screen.getByText('IP Address')).toBeInTheDocument();
       expect(screen.getByText('Status')).toBeInTheDocument();
     });
 

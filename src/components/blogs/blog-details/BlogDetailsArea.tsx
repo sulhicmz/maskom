@@ -3,13 +3,13 @@ import Image from "next/image"
 import Link from "next/link"
 import BlogForm from "@/components/forms/BlogForm"
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
-import { DataType } from "@/data/InnerBlogData"
+import { InnerBlogPost } from "@/types/data"
 
 import blog_thumb from "@/assets/images/blog/blog-single-1.jpg"
 import quote from "@/assets/images/icon/right-quote.png"
 import thumb_2 from "@/assets/images/blog/blog-single-2.jpg"
 
-const BlogDetailsArea = ({ single_blog }: { single_blog?: DataType }) => {
+const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
    return (
       <section className="blog-details-section pt-120 pb-80">
          <div className="container">

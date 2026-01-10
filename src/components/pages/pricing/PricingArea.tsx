@@ -9,13 +9,27 @@ const PricingArea = () => {
 
    const [activeTab, setActiveTab] = useState(0);
 
-   // Handle tab click event
    const handleTabClick = (index: number) => {
       setActiveTab(index);
    };
 
+   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+         event.preventDefault();
+         handleTabClick(index);
+      }
+      if (event.key === 'ArrowRight') {
+         event.preventDefault();
+         handleTabClick((index + 1) % tab_title.length);
+      }
+      if (event.key === 'ArrowLeft') {
+         event.preventDefault();
+         handleTabClick((index - 1 + tab_title.length) % tab_title.length);
+      }
+   };
+
    return (
-      <section className="pricing-section pt-110">
+      <section className="pricing-section pt-110" aria-label="Pricing Plans">
          <div className="container">
             <div className="row">
                <div className="col-lg-12">
@@ -29,11 +43,20 @@ const PricingArea = () => {
             <div className="row">
                <div className="col-lg-12">
                   <div className="pricing-tabs style-one text-center mb-40 wow fadeInUp">
-                     <ul className="nav nav-tabs">
+                     <ul className="nav nav-tabs" role="tablist" aria-label="Pricing Category Tabs">
                         {tab_title.map((tab, index) => (
-                           <li key={index}>
-                              <button className={`nav-link ${activeTab === index ? "active" : ""}`} onClick={() => handleTabClick(index)}>
-                                 <span>{tab} </span>
+                           <li key={index} role="presentation">
+                              <button
+                                 className={`nav-link ${activeTab === index ? "active" : ""}`}
+                                 onClick={() => handleTabClick(index)}
+                                 onKeyDown={(e) => handleKeyDown(e, index)}
+                                 role="tab"
+                                 aria-selected={activeTab === index}
+                                 aria-controls={`pricing-tabpanel-${index}`}
+                                 id={`pricing-tab-${index}`}
+                                 tabIndex={activeTab === index ? 0 : -1}
+                              >
+                                 <span>{tab}</span>
                               </button>
                            </li>
                         ))}
@@ -41,9 +64,16 @@ const PricingArea = () => {
                   </div>
                </div>
             </div>
-            <div className="tab-content wow fadeInDown">
+            <div className="tab-content wow fadeInDown" role="tabpanel">
                {pricing_price.map((items, index) => (
-                  <div key={items.id} className={`tab-pane fade ${activeTab === index ? 'show active' : ''}`}>
+                  <div
+                     key={items.id}
+                     className={`tab-pane fade ${activeTab === index ? 'show active' : ''}`}
+                     role="tabpanel"
+                     id={`pricing-tabpanel-${index}`}
+                     aria-labelledby={`pricing-tab-${index}`}
+                     hidden={activeTab !== index}
+                  >
                      <div className="row">
                         {items.price_details.map((item) => (
                            <div key={item.id} className="col-xl-3 col-md-6 col-sm-12">
