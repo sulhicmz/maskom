@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { EmailRule, PasswordRule } from './rules';
+import { PasswordRule } from './rules';
 
 const EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
