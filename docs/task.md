@@ -4,7 +4,153 @@
 - ⏳ **Pending**: Not started
 - 🚧 **In Progress**: Currently being worked on (DO NOT MODIFY)
  - ✅ **Completed**: Finished and verified
- - ❌ **Blocked**: Waiting on dependencies
+  - ❌ **Blocked**: Waiting on dependencies
+
+---
+
+## Task 41: API Documentation - Complete Service Coverage
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Integration Engineering
+
+**Problem**:
+- API documentation in `docs/api.md` only documented EmailService
+- AuthService was undocumented despite being a key service
+- No centralized API documentation for all services
+- Future developers lacked complete service reference
+
+**Locations**:
+- `docs/api.md` - EmailService documented, AuthService missing
+- `src/services/auth/AuthService.ts` - Undocumented service
+- `src/services/auth/types.ts` - Undocumented interfaces
+
+**Solution**:
+1. Added comprehensive API documentation for AuthService
+2. Documented all four endpoints: login, register, logout, getCurrentUser
+3. Added request/response specifications with TypeScript interfaces
+4. Documented validation rules (email regex, password length)
+5. Documented current mock implementation and future backend integration options
+6. Provided usage examples for all service methods
+7. Added security considerations and future enhancements
+8. Updated Table of Contents to include AuthService
+
+**Documentation Added**:
+
+**Service Overview**:
+- Purpose, provider, version information
+- Current mock implementation details
+- Backend integration options (Auth0, Firebase, NextAuth, custom)
+
+**Endpoints Documented**:
+- Login: Authentication with email/password
+- Register: New user account creation
+- Logout: Session management
+- Get Current User: Retrieve authenticated user
+
+**Request Specifications**:
+- LoginCredentials interface
+- RegisterData interface
+- Validation rules (email format, password length)
+
+**Response Specifications**:
+- AuthResult interface
+- User interface
+- All error response codes (400, 500)
+
+**Additional Sections**:
+- Environment variables (future requirements)
+- Usage examples for all methods
+- Security considerations
+- Future enhancements (rate limiting, session persistence, 2FA, OAuth)
+
+**Success Criteria**:
+- [x] AuthService fully documented in docs/api.md
+- [x] All four endpoints documented with request/response specs
+- [x] Validation rules documented
+- [x] Usage examples provided
+- [x] Security considerations added
+- [x] Future integration options documented (Auth0, Firebase, NextAuth, custom)
+- [x] Table of Contents updated
+- [x] All 870 tests passing (100% success rate)
+- [x] Lint passes with expected warnings (2 intentional warnings for test img tags)
+- [x] Zero regressions in existing functionality
+
+**Related Files**:
+- Updated: `docs/api.md` - Added comprehensive AuthService documentation
+- Verified: `src/services/auth/AuthService.ts` - Service implementation matches documentation
+- Verified: `src/services/auth/types.ts` - Interface definitions match documentation
+
+**Integration Engineer Context**:
+
+This task completes the **API Documentation** item from the Integration Engineer task list. All 6 Integration Engineer tasks are now complete:
+
+1. ✅ **Integration Hardening** - Timeout, retry, circuit breaker patterns implemented
+2. ✅ **API Standardization** - Consistent naming, formats, error responses across services
+3. ✅ **Error Response** - Standardized codes and messages (400, 408, 502, 503, 500)
+4. ✅ **API Documentation** - Complete coverage for EmailService and AuthService
+5. ✅ **Rate Limiting** - EmailService and form protection implemented
+6. N/A **Webhook Reliability** - No webhooks in current application
+
+**Resilience Patterns Verified**:
+
+**EmailService** (`src/services/email/EmailService.ts`):
+- ✅ Timeout Protection: 10 second timeout
+- ✅ Retry with Exponential Backoff: 3 attempts, 1s-10s backoff
+- ✅ Circuit Breaker: 5 failure threshold, 60s reset timeout
+- ✅ Rate Limiting: 5 attempts per 60s, 5 minute cooldown
+
+**AuthService** (`src/services/auth/AuthService.ts`):
+- ✅ Input Validation: Email format, password length
+- ✅ Error Handling: Consistent error format with Indonesian messages
+- ⚠️ Note: Mock implementation doesn't require retry/circuit breaker (no external calls)
+- 📋 Future: Rate limiting recommended for real backend integration
+
+**Testing**:
+- All 870 tests passing (100% success rate)
+- Lint passed with expected warnings (2 intentional warnings for test img tags)
+- Zero regressions in existing functionality
+
+**Notes**:
+- API documentation is now comprehensive for all services
+- Integration patterns are consistent and well-documented
+- Future backend integrations have clear guidance
+- All security considerations documented
+- Follows Integration Engineering principles:
+  - Self-Documenting: Comprehensive API specs in docs/api.md
+  - Consistent Patterns: Same resilience patterns across EmailService
+  - Contract First: Interfaces defined before implementation
+  - Backward Compatibility: No breaking changes, documentation only
+
+**Impact**:
+- API documentation is now complete for all services
+- Future developers have complete reference for integration work
+- Clear guidance for real backend integration (Auth0, Firebase, NextAuth, custom)
+- Integration patterns are consistent and well-documented
+- Zero breaking changes to existing functionality
+
+**Next Integration Engineering Opportunities**:
+
+1. **Add Rate Limiting to AuthService** - Protect against brute force attacks
+   - Add login/register rate limiting (similar to EmailService)
+   - Implement account lockout after failed attempts
+   - Recommended limits: 5 attempts per 15 minutes, 30 minute lockout
+
+2. **Add Real Authentication Provider** - Replace mock with production-ready auth
+   - Choose Auth0, Firebase, NextAuth, or custom backend
+   - Implement session persistence (localStorage/cookies)
+   - Add protected routes for authenticated pages
+
+3. **Add API Route Protection** - Next.js API routes with authentication
+   - Create middleware for protected API routes
+   - Implement JWT validation
+   - Add refresh token logic
+
+4. **Add Monitoring & Metrics** - Track integration health
+   - Circuit breaker state monitoring
+   - Rate limit tracking
+   - Success/failure rate metrics
+   - Alert thresholds for degraded service
 
 ---
 

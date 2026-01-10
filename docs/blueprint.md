@@ -475,6 +475,7 @@ See `docs/task.md` for ongoing architectural improvements and prioritized refact
 Comprehensive API specifications for all external service integrations are documented in `docs/api.md`.
 
 - Email Service API with resilience patterns
+- Authentication Service API (login, register, logout, getCurrentUser)
 - Error response standards
 - Rate limiting configuration
 - Adding new integrations guide

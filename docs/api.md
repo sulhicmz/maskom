@@ -7,6 +7,7 @@ This document provides comprehensive API specifications for all external service
 ## Table of Contents
 
 - [Email Service API](#email-service-api)
+- [Authentication Service API](#authentication-service-api)
 - [Error Response Standards](#error-response-standards)
 - [Resilience Patterns](#resilience-patterns)
 
@@ -263,6 +264,270 @@ try {
 4. **CSP**: EmailJS domain (`api.emailjs.com`) allowed in Content Security Policy
 
 ---
+
+---
+
+## Authentication Service API
+
+### Service: AuthService (`src/services/auth/AuthService.ts`)
+
+**Purpose**: Handles user authentication operations with mock implementation (ready for real backend integration).
+
+**Provider**: Mock implementation (interface ready for Auth0, Firebase, NextAuth, or custom backend).
+
+**Version**: v1.0.0 (Current)
+
+---
+
+### Endpoints
+
+#### Login
+
+**Method**: `login(credentials: LoginCredentials): Promise<AuthResult>`
+
+**Description**: Authenticates a user with email and password.
+
+---
+
+#### Register
+
+**Method**: `register(userData: RegisterData): Promise<AuthResult>`
+
+**Description**: Registers a new user account.
+
+---
+
+#### Logout
+
+**Method**: `logout(): Promise<AuthResult>`
+
+**Description**: Clears the current user session.
+
+---
+
+#### Get Current User
+
+**Method**: `getCurrentUser(): Promise<User | null>`
+
+**Description**: Retrieves the currently authenticated user.
+
+---
+
+### Request
+
+#### Login Parameters
+
+```typescript
+interface LoginCredentials {
+    email: string;     // User's email address (required, validated)
+    password: string;  // User's password (required)
+}
+```
+
+#### Register Parameters
+
+```typescript
+interface RegisterData {
+    name: string;      // User's full name (required)
+    email: string;     // User's email address (required, validated)
+    password: string;  // User's password (required, min 8 characters)
+}
+```
+
+#### Validation Rules
+
+- **Email**: Must be valid email format (regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`)
+- **Password (Register)**: Minimum 8 characters
+- **Name (Register)**: Required field
+
+---
+
+### Response
+
+#### Success Response
+
+```typescript
+interface AuthResult {
+    success: true;
+    message: string;  // Success message (Indonesian)
+    user?: User;      // User object (on successful login/register)
+    token?: string;   // Authentication token (mock-jwt-token)
+}
+
+interface User {
+    id: string;       // Generated user ID (format: user_<email_sanitized>)
+    name: string;     // User's display name
+    email: string;    // User's email address
+}
+```
+
+#### Error Responses
+
+All error responses follow the [Error Response Standards](#error-response-standards).
+
+**400 Bad Request - Missing Fields**
+
+```json
+{
+    "success": false,
+    "error": "Email dan kata sandi diperlukan"
+}
+```
+
+**400 Bad Request - Invalid Email**
+
+```json
+{
+    "success": false,
+    "error": "Format email tidak valid"
+}
+```
+
+**400 Bad Request - Short Password**
+
+```json
+{
+    "success": false,
+    "error": "Kata sandi minimal 8 karakter"
+}
+```
+
+**500 Internal Server Error**
+
+```json
+{
+    "success": false,
+    "error": "Terjadi kesalahan saat login"
+}
+```
+
+---
+
+### Service Implementation Notes
+
+#### Current Implementation: Mock Mode
+
+- **Authentication**: Client-side mock with in-memory state
+- **User Storage**: `currentUser` stored in service instance (no persistence)
+- **Token**: Mock JWT token (`"mock-jwt-token"`)
+- **User ID**: Generated from email (`user_<email_sanitized>`)
+- **Name Extraction**: For login without name, extracted from email local part
+- **Error Messages**: Indonesian language for user-facing errors
+
+#### Future Integration: Real Backend
+
+The `IAuthService` interface is ready for real authentication providers:
+
+**Option 1: Auth0**
+```typescript
+import { Auth0Client } from '@auth0/auth0-spa-js';
+// Implement IAuthService using Auth0 SDK
+```
+
+**Option 2: Firebase Auth**
+```typescript
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+// Implement IAuthService using Firebase
+```
+
+**Option 3: NextAuth.js**
+```typescript
+import { signIn } from 'next-auth/react';
+// Implement IAuthService using NextAuth
+```
+
+**Option 4: Custom Backend**
+```typescript
+// Implement IAuthService with fetch/axios to your API
+```
+
+---
+
+### Environment Variables
+
+**Current Implementation**: No environment variables required (mock mode).
+
+**Future Implementation** (depending on provider):
+
+**Auth0**:
+```bash
+NEXT_PUBLIC_AUTH0_DOMAIN=<domain>
+NEXT_PUBLIC_AUTH0_CLIENT_ID=<client_id>
+```
+
+**Firebase**:
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=<api_key>
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=<auth_domain>
+```
+
+---
+
+### Usage Example
+
+```typescript
+import { authService } from '@/services/auth';
+
+// Login
+const loginResult = await authService.login({
+    email: 'john@example.com',
+    password: 'password123'
+});
+
+if (loginResult.success) {
+    console.log('Login successful:', loginResult.user);
+    console.log('Token:', loginResult.token);
+} else {
+    console.error('Login failed:', loginResult.error);
+}
+
+// Register
+const registerResult = await authService.register({
+    name: 'John Doe',
+    email: 'john@example.com',
+    password: 'password123'
+});
+
+if (registerResult.success) {
+    console.log('Registration successful:', registerResult.user);
+} else {
+    console.error('Registration failed:', registerResult.error);
+}
+
+// Get Current User
+const currentUser = await authService.getCurrentUser();
+console.log('Current user:', currentUser);
+
+// Logout
+const logoutResult = await authService.logout();
+if (logoutResult.success) {
+    console.log('Logout successful');
+}
+```
+
+---
+
+### Security Considerations
+
+1. **Mock Mode**: No real security - for development/testing only
+2. **Password Validation**: Client-side validation only (backend validation required in production)
+3. **Session Management**: In-memory only (localStorage/cookies required for persistence)
+4. **Token**: Mock token - implement real JWT in production
+5. **HTTPS Required**: Always use HTTPS for authentication in production
+6. **Rate Limiting**: Recommended for real backend (prevent brute force attacks)
+
+---
+
+### Future Enhancements
+
+1. **Rate Limiting**: Add rate limiting for login/register attempts
+2. **Session Persistence**: Implement localStorage/cookie storage for sessions
+3. **Protected Routes**: Add route guards for authenticated pages
+4. **Password Reset**: Extend service with forgotPassword/resetPassword methods
+5. **Token Refresh**: Implement JWT refresh token logic
+6. **OAuth Providers**: Add Google/Facebook/Social login
+7. **Two-Factor Authentication**: Add 2FA support
+8. **Email Verification**: Add email verification flow after registration
 
 ---
 
