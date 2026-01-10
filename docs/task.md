@@ -2257,3 +2257,114 @@ Pages and Components
 - Users receive proper error notifications via toast notifications (react-toastify)
 
 ---
+
+## Task 31: Critical Path Testing - FaqArea, TeamArea, Breadcrumb
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Test Engineering
+
+**Problem**:
+- FaqArea component has critical state management (tab switching, accordion logic) but was untested
+- TeamArea component has pagination with react-paginate but lacked test coverage
+- Breadcrumb component is critical for navigation but had no test coverage
+- These components contain business logic that could regress without tests
+
+**Locations**:
+- `src/components/pages/faq/FaqArea.tsx` (tab switching, accordion state management)
+- `src/components/pages/teams/team/TeamArea.tsx` (pagination with react-paginate)
+- `src/components/common/Breadcrumb.tsx` (navigation component with links)
+
+**Solution**:
+1. Created comprehensive test suite for FaqArea component (18 tests)
+2. Created comprehensive test suite for TeamArea component (20 tests)
+3. Created comprehensive test suite for Breadcrumb component (26 tests)
+4. All tests follow AAA pattern and test behavior, not implementation
+5. Tests cover happy paths, edge cases, state management, and user interactions
+
+**Success Criteria**:
+- [x] FaqArea has 18 comprehensive tests
+- [x] TeamArea has 20 comprehensive tests
+- [x] Breadcrumb has 26 comprehensive tests
+- [x] All 635 tests passing (100% success rate - 64 new tests added)
+- [x] Lint passes without errors
+- [x] Zero regressions in existing functionality
+
+**Related Files**:
+- Created: `src/components/pages/faq/__tests__/FaqArea.test.tsx` - 18 comprehensive tests
+- Created: `src/components/pages/teams/team/__tests__/TeamArea.test.tsx` - 20 comprehensive tests
+- Created: `src/components/common/__tests__/Breadcrumb.test.tsx` - 26 comprehensive tests
+
+**Test Coverage Summary**:
+- **FaqArea Component (18 tests)**:
+  - Renders FAQ section with tab titles and categories
+  - First tab active by default, switches on click
+  - FAQ items display correctly, updates when tab changes
+  - Accordion expansion/collapse behavior
+  - First FAQ expanded by default, maintains state within tab
+  - Resets to first item when switching tabs
+  - Handles rapid tab switching without errors
+  - Proper section structure, CSS classes
+  - Client component directive ("use client")
+
+- **TeamArea Component (20 tests)**:
+  - Renders team section with container
+  - Displays exactly 8 team members per page (itemsPerPage)
+  - Renders pagination component with correct page count
+  - Page navigation: next, previous, multiple switches
+  - Hides first page members when on second page
+  - Preserves team data structure across page changes
+  - Rapid page navigation without errors
+  - Proper section structure, CSS classes
+  - Team items structure, member images, info display
+  - Social share buttons with aria-labels (using getAllByLabelText for multiple elements)
+
+- **Breadcrumb Component (26 tests)**:
+  - Renders breadcrumb with title, subtitle
+  - Home link with default label "Beranda" and custom homeLabel
+  - Home link with default href "/" and custom homeLink
+  - Dot separator between home and subtitle
+  - Proper section structure, wrapper with background image
+  - Shape elements (circles), container, row structure
+  - Content wrapper with correct classes
+  - Breadcrumb title and list with correct structure
+  - All elements in correct order
+  - Column layout, special characters, long titles
+  - Empty subtitle handling, numeric homeLabel
+  - DOM structure for accessibility, background image style
+  - Both shape elements, subtitle as plain text
+  - Default props with only required props
+
+**Total**: 64 new tests created across 3 critical components
+
+**Notes**:
+- All 635 tests passing (100% success rate)
+- Lint passed without errors (4 intentional warnings for test img tags)
+- Tests follow AAA (Arrange-Act-Assert) pattern
+- External dependencies properly mocked (react-paginate, next/image, next/link, InnerFaqData, TeamData)
+- Descriptive test names covering scenarios + expectations
+- One assertion focus per test
+- Happy paths and edge cases both tested
+- State management and user interaction testing
+- Proper mocking strategies for data dependencies
+- Critical business logic now covered by comprehensive tests
+- Follows Test Engineering principles:
+  - Test Behavior, Not Implementation: Tests verify WHAT, not HOW
+  - Test Pyramid: Unit tests for stateful components
+  - Isolation: Each test is independent
+  - Determinism: Same result every time
+  - Fast Feedback: Tests execute quickly (17s total)
+  - Meaningful Coverage: Critical paths covered
+
+**Impact**:
+- 64 new tests added to existing 571 tests (10% increase)
+- Critical navigation components (Breadcrumb) now tested
+- Stateful components with complex logic (FaqArea, TeamArea) now have coverage
+- Future regressions in tab switching, accordion, and pagination will be caught
+- Better confidence in refactoring these components
+
+---
+
+**Last Updated**: 2026-01-10
+
+---
