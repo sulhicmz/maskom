@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { authService } from '@/services/auth';
+import { useState } from 'react';
 
 import icon from "@/assets/images/icon/google.png"
 
@@ -15,6 +16,7 @@ interface FormData {
    password: string;
 }
 const SignUpForm = () => {
+   const [isSubmitting, setIsSubmitting] = useState(false);
 
    const schema = yup
       .object({
@@ -26,11 +28,14 @@ const SignUpForm = () => {
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
    const onSubmit = async (data: FormData) => {
+      setIsSubmitting(true);
       const result = await authService.register({
          name: data.name,
          email: data.email,
          password: data.password,
       });
+
+      setIsSubmitting(false);
 
       if (result.success) {
          toast(result.message, { position: 'top-center' });
@@ -52,6 +57,7 @@ const SignUpForm = () => {
                placeholder="Contoh: Andi Wijaya"
                aria-invalid={!!errors.name}
                aria-describedby="signup_name_error"
+               disabled={isSubmitting}
             />
             <p id="signup_name_error" className="form_error" role="alert">{errors.name?.message}</p>
          </div>
@@ -65,6 +71,7 @@ const SignUpForm = () => {
                placeholder="nama@perusahaan.co.id"
                aria-invalid={!!errors.email}
                aria-describedby="signup_email_error"
+               disabled={isSubmitting}
             />
             <p id="signup_email_error" className="form_error" role="alert">{errors.email?.message}</p>
          </div>
@@ -78,15 +85,18 @@ const SignUpForm = () => {
                placeholder="Minimal 8 karakter"
                aria-invalid={!!errors.password}
                aria-describedby="signup_password_error"
+               disabled={isSubmitting}
             />
             <p id="signup_password_error" className="form_error" role="alert">{errors.password?.message}</p>
          </div>
          <div className="form-group mb-25">
-            <button className="theme-btn style-one">Daftarkan akun</button>
+            <button type="submit" className="theme-btn style-one" disabled={isSubmitting} aria-live="polite" aria-busy={isSubmitting}>
+               {isSubmitting ? 'Mendaftarkan...' : 'Daftarkan akun'}
+            </button>
          </div>
          <div className="form-group">
-            <button className="theme-btn style-one">
-               <Image src={icon} alt="google" />Daftar dengan Google Workspace
+            <button type="button" className="theme-btn style-one" disabled={isSubmitting} aria-label="Daftar dengan Google Workspace (Fitur akan segera hadir)">
+               <Image src={icon} alt="google" width={20} height={20} />Daftar dengan Google Workspace
             </button>
          </div>
          <div className="form-text text-center">
