@@ -30,6 +30,7 @@ jest.mock('@/data/TeamData', () => [
 
 jest.mock('next/image', () => {
   return function ImageMock({ alt, src }: { alt: string; src: string }) {
+    // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} data-testid="team-image" />;
   };
 });
