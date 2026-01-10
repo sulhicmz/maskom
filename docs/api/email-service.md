@@ -355,4 +355,4 @@ Consider adding:
 
 - [EmailJS Documentation](https://www.emailjs.com/docs/)
 - [Resilience Patterns - src/utils/resilience/](../utils/resilience/)
-- [Integration Architecture - docs/blueprint.md](../../docs/blueprint.md)
+- [Integration Architecture - blueprint.md](../blueprint.md)
