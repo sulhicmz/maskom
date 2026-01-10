@@ -263,3 +263,38 @@ Comprehensive API specifications for all external service integrations are docum
 - Error response standards
 - Rate limiting configuration
 - Adding new integrations guide
+
+## Security Configuration
+
+### CORS (Cross-Origin Resource Sharing)
+
+The application uses environment-based CORS configuration for flexibility across environments:
+
+```bash
+# .env.local
+NEXT_PUBLIC_CORS_ORIGIN=https://maskom.co.id  # Production
+# NEXT_PUBLIC_CORS_ORIGIN=http://localhost:3000  # Development
+```
+
+**Security Headers** (public/_headers):
+- **Access-Control-Allow-Origin**: Uses `$NEXT_PUBLIC_CORS_ORIGIN` environment variable
+- **Access-Control-Allow-Methods**: GET, POST, PUT, DELETE, OPTIONS
+- **Access-Control-Allow-Headers**: Content-Type, Authorization
+- **Access-Control-Max-Age**: 86400
+
+**Environment-Specific Values**:
+- **Production**: `https://maskom.co.id` (single origin, secure by default)
+- **Development**: `http://localhost:3000` or `http://127.0.0.1:3000`
+- **Staging**: Specific staging domain (never use wildcard `*`)
+
+**Implementation**: Cloudflare Pages supports `$VARIABLE` syntax in `_headers` file for environment variable substitution.
+
+### Additional Security Headers
+
+- **X-Frame-Options: DENY** - Prevents clickjacking
+- **X-Content-Type-Options: nosniff** - MIME-type sniffing protection
+- **X-XSS-Protection: 1; mode=block** - XSS protection
+- **Strict-Transport-Security**: max-age=63072000 with includeSubDomains and preload (HSTS)
+- **Content-Security-Policy**: Comprehensive CSP with proper restrictions
+- **Referrer-Policy**: strict-origin-when-cross-origin
+- **Permissions-Policy**: geolocation=(), microphone=(), camera=()

@@ -9,7 +9,10 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 # CORS Headers untuk membatasi origin yang diizinkan
-  Access-Control-Allow-Origin: https://maskom.co.id
+# Note: Set NEXT_PUBLIC_CORS_ORIGIN environment variable in Cloudflare Pages/Workers
+# Production: https://maskom.co.id
+# Development: http://localhost:3000 or http://127.0.0.1:3000
+  Access-Control-Allow-Origin: $NEXT_PUBLIC_CORS_ORIGIN
   Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
   Access-Control-Allow-Headers: Content-Type, Authorization
   Access-Control-Max-Age: 86400

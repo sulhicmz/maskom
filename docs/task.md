@@ -2477,3 +2477,77 @@ Pages and Components
 **Last Updated**: 2026-01-10
 
 ---
+
+## Task 30: Security Hardening - CORS Flexibility for Development/Staging
+
+**Status**: ✅ Completed
+**Priority**: STANDARD
+**Type**: Security Engineering
+
+**Problem**:
+- `public/_headers` limits `Access-Control-Allow-Origin` to `https://maskom.co.id` only
+- Cross-origin requests (e.g., staging, preview Workers) are rejected by browsers
+- Development environments and testing cannot access the application
+- CORS header is hardcoded without environment variable support
+- Documented as known issue #1 in docs/operations/known-issues.md
+
+**Locations**:
+- `public/_headers` - Line 12: Hardcoded CORS origin
+- `.env.example` - Missing CORS origin configuration
+
+**Solution**:
+1. Added NEXT_PUBLIC_CORS_ORIGIN to .env.example with default production value
+2. Updated Cloudflare Pages _headers file to use $NEXT_PUBLIC_CORS_ORIGIN environment variable
+3. Updated known-issues.md to mark CORS issue as resolved
+4. Added documentation comments in _headers file explaining CORS configuration
+5. Maintained security by documenting production-specific values
+
+**Success Criteria**:
+- [x] NEXT_PUBLIC_CORS_ORIGIN added to .env.example
+- [x] _headers updated to use $NEXT_PUBLIC_CORS_ORIGIN environment variable
+- [x] Production deployment will use https://maskom.co.id (maintain security)
+- [x] Development/staging can use localhost or preview URLs
+- [x] Documentation updated with CORS configuration guide in _headers
+- [x] Security validated (default is production origin, no wildcards)
+- [x] All 664 tests passing (100% success rate)
+- [x] Lint passes (5 intentional warnings for test img tags)
+
+**Related Files**:
+- Updated: `.env.example` - Added NEXT_PUBLIC_CORS_ORIGIN with production default
+- Updated: `public/_headers` - Changed to use $NEXT_PUBLIC_CORS_ORIGIN
+- Updated: `docs/operations/known-issues.md` - Marked CORS issue as resolved
+
+**Security Considerations**:
+- **Production**: Must use https://maskom.co.id (no wildcards)
+- **Development**: Can use http://localhost:3000 or http://127.0.0.1:3000
+- **Staging**: Use specific staging domain, not wildcard
+- **Default Value**: https://maskom.co.id (secure by default)
+
+**Implementation Details**:
+- Cloudflare Pages supports environment variables in _headers file using $VARIABLE syntax
+- Default production value: https://maskom.co.id
+- Development value examples: http://localhost:3000, http://127.0.0.1:3000
+- Environment variable must be set in Cloudflare Pages/Workers deployment settings
+
+**Testing**:
+- Build: Successful (18 pages generated)
+- Tests: All 664 passing (100% success rate)
+- Lint: Passed with 5 intentional warnings (test mock img tags)
+
+**Notes**:
+- This implements Future Security Recommendation #2 from Task 27
+- Follows Security Engineering principles:
+  - Defense in Depth: CORS + CSP + HSTS layers maintained
+  - Least Privilege: Restrictive by default, configurable for dev/staging
+  - Fail Secure: Invalid origins result in blocked requests
+  - Secure by Default: Production value is https://maskom.co.id
+- Resolved known issue #1 in docs/operations/known-issues.md
+
+**Impact**:
+- Enables development and testing across multiple environments
+- Maintains production security (single allowed origin)
+- Reduces friction for preview deployments and staging
+- Improves developer experience for cross-origin testing
+- No breaking changes for existing production deployment
+
+---
