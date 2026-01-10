@@ -129,10 +129,43 @@ External API (EmailJS, etc.)
 - **Logging**: Non-sensitive error messages only (no secrets or stack traces)
 - **User Experience**: Graceful degradation with informative error messages
 
+#### 4. Rate Limiting
+
+- **Purpose**: Prevent abuse and protect backend resources from excessive requests
+- **Implementation**: `RateLimiter` class with configurable limits and cooldown
+- **Configuration**:
+  - **Email Limiter**: 5 attempts per 60s window, 5 minute cooldown
+  - **Form Limiter**: 10 attempts per 1 hour window, 2 hour cooldown
+- **Features**:
+  - Per-identifier tracking (email, IP, user ID)
+  - Automatic reset after window expires
+  - Cooldown period after limit exceeded
+  - Cleanup of expired records
+- **Error Handling**: Clear error messages with remaining time
+- **Location**: `src/utils/rateLimiter.ts`
+
+#### 5. Service Abstraction
+
+- **Purpose**: Decouple business logic from external API implementations
+- **Implementation**: Interface-based service layer with dependency injection
+- **Benefits**:
+  - Easy to mock for testing
+  - Simple to swap implementations (e.g., EmailJS → SendGrid)
+  - Centralized error handling and logging
+- **Location**: `src/services/email/EmailService.ts`
+
+#### Error Handling
+
+- **ResilienceError**: Custom error type with `isTimeout` and `isRetryable` flags
+- **Logging**: Non-sensitive error messages only (no secrets or stack traces)
+- **User Experience**: Graceful degradation with informative error messages
+- **Rate Limiting**: Clear messages with countdown timers
+
 #### Monitoring
 
 - **Circuit Breaker State**: Accessible via `getCircuitBreakerState()`
 - **Manual Reset**: Available via `resetCircuitBreaker()` (use with caution)
+- **Rate Limit Status**: Accessible via `getStatus(identifier)`
 - **Metrics**: Future enhancement for success rates, failure patterns
 
 ## Key Dependencies
@@ -155,3 +188,12 @@ External API (EmailJS, etc.)
 ## Roadmap
 
 See `docs/task.md` for ongoing architectural improvements and prioritized refactoring tasks.
+
+## API Documentation
+
+Comprehensive API specifications for all external service integrations are documented in `docs/api.md`.
+
+- Email Service API with resilience patterns
+- Error response standards
+- Rate limiting configuration
+- Adding new integrations guide
