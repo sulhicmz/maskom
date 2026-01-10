@@ -1,4 +1,5 @@
 import { TeamMember } from "@/types/data";
+import { createIdIndex, type IdIndex } from "@/utils/dataIndex";
 
 import team_1 from "@/assets/images/team/team-1.jpg"
 import team_2 from "@/assets/images/team/team-2.jpg"
@@ -61,3 +62,4 @@ const team_data: TeamMember[] = [
 ];
 
 export default team_data;
+export const teamById: IdIndex<TeamMember> = createIdIndex(team_data);

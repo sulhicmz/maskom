@@ -1,5 +1,6 @@
 import { filterItems } from "@/utils/dataFilters";
 import { FeedbackItem } from "@/types/data";
+import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
 
 import avatar_1 from "@/assets/images/testimonial/thumb-1.svg"
 import avatar_2 from "@/assets/images/testimonial/thumb-2.svg"
@@ -111,3 +112,4 @@ export default testi_data;
 
 export const home_1_feedback = filterItems(testi_data, "home_1");
 export const home_2_feedback = filterItems(testi_data, "home_2");
+export const feedbackByPage: PageIndex<FeedbackItem> = createPageIndex(testi_data);
