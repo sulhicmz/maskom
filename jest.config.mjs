@@ -13,6 +13,9 @@ const customJestConfig = {
   },
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
   testPathIgnorePatterns: ["<rootDir>/.next/"],
+  transformIgnorePatterns: [
+    "node_modules/(?!swiper)",
+  ],
 };
 
 export default createJestConfig(customJestConfig);
