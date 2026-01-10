@@ -293,8 +293,90 @@ export interface DataRelationship {
 
 5. **Performance Optimization**:
    - Cached access layer
-   - Pre-built indexes at build time
-   - O(1) lookups vs O(n) linear search
+    - Pre-built indexes at build time
+    - O(1) lookups vs O(n) linear search
+
+## Validation Layer Architecture (✅ COMPLETED - Task 48)
+
+### Problem Solved
+
+Before Task 48, the application had **duplicated validation logic**:
+- Email validation implemented twice (direct function + yup schema)
+- Password validation implemented twice (direct function + yup schema)
+- Inconsistent error messages between implementations
+- Changes required updating multiple locations
+- No single source of truth for validation rules
+
+### Architecture Solution
+
+```
+Validation Rules (src/utils/validation/rules.ts)
+    ↓
+Yup Adapter (src/utils/validation/yupAdapter.ts)
+    ↓
+Form Validation (src/utils/formValidation.ts)
+    ↓
+Forms (ContactForm, LoginForm, SignUpForm, BlogForm)
+```
+
+```
+Validation Rules (src/utils/validation/rules.ts)
+    ↓
+Direct Adapter (src/utils/validation/directAdapter.ts)
+    ↓
+Service Validation (src/utils/validation.ts)
+    ↓
+Services (AuthService)
+```
+
+### Layer Components
+
+**1. Rules Layer** (`src/utils/validation/rules.ts`):
+- Core validation rules independent of implementation
+- EmailRule: Email format validation with regex
+- PasswordRule: Minimum length validation (8 characters)
+- RequiredRule: Non-empty string validation
+- MinLengthRule, MaxLengthRule, PatternRule: Configurable rules
+- **Single source of truth** for all validation rules
+
+**2. Yup Adapter** (`src/utils/validation/yupAdapter.ts`):
+- Generates yup schemas from core rules
+- createEmailFieldSchema(), createPasswordFieldSchema(), createNameFieldSchema()
+- createRequiredFieldSchema() with label support
+- createEmailPasswordSchema(), createContactFormSchema(), createSignUpFormSchema(), createBlogFormSchema()
+- Preserves label-based error messages for flexibility
+
+**3. Direct Adapter** (`src/utils/validation/directAdapter.ts`):
+- Generates ValidationResult from core rules
+- validateEmail(), validatePassword(), validateRequired()
+- Same error messages as yup adapter
+- Used by services for direct validation
+
+**4. Central Export** (`src/utils/validation/index.ts`):
+- Exports all rules, adapters, and types
+- Single import point for validation utilities
+
+### Benefits
+
+1. **Single Source of Truth**: Rules defined once, used everywhere
+2. **Layer Separation**: Rules independent of implementation (yup, direct, zod, etc.)
+3. **Consistency**: Same error messages across all implementations
+4. **Maintainability**: Change rule in one place, all adapters update
+5. **Extensibility**: Easy to add new adapters (zod, class-validator, io-ts)
+6. **Type Safety**: All adapters properly typed with TypeScript
+
+### Future Enhancement Opportunities
+
+1. **Zod Adapter** - Add zod-based validation adapter
+2. **Custom Rule Factory** - Create configurable rule generators
+3. **Validation Pipeline** - Chain multiple validators with error aggregation
+4. **Internationalization (i18n)** - Multi-language error messages
+
+### Testing
+
+- All 945 tests passing (100% success rate)
+- Zero regressions in existing functionality
+- Error messages verified consistent across all adapters
 
 ## Architectural Patterns
 
@@ -318,6 +400,8 @@ export interface DataRelationship {
 - ✅ Form submission hook with consistent error handling (useFormSubmission)
 - ✅ Service layer abstraction for external API calls (EmailService, AuthService)
 - ✅ DRY principle applied to form validation and submission patterns
+- ✅ Unified validation layer with rule-based architecture (src/utils/validation/)
+- ✅ Layer separation: Validation rules independent of implementation (yup, direct adapters)
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -330,6 +414,7 @@ export interface DataRelationship {
 - ❌ Inline authentication logic in LoginForm/SignUpForm - FIXED
 - ❌ Form submission logic duplicated across 4 components - FIXED
 - ❌ Email validation duplicated in AuthService - FIXED
+- ❌ Duplicated validation implementations (validation.ts vs formValidation.ts) - FIXED
 
 ### Integration Patterns (Maintain)
 
