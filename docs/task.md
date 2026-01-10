@@ -608,8 +608,318 @@ export interface AuthResult {
  - Zero functional changes or regressions
  - All 769 tests passing with updated test mocks
  
- ---
- 
+---
+
+## Task 40: Data Architecture - Validation, Indexing & Relationship Management
+
+**Status**: 🚧 In Progress
+**Priority**: HIGH
+**Type**: Data Architecture
+
+**Problem**:
+- No runtime validation for data integrity across TypeScript data files
+- Inconsistent data patterns (some extend BaseDataItem, others don't)
+- Linear array searches for frequently accessed items (O(n) complexity)
+- No data relationship management despite having `id` fields
+- Manual ID assignment could lead to duplicates
+- No centralized data access layer or caching strategy
+- Date format inconsistencies (e.g., "15 Mar 2024" string, no standardization)
+- Mixed filtering patterns (some pre-filtered exports, others not)
+
+**Locations**:
+- `src/data/*.ts` - All static data files need review
+- `src/types/data/index.ts` - Type definitions need enhancement
+- `src/utils/dataFilters.ts` - Filter utilities need indexing support
+- Missing: `src/utils/dataValidation.ts` - Runtime validation utilities
+- Missing: `src/utils/dataIndex.ts` - Data indexing utilities
+- Missing: `src/utils/dataCache.ts` - Data caching layer
+
+**Data Architecture Analysis**:
+
+### Current Issues:
+
+1. **No Runtime Validation**:
+   - Data integrity only checked at compile time via TypeScript
+   - No validation for missing required fields
+   - No validation for invalid values (e.g., empty strings, negative IDs)
+   - No validation for duplicate IDs within collections
+
+2. **Inconsistent Data Patterns**:
+   - Some items extend `BaseDataItem` (FeedbackItem, FaqItem, FeatureItem)
+   - Some items don't extend any base (TeamMember, MenuItem, InnerBlogPost)
+   - TeamMember has no `page` field, yet has `id` for potential referencing
+
+3. **Performance Issues**:
+   - Linear searches: `items.find(i => i.id === id)` is O(n)
+   - No indexing for frequently accessed items
+   - No caching for repeated data access
+
+4. **No Relationship Management**:
+   - Data items have `id` fields but no foreign key relationships
+   - No referential integrity checks
+   - No cascade deletion/update strategies
+
+5. **ID Generation**:
+   - Manual assignment in data files
+   - Risk of duplicate IDs
+   - No auto-increment or GUID strategy
+
+### Data Files Analysis:
+
+| Data File | Base Type | Has Page | Has ID | Pre-filtered | Issues |
+|-----------|-----------|----------|--------|--------------|--------|
+| TeamData.ts | TeamMember | No | Yes | No | No base type, no page field |
+| InnerBlogData.ts | InnerBlogPost | No | Yes | No | No base type, no page field |
+| FeedbackData.ts | FeedbackItem | Yes | Yes | Yes | Good pattern |
+| MenuData.ts | MenuItem | No | Yes | No | No base type, no page field |
+| FaqData.ts | FaqItem | Yes | Yes | ? | Extends BaseDataItem |
+| FeatureData.ts | FeatureItem | Yes | Yes | ? | Extends BaseDataItem |
+| ProcessData.ts | ProcessItem | Yes | Yes | ? | Extends BaseDataItem |
+| CauseData.ts | CauseItem | Yes | Yes | ? | Extends BaseDataItem |
+| PriceData.ts | PriceItem | Yes | Yes | ? | Extends BaseDataItem |
+| BlogCommentData.ts | BlogCommentItem | No | Yes | No | No base type, no page field |
+| SocialMediaData.ts | ? | ? | ? | ? | Need review |
+| InnerFaqData.ts | InnerFaqItem | ? | Yes | ? | Complex structure |
+| DashboardData.ts | ? | ? | ? | ? | Need review |
+
+**Solution**:
+
+### Phase 1: Data Validation Layer (HIGH PRIORITY)
+
+1. **Create Runtime Validation Utilities** (`src/utils/dataValidation.ts`):
+   ```typescript
+   - validateRequiredFields<T>(item: T, required: (keyof T)[]): ValidationError[]
+   - validateUniqueId<T extends { id: number }>(items: T[]): ValidationError[]
+   - validateEmail(email: string): boolean
+   - validateDate(dateStr: string): boolean
+   - validateRange(value: number, min: number, max: number): boolean
+   - validateEnum<T>(value: T, allowed: T[]): boolean
+   ```
+
+2. **Add Validation to All Data Files**:
+   - Create validation schemas for each data type
+   - Run validation at build time (via Next.js build script)
+   - Throw clear error messages for invalid data
+
+3. **Create Type Guards**:
+   ```typescript
+   - isFeedbackItem(item: unknown): item is FeedbackItem
+   - isTeamMember(item: unknown): item is TeamMember
+   - etc.
+   ```
+
+### Phase 2: Data Indexing Layer (MEDIUM PRIORITY)
+
+1. **Create Index Utilities** (`src/utils/dataIndex.ts`):
+   ```typescript
+   - createIdIndex<T extends { id: number }>(items: T[]): Map<number, T>
+   - createMultiFieldIndex<T>(items: T[], fields: (keyof T)[]): Map<string, T[]>
+   - createPageIndex<T extends { page: string }>(items: T[]): Map<string, T[]>
+   ```
+
+2. **Add Pre-built Indexes to Data Exports**:
+   ```typescript
+   export const teamById = createIdIndex(team_data);
+   export const feedbackByPage = createPageIndex(testi_data);
+   ```
+
+3. **Create Cached Access Layer**:
+   ```typescript
+   - getDataById<T>(items: T[], id: number, index?: Map<number, T>): T | undefined
+   - getDataByPage<T>(items: T[], page: string, index?: Map<string, T[]>): T[]
+   ```
+
+### Phase 3: Data Relationship Management (MEDIUM PRIORITY)
+
+1. **Define Relationship Types**:
+   ```typescript
+   export interface DataRelationship {
+       sourceCollection: string;
+       targetCollection: string;
+       sourceField: string;
+       targetField: string;
+       type: 'one-to-one' | 'one-to-many' | 'many-to-many';
+   }
+   ```
+
+2. **Create Relationship Validation**:
+   ```typescript
+   - validateRelationships(relations: DataRelationship[]): ValidationError[]
+   - checkReferentialIntegrity(): ValidationError[]
+   ```
+
+### Phase 4: Data Standardization (LOW PRIORITY)
+
+1. **Standardize Base Types**:
+   - Review which items should extend `BaseDataItem`
+   - Create additional base types for common patterns
+   - Ensure consistent use across all data files
+
+2. **Standardize Date Formats**:
+   - Use ISO 8601 format: "2024-03-15"
+   - Add date formatting utilities for display
+   - Validate date strings at build time
+
+3. **Auto-ID Generation** (Optional):
+   - Create ID generator utility
+   - Auto-assign IDs based on index in array
+   - Ensure uniqueness across collections
+
+**Success Criteria**:
+- [ ] Runtime validation utilities created and tested
+- [ ] All data files have validation schemas
+- [ ] Build-time validation catches data integrity issues
+- [ ] Data indexing utilities created with comprehensive tests
+- [ ] Pre-built indexes added to frequently accessed data exports
+- [ ] Cached access layer implemented
+- [ ] Relationship types defined
+- [ ] Referential integrity checks implemented
+- [ ] All data follows consistent patterns
+- [ ] Date formats standardized
+- [ ] All 870+ tests passing (100% success rate)
+- [ ] Lint passes without errors
+- [ ] Build completed successfully (18 pages generated)
+- [ ] Zero regressions in existing functionality
+- [ ] Performance benchmarks showing improvement with indexing
+
+**Related Files**:
+- Create: `src/utils/dataValidation.ts` - Runtime validation utilities
+- Create: `src/utils/dataIndex.ts` - Data indexing utilities
+- Create: `src/utils/dataCache.ts` - Data caching layer
+- Create: `src/utils/__tests__/dataValidation.test.ts` - Validation tests
+- Create: `src/utils/__tests__/dataIndex.test.ts` - Indexing tests
+- Update: `src/types/data/index.ts` - Add relationship types
+- Update: `src/data/*.ts` - Add validation schemas and indexes
+- Update: `docs/blueprint.md` - Add data architecture patterns
+
+**Performance Impact**:
+
+**Before Optimization**:
+- Linear search O(n) for 8 team members: ~4 operations average
+- Linear search O(n) for 10 feedback items: ~5 operations average
+- No caching for repeated access
+- Repeated searches on same data
+
+**After Optimization**:
+- Hash map lookup O(1) for all items: 1 operation constant
+- Pre-built indexes created once at build time
+- Cached access layer for repeated queries
+- Estimated 80%+ improvement for frequent ID lookups
+
+**Validation Impact**:
+
+**Build-Time Validation**:
+- Catches data integrity issues before deployment
+- Prevents runtime errors from invalid data
+- Clear error messages for quick debugging
+
+**Runtime Validation** (Optional):
+- Validates data at application startup
+- Ensures data integrity in production
+- Provides safety for dynamic data (future)
+
+**Data Integrity Improvements**:
+
+1. **Unique IDs**: All IDs guaranteed unique within collections
+2. **Required Fields**: All required fields present and non-empty
+3. **Valid Formats**: Dates, emails, URLs validated
+4. **Range Validation**: Numbers within expected ranges
+5. **Referential Integrity**: Foreign key references valid
+
+**Testing**:
+
+**Validation Tests** (30+ tests):
+- Required field validation
+- Unique ID validation
+- Email format validation
+- Date format validation
+- Range validation
+- Enum validation
+- Type guard functions
+
+**Indexing Tests** (25+ tests):
+- ID index creation
+- Multi-field index creation
+- Page index creation
+- Cached access layer
+- Performance benchmarks
+
+**Data File Tests** (10+ tests):
+- All data files pass validation
+- Pre-filtered exports correct
+- Indexes properly created
+
+**Total**: 65+ new tests
+
+**Documentation Updates**:
+- Update `docs/blueprint.md` with:
+  - Data validation patterns
+  - Data indexing strategies
+  - Relationship management
+  - Data access best practices
+  - Performance optimization guidelines
+
+**Notes**:
+- Follows Data Architecture principles:
+  - Data Integrity First: Validation ensures correctness
+  - Query Efficiency: Indexes support usage patterns
+  - Single Source of Truth: Consistent data patterns
+  - Performance First: O(1) lookups vs O(n) linear search
+- Non-destructive: All changes are additive (validation, indexes, caches)
+- Backward compatible: Existing code continues to work
+- Zero breaking changes to data structure
+- Follow the principle of "Schema First" - define validation before implementing
+- Use TypeScript for compile-time safety AND runtime validation for production
+
+**Impact Summary**:
+
+**Data Integrity**:
+- Runtime validation catches data integrity issues
+- Unique IDs guaranteed across all collections
+- Required fields validated at build time
+- Referential integrity enforced for relationships
+
+**Performance**:
+- 80%+ improvement for ID-based lookups (O(1) vs O(n))
+- Pre-built indexes created once at build time
+- Cached access layer reduces redundant operations
+- Reduced CPU usage for repeated data access
+
+**Developer Experience**:
+- Clear error messages for data validation issues
+- Type-safe data access with cached lookups
+- Consistent patterns across all data files
+- Easy to add new data files with validation
+
+**Maintainability**:
+- Centralized validation logic
+- Reusable indexing utilities
+- Clear data access patterns
+- Future-proof for dynamic data sources
+
+**Future Enhancement Opportunities**:
+
+1. **Dynamic Data Loading**: Replace static files with API calls
+   - Validation layer already in place
+   - Caching layer supports dynamic data
+   - Indexes can be built at runtime
+
+2. **Database Integration**: Add real database with migrations
+   - Validation schemas become database schemas
+   - Indexes become database indexes
+   - Relationships become foreign key constraints
+
+3. **Real-time Data Updates**: WebSocket support for live data
+   - Cache invalidation strategies
+   - Index rebuilding on data changes
+   - Optimistic UI updates with validation
+
+4. **Data Versioning**: Track changes to data over time
+   - Schema migration support
+   - Data diff utilities
+   - Rollback capabilities
+
+---
  ## Task 35: Security Health Assessment - Comprehensive Security Audit
 
 **Status**: ✅ Completed

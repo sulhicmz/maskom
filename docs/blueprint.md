@@ -41,6 +41,204 @@ Pages/Sections
 Layout/Wrapper
 ```
 
+## Data Architecture
+
+### Current Data Model
+
+The application uses a **static data-driven architecture** with TypeScript data files:
+
+```
+Data Files (src/data/*.ts)
+    ↓
+Type Definitions (src/types/data/index.ts)
+    ↓
+Filter Utilities (src/utils/dataFilters.ts) - Type-safe filtering
+    ↓
+Pre-filtered Exports (page-specific data)
+    ↓
+Components (use pre-filtered data)
+    ↓
+Pages/Sections
+    ↓
+Layout/Wrapper
+```
+
+### Data Structure Patterns
+
+#### Base Type Pattern
+
+**BaseDataItem** - Common structure for data items:
+
+```typescript
+export interface BaseDataItem {
+    id: number;              // Unique identifier
+    page: string;            // Page route for filtering
+}
+```
+
+**Usage**:
+- Items extending `BaseDataItem` have both `id` and `page` fields
+- Enables filtering by page via `filterByPage()` utility
+- Supports unique identification across collections
+
+#### Data Collection Patterns
+
+**Pattern 1: BaseDataItem Extension** (Page-filtered data):
+```typescript
+// FaqItem, FeatureItem, FeedbackItem, etc.
+export interface FaqItem extends BaseDataItem {
+    question: string;
+    answer: string;
+}
+```
+
+**Pattern 2: Standalone Items** (Global data):
+```typescript
+// TeamMember, MenuItem, InnerBlogPost
+export interface TeamMember {
+    id: number;
+    img: StaticImageData;
+    title: string;
+    designation: string;
+}
+```
+
+#### Data Access Patterns
+
+**Pattern 1: Direct Export** (Simple):
+```typescript
+export default team_data;
+```
+
+**Pattern 2: Pre-filtered Export** (Page-specific):
+```typescript
+export default testi_data;
+export const home_1_feedback = filterItems(testi_data, "home_1");
+export const home_2_feedback = filterItems(testi_data, "home_2");
+```
+
+### Data Files Inventory
+
+| Data File | Base Type | Has Page | Has ID | Pre-filtered | Purpose |
+|-----------|-----------|----------|--------|--------------|---------|
+| TeamData.ts | TeamMember | No | Yes | No | Team members |
+| InnerBlogData.ts | InnerBlogPost | No | Yes | No | Blog posts |
+| FeedbackData.ts | FeedbackItem | Yes | Yes | Yes | Testimonials |
+| MenuData.ts | MenuItem | No | Yes | No | Navigation menu |
+| FaqData.ts | FaqItem | Yes | Yes | No | FAQ items |
+| FeatureData.ts | FeatureItem | Yes | Yes | No | Feature cards |
+| ProcessData.ts | ProcessItem | Yes | Yes | No | Process steps |
+| CauseData.ts | CauseItem | Yes | Yes | No | Cause cards |
+| PriceData.ts | PriceItem | Yes | Yes | No | Pricing tables |
+| BlogCommentData.ts | BlogCommentItem | No | Yes | No | Blog comments |
+| SocialMediaData.ts | SocialLink | No | No | No | Social links |
+| InnerFaqData.ts | InnerFaqItem | No | Yes | No | FAQ categories |
+| DashboardData.ts | WiFiDevice, etc. | No | Yes | No | Dashboard widgets |
+
+### Data Validation (Planned - Task 40)
+
+**Validation Utilities** (src/utils/dataValidation.ts):
+- `validateRequiredFields<T>()` - Check required fields
+- `validateUniqueId<T>()` - Ensure unique IDs
+- `validateEmail()` - Email format validation
+- `validateDate()` - Date format validation
+- `validateRange()` - Number range validation
+- `validateEnum<T>()` - Enum value validation
+
+**Type Guards**:
+- `isFeedbackItem(item: unknown): item is FeedbackItem`
+- `isTeamMember(item: unknown): item is TeamMember`
+- etc.
+
+### Data Indexing (Planned - Task 40)
+
+**Index Utilities** (src/utils/dataIndex.ts):
+
+**ID Index** (O(1) lookups):
+```typescript
+export const teamById = createIdIndex(team_data);
+// teamById.get(1) → TeamMember | undefined
+```
+
+**Page Index** (Page-based filtering):
+```typescript
+export const feedbackByPage = createPageIndex(testi_data);
+// feedbackByPage.get("home_1") → FeedbackItem[]
+```
+
+**Multi-field Index** (Complex queries):
+```typescript
+export const feedbackByDesignation = createMultiFieldIndex(testi_data, ['designation']);
+```
+
+### Data Relationship Management (Planned - Task 40)
+
+**Relationship Types**:
+```typescript
+export interface DataRelationship {
+    sourceCollection: string;    // e.g., "FeedbackData"
+    targetCollection: string;    // e.g., "TeamData"
+    sourceField: string;        // e.g., "authorId"
+    targetField: string;        // e.g., "id"
+    type: 'one-to-one' | 'one-to-many' | 'many-to-many';
+}
+```
+
+**Referential Integrity**:
+- Validate foreign key references
+- Cascade deletion/update strategies
+- Prevent orphaned records
+
+### Performance Considerations
+
+**Current**:
+- Linear searches: O(n) for ID lookups
+- No caching for repeated access
+- Repeated array iteration for filtering
+
+**Planned** (Task 40):
+- Hash map lookups: O(1) for ID lookups
+- Pre-built indexes at build time
+- Cached access layer for repeated queries
+- Estimated 80%+ improvement for frequent lookups
+
+### Data Integrity Best Practices
+
+1. **Schema First**: Define TypeScript interfaces before creating data files
+2. **Validation**: Compile-time (TypeScript) + Runtime (validation utilities)
+3. **Unique IDs**: Manual assignment with careful review (auto-generation planned)
+4. **Type Safety**: Use TypeScript type guards for dynamic data
+5. **Consistent Patterns**: Follow BaseDataItem pattern where applicable
+6. **Indexing**: Use indexes for frequently accessed items
+7. **Caching**: Cache repeated data access for performance
+
+### Future Data Architecture Enhancements (Task 40)
+
+1. **Runtime Validation Layer**:
+   - Build-time validation for all data files
+   - Clear error messages for data integrity issues
+   - Type guard functions for dynamic data
+
+2. **Data Indexing Layer**:
+   - Pre-built indexes for ID-based lookups
+   - Page indexes for page-filtered data
+   - Multi-field indexes for complex queries
+
+3. **Data Relationship Management**:
+   - Define relationships between collections
+   - Referential integrity checks
+   - Cascade deletion/update strategies
+
+4. **Data Standardization**:
+   - Standardize date formats (ISO 8601)
+   - Consistent base type usage
+   - Auto-ID generation (optional)
+
+5. **Performance Optimization**:
+   - Cached access layer
+   - Pre-built indexes at build time
+   - O(1) lookups vs O(n) linear search
+
 ## Architectural Patterns
 
 ### Good Patterns (Maintain)
