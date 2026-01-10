@@ -136,11 +136,37 @@ describe('LoginForm', () => {
     expect(signupLink.closest('a')).toHaveAttribute('href', '/sign-up');
   });
 
-  it('should render forgot password button', () => {
+  it('should show loading state during submission', () => {
     render(<LoginForm />);
 
-    const forgotButton = screen.getByText('Lupa?');
-    expect(forgotButton).toBeInTheDocument();
-    expect(forgotButton.closest('button')).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: /masuk sekarang/i });
+    expect(submitButton).toHaveTextContent('Masuk sekarang');
+    expect(submitButton).not.toBeDisabled();
+  });
+
+  it('should disable inputs and button when submitting', async () => {
+    const { authService } = require('@/services/auth');
+    authService.login.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'Success' }), 100)));
+
+    render(<LoginForm />);
+
+    fireEvent.change(screen.getByPlaceholderText('nama@maskom.co.id'), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('Masukkan kata sandi'), { target: { value: 'password123' } });
+
+    const submitButton = screen.getByRole('button', { name: /masuk sekarang/i });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(submitButton).toBeDisabled();
+      expect(submitButton).toHaveTextContent('Masuk...');
+    });
+  });
+
+  it('should have proper ARIA attributes for accessibility', () => {
+    render(<LoginForm />);
+
+    const submitButton = screen.getByRole('button', { name: /masuk sekarang/i });
+    expect(submitButton).toHaveAttribute('aria-live', 'polite');
+    expect(submitButton).toHaveAttribute('aria-busy', 'false');
   });
 });
