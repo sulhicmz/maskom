@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 jest.mock('react-toastify', () => ({
-  toast: jest.fn(() => ({ __t: Date.now() })),
+  toast: Object.assign(
+    jest.fn(() => ({ __t: Date.now() })),
+    {
+      success: jest.fn(() => ({ __t: Date.now() })),
+      error: jest.fn(() => ({ __t: Date.now() })),
+    }
+  ),
 }));
 
 jest.mock('@/services/auth', () => ({
@@ -12,6 +18,8 @@ jest.mock('@/services/auth', () => ({
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import LoginForm from '../LoginForm';
+
+const mockToast = require('react-toastify').toast;
 
 describe('LoginForm', () => {
   beforeEach(() => {
@@ -34,21 +42,20 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /masuk sekarang/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Email is a required field')).toBeInTheDocument();
-      expect(screen.getByText('Kata sandi is a required field')).toBeInTheDocument();
+      expect(screen.getByText('Email diperlukan')).toBeInTheDocument();
+      expect(screen.getByText('Kata sandi diperlukan')).toBeInTheDocument();
     });
   });
 
   it('should handle email with valid format', async () => {
     render(<LoginForm />);
 
-    const emailInput = screen.getByPlaceholderText('nama@maskom.co.id');
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('nama@maskom.co.id'), { target: { value: 'test@example.com' } });
 
     fireEvent.click(screen.getByRole('button', { name: /masuk sekarang/i }));
 
     await waitFor(() => {
-      expect(screen.queryByText(/must be a valid email/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/tidak valid/i)).not.toBeInTheDocument();
     });
   });
 
@@ -61,8 +68,7 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /masuk sekarang/i }));
 
     await waitFor(() => {
-      const { toast } = require('react-toastify');
-      expect(toast).toHaveBeenCalledWith('Berhasil masuk ke portal', { position: 'top-center' });
+      expect(mockToast).toHaveBeenCalledWith('Berhasil masuk ke portal', { position: 'top-center' });
     });
   });
 
@@ -75,21 +81,20 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /masuk sekarang/i }));
 
     await waitFor(() => {
-      expect(screen.queryByText(/is a required field/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/must be a valid email/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/diperlukan/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/tidak valid/i)).not.toBeInTheDocument();
     });
   });
 
   it('should handle email with valid format', async () => {
     render(<LoginForm />);
 
-    const emailInput = screen.getByPlaceholderText('nama@maskom.co.id');
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText('nama@maskom.co.id'), { target: { value: 'test@example.com' } });
 
     fireEvent.click(screen.getByRole('button', { name: /masuk sekarang/i }));
 
     await waitFor(() => {
-      expect(screen.queryByText(/must be a valid email/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/tidak valid/i)).not.toBeInTheDocument();
     });
   });
 
@@ -103,8 +108,7 @@ describe('LoginForm', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      const { toast } = require('react-toastify');
-      expect(toast).toHaveBeenCalled();
+      expect(mockToast).toHaveBeenCalled();
     });
 
     expect(screen.getByPlaceholderText('nama@maskom.co.id')).toHaveValue('');

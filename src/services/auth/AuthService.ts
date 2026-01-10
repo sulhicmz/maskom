@@ -1,4 +1,5 @@
 import type { IAuthService, LoginCredentials, RegisterData, AuthResult, User } from './types';
+import { validateEmail, validatePassword } from '@/utils/validation';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -12,11 +13,11 @@ class AuthService implements IAuthService {
                 };
             }
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(credentials.email)) {
+            const emailValidation = validateEmail(credentials.email);
+            if (!emailValidation.valid) {
                 return {
                     success: false,
-                    error: 'Format email tidak valid',
+                    error: emailValidation.error || 'Format email tidak valid',
                 };
             }
 
@@ -49,18 +50,19 @@ class AuthService implements IAuthService {
                 };
             }
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(userData.email)) {
+            const emailValidation = validateEmail(userData.email);
+            if (!emailValidation.valid) {
                 return {
                     success: false,
-                    error: 'Format email tidak valid',
+                    error: emailValidation.error || 'Format email tidak valid',
                 };
             }
 
-            if (userData.password.length < 8) {
+            const passwordValidation = validatePassword(userData.password);
+            if (!passwordValidation.valid) {
                 return {
                     success: false,
-                    error: 'Kata sandi minimal 8 karakter',
+                    error: passwordValidation.error || 'Kata sandi tidak valid',
                 };
             }
 

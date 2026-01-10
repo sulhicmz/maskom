@@ -1,12 +1,11 @@
 "use client"
 import Link from "next/link";
 import Image from "next/image"
-import { toast } from 'react-toastify';
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { authService } from '@/services/auth';
-import { useState } from 'react';
+import { createSignUpFormSchema } from '@/utils/formValidation';
+import { useFormSubmission } from '@/hooks/useFormSubmission';
 
 import icon from "@/assets/images/icon/google.png"
 
@@ -16,34 +15,18 @@ interface FormData {
    password: string;
 }
 const SignUpForm = () => {
-   const [isSubmitting, setIsSubmitting] = useState(false);
-
-   const schema = yup
-      .object({
-         name: yup.string().required().label("Nama"),
-         email: yup.string().required().email().label("Email"),
-         password: yup.string().required().label("Kata sandi"),
-      })
-      .required();
-
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = async (data: FormData) => {
-      setIsSubmitting(true);
-      const result = await authService.register({
-         name: data.name,
-         email: data.email,
-         password: data.password,
-      });
-
-      setIsSubmitting(false);
-
-      if (result.success) {
-         toast(result.message, { position: 'top-center' });
-         reset();
-      } else {
-         toast(result.error, { position: 'top-center' });
-      }
-   };
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createSignUpFormSchema()), });
+   
+   const { submit: onSubmit, isSubmitting } = useFormSubmission(
+      async (data: FormData) => {
+         return await authService.register({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+         });
+      },
+      { resetForm: reset }
+   );
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="user-form" noValidate>
