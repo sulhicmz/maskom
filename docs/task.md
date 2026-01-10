@@ -1511,6 +1511,51 @@ await emailService.sendEmail(params);
 
 ---
 
+## Task 26: [REFACTOR] Validation Logic Duplications
+- Location: src/utils/dataValidation.ts (584 lines, 20+ functions)
+- Issue: Massive validation file with nearly identical validation functions following same pattern with only field names varying. Difficult to maintain, violates DRY principle.
+- Suggestion: Create generic validation factory function that accepts rules configuration instead of duplicating validation logic for each data type. Reduce file size significantly.
+- Priority: HIGH
+- Effort: Medium
+
+---
+
+## Task 27: [REFACTOR] Form Component Duplication
+- Location: src/components/forms/ (ContactForm, LoginForm, SignUpForm, BlogForm)
+- Issue: All forms follow identical patterns with react-hook-form setup, yup validation, and similar markup structure. Changes to form behavior require updates across multiple files.
+- Suggestion: Create reusable useFormHandler hook that encapsulates form logic, validation, and error handling. Eliminate code duplication across 4+ form components.
+- Priority: HIGH
+- Effort: Medium
+
+---
+
+## Task 28: [REFACTOR] Missing Error Boundaries
+- Location: Application-wide (src/app/layout.tsx)
+- Issue: No React Error Boundary component to catch and handle component errors gracefully. Any component error can crash entire page.
+- Suggestion: Implement ErrorBoundary component with fallback UI, error logging, and recovery options. Wrap routes or entire application with error boundary.
+- Priority: HIGH
+- Effort: Small
+
+---
+
+## Task 29: [REFACTOR] Magic Numbers Scattered Throughout Codebase
+- Location: Multiple files (UseSticky.ts, Price.tsx, EmailService.ts, rateLimiter.ts)
+- Issue: Hardcoded numeric values without clear meaning. Unclear purpose, difficult to adjust configuration, no centralized management.
+- Suggestion: Create src/config/constants.ts file with named constants for breakpoints, circuit breaker config, retry settings, etc. Replace all magic numbers.
+- Priority: MEDIUM
+- Effort: Small
+
+---
+
+## Task 30: [REFACTOR] String-Based Page Filtering Pattern
+- Location: All data files (src/data/*.ts)
+- Issue: Data filtering relies on string matching (page: "home_1", page: "pricing"). Typos cause runtime failures, no type safety, no autocomplete support.
+- Suggestion: Create PageType enum with all page values. Update interfaces to use PageType instead of string. Ensure compile-time type safety.
+- Priority: MEDIUM
+- Effort: Small
+
+---
+
 ## Task 7: Integration Hardening - EmailService Resilience
 
 **Status**: ✅ Completed
