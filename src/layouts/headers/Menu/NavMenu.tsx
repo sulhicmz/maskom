@@ -1,14 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import menu_data from "@/data/MenuData";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useBreakpoint } from "@/hooks/UseSticky";
 
 const NavMenu = () => {
     const currentRoute = usePathname();
-    const { isBreakpointOn } = useBreakpoint();
     const [openSubmenus, setOpenSubmenus] = useState<{ [key: number]: boolean }>({});
 
     const toggleSubMenu = (id: number) => {
