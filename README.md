@@ -62,9 +62,30 @@ public/
 
 ## Dokumentasi & Operasi
 - [docs/architecture/ADR-0001-worker-stack.md](docs/architecture/ADR-0001-worker-stack.md) — keputusan arsitektur worker & Next.js
+- [docs/blueprint.md](docs/blueprint.md) — overview arsitektur lengkap & pola desain
+- [docs/api.md](docs/api.md) — dokumentasi API lengkap untuk layanan (EmailService, AuthService)
+- [docs/testing-guide.md](docs/testing-guide.md) — panduan pengujian lengkap (872+ tes)
 - [docs/operations/performance-playbook.md](docs/operations/performance-playbook.md) — strategi optimasi performa terkini
 - [docs/operations/known-issues.md](docs/operations/known-issues.md) — daftar isu yang perlu ditindaklanjuti
 - [docs/operations/continuous-development.md](docs/operations/continuous-development.md) — panduan menjaga pengembangan berkelanjutan
 - [docs/history/2024-remediation-log.md](docs/history/2024-remediation-log.md) — catatan iterasi perbaikan sebelumnya
 
 Perbarui dokumentasi di atas setiap kali ada perubahan arsitektur, dependensi, atau proses operasional baru.
+
+## Validasi Data
+- Semua data statis di `src/data/` divalidasi menggunakan utilitas di `src/utils/dataValidation.ts`
+- 21 validator mencakup: FeedbackItem, FaqItem, PriceItem, MenuItem, TeamMember, dll
+- Jalankan `npm test` untuk memastikan semua validasi berjalan dengan benar (64 tes validasi)
+- Lihat [docs/blueprint.md](docs/blueprint.md#data-validation--completed---task-40-phase-1) untuk detail lengkap
+
+## Kontribusi
+1. Fork repository dan buat branch fitur baru
+2. Pastikan semua tes lulus: `npm test`
+3. Jalankan linting: `npm run lint`
+4. Buat pull request dengan deskripsi perubahan yang jelas
+
+## Troubleshooting
+- **Tes gagal dengan "module not found"**: Jalankan `npm install` untuk memastikan semua dependensi terinstal
+- **Build gagal di Cloudflare Workers**: Periksa `public/_headers` untuk konfigurasi CORS yang benar
+- **Email tidak terkirim**: Pastikan variabel lingkungan `NEXT_PUBLIC_EMAILJS_*` diatur di `.env.local`
+- **WOW animasi tidak berfungsi**: Ini adalah isu yang diketahui, lihat [docs/operations/known-issues.md](docs/operations/known-issues.md) untuk detail
