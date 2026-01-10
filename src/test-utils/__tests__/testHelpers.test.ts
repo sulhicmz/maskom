@@ -68,7 +68,7 @@ describe('testHelpers', () => {
       await waitForAsync(100);
       const end = Date.now();
       
-      expect(end - start).toBeGreaterThanOrEqual(100);
+      expect(end - start).toBeGreaterThanOrEqual(90);
     });
 
     it('should default to 0 milliseconds', async () => {

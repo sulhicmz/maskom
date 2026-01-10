@@ -8,6 +8,105 @@
 
 ---
 
+## Task 47: README Documentation Update - Recent Improvements
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Technical Writing
+
+**Problem**:
+- README.md (in Indonesian) was missing documentation for recent architectural improvements
+- Features like CSS optimization (CDN, lazy loading), error boundaries, service layer, rate limiting, and data validation were not documented
+- Developers unfamiliar with recent changes would not be aware of new capabilities
+- Troubleshooting section was outdated
+
+**Locations**:
+- `README.md` - Missing documentation for recent features
+
+**Solution**:
+1. Updated Fitur Utama section to include:
+   - ErrorBoundary integration in Wrapper for graceful error handling
+   - CSS optimization with CDN loading (Bootstrap, FontAwesome from jsDelivr/Cloudflare)
+   - Lazy loading CSS for on-demand components (Toastify)
+   - Service layer abstraction (EmailService, AuthService) with resilience patterns
+   - Centralized data validation with 21 validators
+2. Updated Styling & Aset section to document:
+   - CDN loading strategy for better performance
+   - On-demand CSS loading with useEffect
+3. Updated Validasi Data section to reflect:
+   - Data indexing for O(1) lookups
+   - Relationship management for referential integrity
+   - Current test count (945 total)
+4. Added new Layanan (Services) section documenting:
+   - EmailService with resilience patterns
+   - AuthService with mock implementation and rate limiting
+   - Rate limiting protection details
+   - Reference to docs/api.md
+5. Updated Troubleshooting section with:
+   - Rate limit troubleshooting (cooldown periods)
+   - Error boundary recovery guidance
+6. Updated Struktur Proyek to reflect:
+   - New services/ directory
+   - New test-utils/ directory
+   - New types/ directory
+   - Updated utils/ directory structure
+7. Updated Dokumentasi & Operasi section to include:
+   - project_management/ documentation
+   - Updated test count reference (945+ tests)
+
+**Success Criteria**:
+- [x] README documents all recent architectural improvements
+- [x] CSS optimization (CDN, lazy loading) documented
+- [x] Service layer and rate limiting documented
+- [x] Data validation and indexing documented
+- [x] Error boundary documented
+- [x] All 945 tests passing
+- [x] Lint passes without errors
+- [x] Build completed successfully (18 pages)
+- [x] Zero regressions in existing functionality
+
+**Related Files**:
+- Modified: `README.md` - Added documentation for recent improvements
+
+**Testing**:
+- All 945 tests passing (100% success rate)
+- Lint passed without errors
+- Build completed successfully (18 pages generated)
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Technical Writing principles:
+  - **Single Source of Truth**: README matches code implementation
+  - **Clarity Over Completeness**: Clear descriptions of new features
+  - **Actionable Content**: Enables readers to understand recent capabilities
+  - **Progressive Disclosure**: Core features first, advanced details via links
+- Indonesian language maintained for consistency with existing README
+- All references to test counts updated to 945
+
+**Impact**:
+- New developers can understand recent architectural improvements
+- Documentation now reflects current codebase state
+- CSS optimization and service layer patterns are discoverable
+- Troubleshooting guidance updated with recent issues
+- Zero functional changes to existing code
+
+**Next Documentation Opportunities**:
+
+1. **User Guides** - Create guides for common user workflows
+   - How to add new pages
+   - How to create data-driven components
+   - How to integrate new services
+2. **Architecture Decision Records (ADRs)** - Document architectural decisions
+   - CDN loading strategy trade-offs
+   - Service layer pattern rationale
+   - Data architecture evolution
+3. **Code Comments** - Add comments for complex/non-obvious code
+   - Resilience pattern implementations
+   - Data relationship management
+   - Type system utilities
+
+---
+
 ## Task 46: AuthService Rate Limiting - Brute Force Protection
 
 **Status**: ✅ Completed
@@ -3189,6 +3288,250 @@ External API (EmailJS)
 3. Rate limit headers in API responses (X-RateLimit-Limit, X-RateLimit-Remaining)
 4. Metrics and monitoring for rate limit violations
 5. Configurable rate limits via environment variables
+
+---
+
+## Task 47: Extract Constants from Magic Numbers
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- Magic numbers scattered throughout: `5` (maxAttempts), `8` (min password length), rating limits (0-5)
+- Time constants like `60000`, `900000`, `1800000`, `3600000`, `7200000` are repeated multiple times
+- Makes code hard to maintain and understand intent
+- Changing a value requires finding all occurrences
+
+**Locations**:
+- `src/services/auth/AuthService.ts` - Rate limit numbers, password length
+- `src/utils/rateLimiter.ts` - Time constants, attempt limits
+- `src/utils/formValidation.ts` - Validation thresholds
+- `src/utils/dataValidation.ts` - Rating limits, field lengths
+
+**Suggested Improvement**:
+Create `src/constants/rateLimits.ts` and `src/constants/validation.ts`:
+```typescript
+// constants/rateLimits.ts
+export const RATE_LIMITS = {
+  LOGIN: { maxAttempts: 5, windowMs: 900000, cooldownMs: 1800000 },
+  REGISTER: { maxAttempts: 5, windowMs: 3600000, cooldownMs: 7200000 },
+  EMAIL: { maxAttempts: 5, windowMs: 60000, cooldownMs: 300000 },
+  FORM: { maxAttempts: 10, windowMs: 3600000, cooldownMs: 7200000 }
+} as const;
+
+// constants/validation.ts
+export const VALIDATION = {
+  MIN_PASSWORD_LENGTH: 8,
+  RATING_MIN: 0,
+  RATING_MAX: 5
+} as const;
+```
+
+Update all files to use these constants instead of magic numbers.
+
+**Success Criteria**:
+- [ ] Constants files created with TypeScript types
+- [ ] All magic numbers replaced with named constants
+- [ ] Tests pass without regressions
+- [ ] Lint passes without errors
+- [ ] Build successful
+
+**Priority**: HIGH
+**Effort**: Small
+
+**Related Files**:
+- Create: `src/constants/rateLimits.ts`
+- Create: `src/constants/validation.ts`
+- Update: `src/services/auth/AuthService.ts`
+- Update: `src/utils/rateLimiter.ts`
+- Update: `src/utils/formValidation.ts`
+- Update: `src/utils/dataValidation.ts`
+
+---
+
+## Task 48: Extract Reusable Form Input Component
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- Heavy code duplication across all form components
+- Each form has nearly identical input field rendering patterns with error handling
+- Violates DRY principle
+- Changes to input behavior require updates in 4+ files
+
+**Locations**:
+- `src/components/forms/ContactForm.tsx` - Form inputs with error handling
+- `src/components/forms/LoginForm.tsx` - Similar input patterns
+- `src/components/forms/SignUpForm.tsx` - Repeated input logic
+- `src/components/forms/BlogForm.tsx` - Same rendering pattern
+
+**Suggested Improvement**:
+Create `src/components/forms/FormInput.tsx`:
+```typescript
+interface FormInputProps {
+  id: string;
+  label: string;
+  type: string;
+  placeholder: string;
+  error?: string;
+  register: any;
+  disabled?: boolean;
+  rows?: number;
+}
+
+export const FormInput = ({ id, label, type, placeholder, error, register, disabled, rows }: FormInputProps) => {
+  return (
+    <div className="form-group">
+      <label htmlFor={id} className="sr-only">{label}</label>
+      {type === 'textarea' ? (
+        <textarea {...register(id)} id={id} className="form-control" rows={rows} placeholder={placeholder} />
+      ) : (
+        <input type={type} {...register(id)} id={id} className="form-control" placeholder={placeholder} disabled={disabled} />
+      )}
+      {error && <p className="form_error" role="alert">{error}</p>}
+    </div>
+  );
+};
+```
+
+**Success Criteria**:
+- [ ] FormInput component created with TypeScript types
+- [ ] All 4 forms refactored to use FormInput
+- [ ] All tests pass without regressions
+- [ ] Lint passes without errors
+- [ ] Zero functional changes
+
+**Priority**: HIGH
+**Effort**: Medium
+
+**Related Files**:
+- Create: `src/components/forms/FormInput.tsx`
+- Update: `src/components/forms/ContactForm.tsx`
+- Update: `src/components/forms/LoginForm.tsx`
+- Update: `src/components/forms/SignUpForm.tsx`
+- Update: `src/components/forms/BlogForm.tsx`
+
+---
+
+## Task 49: Split Large dataValidation.ts File
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- File is far too large (540 lines, >200 lines threshold)
+- Contains validators for 13+ different data types
+- Hard to navigate and maintain
+- Violates Single Responsibility Principle
+
+**Locations**:
+- `src/utils/dataValidation.ts` - 540 lines, 21 validators mixed together
+
+**Suggested Improvement**:
+Split into smaller, focused modules:
+```
+src/utils/validation/
+├── index.ts (re-exports)
+├── feedbackValidation.ts (FeedbackItem validator)
+├── priceValidation.ts (PriceItem, PriceDetailItem validators)
+├── faqValidation.ts (FaqItem, FaqDetail, InnerFaqItem validators)
+├── menuValidation.ts (MenuItem, NavigationItem, NavigationSection validators)
+├── teamValidation.ts (TeamMember, InnerBlogPost validators)
+└── baseValidation.ts (shared validation logic: createValidator, validateBaseDataItem)
+```
+
+**Success Criteria**:
+- [ ] New directory structure created
+- [ ] dataValidation.ts split into 7 focused files
+- [ ] Re-exports maintain backward compatibility
+- [ ] All tests pass (945 tests)
+- [ ] Lint passes without errors
+- [ ] Build successful
+
+**Priority**: HIGH
+**Effort**: Medium
+
+**Related Files**:
+- Create: `src/utils/validation/index.ts`
+- Create: `src/utils/validation/feedbackValidation.ts`
+- Create: `src/utils/validation/priceValidation.ts`
+- Create: `src/utils/validation/faqValidation.ts`
+- Create: `src/utils/validation/menuValidation.ts`
+- Create: `src/utils/validation/teamValidation.ts`
+- Create: `src/utils/validation/baseValidation.ts`
+- Update: `src/utils/dataValidation.ts` (deprecate, migrate to index.ts)
+- Update: Import statements in all test files
+
+---
+
+## Task 50: Consolidate Duplicate Authentication Logic
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- `login()` and `register()` methods have nearly identical validation logic
+- Rate limit checking, email validation, password validation are duplicated
+- Violates DRY principle
+- Changes to validation require updates in both methods
+
+**Locations**:
+- `src/services/auth/AuthService.ts` - Lines 23-81 (login) and 83-141 (register)
+
+**Suggested Improvement**:
+Extract common validation into a private method:
+```typescript
+private async validateCredentials(
+  email: string,
+  password: string,
+  rateLimiter: RateLimiter,
+  requireName: boolean = false,
+  name?: string
+): Promise<{ valid: boolean; error?: string }> {
+  // Rate limit check
+  const rateLimitStatus = rateLimiter.getStatus(email);
+  if (!rateLimitStatus.allowed) {
+    return { valid: false, error: rateLimitStatus.message };
+  }
+
+  // Email validation
+  if (!this.validateEmail(email)) {
+    return { valid: false, error: "Format email tidak valid" };
+  }
+
+  // Password validation
+  if (password.length < 8) {
+    return { valid: false, error: "Password minimal 8 karakter" };
+  }
+
+  // Name validation (if required)
+  if (requireName && !name?.trim()) {
+    return { valid: false, error: "Nama wajib diisi" };
+  }
+
+  return { valid: true };
+}
+```
+
+**Success Criteria**:
+- [ ] `validateCredentials` private method created
+- [ ] `login()` method refactored to use common validation
+- [ ] `register()` method refactored to use common validation
+- [ ] All tests pass (945 tests)
+- [ ] Lint passes without errors
+- [ ] Zero functional changes
+
+**Priority**: HIGH
+**Effort**: Small
+
+**Related Files**:
+- Update: `src/services/auth/AuthService.ts`
+- Update: `src/services/auth/__tests__/AuthService.test.ts` (verify behavior unchanged)
 
 ---
 
