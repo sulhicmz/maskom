@@ -2,9 +2,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import ReactPaginate from "react-paginate";
+import dynamic from "next/dynamic"
 import inner_blog_data from "@/data/InnerBlogData"
-import BlogSidebar from "../blog-sidebar/BlogSidebar"
 import { usePagination } from "@/hooks/usePagination"
+
+const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
+  loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
+})
 
 const BlogArea = () => {
 
