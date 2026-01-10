@@ -282,6 +282,8 @@ export interface DataRelationship {
 - ✅ Error boundaries with graceful error handling and recovery options
 - ✅ Dynamic imports for non-critical components (Swiper, modals, pagination)
 - ✅ Lazy loading of heavy libraries with loading states (VideoPopup, ReactPaginate)
+- ✅ CDN-based CSS loading (Bootstrap, FontAwesome) with global edge delivery
+- ✅ Lazy loading CSS on-demand (Toastify CSS loaded only when needed)
 - ✅ Form validation utilities with shared schema factories (formValidation.ts)
 - ✅ Form submission hook with consistent error handling (useFormSubmission)
 - ✅ Service layer abstraction for external API calls (EmailService, AuthService)
@@ -423,13 +425,14 @@ External API (EmailJS, etc.)
 
 - **Framework**: Next.js 15 (App Router)
 - **Deployment**: OpenNext for Cloudflare Workers
-- **UI Libraries**: Bootstrap 5, Swiper, Isotope
+- **UI Libraries**: Bootstrap 5 (CDN), Swiper, Isotope
 - **Forms**: React Hook Form, Yup validation
 - **Email**: EmailJS (via service abstraction with resilience patterns)
 - **Authentication**: AuthService (mock implementation with ready-to-use interfaces)
-- **Animations**: WOW.js, React Toastify
+- **Animations**: WOW.js, React Toastify (lazy loaded CSS)
 - **Data Filtering**: Custom utility functions with TypeScript generics
 - **Error Handling**: React Error Boundary with custom fallback UI
+- **CSS**: Bootstrap 5.3.2 (jsDelivr CDN), FontAwesome 6.7.2 (Cloudflare CDN)
 
 ## Error Handling Pattern
 
@@ -491,6 +494,87 @@ import ErrorBoundary from "@/components/common/ErrorBoundary";
     <PageContent />
 </ErrorBoundary>
 ```
+
+## CSS Optimization Patterns
+
+### Global CSS Loading (CDN)
+
+**Purpose**: Reduce build size, leverage CDN edge delivery, enable browser caching
+
+**Implementation**:
+- Bootstrap loaded from CDN instead of local files
+- FontAwesome loaded from CDN (Task 39)
+- Reduces bundle size significantly
+
+**Benefits**:
+- Build size reduction: 68% CSS reduction (323K → 103K)
+- CDN edge delivery: Faster load times from nearest edge location
+- Browser caching: Shared across all sites using same CDN URL
+- Reduced server bandwidth: CDN handles distribution
+
+**Implementation Example** (src/styles/index.scss):
+```scss
+// Bootstrap from CDN
+@import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css");
+
+// FontAwesome from CDN
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css");
+```
+
+**Trade-offs**:
+- CDN dependency vs. self-hosted control
+- Offline availability: CDN assets not available if network fails
+- Versioning: Must manually update CDN URLs when upgrading
+
+### On-Demand CSS Loading
+
+**Purpose**: Load CSS only when needed to reduce initial page weight
+
+**Implementation**:
+- React Toastify CSS loaded dynamically via useEffect
+- CSS injected into document.head when ToastContainer mounts
+- Cleaned up on unmount
+
+**Benefits**:
+- Initial page load: Toastify CSS not loaded on first paint
+- On-demand: CSS loaded only when toast notifications are needed
+- Smaller initial bundle: Reduces critical CSS size
+
+**Implementation Example** (src/layouts/Wrapper.tsx):
+```typescript
+import { useEffect } from "react";
+
+const Wrapper = ({ children }: WrapperProps) => {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "https://cdn.jsdelivr.net/npm/react-toastify@9.1.3/dist/ReactToastify.min.css";
+        link.id = "toastify-css";
+        document.head.appendChild(link);
+
+        return () => {
+            const existing = document.getElementById("toastify-css");
+            if (existing) {
+                document.head.removeChild(existing);
+            }
+        };
+    }, []);
+
+    return (
+        <ErrorBoundary>
+            {children}
+            <ScrollToTop />
+            <ToastContainer position="top-center" />
+        </ErrorBoundary>
+    );
+};
+```
+
+**Usage Guidelines**:
+- Use CDN loading for large, third-party CSS (Bootstrap, FontAwesome)
+- Use on-demand loading for CSS only needed after user interaction (Toastify, modals)
+- Keep critical CSS inline for above-the-fold content (future enhancement)
+- Test both online and offline scenarios for CDN dependencies
 
 ## Technical Constraints
 

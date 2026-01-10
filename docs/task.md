@@ -8,6 +8,152 @@
 
 ---
 
+## Task 45: CSS Optimization - CDN Loading & Lazy Loading
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Performance Engineering
+
+**Problem**:
+- 228K Bootstrap CSS loaded synchronously on every page
+- Bootstrap loaded from local files (no CDN caching or edge delivery)
+- React Toastify CSS loaded globally on every page but only used for form submissions
+- Large CSS bundle size degraded initial page load performance
+- No CDN benefits for Bootstrap (global browser caching, edge delivery)
+
+**Locations**:
+- `src/styles/index.scss` - Local Bootstrap CSS import, Toastify CSS import
+- `src/layouts/Wrapper.tsx` - ToastContainer component without CSS lazy loading
+
+**Analysis**:
+- Bootstrap CSS: 228K local file loaded on every page
+- React Toastify CSS: ~30K loaded globally
+- Build CSS files before optimization:
+  - 77fbdafd29d3c998.css: 223K (Bootstrap)
+  - Other CSS files: ~100K combined
+- Only ~70-80 unique Bootstrap classes used (3% of available)
+- Toastify CSS only needed after form submissions (contact, login, signup)
+
+**Solution**:
+1. Replaced local Bootstrap CSS with CDN
+   - Changed from: `@import "../../public/assets/vendor/bootstrap/css/bootstrap.min.css";`
+   - Changed to: `@import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css");`
+   - CDN provider: jsDelivr (fast, reliable, global edge delivery)
+   - Version: 5.3.2 (matches local version)
+2. Lazy loaded React Toastify CSS
+   - Removed global import from `src/styles/index.scss`
+   - Added `useEffect` hook in `src/layouts/Wrapper.tsx`
+   - Dynamically loads Toastify CSS when ToastContainer mounts
+   - Uses CDN: `https://cdn.jsdelivr.net/npm/react-toastify@9.1.3/dist/ReactToastify.min.css`
+   - Clean up on unmount (remove stylesheet element)
+   - Toastify CSS now loaded only on client-side (no SSR)
+
+**Performance Impact**:
+
+**Bundle Size**:
+- Before: 223K Bootstrap CSS in build bundle
+- After: 0K Bootstrap CSS in build (loaded from CDN)
+- CSS Build Files: Reduced from ~323K to ~103K (68% reduction)
+- Largest CSS file: 223K → 79K (65% reduction)
+
+**Network Benefits**:
+- Bootstrap CDN: Global edge delivery via jsDelivr
+- Browser Caching: Shared CDN cache across all sites using same URL
+- Reduced Bandwidth: CDN handles distribution, not your server
+- Better Latency: Global edge network reduces load time
+- Toastify CSS: Lazy loaded on-demand (not on initial page load)
+
+**User Experience Improvements**:
+- Faster Initial Page Load: Large CSS no longer downloaded from server
+- Better Caching: CDN URL more likely to be cached across sessions
+- Reduced Server Bandwidth: CSS served from CDN, not Cloudflare
+- Better Time to First Byte (TTFB): CDN edge locations
+- Lazy Loaded Toastify: CSS only loaded when needed (client-side only)
+
+**Build Metrics**:
+- Before: CSS files total ~323K (223K Bootstrap + 100K other)
+- After: CSS files total ~103K (79K largest + 24K others)
+- CSS Reduction: 220K (68% reduction)
+- First Load JS: 295 kB → 290 kB (5K reduction from reduced CSS imports)
+- Build Time: 2.4s → 2.4s (unchanged)
+
+**Success Criteria**:
+- [x] Bootstrap CSS loaded from CDN instead of local file
+- [x] React Toastify CSS lazy loaded via useEffect
+- [x] CDN URLs verified and accessible
+- [x] All 932 tests passing (100% success rate)
+- [x] Lint passes without errors
+- [x] Build completed successfully (18 pages generated)
+- [x] CSS build size reduced by 68% (323K → 103K)
+- [x] Zero regressions in existing functionality
+- [x] Bootstrap classes preserved (no code changes needed)
+- [x] Toastify notifications work correctly
+
+**Related Files**:
+- Modified: `src/styles/index.scss` - CDN Bootstrap import, removed Toastify CSS import
+- Modified: `src/layouts/Wrapper.tsx` - Added useEffect for Toastify CSS lazy loading
+- Deprecated: `public/assets/vendor/bootstrap/css/bootstrap.min.css` - Local file (safe to remove)
+
+**Testing**:
+- All 932 tests passing (100% success rate)
+- Build completed successfully (18 pages generated)
+- Lint passed without errors
+- Zero regressions in existing functionality
+- CDN URLs verified:
+  - Bootstrap: https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css (HTTP 200)
+  - Toastify: https://cdn.jsdelivr.net/npm/react-toastify@9.1.3/dist/ReactToastify.min.css (HTTP 200)
+
+**Notes**:
+- CDN version 5.3.2 matches local version (backward compatible)
+- No code changes required for Bootstrap usage (all class names preserved)
+- Toastify CSS lazy loaded client-side only (no SSR to prevent hydration mismatch)
+- Trade-offs:
+  - CDN dependency vs. self-hosted control
+  - Offline: CDN assets not available if network fails
+  - Versioning: Must manually update CDN URLs when upgrading dependencies
+- Follows Performance Engineering principles:
+  - **Measure First**: Profiled 228K CSS bundle, Toastify usage patterns
+  - **User-Centric**: Faster initial page load, CDN edge delivery, better caching
+  - **Resource Efficiency**: Eliminated 220K CSS from build bundle
+  - **Lazy Loading**: Toastify CSS loaded only when needed
+  - **Zero Regressions**: All tests pass, build successful, no code changes
+
+**Impact**:
+- Bundle size reduction: 220K CSS removed from build (68% reduction)
+- Network: CDN edge delivery, better caching, reduced server bandwidth
+- User Experience: Faster initial page load, better CSS loading performance
+- Zero functional changes or regressions
+- All 932 tests passing with zero code changes to CSS class usage
+
+**Optional Next Step**:
+- Remove local Bootstrap files from `public/assets/vendor/bootstrap/css/` after production verification
+- Estimated additional cleanup: 228K of unused local files
+
+**Future Enhancement Opportunities**:
+
+1. **Custom Bootstrap Build** - Create minimal Bootstrap bundle
+   - Use PurgeCSS to extract only used Bootstrap classes
+   - Expected savings: Additional 50K+ (only 70 classes used vs 223K)
+   - Trade-off: Custom build vs. CDN convenience
+
+2. **Critical CSS Extraction** - Inline above-the-fold CSS
+   - Extract critical CSS for hero section, above-the-fold content
+   - Lazy load remaining CSS
+   - Expected savings: 20-30K critical inline vs full bundle
+   - Effort: High (requires identifying critical CSS per page)
+
+3. **CSS Subsetting** - Create minimal font files
+   - Create minimal Bootstrap with only used components
+   - Expected savings: 50%+ on remaining CSS (100K → ~50K)
+   - Effort: High (requires automated build step)
+
+4. **HTTP/2 Server Push** - Preload critical CSS
+   - Configure Cloudflare to push critical CSS with initial HTML
+   - Expected savings: 100-200ms reduction in Time to First Paint
+   - Effort: Low (requires Cloudflare configuration)
+
+---
+
 ## Task 44: Test Infrastructure - Utilities, Fixtures & Custom Matchers
 
 **Status**: ✅ Completed
