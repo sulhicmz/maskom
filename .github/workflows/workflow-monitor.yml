@@ -6,13 +6,13 @@ on:
     - cron: '*/30 * * * *' # Run every 30 minutes
 
 permissions:
-  actions: read
+  actions: write
   contents: write
 
 jobs:
   monitor:
     name: Monitor and Trigger Workflows
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     timeout-minutes: 10
     
     steps:
