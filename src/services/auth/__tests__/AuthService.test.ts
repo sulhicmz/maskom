@@ -4,6 +4,7 @@ import type { LoginCredentials, RegisterData } from '../types';
 describe('AuthService', () => {
     beforeEach(() => {
         authService.logout();
+        authService.resetAllRateLimits();
     });
 
     describe('login', () => {
@@ -354,6 +355,241 @@ describe('AuthService', () => {
             await authService.login(credentials);
             currentUser = await authService.getCurrentUser();
             expect(currentUser?.email).toBe('test@example.com');
+        });
+    });
+
+    describe('rate limiting - login', () => {
+        it('should allow login within rate limit', async () => {
+            const credentials: LoginCredentials = {
+                email: 'rate1@example.com',
+                password: 'password123',
+            };
+
+            const result1 = await authService.login(credentials);
+            const result2 = await authService.login(credentials);
+            const result3 = await authService.login(credentials);
+
+            expect(result1.success).toBe(true);
+            expect(result2.success).toBe(true);
+            expect(result3.success).toBe(true);
+        });
+
+        it('should allow up to 5 failed login attempts within window', async () => {
+            const credentials: LoginCredentials = {
+                email: 'rate2@example.com',
+                password: 'pass',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                const result = await authService.login(credentials);
+                expect(result.success).toBe(false);
+            }
+        });
+
+        it('should block login after 5 failed attempts', async () => {
+            const credentials: LoginCredentials = {
+                email: 'rate3@example.com',
+                password: 'pass',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.login(credentials);
+            }
+
+            const blockedResult = await authService.login(credentials);
+            expect(blockedResult.success).toBe(false);
+            expect(blockedResult.error).toContain('Terlalu banyak percobaan');
+        });
+
+        it('should block successful login attempts after rate limit exceeded', async () => {
+            const invalidCredentials: LoginCredentials = {
+                email: 'rate4@example.com',
+                password: 'pass',
+            };
+
+            const validCredentials: LoginCredentials = {
+                email: 'rate4@example.com',
+                password: 'password123',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.login(invalidCredentials);
+            }
+
+            const blockedResult = await authService.login(validCredentials);
+            expect(blockedResult.success).toBe(false);
+            expect(blockedResult.error).toContain('Terlalu banyak percobaan');
+        });
+
+        it('should track rate limit status for login', async () => {
+            const email = 'rate5@example.com';
+
+            const status1 = authService.getLoginRateLimitStatus(email);
+            expect(status1.count).toBe(0);
+            expect(status1.attemptsRemaining).toBe(5);
+
+            const credentials: LoginCredentials = {
+                email,
+                password: 'pass',
+            };
+
+            await authService.login(credentials);
+
+            const status2 = authService.getLoginRateLimitStatus(email);
+            expect(status2.count).toBe(1);
+            expect(status2.attemptsRemaining).toBe(4);
+        });
+
+        it('should reset login rate limit for specific email', async () => {
+            const email = 'rate6@example.com';
+            const credentials: LoginCredentials = {
+                email,
+                password: 'pass',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.login(credentials);
+            }
+
+            let status = authService.getLoginRateLimitStatus(email);
+            expect(status.count).toBe(5);
+            expect(status.attemptsRemaining).toBe(0);
+
+            authService.resetLoginRateLimit(email);
+
+            status = authService.getLoginRateLimitStatus(email);
+            expect(status.count).toBe(0);
+            expect(status.attemptsRemaining).toBe(5);
+        });
+
+        it('should handle rate limit for different emails independently', async () => {
+            const credentials1: LoginCredentials = {
+                email: 'user1@example.com',
+                password: 'pass',
+            };
+
+            const credentials2: LoginCredentials = {
+                email: 'user2@example.com',
+                password: 'password123',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.login(credentials1);
+            }
+
+            const blockedResult1 = await authService.login(credentials1);
+            expect(blockedResult1.success).toBe(false);
+
+            const successResult = await authService.login(credentials2);
+            expect(successResult.success).toBe(true);
+        });
+    });
+
+    describe('rate limiting - register', () => {
+        it('should allow register within rate limit', async () => {
+            const userData: RegisterData = {
+                name: 'User One',
+                email: 'rate7@example.com',
+                password: 'password123',
+            };
+
+            const result1 = await authService.register(userData);
+            expect(result1.success).toBe(true);
+        });
+
+        it('should allow up to 5 failed register attempts within window', async () => {
+            const userData: RegisterData = {
+                name: '',
+                email: 'rate8@example.com',
+                password: 'password123',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                const result = await authService.register(userData);
+                expect(result.success).toBe(false);
+            }
+        });
+
+        it('should block register after 5 failed attempts', async () => {
+            const userData: RegisterData = {
+                name: '',
+                email: 'rate9@example.com',
+                password: 'password123',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.register(userData);
+            }
+
+            const blockedResult = await authService.register(userData);
+            expect(blockedResult.success).toBe(false);
+            expect(blockedResult.error).toContain('Terlalu banyak percobaan');
+        });
+
+        it('should track rate limit status for register', async () => {
+            const email = 'rate10@example.com';
+
+            const status1 = authService.getRegisterRateLimitStatus(email);
+            expect(status1.count).toBe(0);
+            expect(status1.attemptsRemaining).toBe(5);
+
+            const userData: RegisterData = {
+                name: '',
+                email,
+                password: 'password123',
+            };
+
+            await authService.register(userData);
+
+            const status2 = authService.getRegisterRateLimitStatus(email);
+            expect(status2.count).toBe(1);
+            expect(status2.attemptsRemaining).toBe(4);
+        });
+
+        it('should reset register rate limit for specific email', async () => {
+            const email = 'rate11@example.com';
+            const userData: RegisterData = {
+                name: '',
+                email,
+                password: 'password123',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.register(userData);
+            }
+
+            let status = authService.getRegisterRateLimitStatus(email);
+            expect(status.count).toBe(5);
+            expect(status.attemptsRemaining).toBe(0);
+
+            authService.resetRegisterRateLimit(email);
+
+            status = authService.getRegisterRateLimitStatus(email);
+            expect(status.count).toBe(0);
+            expect(status.attemptsRemaining).toBe(5);
+        });
+
+        it('should handle rate limit for login and register independently', async () => {
+            const email = 'rate12@example.com';
+
+            const loginCredentials: LoginCredentials = {
+                email,
+                password: 'pass',
+            };
+
+            for (let i = 0; i < 5; i++) {
+                await authService.login(loginCredentials);
+            }
+
+            const blockedLogin = await authService.login(loginCredentials);
+            expect(blockedLogin.success).toBe(false);
+
+            const successRegister = await authService.register({
+                name: 'User',
+                email,
+                password: 'password123',
+            });
+            expect(successRegister.success).toBe(true);
         });
     });
 });

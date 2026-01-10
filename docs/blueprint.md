@@ -197,23 +197,49 @@ export const feedbackByPage = createPageIndex(testi_data);
 export const feedbackByDesignation = createMultiFieldIndex(testi_data, ['designation']);
 ```
 
-### Data Relationship Management (Planned - Task 40)
+### Data Relationship Management (✅ COMPLETED - Phase 3)
 
 **Relationship Types**:
 ```typescript
+export type RelationshipType = 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
+
 export interface DataRelationship {
     sourceCollection: string;    // e.g., "FeedbackData"
     targetCollection: string;    // e.g., "TeamData"
     sourceField: string;        // e.g., "authorId"
     targetField: string;        // e.g., "id"
-    type: 'one-to-one' | 'one-to-many' | 'many-to-many';
+    type: RelationshipType;
+    optional?: boolean;         // Allow null/undefined foreign keys
 }
 ```
 
+**Relationship Utilities** (`src/utils/dataRelationship.ts`):
+- ✅ `validateRelationships()` - Validate all relationships across collections
+- ✅ `checkReferentialIntegrity()` - Check foreign key validity
+- ✅ `getRelatedItems()` - Get all related items for a source
+- ✅ `getRelatedItem()` - Get single related item (one-to-one/one-to-many)
+- ✅ `getOneToManyRelations()` - Get multiple related collections
+- ✅ `checkCircularDependencies()` - Detect circular reference issues
+- ✅ `getRelationshipGraph()` - Build relationship traversal graph
+- ✅ `findRelationshipsByCollection()` - Find relationships by collection name
+- ✅ `cascadeDelete()` - Identify items to delete on cascade
+- ✅ `validateForeignKey()` - Single foreign key validation
+
 **Referential Integrity**:
-- Validate foreign key references
+- Validate foreign key references at build time
 - Cascade deletion/update strategies
 - Prevent orphaned records
+- Circular dependency detection
+
+**Relationship Validation** (35 tests):
+- ✅ Valid relationships with no errors
+- ✅ Collection not found errors
+- ✅ Referential integrity violations
+- ✅ Optional foreign key handling
+- ✅ String to number comparison
+- ✅ Circular dependency detection
+- ✅ Relationship graph building
+- ✅ Cascade delete operations
 
 ### Performance Considerations
 
@@ -251,10 +277,14 @@ export interface DataRelationship {
    - Page indexes for page-filtered data
    - Multi-field indexes for complex queries
 
-3. **Data Relationship Management**:
-   - Define relationships between collections
-   - Referential integrity checks
-   - Cascade deletion/update strategies
+3. **✅ Data Relationship Management** (COMPLETE - Phase 3):
+    - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
+    - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
+    - ✅ Referential integrity checks with foreign key validation
+    - ✅ Circular dependency detection
+    - ✅ Cascade deletion support
+    - ✅ Relationship graph traversal
+    - ✅ 35 comprehensive tests covering all relationship utilities
 
 4. **Data Standardization**:
    - Standardize date formats (ISO 8601)
@@ -368,11 +398,19 @@ External API (EmailJS, etc.)
 - **Purpose**: Abstract authentication logic from presentation components
 - **Implementation**: Interface-based service with mock implementation
 - **API Methods**:
-  - `login(credentials)`: Authenticate user with email and password
-  - `register(userData)`: Register new user account
+  - `login(credentials)`: Authenticate user with email and password (rate limited)
+  - `register(userData)`: Register new user account (rate limited)
   - `logout()`: Clear current user session
   - `getCurrentUser()`: Get currently authenticated user
+  - `getLoginRateLimitStatus(email)`: Check rate limit status for login
+  - `getRegisterRateLimitStatus(email)`: Check rate limit status for register
+  - `resetLoginRateLimit(email)`: Reset rate limit for login (admin)
+  - `resetRegisterRateLimit(email)`: Reset rate limit for register (admin)
 - **Current Implementation**: Mock authentication (ready for real backend integration)
+- **Rate Limiting**:
+  - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
+  - **Register**: 5 attempts per 1 hour, 2 hour cooldown
+  - Per-email tracking to prevent brute force attacks
 - **Location**: `src/services/auth/AuthService.ts`
 - **Forms Using Service**: LoginForm, SignUpForm
 
@@ -389,13 +427,17 @@ External API (EmailJS, etc.)
 - **Configuration**:
   - **Email Limiter**: 5 attempts per 60s window, 5 minute cooldown
   - **Form Limiter**: 10 attempts per 1 hour window, 2 hour cooldown
+  - **Login Limiter** (AuthService): 5 attempts per 15 minutes, 30 minute cooldown
+  - **Register Limiter** (AuthService): 5 attempts per 1 hour, 2 hour cooldown
 - **Features**:
   - Per-identifier tracking (email, IP, user ID)
   - Automatic reset after window expires
   - Cooldown period after limit exceeded
   - Cleanup of expired records
+  - Independent tracking for different operations (login vs register)
 - **Error Handling**: Clear error messages with remaining time
 - **Location**: `src/utils/rateLimiter.ts`
+- **Services Using**: EmailService, AuthService
 
 #### 5. Service Abstraction
 
