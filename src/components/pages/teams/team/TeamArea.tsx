@@ -1,8 +1,13 @@
 "use client"
-import ReactPaginate from "react-paginate";
+import dynamic from "next/dynamic"
 import team_data from "@/data/TeamData"
 import Image from "next/image"
 import { usePagination } from "@/hooks/usePagination"
+
+const ReactPaginate = dynamic(() => import("react-paginate"), {
+  ssr: false,
+  loading: () => <div className="ac-pagination text-center mt-30 wow fadeInUp"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
+})
 
 const TeamArea = () => {
 
