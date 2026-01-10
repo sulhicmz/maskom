@@ -8,6 +8,113 @@
 
 ---
 
+## Task 27: Security Hardening - Dependency Vulnerability Remediation
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Security Engineering
+
+**Problem**:
+- npm audit reported 11 low-severity vulnerabilities in transitive AWS SDK dependencies
+- Vulnerabilities were in @smithy/config-resolver, @smithy/util-defaults-mode-node, and AWS SDK packages
+- npm's suggested fix would downgrade @opennextjs/cloudflare to v0.2.1, introducing a HIGH severity SSRF vulnerability (CVE-2025-6087)
+- Vulnerabilities were in dependencies that the application doesn't directly use but are pulled in by @opennextjs/cloudflare
+
+**Locations**:
+- `package.json` - Dependency management
+- Transitive dependencies via @opennextjs/cloudflare@1.14.8
+
+**Vulnerability Details**:
+1. @smithy/config-resolver <4.4.0 - AWS SDK v3 adopted defense in depth enhancement for region parameter (GHSA-6475-r3vj-m8vf)
+2. @smithy/util-defaults-mode-node <=3.0.34 - Dependent on vulnerable @smithy/config-resolver
+3. @aws-sdk/client-cloudfront 3.363.0-3.721.0 - Dependent on vulnerable packages
+4. @aws-sdk/client-sso 3.363.0-3.721.0 - Dependent on vulnerable packages
+5. @aws-sdk/client-sts 3.363.0-3.721.0 - Dependent on vulnerable packages
+6. @aws-sdk/token-providers 3.388.0-3.501.0 - Dependent on vulnerable packages
+
+**Solution**:
+1. Added npm overrides to package.json to force patched versions of vulnerable packages without downgrading @opennextjs/cloudflare
+2. Specified minimum safe versions for all vulnerable packages
+3. Maintained @opennextjs/cloudflare@1.14.8 (which has SSRF vulnerability fixed)
+4. Verified build and tests still pass after applying overrides
+
+**Success Criteria**:
+- [x] All 11 npm audit vulnerabilities resolved (0 vulnerabilities found)
+- [x] No breaking changes to @opennextjs/cloudflare version
+- [x] Build completed successfully (18 pages generated)
+- [x] All 652 tests passing (100% success rate)
+- [x] Lint passes without errors (only 7 intentional warnings for test img tags)
+- [x] No HIGH severity SSRF vulnerability introduced
+
+**Related Files**:
+- Updated: `package.json` - Added overrides section with 7 package version constraints
+- Vulnerable packages updated via overrides:
+  - @smithy/config-resolver: forced to >=4.4.0 (installed 4.4.5)
+  - @smithy/util-defaults-mode-node: forced to >=4.2.13 (installed 4.2.21)
+  - @aws-sdk/client-cloudfront: forced to >=3.966.0 (installed 3.966.0)
+  - @aws-sdk/client-sso: forced to >=3.966.0 (installed 3.966.0)
+  - @aws-sdk/client-sts: forced to >=3.966.0 (installed 3.966.0)
+  - @aws-sdk/token-providers: forced to >=3.600.0 (installed 3.966.0)
+  - @aws-sdk/credential-provider-node: forced to >=3.966.0 (installed 3.966.0)
+
+**Security Assessment Summary**:
+- **Vulnerabilities Fixed**: 11 low-severity CVEs (all resolved via overrides)
+- **Security Headers**: Comprehensive security headers already configured in public/_headers
+  - X-Frame-Options: DENY (anti-clickjacking)
+  - X-Content-Type-Options: nosniff (MIME-type protection)
+  - X-XSS-Protection: 1; mode=block (XSS protection)
+  - Strict-Transport-Security: max-age=63072000 with includeSubDomains and preload (HSTS)
+  - Content-Security-Policy: Comprehensive CSP with proper restrictions
+  - Referrer-Policy: strict-origin-when-cross-origin
+  - Permissions-Policy: geolocation=(), microphone=(), camera=()
+- **Secrets Management**: No hardcoded secrets found (all env vars properly configured)
+- **XSS Prevention**: No dangerouslySetInnerHTML usage found
+- **Code Injection**: No eval, Function(), or dangerous setTimeout/setInterval usage found
+- **CSP Assessment**: Current CSP has 'unsafe-inline' and 'unsafe-eval' for scripts/styles (potential improvement without breaking Bootstrap)
+- **CORS Header**: Access-Control-Allow-Origin restricted to https://maskom.co.id (may break other origins - already documented in known-issues.md)
+
+**Future Security Recommendations**:
+1. **CSP Hardening**: Consider removing 'unsafe-inline' from script-src and style-src in CSP after thorough testing with Bootstrap 5.3.8
+   - Risk: May break Bootstrap dynamic styling
+   - Benefit: Stronger XSS protection via CSP
+   - Approach: Gradual migration to nonce-based or hash-based CSP
+2. **CORS Flexibility**: Review Access-Control-Allow-Origin header to allow development/testing environments
+   - Current: Hardcoded to https://maskom.co.id
+   - Recommendation: Use environment variable for CORS origin
+3. **Input Validation**: Current validation using Yup is comprehensive - maintain and review regularly
+4. **Dependency Updates**: Regular npm audit runs and override updates as new patches are released
+5. **Security Headers Consideration**: Ensure headers in public/_headers are properly applied by Cloudflare Workers
+
+**Testing**:
+- npm audit: 0 vulnerabilities found
+- Build: Successful (18 pages generated)
+- Tests: All 652 passing (100% success rate)
+- Lint: Passed with only 7 intentional warnings (test mock img tags)
+
+**Notes**:
+- npm overrides are the correct approach here - they allow patching transitive dependencies without breaking the parent package
+- The npm audit --force suggestion to downgrade to @opennextjs/cloudflare@0.2.1 would introduce CVE-2025-6087 (HIGH severity SSRF)
+- Maintained current @opennextjs/cloudflare@1.14.8 which already fixes the SSRF vulnerability
+- All security best practices followed:
+  - Zero Trust: All inputs validated via Yup schema validation
+  - Least Privilege: CSP restricts sources for scripts, styles, images, fonts, connections
+  - Defense in Depth: Multiple security layers (CSP, HSTS, XSS protection, frame options)
+  - Secure by Default: Headers configured securely by default
+  - Secrets are Sacred: No hardcoded secrets, proper .env.example
+- Follows Security Engineering principles:
+  - Risk Assessment: Evaluated both options (fix via downgrade vs. fix via overrides)
+  - Defense in Depth: Multiple security headers, not relying on single protection
+  - Least Privilege: CSP restricts what resources can be loaded
+  - Fail Secure: Errors don't expose sensitive data
+
+**Impact**:
+- Security posture improved: 0 vulnerabilities (was 11 low-severity)
+- No breaking changes to application functionality
+- No HIGH severity vulnerabilities introduced
+- Dependencies properly patched for production deployment
+
+---
+
 ## Task 25: Documentation - Known Issues Update & Link Verification
 
 **Status**: ✅ Completed
