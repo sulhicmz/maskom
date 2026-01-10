@@ -53,6 +53,7 @@ Layout/Wrapper
 - ✅ Pre-filtered data exports at build time
 - ✅ Centralized type definitions in `src/types/data/`
 - ✅ Runtime data validation with comprehensive test coverage
+- ✅ Validation factory pattern with configuration-based validators (eliminates code duplication)
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -60,6 +61,7 @@ Layout/Wrapper
 - ❌ Duplicate code across components (resize handlers) - FIXED
 - ❌ Hardcoded filter logic in multiple places - FIXED
 - ❌ Missing service layer for external APIs - FIXED
+- ❌ Validation logic duplication (20+ identical functions) - FIXED
 
 ### Integration Patterns (Maintain)
 
