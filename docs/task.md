@@ -3291,6 +3291,250 @@ External API (EmailJS)
 
 ---
 
+## Task 47: Extract Constants from Magic Numbers
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- Magic numbers scattered throughout: `5` (maxAttempts), `8` (min password length), rating limits (0-5)
+- Time constants like `60000`, `900000`, `1800000`, `3600000`, `7200000` are repeated multiple times
+- Makes code hard to maintain and understand intent
+- Changing a value requires finding all occurrences
+
+**Locations**:
+- `src/services/auth/AuthService.ts` - Rate limit numbers, password length
+- `src/utils/rateLimiter.ts` - Time constants, attempt limits
+- `src/utils/formValidation.ts` - Validation thresholds
+- `src/utils/dataValidation.ts` - Rating limits, field lengths
+
+**Suggested Improvement**:
+Create `src/constants/rateLimits.ts` and `src/constants/validation.ts`:
+```typescript
+// constants/rateLimits.ts
+export const RATE_LIMITS = {
+  LOGIN: { maxAttempts: 5, windowMs: 900000, cooldownMs: 1800000 },
+  REGISTER: { maxAttempts: 5, windowMs: 3600000, cooldownMs: 7200000 },
+  EMAIL: { maxAttempts: 5, windowMs: 60000, cooldownMs: 300000 },
+  FORM: { maxAttempts: 10, windowMs: 3600000, cooldownMs: 7200000 }
+} as const;
+
+// constants/validation.ts
+export const VALIDATION = {
+  MIN_PASSWORD_LENGTH: 8,
+  RATING_MIN: 0,
+  RATING_MAX: 5
+} as const;
+```
+
+Update all files to use these constants instead of magic numbers.
+
+**Success Criteria**:
+- [ ] Constants files created with TypeScript types
+- [ ] All magic numbers replaced with named constants
+- [ ] Tests pass without regressions
+- [ ] Lint passes without errors
+- [ ] Build successful
+
+**Priority**: HIGH
+**Effort**: Small
+
+**Related Files**:
+- Create: `src/constants/rateLimits.ts`
+- Create: `src/constants/validation.ts`
+- Update: `src/services/auth/AuthService.ts`
+- Update: `src/utils/rateLimiter.ts`
+- Update: `src/utils/formValidation.ts`
+- Update: `src/utils/dataValidation.ts`
+
+---
+
+## Task 48: Extract Reusable Form Input Component
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- Heavy code duplication across all form components
+- Each form has nearly identical input field rendering patterns with error handling
+- Violates DRY principle
+- Changes to input behavior require updates in 4+ files
+
+**Locations**:
+- `src/components/forms/ContactForm.tsx` - Form inputs with error handling
+- `src/components/forms/LoginForm.tsx` - Similar input patterns
+- `src/components/forms/SignUpForm.tsx` - Repeated input logic
+- `src/components/forms/BlogForm.tsx` - Same rendering pattern
+
+**Suggested Improvement**:
+Create `src/components/forms/FormInput.tsx`:
+```typescript
+interface FormInputProps {
+  id: string;
+  label: string;
+  type: string;
+  placeholder: string;
+  error?: string;
+  register: any;
+  disabled?: boolean;
+  rows?: number;
+}
+
+export const FormInput = ({ id, label, type, placeholder, error, register, disabled, rows }: FormInputProps) => {
+  return (
+    <div className="form-group">
+      <label htmlFor={id} className="sr-only">{label}</label>
+      {type === 'textarea' ? (
+        <textarea {...register(id)} id={id} className="form-control" rows={rows} placeholder={placeholder} />
+      ) : (
+        <input type={type} {...register(id)} id={id} className="form-control" placeholder={placeholder} disabled={disabled} />
+      )}
+      {error && <p className="form_error" role="alert">{error}</p>}
+    </div>
+  );
+};
+```
+
+**Success Criteria**:
+- [ ] FormInput component created with TypeScript types
+- [ ] All 4 forms refactored to use FormInput
+- [ ] All tests pass without regressions
+- [ ] Lint passes without errors
+- [ ] Zero functional changes
+
+**Priority**: HIGH
+**Effort**: Medium
+
+**Related Files**:
+- Create: `src/components/forms/FormInput.tsx`
+- Update: `src/components/forms/ContactForm.tsx`
+- Update: `src/components/forms/LoginForm.tsx`
+- Update: `src/components/forms/SignUpForm.tsx`
+- Update: `src/components/forms/BlogForm.tsx`
+
+---
+
+## Task 49: Split Large dataValidation.ts File
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- File is far too large (540 lines, >200 lines threshold)
+- Contains validators for 13+ different data types
+- Hard to navigate and maintain
+- Violates Single Responsibility Principle
+
+**Locations**:
+- `src/utils/dataValidation.ts` - 540 lines, 21 validators mixed together
+
+**Suggested Improvement**:
+Split into smaller, focused modules:
+```
+src/utils/validation/
+├── index.ts (re-exports)
+├── feedbackValidation.ts (FeedbackItem validator)
+├── priceValidation.ts (PriceItem, PriceDetailItem validators)
+├── faqValidation.ts (FaqItem, FaqDetail, InnerFaqItem validators)
+├── menuValidation.ts (MenuItem, NavigationItem, NavigationSection validators)
+├── teamValidation.ts (TeamMember, InnerBlogPost validators)
+└── baseValidation.ts (shared validation logic: createValidator, validateBaseDataItem)
+```
+
+**Success Criteria**:
+- [ ] New directory structure created
+- [ ] dataValidation.ts split into 7 focused files
+- [ ] Re-exports maintain backward compatibility
+- [ ] All tests pass (945 tests)
+- [ ] Lint passes without errors
+- [ ] Build successful
+
+**Priority**: HIGH
+**Effort**: Medium
+
+**Related Files**:
+- Create: `src/utils/validation/index.ts`
+- Create: `src/utils/validation/feedbackValidation.ts`
+- Create: `src/utils/validation/priceValidation.ts`
+- Create: `src/utils/validation/faqValidation.ts`
+- Create: `src/utils/validation/menuValidation.ts`
+- Create: `src/utils/validation/teamValidation.ts`
+- Create: `src/utils/validation/baseValidation.ts`
+- Update: `src/utils/dataValidation.ts` (deprecate, migrate to index.ts)
+- Update: Import statements in all test files
+
+---
+
+## Task 50: Consolidate Duplicate Authentication Logic
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring
+
+**Problem**:
+- `login()` and `register()` methods have nearly identical validation logic
+- Rate limit checking, email validation, password validation are duplicated
+- Violates DRY principle
+- Changes to validation require updates in both methods
+
+**Locations**:
+- `src/services/auth/AuthService.ts` - Lines 23-81 (login) and 83-141 (register)
+
+**Suggested Improvement**:
+Extract common validation into a private method:
+```typescript
+private async validateCredentials(
+  email: string,
+  password: string,
+  rateLimiter: RateLimiter,
+  requireName: boolean = false,
+  name?: string
+): Promise<{ valid: boolean; error?: string }> {
+  // Rate limit check
+  const rateLimitStatus = rateLimiter.getStatus(email);
+  if (!rateLimitStatus.allowed) {
+    return { valid: false, error: rateLimitStatus.message };
+  }
+
+  // Email validation
+  if (!this.validateEmail(email)) {
+    return { valid: false, error: "Format email tidak valid" };
+  }
+
+  // Password validation
+  if (password.length < 8) {
+    return { valid: false, error: "Password minimal 8 karakter" };
+  }
+
+  // Name validation (if required)
+  if (requireName && !name?.trim()) {
+    return { valid: false, error: "Nama wajib diisi" };
+  }
+
+  return { valid: true };
+}
+```
+
+**Success Criteria**:
+- [ ] `validateCredentials` private method created
+- [ ] `login()` method refactored to use common validation
+- [ ] `register()` method refactored to use common validation
+- [ ] All tests pass (945 tests)
+- [ ] Lint passes without errors
+- [ ] Zero functional changes
+
+**Priority**: HIGH
+**Effort**: Small
+
+**Related Files**:
+- Update: `src/services/auth/AuthService.ts`
+- Update: `src/services/auth/__tests__/AuthService.test.ts` (verify behavior unchanged)
+
+---
+
 ## Task 32: Asset Optimization - Unused FontAwesome & Vendor File Removal
 
 **Status**: ✅ Completed
