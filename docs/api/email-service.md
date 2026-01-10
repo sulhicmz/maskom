@@ -18,7 +18,9 @@ NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=<public-key>
 
 ```typescript
 interface IEmailService {
-    sendEmail(params: EmailSendParams): Promise<EmailSendResult>;
+    sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult>;
+    getCircuitBreakerState(): CircuitBreakerState;
+    resetCircuitBreaker(): void;
 }
 ```
 
@@ -34,6 +36,15 @@ interface EmailSendParams {
 }
 ```
 
+### Options: `EmailSendOptions`
+
+```typescript
+interface EmailSendOptions {
+    skipRateLimit?: boolean;  // Skip rate limit check (for admin use)
+    identifier?: string;     // Custom identifier for rate limiting (defaults to user_email)
+}
+```
+
 ### Response: `EmailSendResult`
 
 ```typescript
@@ -41,6 +52,7 @@ interface EmailSendResult {
     success: boolean;        // True if email sent successfully
     text?: string;          // Success message from EmailJS
     error?: string;         // Error message if failed
+    rateLimited?: boolean;  // True if blocked by rate limiter
 }
 ```
 
@@ -61,6 +73,8 @@ const result = await emailService.sendEmail({
 
 if (result.success) {
     console.log('Email sent successfully:', result.text);
+} else if (result.rateLimited) {
+    console.warn('Rate limited:', result.error);
 } else {
     console.error('Failed to send email:', result.error);
 }
@@ -80,11 +94,77 @@ const handleSendEmail = async (formData: FormData) => {
         }
     });
 
+    if (result.rateLimited) {
+        toast.error(result.error || 'Too many attempts. Please try again later.');
+        return;
+    }
+
     return result;
 };
 ```
 
+### Custom Rate Limit Identifier
+
+```typescript
+import emailService from '@/services/email';
+
+// Use a custom identifier for rate limiting (e.g., IP address instead of email)
+const result = await emailService.sendEmail(
+    {
+        templateParams: {
+            user_name: 'John Doe',
+            user_email: 'john@example.com',
+            message: 'Hello, this is a test message.'
+        }
+    },
+    {
+        identifier: userIpAddress // Rate limit by IP instead of email
+    }
+);
+```
+
+### Skip Rate Limiting (Admin Only)
+
+```typescript
+import emailService from '@/services/email';
+
+// Skip rate limit check for administrative operations (use with caution)
+const result = await emailService.sendEmail(
+    {
+        templateParams: {
+            user_name: 'Admin',
+            user_email: 'admin@example.com',
+            message: 'Admin notification'
+        }
+    },
+    {
+        skipRateLimit: true // Bypass rate limiting
+    }
+);
+```
+
 ## Resilience Patterns
+
+### 0. Rate Limiting
+
+Email sending is protected by rate limiting to prevent abuse:
+
+- **Default Limiter**: 5 attempts per minute, 5 minute cooldown
+- **Identifier**: User email address (customizable via `identifier` option)
+- **Behavior**:
+  - First 5 attempts: Allowed
+  - Exceeding limit: Blocked with cooldown message
+  - Cooldown: 5 minutes before reset
+- **Skip Option**: Use `skipRateLimit: true` for admin operations (use with caution)
+
+**Error Response**:
+```json
+{
+    "success": false,
+    "error": "Too many attempts. Please try again in X seconds.",
+    "rateLimited": true
+}
+```
 
 ### 1. Timeout Protection
 
@@ -168,29 +248,34 @@ emailService.resetCircuitBreaker();
 
 ### Error Scenarios
 
-1. **Missing Credentials**
-   - **Response**: `{ success: false, error: 'EmailJS credentials not configured' }`
-   - **Action**: Check environment variables
+1. **Rate Limited**
+    - **Response**: `{ success: false, error: 'Too many attempts...', rateLimited: true }`
+    - **Action**: Wait for cooldown period (5 minutes) or use different identifier
 
-2. **Timeout**
-   - **Response**: `{ success: false, error: 'EmailJS request timed out' }`
-   - **Action**: Retried automatically (up to 3 attempts)
+2. **Missing Credentials**
+    - **Response**: `{ success: false, error: 'EmailJS credentials not configured' }`
+    - **Action**: Check environment variables
 
-3. **Network Error**
-   - **Response**: `{ success: false, error: 'Network error occurred' }`
-   - **Action**: Retried automatically if matches retryable patterns
+3. **Timeout**
+    - **Response**: `{ success: false, error: 'EmailJS request timed out' }`
+    - **Action**: Retried automatically (up to 3 attempts)
 
-4. **Circuit Breaker Open**
-   - **Response**: `{ success: false, error: 'Circuit breaker is open' }`
-   - **Action**: Wait 60 seconds or manually reset (not recommended)
+4. **Network Error**
+    - **Response**: `{ success: false, error: 'Network error occurred' }`
+    - **Action**: Retried automatically if matches retryable patterns
 
-5. **EmailJS Service Error**
-   - **Response**: `{ success: false, error: 'Service error' }`
-   - **Action**: Check EmailJS status, configuration
+5. **Circuit Breaker Open**
+    - **Response**: `{ success: false, error: 'Circuit breaker is open' }`
+    - **Action**: Wait 60 seconds or manually reset (not recommended)
+
+6. **EmailJS Service Error**
+    - **Response**: `{ success: false, error: 'Service error' }`
+    - **Action**: Check EmailJS status, configuration
 
 ### Error Recovery
 
 The service automatically handles:
+- Rate limiting (prevents abuse, provides clear countdown messages)
 - Transient network failures (retries with backoff)
 - Temporary EmailJS outages (circuit breaker prevents cascade)
 - Timeout scenarios (bounded wait, no indefinite hang)
@@ -202,7 +287,7 @@ The service automatically handles:
 ```typescript
 const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
-    
+
     const result = await emailService.sendEmail({
         templateParams: {
             user_name: data.get('name') as string,
@@ -210,11 +295,13 @@ const handleSubmit = async (data: FormData) => {
             message: data.get('message') as string
         }
     });
-    
+
     setIsLoading(false);
-    
+
     if (result.success) {
         toast.success('Email sent successfully!');
+    } else if (result.rateLimited) {
+        toast.error(result.error || 'Too many attempts. Please try again later.');
     } else {
         toast.error('Failed to send email. Please try again.');
     }
@@ -261,6 +348,8 @@ Component sends request
     ↓
 EmailService.sendEmail()
     ↓
+Rate Limit Check (rejects if exceeded)
+    ↓
 Circuit Breaker Check (rejects if open)
     ↓
 withRetry() (up to 3 attempts)
@@ -274,8 +363,16 @@ Response (success or error)
 
 ### Timeouts
 
+- **Rate Limit Check**: Instant (< 1ms)
+- **Circuit Breaker Check**: Instant (< 1ms)
 - **Single Request Max**: 10 seconds
 - **Max Total Wait**: 10s (attempt 1) + 1s (delay) + 10s (attempt 2) + 2s (delay) + 10s (attempt 3) = ~33 seconds
+
+### Rate Limiting Impact
+
+- **Within Limits**: Normal operation, requests proceed
+- **Exceeded Limit**: Requests rejected immediately (0ms wait)
+- **Cooldown**: 5 minutes before automatic reset
 
 ### Circuit Breaker Impact
 
@@ -314,24 +411,29 @@ See `src/utils/resilience/__tests__/` for pattern-specific tests:
 
 ### Common Issues
 
-1. **"EmailJS credentials not configured"**
-   - Check `.env` file has required variables
-   - Verify environment variables are set in deployment
+1. **"Too many attempts. Please try again in X seconds."**
+    - Rate limit exceeded for this email address
+    - Wait 5 minutes for automatic cooldown reset
+    - Or use a different email address
 
-2. **"Circuit breaker is open"**
-   - EmailJS API may be experiencing issues
-   - Wait 60 seconds for automatic reset
-   - Check EmailJS status page
+2. **"EmailJS credentials not configured"**
+    - Check `.env` file has required variables
+    - Verify environment variables are set in deployment
 
-3. **"EmailJS request timed out"**
-   - Network connectivity issue
-   - EmailJS API slow or unresponsive
-   - Retried automatically (up to 3 times)
+3. **"Circuit breaker is open"**
+    - EmailJS API may be experiencing issues
+    - Wait 60 seconds for automatic reset
+    - Check EmailJS status page
 
-4. **Repeated failures**
-   - Check EmailJS service status
-   - Verify template ID and service ID are correct
-   - Check CSP headers allow EmailJS domain
+4. **"EmailJS request timed out"**
+    - Network connectivity issue
+    - EmailJS API slow or unresponsive
+    - Retried automatically (up to 3 times)
+
+5. **Repeated failures**
+    - Check EmailJS service status
+    - Verify template ID and service ID are correct
+    - Check CSP headers allow EmailJS domain
 
 ## Monitoring & Observability
 

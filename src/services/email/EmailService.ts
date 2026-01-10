@@ -1,6 +1,7 @@
 import emailjs from '@emailjs/browser';
-import type { IEmailService, EmailSendParams, EmailSendResult } from './types';
+import type { IEmailService, EmailSendParams, EmailSendResult, EmailSendOptions } from './types';
 import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
+import { emailRateLimiter } from '@/utils/rateLimiter';
 
 class EmailService implements IEmailService {
     private serviceId: string;
@@ -24,12 +25,25 @@ class EmailService implements IEmailService {
         });
     }
 
-    async sendEmail(params: EmailSendParams): Promise<EmailSendResult> {
+    async sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult> {
         if (!this.serviceId || !this.templateId || !this.publicKey) {
             return {
                 success: false,
                 error: 'EmailJS credentials not configured'
             };
+        }
+
+        const identifier = options?.identifier || params.templateParams.user_email;
+
+        if (!options?.skipRateLimit) {
+            const limitCheck = emailRateLimiter.check(identifier);
+            if (!limitCheck.allowed) {
+                return {
+                    success: false,
+                    error: limitCheck.error,
+                    rateLimited: true
+                };
+            }
         }
 
         try {
@@ -51,6 +65,10 @@ class EmailService implements IEmailService {
 
                 return retryResult.data;
             });
+
+            if (!options?.skipRateLimit) {
+                emailRateLimiter.recordAttempt(identifier);
+            }
 
             return {
                 success: true,

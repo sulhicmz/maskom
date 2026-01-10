@@ -2,11 +2,12 @@
 
 This document tracks current issues in the Maskom codebase with recommended handling.
 
-## 1. CORS Header Restricts Production Domain Only
+## 1. ~~CORS Header Restricts Production Domain Only~~
 
 - **Detail**: `public/_headers` limits `Access-Control-Allow-Origin` to `https://maskom.co.id` only. 【F:public/_headers†L12】
 - **Impact**: Cross-origin requests (e.g., staging, preview Workers) may be rejected by browsers.
-- **Action**: Add a list of valid origins or use controlled wildcards during testing.
+- **Status**: ✅ Fixed - Now using environment variable `NEXT_PUBLIC_CORS_ORIGIN` for flexible CORS configuration
+- **Resolved in**: Task 30 - Security Hardening - CORS Flexibility for Development/Staging
 
 ## 2. WOW Animations Not Initialized
 

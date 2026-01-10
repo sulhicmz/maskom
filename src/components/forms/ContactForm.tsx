@@ -48,8 +48,10 @@ const ContactForm = () => {
       if (result.success) {
          toast.success('Pesan berhasil dikirim', { position: 'top-center' });
          reset();
+      } else if (result.rateLimited) {
+         toast.error(result.error || 'Terlalu banyak percobaan. Silakan coba lagi nanti.', { position: 'top-center' });
       } else {
-         toast.error('Gagal mengirim pesan. Silakan coba lagi.', { position: 'top-center' });
+         toast.error(result.error || 'Gagal mengirim pesan. Silakan coba lagi.', { position: 'top-center' });
       }
    };
 

@@ -25,7 +25,10 @@ jest.mock('next/dynamic', () => ({
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ alt, ...props }: { alt?: string; [key: string]: unknown }) => <img alt={alt} {...props as React.ImgHTMLAttributes<HTMLImageElement>} />,
+  default: ({ alt, ...props }: { alt?: string; [key: string]: unknown }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt={alt} {...props as React.ImgHTMLAttributes<HTMLImageElement>} />
+  ),
 }));
 
 describe('BlogArea', () => {
