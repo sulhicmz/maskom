@@ -3,6 +3,12 @@ jest.mock('react-toastify', () => ({
   toast: jest.fn(() => ({ __t: Date.now() })),
 }));
 
+jest.mock('@/services/auth', () => ({
+  authService: {
+    login: jest.fn(),
+  },
+}));
+
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import LoginForm from '../LoginForm';
@@ -10,6 +16,8 @@ import LoginForm from '../LoginForm';
 describe('LoginForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    const { authService } = require('@/services/auth');
+    authService.login.mockResolvedValue({ success: true, message: 'Berhasil masuk ke portal' });
   });
 
   it('should render form fields correctly', () => {

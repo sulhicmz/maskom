@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
+import { authService } from '@/services/auth';
 
 interface FormData {
    email: string;
@@ -20,10 +21,18 @@ const LoginForm = () => {
       .required();
 
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = () => {
-      const notify = () => toast('Berhasil masuk ke portal', { position: 'top-center' });
-      notify();
-      reset();
+   const onSubmit = async (data: FormData) => {
+      const result = await authService.login({
+         email: data.email,
+         password: data.password,
+      });
+
+      if (result.success) {
+         toast(result.message, { position: 'top-center' });
+         reset();
+      } else {
+         toast(result.error, { position: 'top-center' });
+      }
    };
 
    return (
