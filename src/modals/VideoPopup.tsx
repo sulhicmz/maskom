@@ -1,4 +1,5 @@
 import ModalVideo from "react-modal-video";
+import 'react-modal-video/scss/modal-video.scss';
 
 interface VideoPopupProps {
   isVideoOpen: boolean;

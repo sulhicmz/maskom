@@ -2,7 +2,7 @@
 import NavMenu from "./Menu/NavMenu"
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react";
+import { useState, memo } from "react";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 
 import logo_1 from "@/assets/images/logo/main-logo.svg";
@@ -11,7 +11,7 @@ import logo_2 from "@/assets/images/logo/white-logo.svg";
 interface ProfType {
    style: boolean;
 }
-const HeaderOne = ({ style }: ProfType) => {
+const HeaderOne = memo(({ style }: ProfType) => {
 
    const { sticky } = UseSticky();
    const { isBreakpointOn } = useBreakpoint();
@@ -77,6 +77,8 @@ const HeaderOne = ({ style }: ProfType) => {
          </header>
       </>
    )
-}
+})
+
+HeaderOne.displayName = "HeaderOne"
 
 export default HeaderOne

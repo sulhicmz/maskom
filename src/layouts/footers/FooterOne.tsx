@@ -3,6 +3,7 @@ import Image from "next/image"
 import Link from "next/link"
 import SocialLinks from "@/components/common/SocialLinks"
 import { navigationSections, socialLinks } from "@/data/SocialMediaData"
+import { memo } from "react"
 
 import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/secondary-logo.svg";
@@ -13,7 +14,7 @@ interface ProfType {
    style_2: boolean;
 }
 
-const FooterOne = ({ style, style_2 }: ProfType) => {
+const FooterOne = memo(({ style, style_2 }: ProfType) => {
    return (
 
       <footer className={`${style ? "footer-v2" : "footer-default bg_cover pt-80"}`}>
@@ -43,7 +44,7 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                                           <Link href={item.url} target={item.target || '_self'} rel={item.target === '_blank' ? 'noreferrer' : undefined}>
                                              {item.label}
                                           </Link>
-                                       </li>
+                                        </li>
                                     ))}
                                  </ul>
                               </div>
@@ -62,7 +63,7 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
                              <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
                           </div>
                        </div>
-                    </div>
+                     </div>
                </div>
             </div>
          </div>
@@ -79,6 +80,8 @@ const FooterOne = ({ style, style_2 }: ProfType) => {
          </div>
       </footer>
    )
-}
+})
+
+FooterOne.displayName = "FooterOne"
 
 export default FooterOne
