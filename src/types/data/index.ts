@@ -89,3 +89,49 @@ export interface BlogCommentItem {
   date: string;
   content: string;
 }
+
+export interface TeamMember {
+  id: number;
+  img: StaticImageData;
+  title: string;
+  designation: string;
+}
+
+export interface InnerBlogPost {
+  id: number;
+  thumb: StaticImageData;
+  title: string;
+  desc: string;
+  date: string;
+  user: string;
+  tag: string;
+}
+
+export interface FaqDetail {
+  id: number;
+  title: string;
+  desc: string;
+}
+
+export interface InnerFaqItem {
+  id: number;
+  faq_details: FaqDetail[];
+}
+
+export interface SocialLink {
+  url: string;
+  iconClass: string;
+  ariaLabel: string;
+  target?: "_blank" | "_self";
+}
+
+export interface NavigationItem {
+  url: string;
+  label: string;
+  target?: "_blank" | "_self";
+}
+
+export interface NavigationSection {
+  title: string;
+  items: NavigationItem[];
+}

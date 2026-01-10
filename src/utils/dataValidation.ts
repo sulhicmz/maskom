@@ -8,6 +8,17 @@ import {
   ProcessItem,
   CauseItem,
   MenuItem,
+  WiFiDevice,
+  WebsiteTemplate,
+  AIStep,
+  BlogCommentItem,
+  TeamMember,
+  InnerBlogPost,
+  InnerFaqItem,
+  FaqDetail,
+  SocialLink,
+  NavigationItem,
+  NavigationSection,
 } from "@/types/data";
 
 export interface ValidationResult {
@@ -309,5 +320,264 @@ export function validateDataArray<T>(
   return {
     isValid: allErrors.length === 0,
     errors: allErrors,
+  };
+}
+
+export function validateWiFiDevice(item: WiFiDevice): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`WiFiDevice: id must be a positive number`);
+  }
+
+  if (typeof item.name !== "string" || item.name.trim() === "") {
+    errors.push(`WiFiDevice[${item.id}]: name must be a non-empty string`);
+  }
+
+  if (typeof item.ip !== "string" || item.ip.trim() === "") {
+    errors.push(`WiFiDevice[${item.id}]: ip must be a non-empty string`);
+  }
+
+  if (!["Online", "Offline"].includes(item.status)) {
+    errors.push(`WiFiDevice[${item.id}]: status must be either "Online" or "Offline"`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateWebsiteTemplate(item: WebsiteTemplate): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`WebsiteTemplate: id must be a positive number`);
+  }
+
+  if (typeof item.name !== "string" || item.name.trim() === "") {
+    errors.push(`WebsiteTemplate[${item.id}]: name must be a non-empty string`);
+  }
+
+  if (typeof item.preview !== "string" || item.preview.trim() === "") {
+    errors.push(`WebsiteTemplate[${item.id}]: preview must be a non-empty string`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateAIStep(item: AIStep): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`AIStep: id must be a positive number`);
+  }
+
+  if (typeof item.title !== "string" || item.title.trim() === "") {
+    errors.push(`AIStep[${item.id}]: title must be a non-empty string`);
+  }
+
+  if (typeof item.content !== "string" || item.content.trim() === "") {
+    errors.push(`AIStep[${item.id}]: content must be a non-empty string`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateBlogCommentItem(item: BlogCommentItem): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`BlogCommentItem: id must be a positive number`);
+  }
+
+  if (typeof item.name !== "string" || item.name.trim() === "") {
+    errors.push(`BlogCommentItem[${item.id}]: name must be a non-empty string`);
+  }
+
+  if (typeof item.date !== "string" || item.date.trim() === "") {
+    errors.push(`BlogCommentItem[${item.id}]: date must be a non-empty string`);
+  }
+
+  if (typeof item.content !== "string" || item.content.trim() === "") {
+    errors.push(`BlogCommentItem[${item.id}]: content must be a non-empty string`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateTeamMember(item: TeamMember): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`TeamMember: id must be a positive number`);
+  }
+
+  if (typeof item.title !== "string" || item.title.trim() === "") {
+    errors.push(`TeamMember[${item.id}]: title must be a non-empty string`);
+  }
+
+  if (typeof item.designation !== "string" || item.designation.trim() === "") {
+    errors.push(`TeamMember[${item.id}]: designation must be a non-empty string`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateInnerBlogPost(item: InnerBlogPost): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`InnerBlogPost: id must be a positive number`);
+  }
+
+  if (typeof item.title !== "string" || item.title.trim() === "") {
+    errors.push(`InnerBlogPost[${item.id}]: title must be a non-empty string`);
+  }
+
+  if (typeof item.desc !== "string" || item.desc.trim() === "") {
+    errors.push(`InnerBlogPost[${item.id}]: desc must be a non-empty string`);
+  }
+
+  if (typeof item.date !== "string" || item.date.trim() === "") {
+    errors.push(`InnerBlogPost[${item.id}]: date must be a non-empty string`);
+  }
+
+  if (typeof item.user !== "string" || item.user.trim() === "") {
+    errors.push(`InnerBlogPost[${item.id}]: user must be a non-empty string`);
+  }
+
+  if (typeof item.tag !== "string" || item.tag.trim() === "") {
+    errors.push(`InnerBlogPost[${item.id}]: tag must be a non-empty string`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateFaqDetail(item: FaqDetail): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`FaqDetail: id must be a positive number`);
+  }
+
+  if (typeof item.title !== "string" || item.title.trim() === "") {
+    errors.push(`FaqDetail[${item.id}]: title must be a non-empty string`);
+  }
+
+  if (typeof item.desc !== "string" || item.desc.trim() === "") {
+    errors.push(`FaqDetail[${item.id}]: desc must be a non-empty string`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateInnerFaqItem(item: InnerFaqItem): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.id !== "number" || item.id <= 0) {
+    errors.push(`InnerFaqItem: id must be a positive number`);
+  }
+
+  if (!Array.isArray(item.faq_details) || item.faq_details.length === 0) {
+    errors.push(`InnerFaqItem[${item.id}]: faq_details must be a non-empty array`);
+    return { isValid: false, errors };
+  }
+
+  item.faq_details.forEach((detail) => {
+    const detailResult = validateFaqDetail(detail);
+    errors.push(...detailResult.errors);
+  });
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateSocialLink(item: SocialLink): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.url !== "string" || item.url.trim() === "") {
+    errors.push(`SocialLink: url must be a non-empty string`);
+  }
+
+  if (typeof item.iconClass !== "string" || item.iconClass.trim() === "") {
+    errors.push(`SocialLink[${item.url}]: iconClass must be a non-empty string`);
+  }
+
+  if (typeof item.ariaLabel !== "string" || item.ariaLabel.trim() === "") {
+    errors.push(`SocialLink[${item.url}]: ariaLabel must be a non-empty string`);
+  }
+
+  if (item.target && !["_blank", "_self"].includes(item.target)) {
+    errors.push(`SocialLink[${item.url}]: target must be either "_blank" or "_self"`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateNavigationItem(item: NavigationItem): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.url !== "string" || item.url.trim() === "") {
+    errors.push(`NavigationItem: url must be a non-empty string`);
+  }
+
+  if (typeof item.label !== "string" || item.label.trim() === "") {
+    errors.push(`NavigationItem[${item.url}]: label must be a non-empty string`);
+  }
+
+  if (item.target && !["_blank", "_self"].includes(item.target)) {
+    errors.push(`NavigationItem[${item.url}]: target must be either "_blank" or "_self"`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validateNavigationSection(item: NavigationSection): ValidationResult {
+  const errors: string[] = [];
+
+  if (typeof item.title !== "string" || item.title.trim() === "") {
+    errors.push(`NavigationSection: title must be a non-empty string`);
+  }
+
+  if (!Array.isArray(item.items) || item.items.length === 0) {
+    errors.push(`NavigationSection[${item.title}]: items must be a non-empty array`);
+    return { isValid: false, errors };
+  }
+
+  item.items.forEach((navItem) => {
+    const navItemResult = validateNavigationItem(navItem);
+    errors.push(...navItemResult.errors);
+  });
+
+  return {
+    isValid: errors.length === 0,
+    errors,
   };
 }

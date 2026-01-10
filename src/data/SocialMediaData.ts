@@ -1,20 +1,4 @@
-export interface SocialLink {
-  url: string;
-  iconClass: string;
-  ariaLabel: string;
-  target?: '_blank' | '_self';
-}
-
-export interface NavigationItem {
-  url: string;
-  label: string;
-  target?: '_blank' | '_self';
-}
-
-export interface NavigationSection {
-  title: string;
-  items: NavigationItem[];
-}
+import { SocialLink, NavigationSection } from "@/types/data";
 
 export const socialLinks: SocialLink[] = [
   {

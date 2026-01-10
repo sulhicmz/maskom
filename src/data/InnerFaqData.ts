@@ -1,13 +1,6 @@
-interface DataType {
-   id: number;
-   faq_details: {
-      id: number;
-      title: string;
-      desc: string;
-   }[];
-}
+import { InnerFaqItem } from "@/types/data";
 
-const inner_faq_data: DataType[] = [
+const inner_faq_data: InnerFaqItem[] = [
    {
       id: 1,
       faq_details: [
