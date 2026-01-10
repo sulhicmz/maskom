@@ -4,7 +4,134 @@
 - ⏳ **Pending**: Not started
 - 🚧 **In Progress**: Currently being worked on (DO NOT MODIFY)
    - ✅ **Completed**: Finished and verified
-    - ❌ **Blocked**: Waiting on dependencies
+     - ❌ **Blocked**: Waiting on dependencies
+
+---
+
+## Task 48: Validation Layer Separation - Unified Rules Architecture
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Architectural Refactoring (Layer Separation)
+
+**Problem**:
+- Duplicated validation logic across `validation.ts` and `formValidation.ts`
+- Email validation implemented twice: direct function in `validation.ts`, yup schema in `formValidation.ts`
+- Password validation implemented twice: direct function in `validation.ts`, yup schema in `formValidation.ts`
+- Inconsistent error messages between validation implementations
+- Changes to validation rules required updating multiple locations
+- No single source of truth for validation rules
+- Mixed validation strategies increased maintenance burden
+
+**Locations**:
+- `src/utils/validation.ts` - Direct validation functions (validateEmail, validatePassword)
+- `src/utils/formValidation.ts` - Yup schema functions (createEmailFieldSchema, createPasswordFieldSchema)
+- Services using direct validation: AuthService
+- Forms using yup validation: ContactForm, LoginForm, SignUpForm, BlogForm
+
+**Solution**:
+1. Created unified validation layer in `src/utils/validation/` directory:
+   - `rules.ts`: Centralized rule definitions independent of implementation
+   - `yupAdapter.ts`: Yup adapter for form validation
+   - `directAdapter.ts`: Direct validation adapter for services
+   - `index.ts`: Central export point
+2. Defined core validation rules as reusable, implementation-agnostic:
+   - EmailRule: Email format validation with regex pattern
+   - PasswordRule: Minimum length validation (8 characters)
+   - RequiredRule: Non-empty string validation
+   - MinLengthRule, MaxLengthRule, PatternRule: Configurable rules
+3. Created yup adapter to generate yup schemas from rules:
+   - createEmailFieldSchema(), createPasswordFieldSchema(), createNameFieldSchema()
+   - createRequiredFieldSchema() with label support
+   - createEmailPasswordSchema(), createContactFormSchema(), createSignUpFormSchema(), createBlogFormSchema()
+   - Preserves label-based error messages for flexibility
+4. Created direct adapter to generate ValidationResult from rules:
+   - validateEmail(), validatePassword(), validateRequired()
+   - Consistent error messages with yup adapter
+   - Same validation rules as yup adapter (single source of truth)
+5. Updated formValidation.ts to re-export from yup adapter:
+   - Zero functional changes to form validation behavior
+   - All existing function signatures preserved (label parameters)
+6. Updated validation.ts to re-export from direct adapter:
+   - Zero functional changes to service validation behavior
+   - All existing function signatures preserved
+
+**Architecture Benefits**:
+
+1. **Single Source of Truth**: Validation rules defined once in `rules.ts`
+2. **Layer Separation**: Rules independent of implementation (yup, direct, zod, etc.)
+3. **Consistency**: Same error messages across all validation implementations
+4. **Maintainability**: Change rule in one place, all adapters update
+5. **Extensibility**: Easy to add new validation adapters (zod, class-validator, io-ts)
+6. **Type Safety**: All adapters properly typed with TypeScript
+
+**Success Criteria**:
+- [x] Validation rules layer created with centralized rule definitions
+- [x] Yup adapter implemented for form validation
+- [x] Direct validation adapter implemented for services
+- [x] formValidation.ts updated to use yup adapter
+- [x] validation.ts updated to use direct adapter
+- [x] All 945 tests passing (100% success rate)
+- [x] Lint passes without errors
+- [x] Zero regressions in existing functionality
+- [x] Error messages consistent across all validation implementations
+
+**Related Files**:
+- Created: `src/utils/validation/rules.ts` - Centralized rule definitions
+- Created: `src/utils/validation/yupAdapter.ts` - Yup adapter for forms
+- Created: `src/utils/validation/directAdapter.ts` - Direct adapter for services
+- Created: `src/utils/validation/index.ts` - Central export point
+- Updated: `src/utils/formValidation.ts` - Re-exports from yup adapter
+- Updated: `src/utils/validation.ts` - Re-exports from direct adapter
+
+**Testing**:
+- All 945 tests passing (100% success rate)
+- Lint passed without errors
+- Zero regressions in existing functionality
+- Error messages verified consistent:
+  - Email: "Email diperlukan" / "Email tidak valid"
+  - Password: "Kata sandi diperlukan" / "Kata sandi minimal 8 karakter"
+  - Required: "[fieldName] diperlukan"
+
+**Notes**:
+- Follows Architectural Refactoring principles:
+  - **Layer Separation**: Validation rules separated from implementation adapters
+  - **Single Responsibility**: Each layer has one clear purpose
+  - **Open/Closed**: Easy to add new adapters without modifying rules
+  - **Dependency Inversion**: Forms/services depend on adapters, not concrete implementations
+- Zero breaking changes to existing functionality
+- All imports from `formValidation.ts` and `validation.ts` remain unchanged
+- Future adapters can be added (zod, class-validator, io-ts) without modifying rules
+- Label-based error messages preserved for flexibility in form contexts
+
+**Impact**:
+- Maintenance burden reduced: Validation rules changed in one location
+- Consistency improved: Same error messages across all validation implementations
+- Extensibility enhanced: Easy to add new validation adapters
+- Type safety maintained: All adapters properly typed
+- Zero breaking changes: All existing functionality preserved
+
+**Future Enhancement Opportunities**:
+
+1. **Add Zod Adapter** - Implement zod-based validation
+   - Zod provides better TypeScript inference
+   - Simpler API than yup for complex schemas
+   - Easy to add given existing rule structure
+
+2. **Add Custom Rule Factory** - Create configurable rule generators
+   - Dynamic validation rules based on configuration
+   - Support for custom business-specific validations
+   - Reduce code duplication for similar patterns
+
+3. **Add Validation Pipeline** - Chain multiple validators
+   - Sequential validation with clear error aggregation
+   - Support for conditional validation rules
+   - Better error reporting for complex forms
+
+4. **Add Internationalization (i18n)** - Multi-language error messages
+   - Centralized error message translation
+   - Support for multiple locales
+   - Consistent translations across all adapters
 
 ---
 

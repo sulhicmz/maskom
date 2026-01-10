@@ -1,48 +1,10 @@
-import * as yup from "yup";
-
-export function createEmailFieldSchema(label: string) {
-    return yup.string().required(`${label} diperlukan`).email(`${label} tidak valid`).label(label);
-}
-
-export function createPasswordFieldSchema(label: string) {
-    return yup.string().required(`${label} diperlukan`).min(8, `${label} minimal 8 karakter`).label(label);
-}
-
-export function createNameFieldSchema(label: string) {
-    return yup.string().required(`${label} diperlukan`).label(label);
-}
-
-export function createRequiredFieldSchema(label: string) {
-    return yup.string().required(`${label} diperlukan`).label(label);
-}
-
-export function createEmailPasswordSchema(emailLabel: string = "Email", passwordLabel: string = "Kata sandi") {
-    return yup.object({
-        email: createEmailFieldSchema(emailLabel),
-        password: createPasswordFieldSchema(passwordLabel),
-    }).required();
-}
-
-export function createContactFormSchema() {
-    return yup.object({
-        user_name: createNameFieldSchema("Nama"),
-        user_email: createEmailFieldSchema("Email"),
-        message: createRequiredFieldSchema("Pesan"),
-    }).required();
-}
-
-export function createSignUpFormSchema() {
-    return yup.object({
-        name: createNameFieldSchema("Nama"),
-        email: createEmailFieldSchema("Email"),
-        password: createPasswordFieldSchema("Kata sandi"),
-    }).required();
-}
-
-export function createBlogFormSchema() {
-    return yup.object({
-        name: createNameFieldSchema("Nama"),
-        email: createEmailFieldSchema("Email"),
-        message: createRequiredFieldSchema("Pesan"),
-    }).required();
-}
+export {
+    createEmailFieldSchema,
+    createPasswordFieldSchema,
+    createNameFieldSchema,
+    createRequiredFieldSchema,
+    createEmailPasswordSchema,
+    createContactFormSchema,
+    createSignUpFormSchema,
+    createBlogFormSchema
+} from '@/utils/validation/yupAdapter';
