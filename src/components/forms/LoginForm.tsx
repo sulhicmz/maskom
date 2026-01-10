@@ -1,11 +1,10 @@
 "use client"
 import Link from "next/link";
-import { toast } from 'react-toastify';
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { authService } from '@/services/auth';
-import { useState } from 'react';
+import { createEmailPasswordSchema } from '@/utils/formValidation';
+import { useFormSubmission } from '@/hooks/useFormSubmission';
 
 interface FormData {
    email: string;
@@ -13,32 +12,17 @@ interface FormData {
 }
 
 const LoginForm = () => {
-   const [isSubmitting, setIsSubmitting] = useState(false);
-
-   const schema = yup
-      .object({
-         email: yup.string().required().email().label("Email"),
-         password: yup.string().required().label("Kata sandi"),
-      })
-      .required();
-
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = async (data: FormData) => {
-      setIsSubmitting(true);
-      const result = await authService.login({
-         email: data.email,
-         password: data.password,
-      });
-
-      setIsSubmitting(false);
-
-      if (result.success) {
-         toast(result.message, { position: 'top-center' });
-         reset();
-      } else {
-         toast(result.error, { position: 'top-center' });
-      }
-   };
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createEmailPasswordSchema()), });
+   
+   const { submit: onSubmit, isSubmitting } = useFormSubmission(
+      async (data: FormData) => {
+         return await authService.login({
+            email: data.email,
+            password: data.password,
+         });
+      },
+      { resetForm: reset }
+   );
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="user-form" noValidate>

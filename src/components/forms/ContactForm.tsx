@@ -1,10 +1,10 @@
 "use client"
-import { toast } from 'react-toastify';
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { emailService } from '@/services/email';
+import { createContactFormSchema } from '@/utils/formValidation';
+import { useFormSubmission } from '@/hooks/useFormSubmission';
 
 interface FormData {
    user_name: string;
@@ -12,48 +12,29 @@ interface FormData {
    message: string;
 }
 
-const schema = yup
-   .object({
-      user_name: yup.string().required().label("Nama"),
-      user_email: yup.string().required().email().label("Email"),
-      message: yup.string().required().label("Pesan"),
-   })
-   .required();
-
 const ContactForm = () => {
 
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createContactFormSchema()), });
 
    const form = useRef<HTMLFormElement>(null);
-   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
 
-   const sendEmail = async () => {
-      if (!form.current) {
-         return;
-      }
+   const { submit: sendEmail, isSubmitting: isSubmittingEmail } = useFormSubmission(
+      async () => {
+         if (!form.current) {
+            throw new Error('Form ref not available');
+         }
 
-      setIsSubmittingEmail(true);
+         const formData = new FormData(form.current);
+         const templateParams = {
+            user_name: formData.get('user_name') as string,
+            user_email: formData.get('user_email') as string,
+            message: formData.get('message') as string
+         };
 
-      const formData = new FormData(form.current);
-      const templateParams = {
-         user_name: formData.get('user_name') as string,
-         user_email: formData.get('user_email') as string,
-         message: formData.get('message') as string
-      };
-
-      const result = await emailService.sendEmail({ templateParams });
-
-      setIsSubmittingEmail(false);
-
-      if (result.success) {
-         toast.success('Pesan berhasil dikirim', { position: 'top-center' });
-         reset();
-      } else if (result.rateLimited) {
-         toast.error(result.error || 'Terlalu banyak percobaan. Silakan coba lagi nanti.', { position: 'top-center' });
-      } else {
-         toast.error(result.error || 'Gagal mengirim pesan. Silakan coba lagi.', { position: 'top-center' });
-      }
-   };
+         return await emailService.sendEmail({ templateParams });
+      },
+      { successMessage: 'Pesan berhasil dikirim', resetForm: reset }
+   );
 
    return (
       <form ref={form} onSubmit={handleSubmit(sendEmail)} className="contact-form" noValidate>

@@ -197,23 +197,49 @@ export const feedbackByPage = createPageIndex(testi_data);
 export const feedbackByDesignation = createMultiFieldIndex(testi_data, ['designation']);
 ```
 
-### Data Relationship Management (Planned - Task 40)
+### Data Relationship Management (✅ COMPLETED - Phase 3)
 
 **Relationship Types**:
 ```typescript
+export type RelationshipType = 'one-to-one' | 'one-to-many' | 'many-to-one' | 'many-to-many';
+
 export interface DataRelationship {
     sourceCollection: string;    // e.g., "FeedbackData"
     targetCollection: string;    // e.g., "TeamData"
     sourceField: string;        // e.g., "authorId"
     targetField: string;        // e.g., "id"
-    type: 'one-to-one' | 'one-to-many' | 'many-to-many';
+    type: RelationshipType;
+    optional?: boolean;         // Allow null/undefined foreign keys
 }
 ```
 
+**Relationship Utilities** (`src/utils/dataRelationship.ts`):
+- ✅ `validateRelationships()` - Validate all relationships across collections
+- ✅ `checkReferentialIntegrity()` - Check foreign key validity
+- ✅ `getRelatedItems()` - Get all related items for a source
+- ✅ `getRelatedItem()` - Get single related item (one-to-one/one-to-many)
+- ✅ `getOneToManyRelations()` - Get multiple related collections
+- ✅ `checkCircularDependencies()` - Detect circular reference issues
+- ✅ `getRelationshipGraph()` - Build relationship traversal graph
+- ✅ `findRelationshipsByCollection()` - Find relationships by collection name
+- ✅ `cascadeDelete()` - Identify items to delete on cascade
+- ✅ `validateForeignKey()` - Single foreign key validation
+
 **Referential Integrity**:
-- Validate foreign key references
+- Validate foreign key references at build time
 - Cascade deletion/update strategies
 - Prevent orphaned records
+- Circular dependency detection
+
+**Relationship Validation** (35 tests):
+- ✅ Valid relationships with no errors
+- ✅ Collection not found errors
+- ✅ Referential integrity violations
+- ✅ Optional foreign key handling
+- ✅ String to number comparison
+- ✅ Circular dependency detection
+- ✅ Relationship graph building
+- ✅ Cascade delete operations
 
 ### Performance Considerations
 
@@ -251,10 +277,14 @@ export interface DataRelationship {
    - Page indexes for page-filtered data
    - Multi-field indexes for complex queries
 
-3. **Data Relationship Management**:
-   - Define relationships between collections
-   - Referential integrity checks
-   - Cascade deletion/update strategies
+3. **✅ Data Relationship Management** (COMPLETE - Phase 3):
+    - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
+    - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
+    - ✅ Referential integrity checks with foreign key validation
+    - ✅ Circular dependency detection
+    - ✅ Cascade deletion support
+    - ✅ Relationship graph traversal
+    - ✅ 35 comprehensive tests covering all relationship utilities
 
 4. **Data Standardization**:
    - Standardize date formats (ISO 8601)
@@ -282,6 +312,12 @@ export interface DataRelationship {
 - ✅ Error boundaries with graceful error handling and recovery options
 - ✅ Dynamic imports for non-critical components (Swiper, modals, pagination)
 - ✅ Lazy loading of heavy libraries with loading states (VideoPopup, ReactPaginate)
+- ✅ CDN-based CSS loading (Bootstrap, FontAwesome) with global edge delivery
+- ✅ Lazy loading CSS on-demand (Toastify CSS loaded only when needed)
+- ✅ Form validation utilities with shared schema factories (formValidation.ts)
+- ✅ Form submission hook with consistent error handling (useFormSubmission)
+- ✅ Service layer abstraction for external API calls (EmailService, AuthService)
+- ✅ DRY principle applied to form validation and submission patterns
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -292,6 +328,8 @@ export interface DataRelationship {
 - ❌ Validation logic duplication (20+ identical functions) - FIXED
 - ❌ Missing error boundaries for component error handling - FIXED
 - ❌ Inline authentication logic in LoginForm/SignUpForm - FIXED
+- ❌ Form submission logic duplicated across 4 components - FIXED
+- ❌ Email validation duplicated in AuthService - FIXED
 
 ### Integration Patterns (Maintain)
 
@@ -360,11 +398,19 @@ External API (EmailJS, etc.)
 - **Purpose**: Abstract authentication logic from presentation components
 - **Implementation**: Interface-based service with mock implementation
 - **API Methods**:
-  - `login(credentials)`: Authenticate user with email and password
-  - `register(userData)`: Register new user account
+  - `login(credentials)`: Authenticate user with email and password (rate limited)
+  - `register(userData)`: Register new user account (rate limited)
   - `logout()`: Clear current user session
   - `getCurrentUser()`: Get currently authenticated user
+  - `getLoginRateLimitStatus(email)`: Check rate limit status for login
+  - `getRegisterRateLimitStatus(email)`: Check rate limit status for register
+  - `resetLoginRateLimit(email)`: Reset rate limit for login (admin)
+  - `resetRegisterRateLimit(email)`: Reset rate limit for register (admin)
 - **Current Implementation**: Mock authentication (ready for real backend integration)
+- **Rate Limiting**:
+  - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
+  - **Register**: 5 attempts per 1 hour, 2 hour cooldown
+  - Per-email tracking to prevent brute force attacks
 - **Location**: `src/services/auth/AuthService.ts`
 - **Forms Using Service**: LoginForm, SignUpForm
 
@@ -381,13 +427,17 @@ External API (EmailJS, etc.)
 - **Configuration**:
   - **Email Limiter**: 5 attempts per 60s window, 5 minute cooldown
   - **Form Limiter**: 10 attempts per 1 hour window, 2 hour cooldown
+  - **Login Limiter** (AuthService): 5 attempts per 15 minutes, 30 minute cooldown
+  - **Register Limiter** (AuthService): 5 attempts per 1 hour, 2 hour cooldown
 - **Features**:
   - Per-identifier tracking (email, IP, user ID)
   - Automatic reset after window expires
   - Cooldown period after limit exceeded
   - Cleanup of expired records
+  - Independent tracking for different operations (login vs register)
 - **Error Handling**: Clear error messages with remaining time
 - **Location**: `src/utils/rateLimiter.ts`
+- **Services Using**: EmailService, AuthService
 
 #### 5. Service Abstraction
 
@@ -417,13 +467,14 @@ External API (EmailJS, etc.)
 
 - **Framework**: Next.js 15 (App Router)
 - **Deployment**: OpenNext for Cloudflare Workers
-- **UI Libraries**: Bootstrap 5, Swiper, Isotope
+- **UI Libraries**: Bootstrap 5 (CDN), Swiper, Isotope
 - **Forms**: React Hook Form, Yup validation
 - **Email**: EmailJS (via service abstraction with resilience patterns)
 - **Authentication**: AuthService (mock implementation with ready-to-use interfaces)
-- **Animations**: WOW.js, React Toastify
+- **Animations**: WOW.js, React Toastify (lazy loaded CSS)
 - **Data Filtering**: Custom utility functions with TypeScript generics
 - **Error Handling**: React Error Boundary with custom fallback UI
+- **CSS**: Bootstrap 5.3.2 (jsDelivr CDN), FontAwesome 6.7.2 (Cloudflare CDN)
 
 ## Error Handling Pattern
 
@@ -485,6 +536,87 @@ import ErrorBoundary from "@/components/common/ErrorBoundary";
     <PageContent />
 </ErrorBoundary>
 ```
+
+## CSS Optimization Patterns
+
+### Global CSS Loading (CDN)
+
+**Purpose**: Reduce build size, leverage CDN edge delivery, enable browser caching
+
+**Implementation**:
+- Bootstrap loaded from CDN instead of local files
+- FontAwesome loaded from CDN (Task 39)
+- Reduces bundle size significantly
+
+**Benefits**:
+- Build size reduction: 68% CSS reduction (323K → 103K)
+- CDN edge delivery: Faster load times from nearest edge location
+- Browser caching: Shared across all sites using same CDN URL
+- Reduced server bandwidth: CDN handles distribution
+
+**Implementation Example** (src/styles/index.scss):
+```scss
+// Bootstrap from CDN
+@import url("https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css");
+
+// FontAwesome from CDN
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css");
+```
+
+**Trade-offs**:
+- CDN dependency vs. self-hosted control
+- Offline availability: CDN assets not available if network fails
+- Versioning: Must manually update CDN URLs when upgrading
+
+### On-Demand CSS Loading
+
+**Purpose**: Load CSS only when needed to reduce initial page weight
+
+**Implementation**:
+- React Toastify CSS loaded dynamically via useEffect
+- CSS injected into document.head when ToastContainer mounts
+- Cleaned up on unmount
+
+**Benefits**:
+- Initial page load: Toastify CSS not loaded on first paint
+- On-demand: CSS loaded only when toast notifications are needed
+- Smaller initial bundle: Reduces critical CSS size
+
+**Implementation Example** (src/layouts/Wrapper.tsx):
+```typescript
+import { useEffect } from "react";
+
+const Wrapper = ({ children }: WrapperProps) => {
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "https://cdn.jsdelivr.net/npm/react-toastify@9.1.3/dist/ReactToastify.min.css";
+        link.id = "toastify-css";
+        document.head.appendChild(link);
+
+        return () => {
+            const existing = document.getElementById("toastify-css");
+            if (existing) {
+                document.head.removeChild(existing);
+            }
+        };
+    }, []);
+
+    return (
+        <ErrorBoundary>
+            {children}
+            <ScrollToTop />
+            <ToastContainer position="top-center" />
+        </ErrorBoundary>
+    );
+};
+```
+
+**Usage Guidelines**:
+- Use CDN loading for large, third-party CSS (Bootstrap, FontAwesome)
+- Use on-demand loading for CSS only needed after user interaction (Toastify, modals)
+- Keep critical CSS inline for above-the-fold content (future enhancement)
+- Test both online and offline scenarios for CDN dependencies
 
 ## Technical Constraints
 

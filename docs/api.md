@@ -413,6 +413,7 @@ All error responses follow the [Error Response Standards](#error-response-standa
 - **User ID**: Generated from email (`user_<email_sanitized>`)
 - **Name Extraction**: For login without name, extracted from email local part
 - **Error Messages**: Indonesian language for user-facing errors
+- **Rate Limiting**: Implemented for login/register (5 attempts per 15min/1hr, 30min/2hr cooldown)
 
 #### Future Integration: Real Backend
 
@@ -460,6 +461,65 @@ NEXT_PUBLIC_AUTH0_CLIENT_ID=<client_id>
 NEXT_PUBLIC_FIREBASE_API_KEY=<api_key>
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=<auth_domain>
 ```
+
+---
+
+### Rate Limiting
+
+**Current Status**: Rate limiting is implemented for login and register operations.
+
+**Configuration**:
+
+#### Login Rate Limiting
+- **Max Attempts**: 5 per 15 minutes (per email)
+- **Cooldown**: 30 minutes after limit exceeded
+- **Identifier**: User email address
+
+#### Register Rate Limiting
+- **Max Attempts**: 5 per 1 hour (per email)
+- **Cooldown**: 2 hours after limit exceeded
+- **Identifier**: User email address
+
+**Behavior**:
+- First 5 attempts: Allowed
+- Exceeding limit: Blocked with countdown message
+- Automatic reset after cooldown period
+
+**Error Response (Rate Limited)**:
+
+```json
+{
+    "success": false,
+    "error": "Terlalu banyak percobaan. Silakan coba lagi nanti."
+}
+```
+
+**Monitoring Rate Limit Status**:
+
+```typescript
+const loginStatus = authService.getLoginRateLimitStatus('user@example.com');
+console.log(`Attempts: ${loginStatus.count}`);
+console.log(`Remaining: ${loginStatus.attemptsRemaining}`);
+console.log(`Locked until: ${loginStatus.lockedUntil}`);
+
+const registerStatus = authService.getRegisterRateLimitStatus('user@example.com');
+console.log(`Attempts: ${registerStatus.count}`);
+console.log(`Remaining: ${registerStatus.attemptsRemaining}`);
+console.log(`Locked until: ${registerStatus.lockedUntil}`);
+```
+
+**Reset Rate Limit** (Admin Use):
+
+```typescript
+authService.resetLoginRateLimit('user@example.com');
+authService.resetRegisterRateLimit('user@example.com');
+```
+
+**Security Benefits**:
+- Prevents brute force attacks on login
+- Prevents account creation abuse on register
+- Automatic cooldown after limit exceeded
+- Per-email rate limiting (not IP-based)
 
 ---
 
@@ -514,13 +574,13 @@ if (logoutResult.success) {
 3. **Session Management**: In-memory only (localStorage/cookies required for persistence)
 4. **Token**: Mock token - implement real JWT in production
 5. **HTTPS Required**: Always use HTTPS for authentication in production
-6. **Rate Limiting**: Recommended for real backend (prevent brute force attacks)
+6. **Rate Limiting**: Implemented for login/register (prevent brute force attacks)
 
 ---
 
 ### Future Enhancements
 
-1. **Rate Limiting**: Add rate limiting for login/register attempts
+1. ~~**Rate Limiting**: Add rate limiting for login/register attempts~~ ✅ COMPLETED
 2. **Session Persistence**: Implement localStorage/cookie storage for sessions
 3. **Protected Routes**: Add route guards for authenticated pages
 4. **Password Reset**: Extend service with forgotPassword/resetPassword methods
@@ -553,6 +613,7 @@ interface ApiError {
 | 400 | "EmailJS credentials not configured" | No | Missing or invalid environment variables |
 | 400 | "Invalid email format" | No | Email validation failed |
 | 400 | "Missing required fields" | No | Form validation failed |
+| 429 | "Terlalu banyak percobaan. Silakan coba lagi nanti." | No | Rate limit exceeded (auth) |
 
 #### 2. Server Errors (5xx)
 

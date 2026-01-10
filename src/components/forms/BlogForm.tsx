@@ -1,8 +1,8 @@
 "use client"
-import { toast } from 'react-toastify';
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
+import { createBlogFormSchema } from '@/utils/formValidation';
+import { useFormSubmission } from '@/hooks/useFormSubmission';
 
 interface FormData {
    name: string;
@@ -10,22 +10,15 @@ interface FormData {
    message: string;
 }
 
-const schema = yup
-   .object({
-      name: yup.string().required().label("Nama"),
-      email: yup.string().required().email().label("Email"),
-      message: yup.string().required().label("Pesan"),
-   })
-   .required();
-
 const BlogForm = () => {
-
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = () => {
-      const notify = () => toast('Komentar berhasil dikirim', { position: 'top-center' });
-      notify();
-      reset();
-   };
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createBlogFormSchema()), });
+   
+   const { submit: onSubmit } = useFormSubmission(
+      async () => {
+         return { success: true, message: 'Komentar berhasil dikirim' };
+      },
+      { successMessage: 'Komentar berhasil dikirim', resetForm: reset }
+   );
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="comment-form" noValidate>
