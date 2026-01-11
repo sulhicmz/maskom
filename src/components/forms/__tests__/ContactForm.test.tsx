@@ -55,7 +55,7 @@ describe('ContactForm', () => {
   });
 
   it('calls emailService.sendEmail on successful submission', async () => {
-    mockSendEmail.mockResolvedValue({ success: true, text: 'OK' });
+    mockSendEmail.mockResolvedValue({ success: true, data: { text: 'OK' } });
     render(<ContactForm />);
 
     fireEvent.change(screen.getByPlaceholderText('Nama lengkap'), { target: { value: 'John Doe' } });
@@ -92,7 +92,7 @@ describe('ContactForm', () => {
   });
 
   it('shows success toast on successful submission', async () => {
-    mockSendEmail.mockResolvedValue({ success: true, text: 'OK' });
+    mockSendEmail.mockResolvedValue({ success: true, data: { text: 'OK' } });
     render(<ContactForm />);
 
     fireEvent.change(screen.getByPlaceholderText('Nama lengkap'), { target: { value: 'John Doe' } });
@@ -107,7 +107,7 @@ describe('ContactForm', () => {
   });
 
   it('shows error toast on rate limited submission', async () => {
-    mockSendEmail.mockResolvedValue({ success: false, error: 'Rate limited', rateLimited: true });
+    mockSendEmail.mockResolvedValue({ success: false, error: 'Rate limited', metadata: { rateLimited: true } });
     render(<ContactForm />);
 
     fireEvent.change(screen.getByPlaceholderText('Nama lengkap'), { target: { value: 'John Doe' } });
@@ -122,7 +122,7 @@ describe('ContactForm', () => {
   });
 
   it('resets form after successful submission', async () => {
-    mockSendEmail.mockResolvedValue({ success: true, text: 'OK' });
+    mockSendEmail.mockResolvedValue({ success: true, data: { text: 'OK' } });
     render(<ContactForm />);
 
     fireEvent.change(screen.getByPlaceholderText('Nama lengkap'), { target: { value: 'John Doe' } });
