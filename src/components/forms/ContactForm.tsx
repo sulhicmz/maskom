@@ -5,6 +5,8 @@ import { useRef } from 'react';
 import { emailService } from '@/services/email';
 import { createContactFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
+import FormField from './FormField';
+import LoadingButton from './LoadingButton';
 
 interface FormData {
    user_name: string;
@@ -40,62 +42,48 @@ const ContactForm = () => {
       <form ref={form} onSubmit={handleSubmit(sendEmail)} className="contact-form" noValidate>
          <div className="row">
             <div className="col-lg-6">
-               <div className="form-group">
-                  <label htmlFor="user_name" className="sr-only">Nama lengkap</label>
-                  <input
-                     type="text"
-                     {...register("user_name")}
-                     id="user_name"
-                     className="form-control"
-                     placeholder="Nama lengkap"
-                     aria-invalid={!!errors.user_name}
-                     aria-describedby="user_name_error"
-                  />
-                  <p id="user_name_error" className="form_error" role="alert">{errors.user_name?.message}</p>
-               </div>
+               <FormField
+                  id="user_name"
+                  label="Nama lengkap"
+                  type="text"
+                  placeholder="Nama lengkap"
+                  register={register("user_name")}
+                  error={errors.user_name}
+                  disabled={isSubmittingEmail}
+               />
             </div>
             <div className="col-lg-6">
-               <div className="form-group">
-                  <label htmlFor="user_email" className="sr-only">Email kantor</label>
-                  <input
-                     type="email"
-                     {...register("user_email")}
-                     id="user_email"
-                     className="form-control"
-                     placeholder="Email kantor"
-                     aria-invalid={!!errors.user_email}
-                     aria-describedby="user_email_error"
-                  />
-                  <p id="user_email_error" className="form_error" role="alert">{errors.user_email?.message}</p>
-               </div>
+               <FormField
+                  id="user_email"
+                  label="Email kantor"
+                  type="email"
+                  placeholder="Email kantor"
+                  register={register("user_email")}
+                  error={errors.user_email}
+                  disabled={isSubmittingEmail}
+               />
+            </div>
+            <div className="col-lg-12">
+               <FormField
+                  id="message"
+                  label="Tuliskan kebutuhan Anda"
+                  type="textarea"
+                  placeholder="Tuliskan kebutuhan Anda"
+                  register={register("message")}
+                  error={errors.message}
+                  disabled={isSubmittingEmail}
+                  rows={8}
+               />
             </div>
             <div className="col-lg-12">
                <div className="form-group">
-                  <label htmlFor="message" className="sr-only">Tuliskan kebutuhan Anda</label>
-                  <textarea
-                     {...register("message")}
-                     id="message"
-                     placeholder="Tuliskan kebutuhan Anda"
-                     className="form-control"
-                     cols={30}
-                     rows={8}
-                     aria-invalid={!!errors.message}
-                     aria-describedby="message_error"
-                  ></textarea>
-                  <p id="message_error" className="form_error" role="alert">{errors.message?.message}</p>
-               </div>
-            </div>
-            <div className="col-lg-12">
-               <div className="form-group">
-                  <button
-                     type="submit"
+                  <LoadingButton
                      className="theme-btn gradient-btn"
-                     disabled={isSubmittingEmail}
-                     aria-live="polite"
-                     aria-busy={isSubmittingEmail}
+                     isLoading={isSubmittingEmail}
+                     loadingText="Mengirim..."
                   >
-                     {isSubmittingEmail ? 'Mengirim...' : 'Kirim Pesan'}
-                  </button>
+                     Kirim Pesan
+                  </LoadingButton>
                </div>
             </div>
          </div>

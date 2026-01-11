@@ -25,7 +25,7 @@ const FooterOne = memo(({ style, style_2 }: ProfType) => {
                      <div className="footer-widget footer_about_widget mb-30 wow fadeInUp">
                         <div className="footer-content">
                            <div className="footer-logo mb-30">
-                              <Link href="/"><Image src={style_2 ? logo_3 : style ? logo_2 : logo_1} alt="Footer Logo" /></Link>
+                              <Link href="/"><Image src={style_2 ? logo_3 : style ? logo_2 : logo_1} alt="Maskom - Footer Logo" /></Link>
                            </div>
                            <p>Maskom adalah penyedia layanan konektivitas dan managed service yang membantu perusahaan di Indonesia membangun infrastruktur digital yang aman, stabil, dan mudah dikelola.</p>
                            <SocialLinks links={socialLinks} />
@@ -56,14 +56,28 @@ const FooterOne = memo(({ style, style_2 }: ProfType) => {
                        <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
                           <h4 className="footer-title">News & Update</h4>
                           <div className="newsletter-content">
-                             <div className="form-group mb-30">
-                                <input type="email" placeholder="enter your email" name="email" required />
-                                <button className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}>Subscribe</button>
-                             </div>
+                             <form className="form-group mb-30" onSubmit={(e) => e.preventDefault()}>
+                                <label htmlFor="footer_email" className="sr-only">Email address</label>
+                                <input
+                                   type="email"
+                                   id="footer_email"
+                                   placeholder="Masukkan email Anda"
+                                   name="email"
+                                   required
+                                   aria-label="Email untuk newsletter"
+                                />
+                                <button
+                                   type="submit"
+                                   className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}
+                                   aria-label="Subscribe ke newsletter"
+                                >
+                                   Subscribe
+                                </button>
+                             </form>
                              <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
                           </div>
                        </div>
-                     </div>
+                      </div>
                </div>
             </div>
          </div>

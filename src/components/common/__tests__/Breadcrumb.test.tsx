@@ -122,12 +122,13 @@ describe('Breadcrumb', () => {
     const { container } = render(<Breadcrumb title="Page" sub_title="Details" />);
 
     const list = container.querySelector('.ac-breadcrumb__list');
+    const link = list?.querySelector('a');
     const spans = list?.querySelectorAll('span');
-    
-    expect(spans?.[0]).toContainHTML('a');
-    expect(spans?.[0]).toHaveTextContent('Beranda');
-    expect(spans?.[1]).toHaveClass('dot');
-    expect(spans?.[2]).toHaveTextContent('Details');
+
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveTextContent('Beranda');
+    expect(spans?.[0]).toHaveClass('dot');
+    expect(spans?.[1]).toHaveTextContent('Details');
   });
 
   it('renders with proper column layout', () => {
@@ -165,7 +166,7 @@ describe('Breadcrumb', () => {
 
     const list = document.querySelector('.ac-breadcrumb__list');
     const spans = list?.querySelectorAll('span');
-    expect(spans?.[2]).toHaveTextContent('');
+    expect(spans?.[1]).toHaveTextContent('');
   });
 
   it('works with numeric homeLabel', () => {

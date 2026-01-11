@@ -5,6 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { authService } from '@/services/auth';
 import { createEmailPasswordSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
+import FormField from './FormField';
+import LoadingButton from './LoadingButton';
 
 interface FormData {
    email: string;
@@ -13,7 +15,7 @@ interface FormData {
 
 const LoginForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createEmailPasswordSchema()), });
-   
+
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
       async (data: FormData) => {
          return await authService.login({
@@ -26,42 +28,36 @@ const LoginForm = () => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="user-form" noValidate>
+         <FormField
+            id="login_email"
+            label="Email terdaftar"
+            type="email"
+            placeholder="nama@maskom.co.id"
+            register={register("email")}
+            error={errors.email}
+            disabled={isSubmitting}
+         />
+         <FormField
+            id="login_password"
+            label="Kata sandi"
+            type="password"
+            placeholder="Masukkan kata sandi"
+            register={register("password")}
+            error={errors.password}
+            disabled={isSubmitting}
+         />
          <div className="form-group">
-            <label htmlFor="login_email">Email terdaftar</label>
-            <input
-               id="login_email"
-               {...register("email")}
-               type="email"
-               className="form-control"
-               placeholder="nama@maskom.co.id"
-               aria-invalid={!!errors.email}
-               aria-describedby="login_email_error"
-               disabled={isSubmitting}
-            />
-            <p id="login_email_error" className="form_error" role="alert">{errors.email?.message}</p>
+            <LoadingButton
+               className="theme-btn style-one"
+               isLoading={isSubmitting}
+               loadingText="Masuk..."
+            >
+               Masuk sekarang
+            </LoadingButton>
          </div>
-            <div className="form-group">
-               <label htmlFor="login_password">Kata sandi</label>
-               <input
-                  id="login_password"
-                  type="password"
-                  {...register("password")}
-                  className="form-control"
-                  placeholder="Masukkan kata sandi"
-                  aria-invalid={!!errors.password}
-                  aria-describedby="login_password_error"
-                  disabled={isSubmitting}
-               />
-               <p id="login_password_error" className="form_error" role="alert">{errors.password?.message}</p>
-            </div>
-           <div className="form-group">
-              <button type="submit" className="theme-btn style-one" disabled={isSubmitting} aria-live="polite" aria-busy={isSubmitting}>
-                 {isSubmitting ? 'Masuk...' : 'Masuk sekarang'}
-              </button>
-           </div>
-           <div className="form-text text-center">
-              <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
-           </div>
+         <div className="form-text text-center">
+            <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
+         </div>
        </form>
    )
 }

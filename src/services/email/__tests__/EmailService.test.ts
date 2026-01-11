@@ -61,10 +61,9 @@ describe('EmailService', () => {
 
             const result = await emailServiceInstance.sendEmail(validParams);
 
-            expect(result).toEqual({
-                success: true,
-                text: 'OK'
-            });
+            expect(result.success).toBe(true);
+            expect(result.message).toBe('Email sent successfully');
+            expect(result.data).toEqual({ text: 'OK' });
             expect(mockEmailjsSend).toHaveBeenCalledWith(
                 'test_service_id',
                 'test_template_id',
@@ -84,10 +83,8 @@ describe('EmailService', () => {
 
             const result = await emailServiceInstance.sendEmail(validParams);
 
-            expect(result).toEqual({
-                success: true,
-                text: 'OK'
-            });
+            expect(result.success).toBe(true);
+            expect(result.data).toEqual({ text: 'OK' });
             expect(mockEmailjsSend).toHaveBeenCalledTimes(3);
             jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
         });
@@ -133,10 +130,8 @@ describe('EmailService', () => {
 
             const result = await emailServiceInstance.sendEmail(validParams);
 
-            expect(result).toEqual({
-                success: false,
-                error: 'Circuit breaker is open. Service temporarily unavailable.'
-            });
+            expect(result.success).toBe(false);
+            expect(result.error).toContain('Circuit breaker');
             jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
         });
 
@@ -185,7 +180,13 @@ describe('EmailService', () => {
 
             await emailServiceInstance.sendEmail(validParams);
 
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Email send failed:', 'Network error');
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                '[EmailService] sendEmail failed:',
+                expect.objectContaining({
+                    code: 'UNKNOWN_ERROR',
+                    message: 'Network error'
+                })
+            );
             consoleErrorSpy.mockRestore();
             jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
         });
@@ -218,10 +219,10 @@ describe('EmailService', () => {
 
             const result = await freshInstance.sendEmail(validParams);
 
-            expect(result).toEqual({
-                success: false,
-                error: 'EmailJS credentials not configured'
-            });
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('EmailJS credentials not configured');
+            expect(result.errorCode).toBe('CREDENTIALS_MISSING');
+            expect(result.metadata).toBeDefined();
 
             process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID = 'test_service_id';
             process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID = 'test_template_id';

@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { createBlogFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
+import FormField from './FormField';
+import LoadingButton from './LoadingButton';
 
 interface FormData {
    name: string;
@@ -12,8 +14,8 @@ interface FormData {
 
 const BlogForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createBlogFormSchema()), });
-   
-   const { submit: onSubmit } = useFormSubmission(
+
+   const { submit: onSubmit, isSubmitting } = useFormSubmission(
       async () => {
          return { success: true, message: 'Komentar berhasil dikirim' };
       },
@@ -25,29 +27,53 @@ const BlogForm = () => {
          <div className="row">
             <div className="col-lg-12">
                <div className="form_group">
-                  <label htmlFor="blog_name" className="sr-only">Nama lengkap</label>
-                  <input type="text" {...register("name")} id="blog_name" className="form-control" placeholder="Nama lengkap" aria-invalid={!!errors.name} aria-describedby="blog_name_error" />
-                  <p id="blog_name_error" className="form_error" role="alert">{errors.name?.message}</p>
+                  <FormField
+                     id="blog_name"
+                     label="Nama lengkap"
+                     type="text"
+                     placeholder="Nama lengkap"
+                     register={register("name")}
+                     error={errors.name}
+                     disabled={isSubmitting}
+                  />
                </div>
             </div>
             <div className="col-lg-12">
                <div className="form_group">
-                  <label htmlFor="blog_email" className="sr-only">Email kantor</label>
-                  <input type="email" {...register("email")} id="blog_email" className="form-control" placeholder="Email kantor" aria-invalid={!!errors.email} aria-describedby="blog_email_error" />
-                  <p id="blog_email_error" className="form_error" role="alert">{errors.email?.message}</p>
+                  <FormField
+                     id="blog_email"
+                     label="Email kantor"
+                     type="email"
+                     placeholder="Email kantor"
+                     register={register("email")}
+                     error={errors.email}
+                     disabled={isSubmitting}
+                  />
                </div>
             </div>
             <div className="col-lg-12">
                <div className="form_group">
-                  <label htmlFor="blog_message" className="sr-only">Tulis komentar Anda</label>
-                  <textarea {...register("message")} id="blog_message" className="form-control" rows={4}
-                     placeholder="Tulis komentar Anda" aria-invalid={!!errors.message} aria-describedby="blog_message_error"></textarea>
-                  <p id="blog_message_error" className="form_error" role="alert">{errors.message?.message}</p>
+                  <FormField
+                     id="blog_message"
+                     label="Tulis komentar Anda"
+                     type="textarea"
+                     placeholder="Tulis komentar Anda"
+                     register={register("message")}
+                     error={errors.message}
+                     disabled={isSubmitting}
+                     rows={4}
+                  />
                </div>
             </div>
             <div className="col-lg-12">
                <div className="form_group">
-                  <button type='submit' className="theme-btn gradient-btn">Kirim Komentar</button>
+                  <LoadingButton
+                     className="theme-btn gradient-btn"
+                     isLoading={isSubmitting}
+                     loadingText="Mengirim..."
+                  >
+                     Kirim Komentar
+                  </LoadingButton>
                </div>
             </div>
          </div>
