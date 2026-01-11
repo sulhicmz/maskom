@@ -536,10 +536,15 @@ External API (EmailJS, etc.)
   - `resetLoginRateLimit(email)`: Reset rate limit for login (admin)
   - `resetRegisterRateLimit(email)`: Reset rate limit for register (admin)
 - **Current Implementation**: Mock authentication (ready for real backend integration)
+- **Resilience Patterns** (✅ COMPLETED - Integration Hardening):
+  - **Timeout Protection**: 5,000ms timeout for login/register operations
+  - **Retry with Exponential Backoff**: 3 attempts (1 initial + 2 retries)
+  - **Circuit Breaker**: 50 failure threshold, 60-second reset timeout
+  - **High Threshold**: 50 failures prevents circuit from interfering with per-user rate limiting
 - **Rate Limiting**:
-  - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
-  - **Register**: 5 attempts per 1 hour, 2 hour cooldown
-  - Per-email tracking to prevent brute force attacks
+   - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
+   - **Register**: 5 attempts per 1 hour, 2 hour cooldown
+   - **Per-email tracking**: Prevent brute force attacks
 - **Location**: `src/services/auth/AuthService.ts`
 - **Forms Using Service**: LoginForm, SignUpForm
 

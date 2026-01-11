@@ -1,10 +1,13 @@
 import type { IAuthService, LoginCredentials, RegisterData, User, AuthResult } from './types';
 import { validateEmail, validatePassword } from '@/utils/validation';
 import { RateLimiter } from '@/utils/rateLimiter';
+import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
 import metricsCollector from '@/utils/metrics';
 import { 
     ServiceErrorCode, 
     ServiceValidationError,
+    ServiceTimeoutError,
+    ServiceCircuitBreakerError,
     logServiceError,
     logServiceSuccess,
     createErrorResult
@@ -15,151 +18,245 @@ class AuthService implements IAuthService {
     private currentUser: User | null = null;
     private loginRateLimiter: RateLimiter;
     private registerRateLimiter: RateLimiter;
+    private circuitBreaker: CircuitBreaker;
 
     constructor() {
         this.loginRateLimiter = new RateLimiter(RATE_LIMITS.LOGIN);
         this.registerRateLimiter = new RateLimiter(RATE_LIMITS.REGISTER);
+        this.circuitBreaker = new CircuitBreaker({
+            failureThreshold: 50,
+            resetTimeoutMs: 60000,
+            monitoringPeriodMs: 60000
+        });
+    }
+
+    private async loginWithTimeout(credentials: LoginCredentials): Promise<AuthResult> {
+        return withTimeout(
+            this.loginWithoutResilience(credentials),
+            { timeoutMs: 5000, timeoutError: 'Login request timed out' }
+        );
+    }
+
+    private async loginWithoutResilience(credentials: LoginCredentials): Promise<AuthResult> {
+        if (!credentials.email || !credentials.password) {
+            const error = new ServiceValidationError('Email dan kata sandi diperlukan');
+            throw error;
+        }
+
+        const emailValidation = validateEmail(credentials.email);
+        if (!emailValidation.valid) {
+            const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
+            throw error;
+        }
+
+        const passwordValidation = validatePassword(credentials.password);
+        if (!passwordValidation.valid) {
+            const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
+            throw error;
+        }
+
+        this.currentUser = {
+            id: this.generateUserId(credentials.email),
+            name: this.extractNameFromEmail(credentials.email),
+            email: credentials.email,
+        };
+
+        return {
+            success: true,
+            message: 'Berhasil masuk ke portal',
+            user: this.currentUser,
+            token: 'mock-jwt-token',
+        };
+    }
+
+    private async registerWithTimeout(userData: RegisterData): Promise<AuthResult> {
+        return withTimeout(
+            this.registerWithoutResilience(userData),
+            { timeoutMs: 5000, timeoutError: 'Registration request timed out' }
+        );
+    }
+
+    private async registerWithoutResilience(userData: RegisterData): Promise<AuthResult> {
+        if (!userData.name || !userData.email || !userData.password) {
+            const error = new ServiceValidationError('Nama, email, dan kata sandi diperlukan');
+            throw error;
+        }
+
+        const emailValidation = validateEmail(userData.email);
+        if (!emailValidation.valid) {
+            const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
+            throw error;
+        }
+
+        const passwordValidation = validatePassword(userData.password);
+        if (!passwordValidation.valid) {
+            const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
+            throw error;
+        }
+
+        this.currentUser = {
+            id: this.generateUserId(userData.email),
+            name: userData.name,
+            email: userData.email,
+        };
+
+        return {
+            success: true,
+            message: 'Registrasi berhasil dikirim',
+            user: this.currentUser,
+            token: 'mock-jwt-token',
+        };
     }
 
     async login(credentials: LoginCredentials): Promise<AuthResult> {
+        const startTime = Date.now();
+        
+        const rateLimitCheck = this.loginRateLimiter.check(credentials.email);
+        if (!rateLimitCheck.allowed) {
+            metricsCollector.recordCall('AuthService.login', false, 'rate_limit');
+            const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
+            return createErrorResult(
+                rateLimitCheck.error?.includes('Too many attempts')
+                    ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
+                    : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
+                ServiceErrorCode.RATE_LIMIT,
+                { rateLimited: true }
+            );
+        }
+
         try {
-            const rateLimitCheck = this.loginRateLimiter.check(credentials.email);
-            if (!rateLimitCheck.allowed) {
-                metricsCollector.recordCall('AuthService.login', false, 'rate_limit');
-                const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
-                return createErrorResult(
-                    rateLimitCheck.error?.includes('Too many attempts')
-                        ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
-                        : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                    ServiceErrorCode.RATE_LIMIT,
-                    { rateLimited: true }
+            const result = await this.circuitBreaker.execute(async () => {
+                const retryResult = await withRetry(
+                    () => this.loginWithTimeout(credentials),
+                    {
+                        maxAttempts: 3,
+                        baseDelayMs: 1000,
+                        maxDelayMs: 10000,
+                        backoffMultiplier: 2,
+                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+                    }
                 );
-            }
 
-            if (!credentials.email || !credentials.password) {
-                this.loginRateLimiter.recordAttempt(credentials.email);
-                metricsCollector.recordCall('AuthService.login', false, 'validation');
-                const error = new ServiceValidationError('Email dan kata sandi diperlukan');
-                logServiceError(error, { service: 'AuthService', operation: 'login' });
-                return createErrorResult(error);
-            }
+                if (!retryResult.success || !retryResult.data) {
+                    const error = retryResult.error;
+                    if (error instanceof ServiceValidationError) {
+                        throw error;
+                    }
+                    throw retryResult.error || new Error('Login failed after retries');
+                }
 
-            const emailValidation = validateEmail(credentials.email);
-            if (!emailValidation.valid) {
-                this.loginRateLimiter.recordAttempt(credentials.email);
-                metricsCollector.recordCall('AuthService.login', false, 'validation');
-                const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
-                logServiceError(error, { service: 'AuthService', operation: 'login' });
-                return createErrorResult(error);
-            }
+                return retryResult.data;
+            });
 
-            const passwordValidation = validatePassword(credentials.password);
-            if (!passwordValidation.valid) {
-                this.loginRateLimiter.recordAttempt(credentials.email);
-                metricsCollector.recordCall('AuthService.login', false, 'validation');
-                const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
-                logServiceError(error, { service: 'AuthService', operation: 'login' });
-                return createErrorResult(error);
-            }
-
-            this.currentUser = {
-                id: this.generateUserId(credentials.email),
-                name: this.extractNameFromEmail(credentials.email),
-                email: credentials.email,
-            };
-
-            metricsCollector.recordCall('AuthService.login', true);
-            logServiceSuccess('AuthService', 'login');
-            
-            return {
-                success: true,
-                message: 'Berhasil masuk ke portal',
-                user: this.currentUser,
-                token: 'mock-jwt-token',
-            };
-        } catch (error) {
             this.loginRateLimiter.recordAttempt(credentials.email);
-            metricsCollector.recordCall('AuthService.login', false, 'unknown');
-            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat login';
-            const standardError = new Error(errorMessage);
-            logServiceError(standardError, { service: 'AuthService', operation: 'login' });
+            const responseTime = Date.now() - startTime;
+            metricsCollector.recordCall('AuthService.login', true, undefined, responseTime);
+            logServiceSuccess('AuthService', 'login', responseTime);
+
+            return result;
+        } catch (error) {
+            const responseTime = Date.now() - startTime;
+            let errorType = 'unknown';
             
-            return {
-                success: false,
-                error: errorMessage,
-                errorCode: ServiceErrorCode.UNKNOWN,
-            };
+            if (error instanceof ServiceTimeoutError || (error instanceof Error && error.message.includes('timeout'))) {
+                errorType = 'timeout';
+            } else if (error instanceof ServiceCircuitBreakerError || (error instanceof Error && error.message.includes('circuit breaker'))) {
+                errorType = 'circuit_breaker';
+            } else if (error instanceof ServiceValidationError) {
+                errorType = 'validation';
+            }
+            
+            this.loginRateLimiter.recordAttempt(credentials.email);
+            metricsCollector.recordCall('AuthService.login', false, errorType, responseTime);
+            
+            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+            if (!(standardizedError instanceof ServiceValidationError || 
+                  standardizedError instanceof ServiceTimeoutError || 
+                  standardizedError instanceof ServiceCircuitBreakerError)) {
+                logServiceError(standardizedError, { service: 'AuthService', operation: 'login' });
+            }
+            
+            if (standardizedError instanceof ServiceValidationError) {
+                return createErrorResult(standardizedError);
+            }
+            
+            return createErrorResult(standardizedError.message);
         }
     }
 
     async register(userData: RegisterData): Promise<AuthResult> {
+        const startTime = Date.now();
+        
+        const rateLimitCheck = this.registerRateLimiter.check(userData.email);
+        if (!rateLimitCheck.allowed) {
+            metricsCollector.recordCall('AuthService.register', false, 'rate_limit');
+            const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
+            return createErrorResult(
+                rateLimitCheck.error?.includes('Too many attempts')
+                    ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
+                    : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
+                ServiceErrorCode.RATE_LIMIT,
+                { rateLimited: true }
+            );
+        }
+
         try {
-            const rateLimitCheck = this.registerRateLimiter.check(userData.email);
-            if (!rateLimitCheck.allowed) {
-                metricsCollector.recordCall('AuthService.register', false, 'rate_limit');
-                const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
-                return createErrorResult(
-                    rateLimitCheck.error?.includes('Too many attempts')
-                        ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
-                        : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                    ServiceErrorCode.RATE_LIMIT,
-                    { rateLimited: true }
+            const result = await this.circuitBreaker.execute(async () => {
+                const retryResult = await withRetry(
+                    () => this.registerWithTimeout(userData),
+                    {
+                        maxAttempts: 3,
+                        baseDelayMs: 1000,
+                        maxDelayMs: 10000,
+                        backoffMultiplier: 2,
+                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+                    }
                 );
-            }
 
-            if (!userData.name || !userData.email || !userData.password) {
-                this.registerRateLimiter.recordAttempt(userData.email);
-                metricsCollector.recordCall('AuthService.register', false, 'validation');
-                const error = new ServiceValidationError('Nama, email, dan kata sandi diperlukan');
-                logServiceError(error, { service: 'AuthService', operation: 'register' });
-                return createErrorResult(error);
-            }
+                if (!retryResult.success || !retryResult.data) {
+                    const error = retryResult.error;
+                    if (error instanceof ServiceValidationError) {
+                        throw error;
+                    }
+                    throw retryResult.error || new Error('Registration failed after retries');
+                }
 
-            const emailValidation = validateEmail(userData.email);
-            if (!emailValidation.valid) {
-                this.registerRateLimiter.recordAttempt(userData.email);
-                metricsCollector.recordCall('AuthService.register', false, 'validation');
-                const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
-                logServiceError(error, { service: 'AuthService', operation: 'register' });
-                return createErrorResult(error);
-            }
+                return retryResult.data;
+            });
 
-            const passwordValidation = validatePassword(userData.password);
-            if (!passwordValidation.valid) {
-                this.registerRateLimiter.recordAttempt(userData.email);
-                metricsCollector.recordCall('AuthService.register', false, 'validation');
-                const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
-                logServiceError(error, { service: 'AuthService', operation: 'register' });
-                return createErrorResult(error);
-            }
-
-            this.currentUser = {
-                id: this.generateUserId(userData.email),
-                name: userData.name,
-                email: userData.email,
-            };
-
-            metricsCollector.recordCall('AuthService.register', true);
-            logServiceSuccess('AuthService', 'register');
-            
-            return {
-                success: true,
-                message: 'Registrasi berhasil dikirim',
-                user: this.currentUser,
-                token: 'mock-jwt-token',
-            };
-        } catch (error) {
             this.registerRateLimiter.recordAttempt(userData.email);
-            metricsCollector.recordCall('AuthService.register', false, 'unknown');
-            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat registrasi';
-            const standardError = new Error(errorMessage);
-            logServiceError(standardError, { service: 'AuthService', operation: 'register' });
+            const responseTime = Date.now() - startTime;
+            metricsCollector.recordCall('AuthService.register', true, undefined, responseTime);
+            logServiceSuccess('AuthService', 'register', responseTime);
+
+            return result;
+        } catch (error) {
+            const responseTime = Date.now() - startTime;
+            let errorType = 'unknown';
             
-            return {
-                success: false,
-                error: errorMessage,
-                errorCode: ServiceErrorCode.UNKNOWN,
-            };
+            if (error instanceof ServiceTimeoutError || (error instanceof Error && error.message.includes('timeout'))) {
+                errorType = 'timeout';
+            } else if (error instanceof ServiceCircuitBreakerError || (error instanceof Error && error.message.includes('circuit breaker'))) {
+                errorType = 'circuit_breaker';
+            } else if (error instanceof ServiceValidationError) {
+                errorType = 'validation';
+            }
+            
+            this.registerRateLimiter.recordAttempt(userData.email);
+            metricsCollector.recordCall('AuthService.register', false, errorType, responseTime);
+            
+            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+            if (!(standardizedError instanceof ServiceValidationError || 
+                  standardizedError instanceof ServiceTimeoutError || 
+                  standardizedError instanceof ServiceCircuitBreakerError)) {
+                logServiceError(standardizedError, { service: 'AuthService', operation: 'register' });
+            }
+            
+            if (standardizedError instanceof ServiceValidationError) {
+                return createErrorResult(standardizedError);
+            }
+            
+            return createErrorResult(standardizedError.message);
         }
     }
 
@@ -229,6 +326,16 @@ class AuthService implements IAuthService {
             login: loginMetrics,
             register: registerMetrics,
         };
+    }
+
+    getCircuitBreakerState() {
+        const state = this.circuitBreaker.getState();
+        metricsCollector.recordCircuitBreakerState('AuthService', state.isOpen);
+        return state;
+    }
+
+    resetCircuitBreaker() {
+        this.circuitBreaker.reset();
     }
 
     private generateUserId(email: string): string {

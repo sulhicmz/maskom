@@ -5,6 +5,7 @@ describe('AuthService', () => {
     beforeEach(() => {
         authService.logout();
         authService.resetAllRateLimits();
+        authService.resetCircuitBreaker();
     });
 
     describe('login', () => {
