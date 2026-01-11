@@ -799,15 +799,16 @@ const Wrapper = ({ children }: WrapperProps) => {
 
 **Implementation**:
 - Webpack splitChunks configuration with multiple cache groups
-- Higher priority cache groups for specific libraries (forms, swiper)
+- Higher priority cache groups for specific libraries (forms, swiper, toastify, paginate, modalVideo, emailjs)
 - Async chunks (loaded only when needed)
 - reuseExistingChunk: true to prevent duplication
 
 **Benefits**:
-- Vendor bundle reduced from 270KB to 221KB (18.1% reduction)
-- Forms chunk (19KB) loaded only on pages with forms
-- Swiper chunk (24KB) loaded only on pages with carousels
-- 44KB savings on non-form pages (15-16% reduction)
+- Vendor bundle reduced from 226KB to 216KB (4.4% reduction, Task 83)
+- Forms chunk (60KB) loaded only on pages with forms
+- Swiper chunk (79KB) loaded only on pages with carousels
+- Toastify chunk (31KB) loaded only on pages with notifications
+- 10KB savings on most pages (3.8-4.4% reduction, Task 83)
 - Better cache hit ratio (smaller shared chunk)
 
 **Implementation Example** (next.config.ts):
@@ -833,11 +834,48 @@ cacheGroups: {
     priority: 10,
     reuseExistingChunk: true,
   },
+  toastify: {
+    test: /[\\/]node_modules[\\/]react-toastify[\\/]/,
+    name: 'toastify',
+    chunks: 'async',
+    priority: 10,
+    reuseExistingChunk: true,
+  },
+  paginate: {
+    test: /[\\/]node_modules[\\/]react-paginate[\\/]/,
+    name: 'paginate',
+    chunks: 'async',
+    priority: 10,
+    reuseExistingChunk: true,
+  },
+  modalVideo: {
+    test: /[\\/]node_modules[\\/]react-modal-video[\\/]/,
+    name: 'modal-video',
+    chunks: 'async',
+    priority: 10,
+    reuseExistingChunk: true,
+  },
+  emailjs: {
+    test: /[\\/]node_modules[\\/](@emailjs|emailjs-com)[\\/]/,
+    name: 'emailjs',
+    chunks: 'async',
+    priority: 10,
+    reuseExistingChunk: true,
+  },
 }
 ```
 
+**Task 83 Optimization** (Jan 2026):
+- Added 4 new cache groups (toastify, paginate, modalVideo, emailjs)
+- Vendor bundle: 226KB → 216KB = 10KB reduction (4.4%)
+- First Load JS: 229KB → 219KB = 10KB reduction (4.4%)
+- Home page: 239KB → 230KB = 9KB reduction (3.8%)
+- All 1795 tests passing, lint passed
+- Better user experience with faster page loads
+
 **Page-Level Improvements**:
-- **Non-Form Pages** (10 pages): 283KB → 239KB = -44KB (-15.5%)
+- **Non-Form Pages** (10 pages): 283KB → 239KB = -44KB (-15.5%, Task 73)
+- **Task 83 Additional Improvements**: 229KB → 219KB = -10KB (-4.4%)
 - **Form Pages** (3 pages): 285KB → 260KB = -25KB (-8.8%)
 - **Total Savings**: 440KB (non-form) + 75KB (form) = 515KB
 
