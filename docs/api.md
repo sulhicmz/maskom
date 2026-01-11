@@ -299,33 +299,6 @@ All error responses follow the [Error Response Standards](#error-response-standa
 }
 ```
 
-**503 Service Unavailable**
-
-```json
-{
-    "success": false,
-    "error": "Circuit breaker is open. Service temporarily unavailable."
-}
-```
-
-**408 Request Timeout**
-
-```json
-{
-    "success": false,
-    "error": "EmailJS request timed out"
-}
-```
-
-**502 Bad Gateway**
-
-```json
-{
-    "success": false,
-    "error": "Email send failed after retries"
-}
-```
-
 ---
 
 ### Resilience Configuration
@@ -741,6 +714,14 @@ console.log(`Locked until: ${registerStatus.lockedUntil}`);
 authService.resetLoginRateLimit('user@example.com');
 authService.resetRegisterRateLimit('user@example.com');
 ```
+
+**Reset All Rate Limits** (Admin Use):
+
+```typescript
+authService.resetAllRateLimits();
+```
+
+Warning: Manual reset should be used with caution in production.
 
 #### Get Circuit Breaker State
 

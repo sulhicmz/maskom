@@ -8,6 +8,103 @@
 
 ---
 
+## Task 78: API Documentation Update
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Documentation (API Documentation)
+
+**Problem**:
+- docs/api.md was missing documentation for `resetAllRateLimits()` method in AuthService
+- Duplicate error response sections existed in Email Service API documentation
+- Incomplete documentation could lead to confusion when using integration APIs
+- Missing admin method documentation could prevent proper rate limit management
+
+**Locations**:
+- `docs/api.md` - API documentation file with incomplete content
+
+**Solution**:
+1. **Added documentation for `resetAllRateLimits()` method** (AuthService):
+   - Documented method signature: `resetAllRateLimits(): void`
+   - Added usage example with warning about production use
+   - Clarified this method resets both login and register rate limiters
+   - Updated "Reset Rate Limit" section to include this new method
+
+2. **Removed duplicate error response sections** (Email Service):
+   - Removed duplicate "503 Service Unavailable" entry (simplified version without errorCode)
+   - Removed duplicate "408 Request Timeout" entry (simplified version without errorCode)
+   - Removed duplicate "502 Bad Gateway" entry (simplified version without errorCode)
+   - Kept only properly formatted error responses with errorCode and metadata
+
+**Documentation Updates**:
+- Added `resetAllRateLimits()` method documentation after individual reset methods
+- Included usage example: `authService.resetAllRateLimits()`
+- Added warning: "Manual reset should be used with caution in production."
+- Cleaned up duplicate error response blocks for Email Service
+
+**Architecture Benefits**:
+
+1. **Complete API Reference**: All methods now documented
+2. **Reduced Confusion**: No duplicate error response examples
+3. **Admin Capabilities**: Rate limit management methods documented
+4. **Self-Documenting**: API serves as complete reference for developers
+5. **Maintainability**: Single source of truth for all API behavior
+
+**Code Quality**:
+- Documentation follows existing markdown structure and formatting
+- Usage examples match actual implementation
+- Warning text clarifies production risks
+- Error response format consistent across all examples
+
+**Success Criteria**:
+- [x] `resetAllRateLimits()` method documented with usage example
+- [x] Duplicate error response sections removed (3 duplicates)
+- [x] Warning added for production use of reset methods
+- [x] All 1764 tests passing (100% success rate)
+- [x] Lint passed without errors
+- [x] Zero regressions in existing functionality
+- [x] Documentation format consistent with existing docs
+
+**Related Files**:
+- Modified: `docs/api.md` - Added resetAllRateLimits() documentation, removed duplicates
+
+**Testing**:
+- All 1764 tests passing (100% success rate)
+- Lint passed without errors (4 warnings about unused variables, unrelated)
+- Zero regressions in existing functionality
+- Documentation changes verified against implementation
+
+**Notes**:
+- Follows Integration Engineering principles:
+  - **Self-Documenting**: Complete API reference for all integration services
+  - **Consistency**: Unified format across all error responses and methods
+  - **Maintainability**: Single source of truth for API behavior
+- Documentation is now complete and up-to-date with implementation
+- Admin methods properly documented with production warnings
+- No duplicate content that could cause confusion
+
+**Impact**:
+- Developers now have complete reference for all API methods
+- Reduced confusion about error response formats
+- Rate limit management methods properly documented for admin operations
+- Documentation maintenance improved (single source of truth)
+
+**Future Enhancement Opportunities**:
+
+1. **OpenAPI Specification** - Generate OpenAPI spec from TypeScript interfaces
+    - Use tools like `swagger-jsdoc` to auto-generate OpenAPI spec
+    - Provide machine-readable API documentation
+    - Effort: Low (tooling available)
+    - Priority: Low (current documentation sufficient)
+
+2. **Interactive API Explorer** - Add embedded API playground
+    - Use Swagger UI or similar tool for interactive testing
+    - Allow developers to test APIs directly from documentation
+    - Effort: Medium (requires hosting and configuration)
+    - Priority: Low (benefits marginal for this codebase)
+
+---
+
 ## Task 75: Critical Path Testing - Home & About Components
 
 **Status**: ✅ Completed
