@@ -170,39 +170,37 @@ describe('AboutArea', () => {
   });
 
   describe('Animation Classes', () => {
-    it('should have fadeInDown animation on main image', () => {
+    it('should have fadeInDown animation on main image wrapper', () => {
       const { container } = render(<AboutArea />);
-      
-      const images = container.querySelectorAll('.col-lg-12 img');
-      images.forEach(img => {
-        expect(img).toHaveClass('wow');
-        expect(img).toHaveClass('fadeInDown');
+
+      const mainImageWrapper = container.querySelector('.col-lg-12 > div');
+      expect(mainImageWrapper).toHaveClass('wow');
+      expect(mainImageWrapper).toHaveClass('fadeInDown');
+    });
+
+    it('should have fadeInUp animation on smaller image wrappers', () => {
+      const { container } = render(<AboutArea />);
+
+      const smallerImageWrappers = container.querySelectorAll('.col-lg-6 > div');
+      smallerImageWrappers.forEach(wrapper => {
+        expect(wrapper).toHaveClass('wow');
+        expect(wrapper).toHaveClass('fadeInUp');
       });
     });
 
-    it('should have fadeInUp animation on smaller images', () => {
+    it('should have fadeInRight animation on content box wrapper', () => {
       const { container } = render(<AboutArea />);
-      
-      const images = container.querySelectorAll('.col-lg-6 img');
-      images.forEach(img => {
-        expect(img).toHaveClass('wow');
-        expect(img).toHaveClass('fadeInUp');
-      });
-    });
 
-    it('should have fadeInRight animation on content box', () => {
-      const { container } = render(<AboutArea />);
-      
-      const contentBox = container.querySelector('.about-one_content-box');
-      expect(contentBox).toHaveClass('wow');
-      expect(contentBox).toHaveClass('fadeInRight');
+      const contentBoxWrapper = container.querySelector('.col-xl-5 > div');
+      expect(contentBoxWrapper).toHaveClass('wow');
+      expect(contentBoxWrapper).toHaveClass('fadeInRight');
     });
   });
 
   describe('Spacing and Layout', () => {
     it('should have correct padding classes', () => {
       const { container } = render(<AboutArea />);
-      
+
       const section = container.querySelector('.about-section');
       expect(section).toHaveClass('pt-120');
       expect(section).toHaveClass('pb-65');
@@ -210,13 +208,13 @@ describe('AboutArea', () => {
 
     it('should have correct margin classes', () => {
       const { container } = render(<AboutArea />);
-      
+
       const imageBox = container.querySelector('.about-image-box');
       expect(imageBox).toHaveClass('mb-25');
-      
-      const images = container.querySelectorAll('.about-image-box img');
-      images.forEach(img => {
-        expect(img).toHaveClass('mb-25');
+
+      const imageWrappers = container.querySelectorAll('.col-lg-6 > div, .col-lg-12 > div');
+      imageWrappers.forEach(wrapper => {
+        expect(wrapper).toHaveClass('mb-25');
       });
       
       const sectionTitle = container.querySelector('.section-title');

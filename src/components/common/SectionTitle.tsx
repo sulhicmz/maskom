@@ -6,7 +6,7 @@ export interface SectionTitleProps {
    description?: string
    className?: string
    align?: "left" | "center" | "right"
-   animation?: "fadeInDown" | "fadeInUp" | "none"
+   animation?: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none"
    whiteText?: boolean
 }
 

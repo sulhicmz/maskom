@@ -2,6 +2,8 @@
 import { home_1_price } from "@/data/PriceData";
 import Link from "next/link";
 import { useState } from "react";
+import SectionTitle from "@/components/common/SectionTitle";
+import AnimationWrapper from "@/components/common/AnimationWrapper";
 
 const tab_title: string[] = ["Kontrak 12 Bulan", "Kontrak 36 Bulan"];
 
@@ -20,16 +22,20 @@ const Price = () => {
             <div className="container">
                <div className="row">
                   <div className="col-lg-12">
-                     <div className="section-title text-center title-white mb-50 wow fadeInDown">
-                        <span className="sub-title style-one">Paket Layanan</span>
-                        <h2>Pilih Skema Layanan Sesuai Kebutuhan Anda</h2>
-                        <p>Seluruh paket sudah termasuk instalasi, monitoring proaktif, dan dukungan engineer Maskom sesuai SLA yang disepakati.</p>
-                     </div>
+                     <SectionTitle 
+                        subtitle="Paket Layanan"
+                        title="Pilih Skema Layanan Sesuai Kebutuhan Anda"
+                        description="Seluruh paket sudah termasuk instalasi, monitoring proaktif, dan dukungan engineer Maskom sesuai SLA yang disepakati."
+                        align="center"
+                        whiteText={true}
+                        className="mb-50"
+                        animation="fadeInDown"
+                     />
                   </div>
                </div>
                <div className="row">
                   <div className="col-lg-12">
-                     <div className="pricing-tabs style-one text-center mb-40 wow fadeInUp">
+                     <AnimationWrapper animation="fadeInUp" className="pricing-tabs style-one text-center mb-40">
                         <ul className="nav nav-tabs">
                            {tab_title.map((tab, index) => (
                               <li key={index}>
@@ -39,12 +45,12 @@ const Price = () => {
                               </li>
                            ))}
                         </ul>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                </div>
                <div className="row">
                   <div className="col-lg-12">
-                      <div className="tab-content wow fadeInDown">
+                      <AnimationWrapper animation="fadeInDown" className="tab-content">
                          {home_1_price.map((items, index) => (
                            <div key={items.id} className={`tab-pane fade ${activeTab === index ? 'show active' : ''}`} id="all">
                               <div className="row">
@@ -78,8 +84,8 @@ const Price = () => {
                                  ))}
                               </div>
                            </div>
-                        ))}
-                     </div>
+                         ))}
+                      </AnimationWrapper>
                   </div>
                </div>
             </div>

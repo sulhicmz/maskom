@@ -8,6 +8,8 @@ import img_1 from "@/assets/images/contact/contact-4.jpg"
 import img_2 from "@/assets/images/contact/contact-5.jpg"
 import img_3 from "@/assets/images/contact/contact-6.jpg"
 import shape from "@/assets/images/contact/shape-1.png"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const ContactFormArea = () => {
    return (
@@ -15,22 +17,23 @@ const ContactFormArea = () => {
          <div className="container">
             <div className="row">
                <div className="col-xl-5">
-                  <div className="contact-one_image-box p-r z-1 mb-50 wow fadeInLeft">
+                  <AnimationWrapper animation="fadeInLeft" className="contact-one_image-box p-r z-1 mb-50">
                      <Image src={img_1} className="image-one"
                         alt="Contact Image" />
                      <Image src={img_2} className="image-two" alt="Contact Image" />
                      <Image src={img_3} className="image-three" alt="Contact Image" />
                      <Image src={shape} className="shape-one" alt="Contact Image" />
-                  </div>
+                  </AnimationWrapper>
                </div>
                <div className="col-xl-7">
-                  <div className="section-content-box mb-50 pl-xl-45 wow fadeInRight">
-                     <div className="section-title mb-30">
-                        <span className="sub-title style-one">Hubungi Maskom</span>
-                        <h2>Kami Siap Membantu <br /> Kebutuhan Jaringan Anda</h2>
-                     </div>
+                  <AnimationWrapper animation="fadeInRight" className="section-content-box mb-50 pl-xl-45">
+                     <SectionTitle 
+                        subtitle="Hubungi Maskom"
+                        title="Kami Siap Membantu Kebutuhan Jaringan Anda"
+                        className="mb-30"
+                     />
                      <ContactForm />
-                  </div>
+                  </AnimationWrapper>
                </div>
             </div>
          </div>

@@ -1,6 +1,8 @@
 import { home_1_process } from "@/data/ProcessData"
 import Image from "next/image"
 import React from "react"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const Process = React.memo(() => {
    return (
@@ -8,17 +10,20 @@ const Process = React.memo(() => {
          <div className="container">
             <div className="row">
                <div className="col-lg-12">
-                  <div className="section-title text-center mb-55 wow fadeInDown">
-                     <span className="sub-title style-one">Pendekatan Kami</span>
-                     <h2>Implementasi Cepat & Terukur</h2>
-                     <p>Maskom memastikan setiap fase berjalan kolaboratif bersama tim Anda, mulai dari asesmen, desain solusi, hingga pengelolaan harian.</p>
-                  </div>
+                  <SectionTitle 
+                     subtitle="Pendekatan Kami"
+                     title="Implementasi Cepat & Terukur"
+                     description="Maskom memastikan setiap fase berjalan kolaboratif bersama tim Anda, mulai dari asesmen, desain solusi, hingga pengelolaan harian."
+                     align="center"
+                     className="mb-55"
+                     animation="fadeInDown"
+                  />
                </div>
             </div>
             <div className="row justify-content-center">
                {home_1_process.map((item) => (
                   <div key={item.id} className="col-xl-4 col-md-6 col-sm-6">
-                     <div className="ac-process-item mb-40 wow fadeInUp">
+                     <AnimationWrapper animation="fadeInUp" className="ac-process-item mb-40">
                         <div className="process-inner-content">
                            <div className="thumbnail">
                               <Image src={item.img} alt="work image" />
@@ -29,7 +34,7 @@ const Process = React.memo(() => {
                               <p>{item.desc}</p>
                            </div>
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                ))}
             </div>

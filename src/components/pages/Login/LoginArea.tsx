@@ -6,6 +6,7 @@ const LoginForm = dynamic(() => import("@/components/forms/LoginForm"), {
 
 import login_img1 from "@/assets/images/gallery/robot.png"
 import login_img2 from "@/assets/images/gallery/base.png"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const LoginArea = () => {
    return (
@@ -13,18 +14,18 @@ const LoginArea = () => {
          <div className="container">
             <div className="row align-items-center">
                <div className="col-lg-6">
-                   <div className="signup-image-box p-r z-1 mb-50 wow fadeInLeft">
+                   <AnimationWrapper animation="fadeInLeft" className="signup-image-box p-r z-1 mb-50">
                       <Image src={login_img1} className="image-one" alt="Ilustrasi robot layanan digital Maskom" />
                       <Image src={login_img2} className="image-two" alt="Base ilustrasi platform digital" />
-                   </div>
+                   </AnimationWrapper>
                </div>
                <div className="col-lg-6">
-                  <div className="user-wrapper mb-50 wow fadeInRight">
+                  <AnimationWrapper animation="fadeInRight" className="user-wrapper mb-50">
                      <div className="form-title text-center mb-35">
                         <h3>Masuk ke portal pelanggan</h3>
                      </div>
                      <LoginForm />
-                  </div>
+                  </AnimationWrapper>
                </div>
             </div>
          </div>

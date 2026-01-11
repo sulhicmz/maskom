@@ -1,5 +1,7 @@
 import { about_feature } from "@/data/FeatureData"
 import React from "react"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const Feature = React.memo(() => {
    return (
@@ -7,21 +9,23 @@ const Feature = React.memo(() => {
          <div className="container">
             <div className="row align-items-center">
                <div className="col-lg-7">
-                  <div className="section-title mb-50 wow fadeInLeft">
-                     <span className="sub-title style-one">Nilai Utama</span>
-                     <h2>Fondasi Layanan Maskom</h2>
-                  </div>
+                  <SectionTitle 
+                     subtitle="Nilai Utama"
+                     title="Fondasi Layanan Maskom"
+                     className="mb-50"
+                     animation="fadeInLeft"
+                  />
                </div>
                <div className="col-lg-5">
-                  <div className="text-box text-end mb-50 wow fadeInRight">
+                  <AnimationWrapper animation="fadeInRight" className="text-box text-end mb-50">
                      <p>Kami berkomitmen menyediakan layanan yang proaktif, transparan, dan selalu siap berkembang mengikuti kebutuhan bisnis Anda.</p>
-                  </div>
+                  </AnimationWrapper>
                </div>
             </div>
             <div className="row justify-content-center">
                {about_feature.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
-                     <div className="iconic-info-box style-four mb-40 wow fadeInUp">
+                     <AnimationWrapper animation="fadeInUp" className="iconic-info-box style-four mb-40">
                         <div className="icon">
                            <i className={item.icon}></i>
                         </div>
@@ -29,7 +33,7 @@ const Feature = React.memo(() => {
                            <h5>{item.title}</h5>
                            <p>{item.desc}</p>
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                ))}
             </div>

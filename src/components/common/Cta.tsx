@@ -2,6 +2,8 @@ import cta_1 from "@/assets/images/gallery/robot2.png"
 import cta_2 from "@/assets/images/gallery/base2.png"
 import Image from "next/image"
 import Link from "next/link"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
+
 const Cta = () => {
    return (
       <section className="cta-section pb-120">
@@ -9,11 +11,11 @@ const Cta = () => {
             <div className="cta-wrapper_one">
                <div className="row align-items-center">
                   <div className="col-lg-6">
-                     <div className="cta-one_content-box wow fadeInLeft">
+                     <AnimationWrapper animation="fadeInLeft" className="cta-one_content-box">
                         <h2>Bangun Infrastruktur Digital yang Tangguh</h2>
                         <p>Maskom siap mendampingi perjalanan transformasi digital Anda mulai dari perencanaan hingga operasional sehari-hari.</p>
                         <Link href="/contact" className="theme-btn gradient-btn">Konsultasi dengan Kami</Link>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                    <div className="col-lg-6">
                       <div className="cta-one_image-box p-r z-1 text-xl-end">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import contact_data from "@/data/ContactData";
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const ContactArea = () => {
    return (
@@ -8,7 +9,7 @@ const ContactArea = () => {
             <div className="row justify-content-center">
                {contact_data.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
-                     <div className="iconic-info-box style-five mb-40 wow fadeInUp">
+                     <AnimationWrapper animation="fadeInUp" className="iconic-info-box style-five mb-40">
                         <div className="icon">
                            <i className={item.icon}></i>
                         </div>
@@ -25,7 +26,7 @@ const ContactArea = () => {
                               </p>
                            ))}
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                ))}
             </div>

@@ -2,6 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import SocialLinks from "@/components/common/SocialLinks"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 import { navigationSections, socialLinks } from "@/data/SocialMediaData"
 
 import logo from "@/assets/images/logo/blue-logo.png"
@@ -13,7 +14,7 @@ const FooterTwo = () => {
             <div className="footer-widget-area pb-45">
                <div className="row">
                   <div className="col-lg-4">
-                     <div className="footer-widget footer_about_widget mb-30 wow fadeInUp">
+                     <AnimationWrapper animation="fadeInUp" className="footer-widget footer_about_widget mb-30">
                         <div className="footer-content">
                            <div className="footer-logo mb-30">
                               <Link href="/"><Image src={logo} alt="Footer Logo" /></Link>
@@ -21,10 +22,10 @@ const FooterTwo = () => {
                            <p>Maskom mendukung transformasi digital dengan layanan konektivitas, keamanan jaringan, dan managed service yang andal untuk berbagai sektor industri.</p>
                            <SocialLinks links={socialLinks} />
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                   <div className="col-lg-5">
-                     <div className="footer-widget footer_widget_nav_menu wow fadeInDown">
+                     <AnimationWrapper animation="fadeInDown" className="footer-widget footer_widget_nav_menu">
                         <div className="row">
                            {navigationSections.map((section, index) => (
                               <div key={index} className="col-md-6">
@@ -41,21 +42,21 @@ const FooterTwo = () => {
                               </div>
                            ))}
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                    <div className="col-lg-3">
-                      <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
-                         <h4 className="footer-title">News & Update</h4>
-                         <div className="newsletter-content">
-                            <form onSubmit={(e) => e.preventDefault()}>
-                               <div className="form-group mb-30">
-                                  <input type="email" placeholder="enter your email" name="email" required />
-                                  <button className="theme-btn style-one">Subscribe</button>
-                               </div>
-                            </form>
-                            <p>Dapatkan insight terkini dari Maskom mengenai teknologi jaringan dan praktik terbaik pengelolaan infrastruktur.</p>
-                         </div>
-                      </div>
+                       <AnimationWrapper animation="fadeInUp" className="footer-widget footer-newsletter-widget mb-30">
+                          <h4 className="footer-title">News & Update</h4>
+                          <div className="newsletter-content">
+                             <form onSubmit={(e) => e.preventDefault()}>
+                                <div className="form-group mb-30">
+                                   <input type="email" placeholder="enter your email" name="email" required />
+                                   <button className="theme-btn style-one">Subscribe</button>
+                                </div>
+                             </form>
+                             <p>Dapatkan insight terkini dari Maskom mengenai teknologi jaringan dan praktik terbaik pengelolaan infrastruktur.</p>
+                          </div>
+                       </AnimationWrapper>
                    </div>
                 </div>
             </div>

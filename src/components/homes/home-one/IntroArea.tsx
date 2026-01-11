@@ -9,6 +9,8 @@ const VideoPopup = dynamic(() => import("@/modals/VideoPopup"), {
 })
 
 import video_thumb from "@/assets/images/gallery/video-1.svg"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const IntroArea = () => {
 
@@ -21,27 +23,28 @@ const IntroArea = () => {
                <div className="intro-wrapper">
                   <div className="row align-items-center">
                      <div className="col-xl-6">
-                        <div className="video-one_image-box p-r z-1 mb-50 wow fadeInLeft">
+                        <AnimationWrapper animation="fadeInLeft" className="video-one_image-box p-r z-1 mb-50">
                            <Image src={video_thumb} alt="video image" />
                            <div className="play-button">
                               <a onClick={() => setIsVideoOpen(true)} style={{ cursor: "pointer" }} className="video-popup"><i
                                  className="flaticon-play-button-arrowhead"></i></a>
                            </div>
-                        </div>
+                        </AnimationWrapper>
                      </div>
                      <div className="col-xl-6">
-                        <div className="section-content-box text-white mb-50 wow fadeInRight">
-                           <div className="section-title mb-55">
-                              <span className="sub-title style-one">Tentang Maskom</span>
-                              <h2>Partner Infrastruktur Digital <br /> Untuk Bisnis Anda</h2>
-                           </div>
+                        <AnimationWrapper animation="fadeInRight" className="section-content-box text-white mb-50">
+                           <SectionTitle 
+                              subtitle="Tentang Maskom"
+                              title="Partner Infrastruktur Digital Untuk Bisnis Anda"
+                              className="mb-55"
+                           />
                            <p>Sejak 2004 Maskom membantu perusahaan di Indonesia membangun konektivitas yang stabil, aman, dan mudah dikelola. Kami memadukan jaringan fiber, sistem keamanan, serta layanan managed service agar tim Anda fokus pada inovasi bisnis.</p>
                            <ul className="circle-list style-one">
                               <li>Engineer bersertifikasi yang siap melakukan deployment di seluruh nusantara.</li>
                               <li>Operasional jaringan dipantau dari Network Operation Center 24/7.</li>
                               <li>Model kerjasama fleksibel: sewa perangkat, managed service, hingga revenue sharing.</li>
                            </ul>
-                        </div>
+                        </AnimationWrapper>
                      </div>
                   </div>
                </div>

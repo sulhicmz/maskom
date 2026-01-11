@@ -6,6 +6,9 @@ import author from "@/assets/images/about/author-1.jpg"
 import signature from "@/assets/images/about/sign.png"
 
 import Image from "next/image"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
+
 const AboutArea = () => {
    return (
       <section className="about-section pt-120 pb-65">
@@ -15,23 +18,30 @@ const AboutArea = () => {
                   <div className="about-image-box mb-25">
                      <div className="row">
                         <div className="col-lg-12">
-                           <Image src={about_img1} className="mb-25 wow fadeInDown" alt="about image" />
+                           <AnimationWrapper animation="fadeInDown" className="mb-25">
+                              <Image src={about_img1} alt="about image" />
+                           </AnimationWrapper>
                         </div>
                         <div className="col-lg-6">
-                           <Image src={about_img2} className="mb-25 wow fadeInUp" alt="about image" />
+                           <AnimationWrapper animation="fadeInUp" className="mb-25">
+                              <Image src={about_img2} alt="about image" />
+                           </AnimationWrapper>
                         </div>
                         <div className="col-lg-6">
-                           <Image src={about_img3} className="mb-25 wow fadeInUp" alt="about image" />
+                           <AnimationWrapper animation="fadeInUp" className="mb-25">
+                              <Image src={about_img3} alt="about image" />
+                           </AnimationWrapper>
                         </div>
                      </div>
                   </div>
                </div>
                <div className="col-xl-5">
-                  <div className="section-content-box about-one_content-box wow fadeInRight">
-                     <div className="section-title mb-50">
-                        <span className="sub-title style-one">Tentang Kami</span>
-                        <h2>Menghubungkan Bisnis Indonesia Sejak 2004</h2>
-                     </div>
+                  <AnimationWrapper animation="fadeInRight" className="section-content-box about-one_content-box">
+                     <SectionTitle 
+                        subtitle="Tentang Kami"
+                        title="Menghubungkan Bisnis Indonesia Sejak 2004"
+                        className="mb-50"
+                     />
                      <p>Maskom berdiri dengan visi menghadirkan infrastruktur digital yang andal untuk mendukung pertumbuhan bisnis. Kami memadukan jaringan fiber optik, radio, hingga konektivitas cloud untuk memastikan data penting perusahaan bergerak dengan aman dan cepat.</p>
                      <p>Didukung tim engineer berpengalaman, Maskom menyediakan layanan konsultasi, implementasi, hingga pengelolaan harian melalui Network Operation Center. Pendekatan kami selalu kolaboratif agar solusi yang dihadirkan selaras dengan strategi teknologi informasi setiap organisasi.</p>
                      <div className="author-card d-flex align-items-center justify-content-between">
@@ -48,7 +58,7 @@ const AboutArea = () => {
                            <Image src={signature} alt="author sign" />
                         </div>
                      </div>
-                  </div>
+                  </AnimationWrapper>
                </div>
             </div>
          </div>
