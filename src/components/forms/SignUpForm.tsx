@@ -20,7 +20,8 @@ const SignUpForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createSignUpFormSchema()), });
 
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
-      async (data: FormData) => {
+      async (data?: FormData) => {
+         if (!data) return { success: false, error: 'Invalid form data' };
          return await authService.register({
             name: data.name,
             email: data.email,

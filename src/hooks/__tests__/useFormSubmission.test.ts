@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useFormSubmission, ServiceResult } from '../useFormSubmission';
+import { useFormSubmission, type BaseResult } from '../useFormSubmission';
 
 jest.mock('react-toastify', () => ({
   toast: jest.fn(() => ({ __t: Date.now() })),
 }));
 
-type TestServiceResult = ServiceResult & { message?: string };
+type TestBaseResult = BaseResult & { message?: string };
 
 const mockToast = require('react-toastify').toast;
 
@@ -20,7 +20,7 @@ describe('useFormSubmission', () => {
 
     describe('submit function - happy path', () => {
         it('should handle successful submission with success message', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: true,
                 message: 'Success!',
@@ -52,7 +52,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle successful submission without success message', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: true,
                 message: 'Service message',
@@ -74,7 +74,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle successful submission without message', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: true,
             });
@@ -95,7 +95,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle successful submission without callbacks', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: true,
             });
@@ -118,7 +118,7 @@ describe('useFormSubmission', () => {
 
     describe('submit function - error path', () => {
         it('should handle service failure with error message', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: false,
                 error: 'Service error',
@@ -143,7 +143,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle service failure with default error message', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: false,
             });
@@ -164,7 +164,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle service failure without callbacks', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: false,
                 error: 'Error',
@@ -188,10 +188,10 @@ describe('useFormSubmission', () => {
 
     describe('submit function - rate limited path', () => {
         it('should handle rate limited submission with custom error', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: false,
-                rateLimited: true,
+                metadata: { rateLimited: true },
                 error: 'Too many requests',
             });
             const onError = jest.fn();
@@ -202,7 +202,7 @@ describe('useFormSubmission', () => {
 
             await act(async () => {
                 const resultData = await result.current.submit({ test: 'data' });
-                expect(resultData).toEqual({ success: false, rateLimited: true, error: 'Too many requests' });
+                expect(resultData).toEqual({ success: false, metadata: { rateLimited: true }, error: 'Too many requests' });
             });
 
             await waitFor(() => {
@@ -214,10 +214,10 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle rate limited submission with default message', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: false,
-                rateLimited: true,
+                metadata: { rateLimited: true },
             });
 
             const { result } = renderHook(() =>
@@ -238,7 +238,7 @@ describe('useFormSubmission', () => {
 
     describe('isSubmitting state', () => {
         it('should set isSubmitting to true during submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockImplementation(
                 () => new Promise((resolve) => setTimeout(() => resolve({ success: true }), 100))
             );
@@ -247,7 +247,7 @@ describe('useFormSubmission', () => {
                 useFormSubmission(mockServiceCall)
             );
 
-            let submitPromise: Promise<ServiceResult>;
+            let submitPromise: Promise<BaseResult>;
             act(() => {
                 submitPromise = result.current.submit({ test: 'data' });
             });
@@ -262,7 +262,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should reset isSubmitting to false after successful submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({ success: true });
 
             const { result } = renderHook(() =>
@@ -279,7 +279,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should reset isSubmitting to false after failed submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({ success: false });
 
             const { result } = renderHook(() =>
@@ -296,7 +296,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should reset isSubmitting to false after error', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockRejectedValue(new Error('Network error'));
 
             const { result } = renderHook(() =>
@@ -315,7 +315,7 @@ describe('useFormSubmission', () => {
 
     describe('callbacks', () => {
         it('should call onSuccess callback on successful submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({ success: true, message: 'Success' });
             const onSuccess = jest.fn();
 
@@ -331,7 +331,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should call onError callback on failed submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
             mockServiceCall.mockResolvedValue({ success: false, error: 'Error' });
             const onError = jest.fn();
 
@@ -347,8 +347,8 @@ describe('useFormSubmission', () => {
         });
 
         it('should call onError callback on rate limited submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestServiceResult>>;
-            mockServiceCall.mockResolvedValue({ success: false, rateLimited: true, error: 'Rate limited' });
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<TestBaseResult>>;
+            mockServiceCall.mockResolvedValue({ success: false, metadata: { rateLimited: true }, error: 'Rate limited' });
             const onError = jest.fn();
 
             const { result } = renderHook(() =>
@@ -363,7 +363,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should call resetForm callback on successful submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({ success: true });
             const resetForm = jest.fn();
 
@@ -379,7 +379,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should not call resetForm on failed submission', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({ success: false });
             const resetForm = jest.fn();
 
@@ -396,13 +396,13 @@ describe('useFormSubmission', () => {
     });
 
     describe('type safety', () => {
-        it('should accept typed data and return ServiceResult', async () => {
+        it('should accept typed data and return BaseResult', async () => {
             interface TestData {
                 name: string;
                 email: string;
             }
 
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: TestData) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data?: TestData) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: true,
             });
@@ -422,7 +422,7 @@ describe('useFormSubmission', () => {
 
     describe('edge cases', () => {
         it('should handle empty options', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({ success: true });
 
             const { result } = renderHook(() =>
@@ -441,7 +441,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle service call rejection', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockRejectedValue(new Error('Network error'));
 
             const { result } = renderHook(() =>
@@ -460,7 +460,7 @@ describe('useFormSubmission', () => {
         });
 
         it('should handle undefined properties in return value from service', async () => {
-            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<ServiceResult>>;
+            const mockServiceCall = jest.fn() as jest.MockedFunction<(data: unknown) => Promise<BaseResult>>;
             mockServiceCall.mockResolvedValue({
                 success: true,
             });

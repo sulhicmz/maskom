@@ -17,7 +17,8 @@ const LoginForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createEmailPasswordSchema()), });
 
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
-      async (data: FormData) => {
+      async (data?: FormData) => {
+         if (!data) return { success: false, error: 'Invalid form data' };
          return await authService.login({
             email: data.email,
             password: data.password,
