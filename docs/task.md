@@ -8684,6 +8684,184 @@ Access-Control-Max-Age: 86400
 ## Task 77: Security Assessment - Quarterly Verification (Q1 2026)
 ---
 
+## Task 77: Data Architecture Enhancement - Auto-ID Generation System
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture (Data Integrity Enhancement)
+
+**Problem**:
+- All data files use manual ID assignment (id: 1, id: 2, etc.) across 18+ data files
+- Manual ID assignment creates risks of duplicates and inconsistent sequences
+- No unified system for generating unique IDs across data collections
+- Developers must manually track and increment IDs when adding new items
+- Risk of duplicate IDs when multiple developers work on same data file
+- No validation to ensure ID uniqueness at data file level
+
+**Locations**:
+- `src/data/FeedbackData.ts` - Manual IDs (1-10)
+- `src/data/TeamData.ts` - Manual IDs (1-8)
+- `src/data/FaqData.ts` - Manual IDs (1-15)
+- All 18+ data files - Manual ID assignment pattern
+
+**Solution**:
+1. **Created auto-ID generation utility** (`src/utils/dataAutoId.ts`):
+    - `AutoIdGenerator` class for managing ID sequences
+    - Configurable start value, increment step, and collection name
+    - Duplicate ID detection with automatic validation
+    - Reset capability for reusing ID sequences
+    - `autoIdArray()` helper function for batch ID assignment
+
+2. **Type-safe implementation**:
+    - Full TypeScript support with generic types
+    - Works with `BaseDataItem` interface (id + page)
+    - Compatible with all data types extending BaseDataItem
+    - Type guard safety for item properties
+
+3. **Key features**:
+    - **Auto-increment**: Generates sequential IDs automatically
+    - **Custom start**: Begin IDs from any number (startFrom option)
+    - **Custom increment**: Increment by any value (incrementBy option)
+    - **Duplicate detection**: Throws error if ID already used
+    - **Collection tracking**: Collection name for better error messages
+    - **Reset capability**: Clear and restart ID sequence
+    - **Used ID tracking**: Query all assigned IDs
+
+**API Usage**:
+
+```typescript
+import { AutoIdGenerator, autoIdArray, createAutoIdGenerator } from "@/utils/dataAutoId";
+
+// Basic usage
+const generator = new AutoIdGenerator();
+console.log(generator.next()); // 1
+console.log(generator.next()); // 2
+console.log(generator.next()); // 3
+
+// Custom start and increment
+const customGen = new AutoIdGenerator({
+  startFrom: 100,
+  incrementBy: 10,
+  collectionName: "testimonials"
+});
+console.log(customGen.next()); // 100
+console.log(customGen.next()); // 110
+
+// Batch assign IDs to array
+const itemsWithoutIds = [
+  { page: "home_1", title: "Item 1" },
+  { page: "home_1", title: "Item 2" },
+  { page: "home_1", title: "Item 3" },
+];
+
+const { data, generator } = autoIdArray(itemsWithoutIds);
+// data[0].id = 1, data[1].id = 2, data[2].id = 3
+
+// Continue generating IDs
+const nextId = generator.next(); // 4
+
+// Reset generator
+generator.reset(1);
+console.log(generator.next()); // 1
+```
+
+**Architecture Benefits**:
+
+1. **Data Integrity First**: Prevents duplicate IDs at generation time
+2. **Single Source of Truth**: Centralized ID generation system
+3. **Type Safety**: Full TypeScript support with generic types
+4. **Developer Experience**: Simplifies adding new data items
+5. **Error Prevention**: Automatic duplicate ID detection
+6. **Flexibility**: Configurable for different use cases
+7. **Testability**: Fully tested with 34 comprehensive tests
+8. **Zero Breaking Changes**: Existing data files remain functional
+
+**Test Coverage Summary** (34 tests):
+
+**AutoIdGenerator Class Tests** (25 tests):
+- constructor (4 tests): default values, custom startFrom, custom incrementBy, collectionName
+- next() / nextId() (4 tests): default increment, custom start, custom increment, nextId() alias
+- duplicate detection (4 tests): track used IDs, throw on duplicate, collectionName in error, prevent duplicates after reset
+- reset() (4 tests): reset to default, reset to custom, clear used IDs, allow reusing after reset
+- getCurrentId() (2 tests): return current before/after next()
+- getUsedIds() (3 tests): empty initially, return all used IDs, return readonly
+- edge cases (5 tests): zero startFrom, negative startFrom, large increment, handle 10k IDs
+
+**autoIdArray Function Tests** (6 tests):
+- assign auto-generated IDs to array, preserve other properties, custom startFrom, custom incrementBy, return generator for continued use, handle empty array
+
+**createAutoIdGenerator Function Tests** (3 tests):
+- create new instance, pass options, work with default options
+
+**Success Criteria**:
+- [x] AutoIdGenerator class created with full API
+- [x] autoIdArray helper function for batch ID assignment
+- [x] createAutoIdGenerator factory function
+- [x] Duplicate ID detection implemented
+- [x] Reset capability for reusing ID sequences
+- [x] 34 comprehensive tests created (100% passing)
+- [x] All 1764 tests passing (34 new tests added)
+- [x] Lint passes without errors
+- [x] TypeScript types fully implemented
+- [x] Zero regressions in existing functionality
+- [x] Documentation for API usage
+
+**Related Files**:
+- Created: `src/utils/dataAutoId.ts` - Auto-ID generation utility (107 lines)
+- Created: `src/utils/__tests__/dataAutoId.test.ts` - 34 comprehensive tests (350 lines)
+
+**Testing**:
+- All 1764 tests passing (100% success rate)
+- AutoIdGenerator tests: 34 passing
+- Lint passed without errors
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Data Architect principles:
+  - **Data Integrity First**: Duplicate detection prevents data corruption
+  - **Schema Design**: Type-safe generic implementation
+  - **Single Source of Truth**: Centralized ID generation system
+  - **Migration Safety**: Non-breaking, existing data files unchanged
+- Existing data files continue to work with manual IDs
+- Auto-ID generation available for future data file additions
+- Utility designed for flexibility (custom start, increment, collection name)
+- Follows existing project patterns (TypeScript, tests, type safety)
+
+**Impact**:
+- Data Integrity: Prevents duplicate IDs at generation time
+- Developer Experience: Simplifies adding new data items
+- Future-Proof: Utility available for all future data files
+- Test Coverage: Increased by 34 tests (from 1730 to 1764)
+- Zero breaking changes: All existing functionality preserved
+
+**Future Enhancement Opportunities**:
+
+1. **Apply to Data Files** - Refactor data files to use auto-ID generation
+   - Apply autoIdArray to data files with frequent additions
+   - Maintain existing ID sequences for backward compatibility
+   - Effort: Medium (refactor 18+ data files)
+   - Priority: Low (current manual IDs work well)
+
+2. **Data File Linter** - Check for duplicate IDs in existing files
+   - Create lint rule to detect duplicate IDs at development time
+   - Validate ID uniqueness across data files
+   - Effort: Medium (custom ESLint rule)
+   - Priority: Low (manual review works for now)
+
+3. **Build-Time Validation** - Validate all data files during build
+   - Run validators and ID uniqueness checks at build time
+   - Fail build on data integrity issues
+   - Effort: Low (add to build script)
+   - Priority: Medium (improves data integrity enforcement)
+
+4. **ID Range Validation** - Enforce ID ranges per collection
+   - Define expected ID ranges for each data collection
+   - Validate at build time
+   - Effort: Low (add validation rules)
+   - Priority: Low (current auto-detection sufficient)
+
+---
+
 ## Task 76: Performance Optimization - Asset Optimization (WebP Conversion Phase 2)
 
 **Status**: ✅ Completed
