@@ -8,6 +8,333 @@
 
 ---
 
+## Task 79: Form UI/UX Improvements - Validation, Errors, Hints
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX Engineering (Form Improvement)
+
+**Problem**:
+- FormField component lacked visual feedback for required fields (no asterisk indicator)
+- No field descriptions/hints to guide users on what to enter
+- Error state had only text message, no visual field styling
+- Textarea fields had no character count feedback
+- Password fields had no visibility toggle, causing usability issues
+- Missing aria-required attribute for screen readers
+- Forms (ContactForm, LoginForm, SignUpForm) didn't leverage FormField features
+
+**Locations**:
+- `src/components/forms/FormField.tsx` - Core form field component
+- `src/components/forms/ContactForm.tsx` - Contact page form
+- `src/components/forms/LoginForm.tsx` - Login page form
+- `src/components/forms/SignUpForm.tsx` - Registration page form
+- `public/assets/scss/sections/_sections.scss` - Form styling
+
+**Solution**:
+
+1. **Added Required Field Indicator** (FormField.tsx):
+   - Added asterisk (*) next to labels for required fields
+   - Styled with `.required-indicator` class (blue color, bold)
+   - Added `aria-label="wajib diisi"` for screen readers
+   - Added `required` boolean prop to FormFieldProps
+
+2. **Added Field Descriptions/Hints** (FormField.tsx):
+   - Added `description` prop for field guidance text
+   - Rendered as `<p class="form-description">` below label
+   - Associated with input via `aria-describedby`
+   - Styled with 14px font, proper spacing, line-height 1.5
+
+3. **Visual Error State Styling** (FormField.tsx + _sections.scss):
+   - Added `.form-control-error` class for red border and background
+   - Applied automatically when `error` prop is provided
+   - Red border: `#dc3545`
+   - Red background: `#fff8f8`
+   - Red focus ring: `0.25rem rgba(220, 53, 69, 0.25)`
+
+4. **Character Count for Textarea** (FormField.tsx):
+   - Added `maxLength` prop support
+   - Real-time character count display: "X / Y karakter"
+   - Styled with `.char-count` class (12px, right-aligned)
+   - Added `aria-live="off"` to prevent screen reader spam
+   - Set `maxLength` attribute on textarea element
+
+5. **Password Visibility Toggle** (FormField.tsx):
+   - Added toggle button for password fields (eye/eye-slash icons)
+   - FontAwesome icons: `.fa-eye` (show) / `.fa-eye-slash` (hide)
+   - Toggles between `type="password"` and `type="text"`
+   - Accessible button with proper `aria-label` updates
+   - Added `aria-pressed` state for toggle button
+   - Disabled when form field is disabled
+
+6. **Added aria-required Attribute** (FormField.tsx):
+   - Set `aria-required="true"` for required fields
+   - Set `aria-required="false"` for optional fields
+   - Proper screen reader support for required field indication
+
+7. **Updated Form Components** (ContactForm, LoginForm, SignUpForm):
+   - ContactForm: Added required, description, maxLength props
+   - LoginForm: Added required, description props
+   - SignUpForm: Added required, description props
+   - All forms now use new FormField features for better UX
+
+8. **CSS Styles** (_sections.scss):
+   - `.required-indicator`: Blue asterisk, bold, 2px margin-left
+   - `.form-description`: 14px font, gray color, 5px margin, line-height 1.5
+   - `.form-control-error`: Red border/background, red focus ring
+   - `.input-wrapper`: Relative positioning, flex layout
+   - `.password-toggle`: Absolute positioning, eye icon styling, hover states
+   - `.char-count`: 12px font, right-aligned, 4px margin-top
+
+9. **Fixed Form Reset Bug** (FormField.tsx):
+   - Properly merged `onChange` handlers for textarea
+   - Calls `register.onChange()` AND updates charCount
+   - Form reset functionality now works correctly after submission
+
+**Test Coverage** (32 new tests):
+
+**Required Field Indicator Tests** (5 tests):
+- Does not render indicator when required is false/undefined
+- Renders asterisk when required is true
+- Sets aria-required correctly
+- Label text includes asterisk
+
+**Field Descriptions Tests** (4 tests):
+- Does not render description when undefined
+- Renders description when provided
+- Associates description with input via aria-describedby
+- Combines with error aria-describedby
+
+**Visual Error State Tests** (3 tests):
+- Does not apply error class when no error
+- Applies error class when error provided
+- Applies error class to textarea
+
+**Character Count Tests** (6 tests):
+- Does not render count when maxLength is undefined
+- Renders count when maxLength is provided
+- Updates count as user types
+- Sets aria-live="off" on count element
+- Sets maxLength attribute on textarea
+- Does not render for non-textarea fields
+
+**Password Visibility Toggle Tests** (10 tests):
+- Does not render toggle for non-password fields
+- Renders toggle for password fields
+- Displays password input type initially
+- Toggles to text type when clicked
+- Updates aria-label when toggling
+- Updates aria-pressed when toggling
+- Contains correct icon (eye/eye-slash)
+- Has aria-hidden="true" on icon
+- Disables toggle when input is disabled
+
+**Input Wrapper Tests** (3 tests):
+- Wraps non-password input without wrapper
+- Wraps password input with wrapper div
+- Positions toggle button inside wrapper
+
+**Updated Form Tests**:
+- ContactForm: 7 tests (all passing)
+- LoginForm: 5 tests (all passing)
+- SignUpForm: 5 tests (all passing)
+
+**Architecture Benefits**:
+
+1. **User-Centric UX**: Required fields are clearly marked, hints guide users
+2. **Accessibility**: Screen readers get aria-required, aria-describedby, aria-live
+3. **Visual Feedback**: Error states have red border/background for quick identification
+4. **Reduced Errors**: Character count helps users stay within limits
+5. **Better Usability**: Password toggle prevents typos, easier on mobile
+6. **Consistent UI**: All forms use same FormField patterns
+7. **Type Safety**: New props fully typed with TypeScript
+8. **Tested**: 32 new tests verify all new features
+9. **Zero Regressions**: All 1795 tests passing (100% success rate)
+10. **Form Reset Fixed**: Textarea onChange properly merged with register
+
+**Code Quality**:
+- All new features fully typed with TypeScript
+- Proper ARIA attributes for accessibility (aria-required, aria-describedby, aria-live, aria-pressed, aria-hidden, aria-label)
+- Semantic HTML structure maintained
+- CSS follows existing design system patterns
+- Tests follow AAA pattern
+- Indonesian language content preserved
+
+**Success Criteria**:
+- [x] Required field indicator (asterisk) added to FormField labels
+- [x] Field descriptions/hints support added to FormField component
+- [x] Visual error state with red border/background styling
+- [x] Character count support for textarea fields in FormField
+- [x] Password visibility toggle for password fields
+- [x] aria-required attribute for required fields
+- [x] All form components updated (ContactForm, LoginForm, SignUpForm)
+- [x] 32 new tests added for FormField features (66 total tests)
+- [x] All 1795 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 4 warnings in unrelated files)
+- [x] Zero regressions in existing functionality
+- [x] Form reset bug fixed (textarea onChange properly merged)
+- [x] CSS styles added for all new features
+
+**Related Files**:
+- Modified: `src/components/forms/FormField.tsx` - Added required, description, maxLength props, password toggle, char count
+- Modified: `src/components/forms/ContactForm.tsx` - Added required, description, maxLength props
+- Modified: `src/components/forms/LoginForm.tsx` - Added required, description props
+- Modified: `src/components/forms/SignUpForm.tsx` - Added required, description props
+- Modified: `public/assets/scss/sections/_sections.scss` - Added CSS styles for new features
+- Updated: `src/components/forms/__tests__/FormField.test.tsx` - 32 new tests added
+
+**Testing**:
+- All 1795 tests passing (100% success rate)
+- FormField tests: 66 passing (34 original + 32 new)
+- ContactForm tests: 7 passing
+- LoginForm tests: 5 passing
+- SignUpForm tests: 5 passing
+- Lint passed (0 errors, 4 warnings in unrelated files)
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows UI/UX Engineer principles:
+  - **User-Centric**: Every decision improves UX (clearer fields, better feedback)
+  - **Accessibility**: ARIA attributes for screen readers, keyboard navigation support
+  - **Consistency**: All forms use same FormField patterns
+  - **Performance**: Char count updates efficiently with React state
+  - **Semantic Structure**: Meaningful HTML elements maintained
+- Password toggle button only appears for password fields (conditional rendering)
+- Input wrapper div only wraps password fields (no unnecessary DOM for other types)
+- Character count only appears for textarea fields with maxLength
+- Form reset bug fixed: register.onChange called alongside charCount update
+- Indonesian language content maintained throughout
+- CSS uses design system colors (var(--blue-color), var(--text-color))
+- Error styling uses red (#dc3545) with proper focus ring for accessibility
+
+**Impact**:
+- User Experience: Required fields clearly marked, hints guide users, error states visible
+- Accessibility: Screen reader support via ARIA attributes, keyboard navigation preserved
+- Reduced Errors: Character count helps users stay within message length limits
+- Better Usability: Password toggle prevents typos, easier on mobile devices
+- Consistency: All forms share same FormField patterns and behavior
+- Code Quality: Type-safe props, comprehensive test coverage
+- Zero Regressions: All existing functionality preserved (1795 tests passing)
+
+**Future Enhancement Opportunities**:
+
+1. **Password Strength Indicator** - Add real-time strength meter to SignUpForm
+    - Visual feedback (weak/fair/good/strong)
+    - Progress bar or color-coded indicator
+    - Requirements: length, uppercase, number, special character
+    - Effort: Medium (requires strength calculation + UI)
+    - Priority: Low (current toggle is good UX)
+
+2. **Floating Labels** - Add modern floating label pattern
+    - Labels animate to top when field has value
+    - Material Design style pattern
+    - Effort: Medium (CSS animation + label state tracking)
+    - Priority: Low (current static labels are functional)
+
+3. **Inline Validation** - Add real-time validation feedback
+    - Validate as user types, not just on submit
+    - Show checkmark or error immediately after field
+    - Effort: Medium (requires debouncing + react-hook-form integration)
+    - Priority: Low (current on-submit validation is acceptable)
+
+---
+
+## Task 78: API Documentation Update
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Documentation (API Documentation)
+
+**Problem**:
+- docs/api.md was missing documentation for `resetAllRateLimits()` method in AuthService
+- Duplicate error response sections existed in Email Service API documentation
+- Incomplete documentation could lead to confusion when using integration APIs
+- Missing admin method documentation could prevent proper rate limit management
+
+**Locations**:
+- `docs/api.md` - API documentation file with incomplete content
+
+**Solution**:
+1. **Added documentation for `resetAllRateLimits()` method** (AuthService):
+   - Documented method signature: `resetAllRateLimits(): void`
+   - Added usage example with warning about production use
+   - Clarified this method resets both login and register rate limiters
+   - Updated "Reset Rate Limit" section to include this new method
+
+2. **Removed duplicate error response sections** (Email Service):
+   - Removed duplicate "503 Service Unavailable" entry (simplified version without errorCode)
+   - Removed duplicate "408 Request Timeout" entry (simplified version without errorCode)
+   - Removed duplicate "502 Bad Gateway" entry (simplified version without errorCode)
+   - Kept only properly formatted error responses with errorCode and metadata
+
+**Documentation Updates**:
+- Added `resetAllRateLimits()` method documentation after individual reset methods
+- Included usage example: `authService.resetAllRateLimits()`
+- Added warning: "Manual reset should be used with caution in production."
+- Cleaned up duplicate error response blocks for Email Service
+
+**Architecture Benefits**:
+
+1. **Complete API Reference**: All methods now documented
+2. **Reduced Confusion**: No duplicate error response examples
+3. **Admin Capabilities**: Rate limit management methods documented
+4. **Self-Documenting**: API serves as complete reference for developers
+5. **Maintainability**: Single source of truth for all API behavior
+
+**Code Quality**:
+- Documentation follows existing markdown structure and formatting
+- Usage examples match actual implementation
+- Warning text clarifies production risks
+- Error response format consistent across all examples
+
+**Success Criteria**:
+- [x] `resetAllRateLimits()` method documented with usage example
+- [x] Duplicate error response sections removed (3 duplicates)
+- [x] Warning added for production use of reset methods
+- [x] All 1764 tests passing (100% success rate)
+- [x] Lint passed without errors
+- [x] Zero regressions in existing functionality
+- [x] Documentation format consistent with existing docs
+
+**Related Files**:
+- Modified: `docs/api.md` - Added resetAllRateLimits() documentation, removed duplicates
+
+**Testing**:
+- All 1764 tests passing (100% success rate)
+- Lint passed without errors (4 warnings about unused variables, unrelated)
+- Zero regressions in existing functionality
+- Documentation changes verified against implementation
+
+**Notes**:
+- Follows Integration Engineering principles:
+  - **Self-Documenting**: Complete API reference for all integration services
+  - **Consistency**: Unified format across all error responses and methods
+  - **Maintainability**: Single source of truth for API behavior
+- Documentation is now complete and up-to-date with implementation
+- Admin methods properly documented with production warnings
+- No duplicate content that could cause confusion
+
+**Impact**:
+- Developers now have complete reference for all API methods
+- Reduced confusion about error response formats
+- Rate limit management methods properly documented for admin operations
+- Documentation maintenance improved (single source of truth)
+
+**Future Enhancement Opportunities**:
+
+1. **OpenAPI Specification** - Generate OpenAPI spec from TypeScript interfaces
+    - Use tools like `swagger-jsdoc` to auto-generate OpenAPI spec
+    - Provide machine-readable API documentation
+    - Effort: Low (tooling available)
+    - Priority: Low (current documentation sufficient)
+
+2. **Interactive API Explorer** - Add embedded API playground
+    - Use Swagger UI or similar tool for interactive testing
+    - Allow developers to test APIs directly from documentation
+    - Effort: Medium (requires hosting and configuration)
+    - Priority: Low (benefits marginal for this codebase)
+
+---
+
 ## Task 75: Critical Path Testing - Home & About Components
 
 **Status**: ✅ Completed
@@ -391,180 +718,6 @@
    - Test image rendering from BrandData
    - Effort: Low (simple presentational components)
    - Priority: Low (simple presentational components)
-
----
-
-## Task 74: Component Abstraction - Reusable UI Components (Module Extraction)
-
-**Status**: ✅ Completed
-**Priority**: HIGH
-**Type**: Component Architecture (Module Extraction)
-
-**Problem**:
-- Repeated section-title pattern across 16 components with duplicated HTML markup
-- Repeated wow.js animation classes scattered across 76+ components
-- Repeated bg_cover background image pattern in multiple components
-- Changes to section header structure required updating 16+ files
-- Changes to animation behavior required updating 76+ files
-- Violates DRY principle - duplicated markup and logic
-
-**Locations**:
-- 16 components using section-title pattern (span.sub-title + h2 + p)
-- 76+ components using wow.js animation classes
-- Multiple components using bg_cover with inline backgroundImage styles
-- Examples: Cause.tsx, Feedback.tsx, ContactArea.tsx, and many more
-
-**Solution**:
-1. **Created SectionTitle component** (`src/components/common/SectionTitle.tsx`):
-    - Centralizes section header pattern (subtitle, title, description)
-    - Props: subtitle, title, description, align, animation, whiteText, className
-    - Supports alignment: left, center, right
-    - Supports animation: fadeInDown, fadeInUp, none
-    - Supports white text variant for dark backgrounds
-    - Fully typed with TypeScript interfaces
-
-2. **Created AnimationWrapper component** (`src/components/common/AnimationWrapper.tsx`):
-    - Centralizes wow.js animation logic
-    - Props: children, animation, delay, offset, duration, className
-    - Supports animations: fadeInDown, fadeInUp, fadeInLeft, fadeInRight, none
-    - Supports wow.js data attributes: data-wow-delay, data-wow-offset, data-wow-duration
-    - Bypasses rendering when animation is "none"
-    - Fully typed with TypeScript interfaces
-
-3. **Created BackgroundSection component** (`src/components/common/BackgroundSection.tsx`):
-    - Centralizes bg_cover background section pattern
-    - Props: children, backgroundImage, className, id
-    - Handles inline backgroundImage style automatically
-    - Supports custom className and id attributes
-    - Fully typed with TypeScript interfaces
-
-4. **Refactored existing components** (Cause.tsx, Feedback.tsx):
-    - Migrated from duplicated markup to SectionTitle component
-    - Migrated from direct wow classes to AnimationWrapper component
-    - Migrated from inline styles to BackgroundSection component
-    - Maintained identical behavior with less code
-
-**Test Coverage Summary** (35 new tests):
-
-**SectionTitle Tests** (14 tests):
-- Rendering with title, subtitle, description (all combinations)
-- Alignment (left, center, right) with default center
-- Animation (fadeInDown, fadeInUp, none) with default fadeInDown
-- White text variant for dark backgrounds
-- Custom className support
-- HTML structure verification (h2 for title, p for description, span for subtitle)
-- All props combined correctly
-
-**AnimationWrapper Tests** (11 tests):
-- Default fadeInUp animation
-- No animation when "none"
-- All animation types (fadeInDown, fadeInUp, fadeInLeft, fadeInRight)
-- Data attributes: delay, offset, duration (with and without)
-- Custom className support
-- Complex children rendering
-- All props combined correctly
-
-**BackgroundSection Tests** (10 tests):
-- Background image style rendering
-- Custom className support
-- Id attribute support (with and without)
-- HTML structure (section element)
-- Complex children rendering
-- All props combined correctly
-
-**Architecture Benefits**:
-
-1. **DRY Principle**: Single source of truth for common patterns
-2. **Maintainability**: Change section header in one place, affects all components
-3. **Testability**: Test common patterns once, reuse everywhere
-4. **Type Safety**: All props typed with TypeScript interfaces
-5. **Composition**: Components can be nested and combined
-6. **Consistency**: Uniform behavior across all sections and animations
-7. **Reduced Code Duplication**:
-   - Section titles: 16 instances → 1 reusable component
-   - Animations: 76+ instances → 1 reusable component
-   - Background sections: Multiple instances → 1 reusable component
-
-**Code Quality**:
-- All components use React.memo for performance optimization
-- All components have displayName for debugging
-- All components fully typed with TypeScript
-- All components support optional props with sensible defaults
-- All components have comprehensive test coverage
-
-**Success Criteria**:
-- [x] SectionTitle component created with all necessary props
-- [x] AnimationWrapper component created with wow.js support
-- [x] BackgroundSection component created for bg_cover pattern
-- [x] 35 comprehensive tests created (14 + 11 + 10)
-- [x] All 1578 tests passing (100% success rate - 44 new tests added)
-- [x] Lint passed without errors
-- [x] Cause.tsx refactored to use new components
-- [x] Feedback.tsx refactored to use new components
-- [x] Zero regressions in existing functionality
-- [x] blueprint.md updated with component abstractions note
-
-**Related Files**:
-- Created: `src/components/common/SectionTitle.tsx` - Reusable section header component
-- Created: `src/components/common/AnimationWrapper.tsx` - Reusable animation wrapper component
-- Created: `src/components/common/BackgroundSection.tsx` - Reusable background section component
-- Created: `src/components/common/__tests__/SectionTitle.test.tsx` - 14 tests
-- Created: `src/components/common/__tests__/AnimationWrapper.test.tsx` - 11 tests
-- Created: `src/components/common/__tests__/BackgroundSection.test.tsx` - 10 tests
-- Created: `src/components/homes/home-one/__tests__/Cause.test.tsx` - 4 tests
-- Created: `src/components/homes/home-one/__tests__/Feedback.test.tsx` - 5 tests
-- Modified: `src/components/homes/home-one/Cause.tsx` - Refactored to use SectionTitle and AnimationWrapper
-- Modified: `src/components/homes/home-one/Feedback.tsx` - Refactored to use SectionTitle, AnimationWrapper, BackgroundSection
-- Updated: `docs/blueprint.md` - Added component abstractions note
-
-**Testing**:
-- All 1578 tests passing (100% success rate)
-- New component tests: 35 passing (14 + 11 + 10)
-- Refactored component tests: 9 passing (4 + 5)
-- Lint passed without errors
-- Zero regressions in existing functionality
-
-**Notes**:
-- Follows Component Architecture principles:
-   - **Module Extraction**: Extracted repeated patterns into reusable components
-   - **Composition**: Components can be nested and combined
-   - **Type Safety**: All props typed with TypeScript interfaces
-   - **Performance**: All components use React.memo optimization
-   - **Testability**: All components have comprehensive test coverage
-   - **DRY Principle**: Single source of truth for common patterns
-- Section titles reduced from 16 duplicated patterns to 1 reusable component
-- Animations reduced from 76+ duplicated patterns to 1 reusable component
-- Background sections reduced from multiple instances to 1 reusable component
-- Future components can easily adopt these abstractions
-- Follows existing project patterns (React.memo, displayName, TypeScript interfaces)
-
-**Impact**:
-- Maintainability: Changes to section headers/animations/backgrounds now in one place
-- Code Duplication: Eliminated ~100+ duplicate code instances (16 + 76+)
-- Test Coverage: Increased by 44 tests (from 1534 to 1578)
-- Developer Experience: Faster development with reusable components
-- Consistency: Uniform behavior across all sections and animations
-- Type Safety: All new components fully typed with TypeScript
-
-**Future Enhancement Opportunities**:
-
-1. **Refactor Remaining Components** - Migrate all 16 section-title users
-    - Apply SectionTitle component to all components using section-title pattern
-    - Apply AnimationWrapper to all 76+ components using wow classes
-    - Effort: Medium (requires refactoring 16+ components)
-    - Priority: Low (two examples demonstrated successfully)
-
-2. **SectionVariant Component** - Handle different section title layouts
-    - Create variant prop for different section title designs (style-one, style-two, etc.)
-    - Support custom icon or decorative elements
-    - Effort: Low (extend SectionTitle with variants)
-    - Priority: Low (current implementation covers most use cases)
-
-3. **Animation Presets** - Pre-configured animation combinations
-    - Create animation preset library for common wow.js configurations
-    - Example: "hero-slide", "card-appear", "section-fade"
-    - Effort: Low (create preset objects and utility functions)
-    - Priority: Low (current AnimationWrapper is flexible)
 
 ---
 

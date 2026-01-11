@@ -3,7 +3,7 @@ import {
   autoIdArray,
   createAutoIdGenerator,
 } from "../dataAutoId";
-import { FeedbackItem, BaseDataItem } from "@/types/data";
+import { BaseDataItem } from "@/types/data";
 
 describe("AutoIdGenerator", () => {
   describe("constructor", () => {
@@ -141,7 +141,7 @@ describe("AutoIdGenerator", () => {
     it("should allow reusing IDs after reset", () => {
       const generator = new AutoIdGenerator();
       const id1 = generator.next();
-      const id2 = generator.next();
+      generator.next();
 
       generator.reset();
 
@@ -238,7 +238,7 @@ describe("autoIdArray()", () => {
   ];
 
   it("should assign auto-generated IDs to array of items", () => {
-    const { data, generator } = autoIdArray(mockItems);
+    const { data } = autoIdArray(mockItems);
 
     expect(data).toHaveLength(3);
     expect(data[0].id).toBe(1);
@@ -270,7 +270,7 @@ describe("autoIdArray()", () => {
   });
 
   it("should return generator for continued ID generation", () => {
-    const { data, generator } = autoIdArray(mockItems);
+    const { generator } = autoIdArray(mockItems);
 
     expect(generator.getCurrentId()).toBe(4);
     expect(generator.next()).toBe(4);

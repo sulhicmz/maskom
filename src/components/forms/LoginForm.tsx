@@ -37,6 +37,8 @@ const LoginForm = () => {
             register={register("email")}
             error={errors.email}
             disabled={isSubmitting}
+            required
+            description="Masukkan email yang Anda gunakan saat mendaftar"
          />
          <FormField
             id="login_password"
@@ -46,6 +48,8 @@ const LoginForm = () => {
             register={register("password")}
             error={errors.password}
             disabled={isSubmitting}
+            required
+            description="Minimal 8 karakter"
          />
          <div className="form-group">
             <LoadingButton
@@ -59,7 +63,7 @@ const LoginForm = () => {
          <div className="form-text text-center">
             <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
          </div>
-       </form>
+      </form>
    )
 }
 
