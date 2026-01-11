@@ -242,7 +242,7 @@ describe('Feature (About)', () => {
     const { container } = render(<Feature />);
     
     const iconicInfoBoxes = container.querySelectorAll('.iconic-info-box');
-    iconicInfoBoxes.forEach((item, index) => {
+    iconicInfoBoxes.forEach((item) => {
       expect(item).toBeInTheDocument();
     });
   });
