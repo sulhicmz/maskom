@@ -1,3 +1,4 @@
+import { RATE_LIMITS } from '@/constants';
 
 export interface RateLimitConfig {
     maxAttempts: number;
@@ -163,14 +164,6 @@ export class RateLimiter {
     }
 }
 
-export const emailRateLimiter = new RateLimiter({
-    maxAttempts: 5,
-    windowMs: 60000,
-    cooldownMs: 300000
-});
+export const emailRateLimiter = new RateLimiter(RATE_LIMITS.EMAIL);
 
-export const formRateLimiter = new RateLimiter({
-    maxAttempts: 10,
-    windowMs: 3600000,
-    cooldownMs: 7200000
-});
+export const formRateLimiter = new RateLimiter(RATE_LIMITS.FORM);

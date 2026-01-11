@@ -9,6 +9,7 @@ import {
     logServiceSuccess,
     createErrorResult
 } from '@/services/common';
+import { RATE_LIMITS } from '@/constants';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -16,16 +17,8 @@ class AuthService implements IAuthService {
     private registerRateLimiter: RateLimiter;
 
     constructor() {
-        this.loginRateLimiter = new RateLimiter({
-            maxAttempts: 5,
-            windowMs: 900000,
-            cooldownMs: 1800000
-        });
-        this.registerRateLimiter = new RateLimiter({
-            maxAttempts: 5,
-            windowMs: 3600000,
-            cooldownMs: 7200000
-        });
+        this.loginRateLimiter = new RateLimiter(RATE_LIMITS.LOGIN);
+        this.registerRateLimiter = new RateLimiter(RATE_LIMITS.REGISTER);
     }
 
     async login(credentials: LoginCredentials): Promise<AuthResult> {
@@ -202,7 +195,7 @@ class AuthService implements IAuthService {
             count: status.count,
             firstAttempt: status.firstAttempt,
             lockedUntil: status.lockedUntil,
-            attemptsRemaining: Math.max(0, 5 - status.count)
+            attemptsRemaining: Math.max(0, RATE_LIMITS.LOGIN.maxAttempts - status.count)
         };
     }
 
@@ -212,7 +205,7 @@ class AuthService implements IAuthService {
             count: status.count,
             firstAttempt: status.firstAttempt,
             lockedUntil: status.lockedUntil,
-            attemptsRemaining: Math.max(0, 5 - status.count)
+            attemptsRemaining: Math.max(0, RATE_LIMITS.REGISTER.maxAttempts - status.count)
         };
     }
 

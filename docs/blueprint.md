@@ -420,6 +420,7 @@ Services (AuthService)
 - ✅ Exception classes for typed error handling (ServiceException and subclasses)
 - ✅ Unified error logging across all services (logServiceError, logServiceSuccess)
 - ✅ Helper functions for result creation (createSuccessResult, createErrorResult)
+- ✅ Centralized constants for magic numbers (src/constants/) - Eliminates magic numbers like rate limits and validation thresholds
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -433,6 +434,7 @@ Services (AuthService)
 - ❌ Form submission logic duplicated across 4 components - FIXED
 - ❌ Email validation duplicated in AuthService - FIXED
 - ❌ Duplicated validation implementations (validation.ts vs formValidation.ts) - FIXED
+- ❌ Magic numbers scattered throughout (rate limits, validation thresholds) - FIXED
 
 ### Integration Patterns (Maintain)
 
