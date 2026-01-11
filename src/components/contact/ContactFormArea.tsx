@@ -1,5 +1,8 @@
 import Image from "next/image"
-import ContactForm from "../forms/ContactForm"
+import dynamic from "next/dynamic"
+const ContactForm = dynamic(() => import("../forms/ContactForm"), {
+   loading: () => <div className="text-center py-5">Memuat formulir kontak...</div>
+})
 
 import img_1 from "@/assets/images/contact/contact-4.jpg"
 import img_2 from "@/assets/images/contact/contact-5.jpg"
