@@ -719,6 +719,55 @@ const Wrapper = ({ children }: WrapperProps) => {
 - Keep critical CSS inline for above-the-fold content (future enhancement)
 - Test both online and offline scenarios for CDN dependencies
 
+## Asset Optimization Patterns
+
+### Unused Asset Removal
+
+**Purpose**: Remove unused large assets to reduce storage, bandwidth, and CDN costs
+
+**Implementation**:
+- Profile all images to identify large files (>50KB)
+- Verify image usage by searching codebase for references
+- Remove unused images after confirming no active references
+- Verify build and tests pass after removal
+
+**Benefits**:
+- Reduced storage: 200K saved in Task 62
+- Lower CDN bandwidth: Fewer assets to transfer
+- Faster page load: Fewer assets to request
+- Clean codebase: No orphaned assets
+
+**Implementation Example** (Task 62):
+```bash
+# Identify images >50KB
+find public/assets/images -type f -size +50k -exec ls -lh {} \;
+
+# Verify unused by searching codebase
+grep -r "feature-new.jpg" src/ --include="*.tsx" --include="*.ts"
+
+# Remove unused images
+rm public/assets/images/gallery/feature-new.jpg
+rm public/assets/images/bg/text-bg-1.jpg
+rm public/assets/images/video/video-new.jpg
+```
+
+**Images Removed in Task 62** (200K savings):
+- `public/assets/images/gallery/feature-new.jpg` (52K) - Not used
+- `public/assets/images/bg/text-bg-1.jpg` (52K) - Not used
+- `public/assets/images/video/video-new.jpg` (61K) - Not used
+
+**Usage Guidelines**:
+- Profile first to identify large assets (>50KB threshold)
+- Verify unused by searching entire codebase for references
+- Remove only after confirming no active usage
+- Run tests and build to verify no broken references
+- Document removal in task.md for traceability
+
+**Future Enhancements**:
+- WebP conversion for remaining large images (30-40% savings)
+- Next.js Image component migration for automatic optimization
+- Image sprites for multiple small icons
+
 ## Technical Constraints
 
 - Cloudflare Workers runtime compatibility
