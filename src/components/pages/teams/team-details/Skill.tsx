@@ -9,6 +9,8 @@ const VideoPopup = dynamic(() => import("@/modals/VideoPopup"), {
 })
 
 import skill_thumb from "@/assets/images/team/team-single-2.jpg"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const Skill = () => {
 
@@ -20,11 +22,12 @@ const Skill = () => {
             <div className="container">
                <div className="row align-items-center">
                   <div className="col-xl-7">
-                     <div className="skill-content-box wow fadeInLeft">
-                        <div className="section-title mb-50">
-                           <h2>My Skills</h2>
-                           <p>Our goal is to utilize today&apos;s ttechnologies to stay ahead of the curve.</p>
-                        </div>
+                     <AnimationWrapper animation="fadeInLeft" className="skill-content-box">
+                        <SectionTitle 
+                           title="My Skills"
+                           description="Our goal is to utilize today's ttechnologies to stay ahead of the curve."
+                           className="mb-50"
+                        />
                         <div className="skill-item style-one mb-50">
                            <h5>Analytical</h5>
                            <div className="skill-bar skill1 wow slideInLeft">
@@ -49,10 +52,10 @@ const Skill = () => {
                               <span className="skill-count4">40%</span>
                            </div>
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                   <div className="col-xl-5">
-                     <div className="skill-one_image-box mb-50 wow fadeInRight">
+                     <AnimationWrapper animation="fadeInRight" className="skill-one_image-box mb-50">
                         <Image src={skill_thumb} alt="Skill Image" />
                         <div className="image-overlay">
                            <div className="play-button d-flex align-items-center">
@@ -61,7 +64,7 @@ const Skill = () => {
                               <div className="text">Discover my bio</div>
                            </div>
                         </div>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                </div>
             </div>

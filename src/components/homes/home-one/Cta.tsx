@@ -3,6 +3,7 @@ import cta_2 from "@/assets/images/gallery/base2.svg"
 import Image from "next/image"
 import Link from "next/link"
 import React from "react"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const Cta = React.memo(() => {
    return (
@@ -11,11 +12,11 @@ const Cta = React.memo(() => {
             <div className="cta-wrapper_one">
                <div className="row align-items-center">
                   <div className="col-lg-6">
-                     <div className="cta-one_content-box wow fadeInLeft">
+                     <AnimationWrapper animation="fadeInLeft" className="cta-one_content-box">
                         <h2>Siap Tingkatkan Kualitas Konektivitas Anda?</h2>
                         <p>Diskusikan kebutuhan jaringan dan managed service bersama konsultan Maskom. Kami bantu rancang solusi paling efisien.</p>
                         <Link href="/contact" className="theme-btn gradient-btn">Hubungi Maskom</Link>
-                     </div>
+                     </AnimationWrapper>
                   </div>
                   <div className="col-lg-6">
                       <div className="cta-one_image-box p-r z-1 text-xl-end">

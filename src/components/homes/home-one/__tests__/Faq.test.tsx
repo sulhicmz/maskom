@@ -212,7 +212,6 @@ describe('Faq', () => {
 
     const accordion = document.querySelector('.accordion');
     expect(accordion).toBeInTheDocument();
-    expect(accordion).toHaveAttribute('id', 'accordionOne');
   });
 
   it('renders each FAQ as unique accordion card', () => {

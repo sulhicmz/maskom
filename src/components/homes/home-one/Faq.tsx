@@ -7,6 +7,8 @@ import faq_1 from "@/assets/images/contact/contact-1.svg"
 import faq_2 from "@/assets/images/contact/contact-2.svg"
 import faq_3 from "@/assets/images/contact/contact-3.svg"
 import faq_shape from "@/assets/images/contact/shape-1.png"
+import SectionTitle from "@/components/common/SectionTitle"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const Faq = () => {
 
@@ -18,34 +20,42 @@ const Faq = () => {
             <div className="row">
                <div className="col-xl-6">
                   <div className="contact-two_image-box p-r z-1 mb-50">
-                     <Image src={faq_1} className="image-one wow fadeInLeft" alt="Contact Image" />
-                     <Image src={faq_2} className="image-two wow fadeInRight" alt="Contact Image" />
-                     <Image src={faq_3} className="image-three wow fadeInDown" alt="Contact Image" />
+                     <AnimationWrapper animation="fadeInLeft" className="image-one">
+                        <Image src={faq_1} alt="Contact Image" />
+                     </AnimationWrapper>
+                     <AnimationWrapper animation="fadeInRight" className="image-two">
+                        <Image src={faq_2} alt="Contact Image" />
+                     </AnimationWrapper>
+                     <AnimationWrapper animation="fadeInDown" className="image-three">
+                        <Image src={faq_3} alt="Contact Image" />
+                     </AnimationWrapper>
                      <Image src={faq_shape} className="shape-one" alt="Contact Image" />
                   </div>
                </div>
                <div className="col-xl-6">
                   <div className="section-content-box pl-xl-45 mb-30">
-                     <div className="section-title mb-55 wow fadeInDown">
-                        <span className="sub-title style-one">Pertanyaan Umum</span>
-                        <h2>Hal yang Sering <br /> Ditanyakan Klien</h2>
-                     </div>
-                      <div className="accordion wow fadeInUp" id="accordionOne">
-                         {home_1_faq.map((item) => (
-                           <div key={item.id} className="accordion-card style-one mb-15">
-                              <div className="accordion-header">
-                                 <h6 onClick={() => setActiveId(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >
-                                     {item.question}
-                                  </h6>
-                              </div>
-                              <div id="collapse1" className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}>
-                                 <div className="accordion-content">
-                                    <p>{item.answer}</p>
-                                 </div>
-                              </div>
-                           </div>
-                        ))}
-                     </div>
+                     <SectionTitle 
+                        subtitle="Pertanyaan Umum"
+                        title="Hal yang Sering Ditanyakan Klien"
+                        className="mb-55"
+                        animation="fadeInDown"
+                     />
+                       <AnimationWrapper animation="fadeInUp" className="accordion" id="accordionOne">
+                          {home_1_faq.map((item) => (
+                            <div key={item.id} className="accordion-card style-one mb-15">
+                               <div className="accordion-header">
+                                  <h6 onClick={() => setActiveId(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >
+                                      {item.question}
+                                   </h6>
+                               </div>
+                               <div id="collapse1" className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}>
+                                  <div className="accordion-content">
+                                     <p>{item.answer}</p>
+                                  </div>
+                               </div>
+                            </div>
+                         ))}
+                      </AnimationWrapper>
                   </div>
                </div>
             </div>

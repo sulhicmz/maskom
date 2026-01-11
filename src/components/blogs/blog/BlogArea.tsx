@@ -4,6 +4,7 @@ import Link from "next/link"
 import dynamic from "next/dynamic"
 import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
+import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const ReactPaginate = dynamic(() => import("react-paginate"), {
   ssr: false,
@@ -31,7 +32,7 @@ const BlogArea = () => {
                <div className="col-xl-8">
                   <div className="blogs-wrapper mb-30">
                      {currentItems.map((item) => (
-                        <article key={item.id} className="blog-post-item style-two mb-60 wow fadeInUp">
+                        <AnimationWrapper key={item.id} animation="fadeInUp" className="blog-post-item style-two mb-60">
                            <div className="post-thumbnail">
                               <Link href="/blog-details"><Image src={item.thumb} alt="post post-thumbnail" /></Link>
                            </div>
@@ -42,23 +43,23 @@ const BlogArea = () => {
                                  <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                               </div>
                               <div className="post-meta-wrap">
-                               <div className="post-meta">
-                                  <span><time><i className="flaticon-clock"></i>{item.date}</time></span>
-                                  <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
-                                  <span><span><i className="flaticon-price-tag"></i>{item.tag}</span></span>
-                               </div>
-                                 <div className="post-share">
-                                    <div className="share-btn"><i className="flaticon-share"></i></div>
-                                     <ul className="social-link">
-                                        <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                        <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                        <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                        <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                                     </ul>
-                                 </div>
+                                <div className="post-meta">
+                                   <span><time><i className="flaticon-clock"></i>{item.date}</time></span>
+                                   <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
+                                   <span><span><i className="flaticon-price-tag"></i>{item.tag}</span></span>
+                                </div>
+                                  <div className="post-share">
+                                     <div className="share-btn"><i className="flaticon-share"></i></div>
+                                      <ul className="social-link">
+                                         <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                         <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                         <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                         <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                                      </ul>
+                                  </div>
                               </div>
                            </div>
-                        </article>
+                        </AnimationWrapper>
                      ))}
                      <div className="ac-pagination">
                         <nav>
