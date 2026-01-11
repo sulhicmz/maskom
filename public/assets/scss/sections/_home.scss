@@ -1,7 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*====================
-    02. Home css 
-======================*/
+    02. Home css
+ ======================*/
 
 .home-one{
     & .header-navigation{

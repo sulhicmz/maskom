@@ -1,7 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*---========================
-        14. Images css 
-=======================----*/
+        14. images css
+ =======================----*/
 
 .section-image-box{
     &.style-one{

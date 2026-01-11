@@ -1,7 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*---========================
-        16. Blog css 
-=======================----*/
+        16. Blog css
+ =======================----*/
 
 .blog-details-wrapper{
     & .blog-post-item{

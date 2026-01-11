@@ -6,9 +6,9 @@
     Description: AIcraft - AI Application & Generator HTML Template
     Version: 1.0
 
---------------------------
-   CSS INDEX
---------------------------
+ --------------------------
+    CSS INDEX
+ --------------------------
     01. Common css
     02. Home css
     03. Default css
@@ -37,37 +37,36 @@
 
 // Global variables
 
-@import 'variables';
+@use 'variables' as *;
 
 // Global Mixins
 
-@import 'mixin';
+@use 'mixin' as *;
 
 // base directories
 
-@import 'extend';
-@import 'common';
+@use 'extend' as *;
+@use 'common' as *;
 
 // All Sections css
 
-@import 'sections/home';
-@import 'sections/header';
-@import 'sections/hero';
-@import 'sections/default';
-@import 'elements/iconic-box';
-@import 'elements/pricings';
-@import 'elements/item';
-@import 'elements/post';
-@import 'elements/tabs';
-@import 'elements/sidebar';
-@import 'sections/gallery';
-@import 'elements/faqs';
-@import 'sections/images';
-@import 'sections/team';
-@import 'sections/blog';
-@import 'sections/contact';
-@import 'sections/footer';
-@import 'sections/wrapper';
-@import 'sections/dashboard';
-@import 'sections/sections';
-@import 'sections/wrapper';
+@use 'sections/home';
+@use 'sections/header';
+@use 'sections/hero';
+@use 'sections/default';
+@use 'elements/iconic-box';
+@use 'elements/pricings';
+@use 'elements/item';
+@use 'elements/post';
+@use 'elements/tabs';
+@use 'elements/sidebar';
+@use 'sections/gallery';
+@use 'elements/faqs';
+@use 'sections/images';
+@use 'sections/team';
+@use 'sections/blog';
+@use 'sections/contact';
+@use 'sections/footer';
+@use 'sections/wrapper';
+@use 'sections/dashboard';
+@use 'sections/sections';

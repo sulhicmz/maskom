@@ -1,7 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*---========================
-        19. Sections css 
-=======================----*/
+        19. Sections css
+ =======================----*/
 
 .black-dark-bg{
     & .pricing-item{
