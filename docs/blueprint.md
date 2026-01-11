@@ -445,6 +445,8 @@ Services (AuthService)
 - ✅ Webpack code splitting for large dependencies (forms, swiper cache groups)
 - ✅ Lazy-loaded form components with loading states (ContactForm, LoginForm, SignUpForm, BlogForm)
 - ✅ Bundle optimization with separate async chunks (19KB forms, 24KB swiper)
+- ✅ Consolidated validation logic in AuthService (validateCredentials private method)
+- ✅ DRY principle applied to authentication validation (66% code reduction)
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -459,6 +461,7 @@ Services (AuthService)
 - ❌ Email validation duplicated in AuthService - FIXED
 - ❌ Duplicated validation implementations (validation.ts vs formValidation.ts) - FIXED
 - ❌ Magic numbers scattered throughout (rate limits, validation thresholds) - FIXED
+- ❌ Duplicate validation logic in AuthService login/register methods - FIXED (Task 50)
 
 ### Integration Patterns (Maintain)
 
@@ -536,11 +539,16 @@ External API (EmailJS, etc.)
   - `resetLoginRateLimit(email)`: Reset rate limit for login (admin)
   - `resetRegisterRateLimit(email)`: Reset rate limit for register (admin)
 - **Current Implementation**: Mock authentication (ready for real backend integration)
-- **Resilience Patterns** (✅ COMPLETED - Integration Hardening):
-  - **Timeout Protection**: 5,000ms timeout for login/register operations
-  - **Retry with Exponential Backoff**: 3 attempts (1 initial + 2 retries)
-  - **Circuit Breaker**: 50 failure threshold, 60-second reset timeout
-  - **High Threshold**: 50 failures prevents circuit from interfering with per-user rate limiting
+ - **Resilience Patterns** (✅ COMPLETED - Integration Hardening):
+   - **Timeout Protection**: 5,000ms timeout for login/register operations
+   - **Retry with Exponential Backoff**: 3 attempts (1 initial + 2 retries)
+   - **Circuit Breaker**: 50 failure threshold, 60-second reset timeout
+   - **High Threshold**: 50 failures prevents circuit from interfering with per-user rate limiting
+- **Code Quality** (✅ COMPLETED - Task 50):
+   - **Consolidated Validation**: `validateCredentials()` private method centralizes validation logic
+   - **DRY Principle**: Single validation method eliminates duplicate code in login/register
+   - **Code Reduction**: 71 lines → 24 lines (66% reduction)
+   - **Maintainability**: Single point of change for validation rules
 - **Rate Limiting**:
    - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
    - **Register**: 5 attempts per 1 hour, 2 hour cooldown

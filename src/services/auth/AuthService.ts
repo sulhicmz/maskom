@@ -37,23 +37,32 @@ class AuthService implements IAuthService {
         );
     }
 
-    private async loginWithoutResilience(credentials: LoginCredentials): Promise<AuthResult> {
-        if (!credentials.email || !credentials.password) {
+    private validateCredentials(email: string, password: string, requireName: boolean = false, name?: string): void {
+        if (requireName && (!name || !email || !password)) {
+            const error = new ServiceValidationError('Nama, email, dan kata sandi diperlukan');
+            throw error;
+        }
+
+        if (!requireName && (!email || !password)) {
             const error = new ServiceValidationError('Email dan kata sandi diperlukan');
             throw error;
         }
 
-        const emailValidation = validateEmail(credentials.email);
+        const emailValidation = validateEmail(email);
         if (!emailValidation.valid) {
             const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
             throw error;
         }
 
-        const passwordValidation = validatePassword(credentials.password);
+        const passwordValidation = validatePassword(password);
         if (!passwordValidation.valid) {
             const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
             throw error;
         }
+    }
+
+    private async loginWithoutResilience(credentials: LoginCredentials): Promise<AuthResult> {
+        this.validateCredentials(credentials.email, credentials.password, false);
 
         this.currentUser = {
             id: this.generateUserId(credentials.email),
@@ -69,30 +78,8 @@ class AuthService implements IAuthService {
         };
     }
 
-    private async registerWithTimeout(userData: RegisterData): Promise<AuthResult> {
-        return withTimeout(
-            this.registerWithoutResilience(userData),
-            { timeoutMs: 5000, timeoutError: 'Registration request timed out' }
-        );
-    }
-
     private async registerWithoutResilience(userData: RegisterData): Promise<AuthResult> {
-        if (!userData.name || !userData.email || !userData.password) {
-            const error = new ServiceValidationError('Nama, email, dan kata sandi diperlukan');
-            throw error;
-        }
-
-        const emailValidation = validateEmail(userData.email);
-        if (!emailValidation.valid) {
-            const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
-            throw error;
-        }
-
-        const passwordValidation = validatePassword(userData.password);
-        if (!passwordValidation.valid) {
-            const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
-            throw error;
-        }
+        this.validateCredentials(userData.email, userData.password, true, userData.name);
 
         this.currentUser = {
             id: this.generateUserId(userData.email),
@@ -106,6 +93,13 @@ class AuthService implements IAuthService {
             user: this.currentUser,
             token: 'mock-jwt-token',
         };
+    }
+
+    private async registerWithTimeout(userData: RegisterData): Promise<AuthResult> {
+        return withTimeout(
+            this.registerWithoutResilience(userData),
+            { timeoutMs: 5000, timeoutError: 'Registration request timed out' }
+        );
     }
 
     async login(credentials: LoginCredentials): Promise<AuthResult> {
