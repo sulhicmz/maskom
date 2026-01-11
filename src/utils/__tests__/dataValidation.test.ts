@@ -1,46 +1,50 @@
 import {
-  validateFeedbackItem,
-  validateFaqItem,
-  validatePriceItem,
-  validatePriceDetailItem,
-  validateFeatureItem,
-  validateProcessItem,
-  validateCauseItem,
-  validateMenuItem,
-  checkDuplicateIds,
-  validateDataArray,
-  validateWiFiDevice,
-  validateWebsiteTemplate,
-  validateAIStep,
-  validateBlogCommentItem,
-  validateTeamMember,
-  validateInnerBlogPost,
-  validateFaqDetail,
-  validateInnerFaqItem,
-  validateSocialLink,
-  validateNavigationItem,
-  validateNavigationSection,
-} from "@/utils/dataValidation";
-import {
-  FeedbackItem,
-  FaqItem,
-  PriceItem,
-  FeatureItem,
-  ProcessItem,
-  CauseItem,
-  MenuItem,
-  WiFiDevice,
-  WebsiteTemplate,
-  AIStep,
-  BlogCommentItem,
-  TeamMember,
-  InnerBlogPost,
-  InnerFaqItem,
-  FaqDetail,
-  SocialLink,
-  NavigationItem,
-  NavigationSection,
-} from "@/types/data";
+   validateFeedbackItem,
+   validateFaqItem,
+   validatePriceItem,
+   validatePriceDetailItem,
+   validateFeatureItem,
+   validateProcessItem,
+   validateCauseItem,
+   validateMenuItem,
+   checkDuplicateIds,
+   validateDataArray,
+   validateWiFiDevice,
+   validateWebsiteTemplate,
+   validateAIStep,
+   validateBlogCommentItem,
+   validateTeamMember,
+   validateInnerBlogPost,
+   validateFaqDetail,
+   validateInnerFaqItem,
+   validateSocialLink,
+   validateNavigationItem,
+   validateNavigationSection,
+   validateContactInfoItem,
+   validateFeatureHomeOneItem,
+ } from "@/utils/dataValidation";
+ import {
+   FeedbackItem,
+   FaqItem,
+   PriceItem,
+   FeatureItem,
+   ProcessItem,
+   CauseItem,
+   MenuItem,
+   WiFiDevice,
+   WebsiteTemplate,
+   AIStep,
+   BlogCommentItem,
+   TeamMember,
+   InnerBlogPost,
+   InnerFaqItem,
+   FaqDetail,
+   SocialLink,
+   NavigationItem,
+   NavigationSection,
+   ContactInfoItem,
+   FeatureHomeOneItem,
+ } from "@/types/data";
 
 const mockStaticImageData = {
   src: "",
@@ -845,10 +849,228 @@ describe("dataValidation", () => {
     });
 
     it("should reject navigation section with empty items", () => {
-      const item: NavigationSection = { title: "Main", items: [] };
-      const result = validateNavigationSection(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("NavigationSection[Main]: items must be a non-empty array");
+       const item: NavigationSection = { title: "Main", items: [] };
+       const result = validateNavigationSection(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("NavigationSection[Main]: items must be a non-empty array");
+     });
+   });
+
+  describe("validateContactInfoItem", () => {
+    it("should validate a valid contact info item with lines only", () => {
+       const item: ContactInfoItem = {
+         id: 1,
+         icon: "fas fa-map-marker-alt",
+         title: "Kantor Pusat",
+         lines: ["Maskom Network", "Jakarta Selatan, DKI Jakarta"],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(true);
+       expect(result.errors).toHaveLength(0);
+     });
+
+    it("should validate a valid contact info item with links only", () => {
+       const item: ContactInfoItem = {
+         id: 2,
+         icon: "far fa-envelope-open",
+         title: "Email",
+         lines: [],
+         links: [
+           { text: "sales@maskom.co.id", href: "mailto:sales@maskom.co.id" },
+           { text: "support@maskom.co.id", href: "mailto:support@maskom.co.id" },
+         ],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(true);
+       expect(result.errors).toHaveLength(0);
+     });
+
+    it("should validate a valid contact info item with lines and links", () => {
+       const item: ContactInfoItem = {
+         id: 3,
+         icon: "fas fa-phone-alt",
+         title: "Telepon",
+         lines: ["(+62) 817-000-6625"],
+         links: [
+           { text: "WhatsApp Business", href: "https://wa.me/628170006625", target: "_blank", rel: "noreferrer" },
+         ],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(true);
+       expect(result.errors).toHaveLength(0);
+     });
+
+    it("should reject contact info item with empty icon", () => {
+       const item: ContactInfoItem = {
+         id: 1,
+         icon: "",
+         title: "Kantor Pusat",
+         lines: ["Maskom Network"],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem[1]: icon must be a non-empty string");
+     });
+
+    it("should reject contact info item with empty title", () => {
+       const item: ContactInfoItem = {
+         id: 1,
+         icon: "fas fa-map-marker-alt",
+         title: "",
+         lines: ["Maskom Network"],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem[1]: title must be a non-empty string");
+     });
+
+    it("should reject contact info item with zero id", () => {
+       const item: ContactInfoItem = {
+          id: 0,
+          icon: "fas fa-map-marker-alt",
+          title: "Kantor Pusat",
+          lines: ["Maskom Network"],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem: id must be a positive number");
+      });
+
+    it("should reject contact info item with empty string in lines array", () => {
+       const item: ContactInfoItem = {
+         id: 1,
+         icon: "fas fa-map-marker-alt",
+         title: "Kantor Pusat",
+         lines: ["Maskom Network", ""],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem: lines array items must be non-empty strings");
+    });
+
+    it("should reject contact info item with empty link text", () => {
+       const item: ContactInfoItem = {
+         id: 2,
+         icon: "far fa-envelope-open",
+         title: "Email",
+         lines: [],
+         links: [{ text: "", href: "mailto:sales@maskom.co.id" }],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem: links text must be a non-empty string");
+    });
+
+    it("should reject contact info item with empty link href", () => {
+       const item: ContactInfoItem = {
+         id: 2,
+         icon: "far fa-envelope-open",
+         title: "Email",
+         lines: [],
+         links: [{ text: "sales@maskom.co.id", href: "" }],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem: links href must be a non-empty string");
+    });
+
+    it("should reject contact info item with invalid link target", () => {
+       const item: ContactInfoItem = {
+         id: 3,
+         icon: "fas fa-phone-alt",
+         title: "Telepon",
+         lines: [],
+         links: [{ text: "WhatsApp Business", href: "https://wa.me/628170006625", target: "_top" as "_blank" | "_self" }],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("ContactInfoItem: links target must be either '_blank' or '_self'");
+    });
+
+    it("should accept contact info item without lines or links (both optional)", () => {
+       const item: ContactInfoItem = {
+         id: 1,
+         icon: "fas fa-map-marker-alt",
+         title: "Kantor Pusat",
+         lines: [],
+       };
+       const result = validateContactInfoItem(item);
+       expect(result.isValid).toBe(true);
+       expect(result.errors).toHaveLength(0);
     });
   });
-});
+
+  describe("validateFeatureHomeOneItem", () => {
+    it("should validate a valid feature home one item", () => {
+       const item: FeatureHomeOneItem = {
+         id: 1,
+         icon: "fas fa-network-wired",
+         title: "Konektivitas Tinggi",
+         desc: "Solusi SD-WAN untuk koneksi stabil",
+       };
+       const result = validateFeatureHomeOneItem(item);
+       expect(result.isValid).toBe(true);
+       expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject feature home one item with empty icon", () => {
+       const item: FeatureHomeOneItem = {
+         id: 1,
+         icon: "",
+         title: "Konektivitas Tinggi",
+         desc: "Solusi SD-WAN untuk koneksi stabil",
+       };
+       const result = validateFeatureHomeOneItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("FeatureHomeOneItem[1]: icon must be a non-empty string");
+    });
+
+    it("should reject feature home one item with empty title", () => {
+       const item: FeatureHomeOneItem = {
+         id: 1,
+         icon: "fas fa-network-wired",
+         title: "",
+         desc: "Solusi SD-WAN untuk koneksi stabil",
+       };
+       const result = validateFeatureHomeOneItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("FeatureHomeOneItem[1]: title must be a non-empty string");
+    });
+
+    it("should reject feature home one item with empty desc", () => {
+       const item: FeatureHomeOneItem = {
+         id: 1,
+         icon: "fas fa-network-wired",
+         title: "Konektivitas Tinggi",
+         desc: "",
+       };
+       const result = validateFeatureHomeOneItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("FeatureHomeOneItem[1]: desc must be a non-empty string");
+    });
+
+    it("should reject feature home one item with invalid id", () => {
+       const item: FeatureHomeOneItem = {
+         id: -1,
+         icon: "fas fa-network-wired",
+         title: "Konektivitas Tinggi",
+         desc: "Solusi SD-WAN untuk koneksi stabil",
+       };
+       const result = validateFeatureHomeOneItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("FeatureHomeOneItem[-1]: id must be a positive number");
+    });
+
+    it("should reject feature home one item with zero id", () => {
+       const item: FeatureHomeOneItem = {
+         id: 0,
+         icon: "fas fa-network-wired",
+         title: "Konektivitas Tinggi",
+         desc: "Solusi SD-WAN untuk koneksi stabil",
+       };
+       const result = validateFeatureHomeOneItem(item);
+       expect(result.isValid).toBe(false);
+       expect(result.errors).toContain("FeatureHomeOneItem: id must be a positive number");
+    });
+  });
+ });
