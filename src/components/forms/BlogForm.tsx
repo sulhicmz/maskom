@@ -16,7 +16,7 @@ const BlogForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createBlogFormSchema()), });
 
     const { submit: onSubmit, isSubmitting } = useFormSubmission(
-       async (_data?: void) => {
+       async () => {
           return { success: true, message: 'Komentar berhasil dikirim' };
        },
        { successMessage: 'Komentar berhasil dikirim', resetForm: reset }

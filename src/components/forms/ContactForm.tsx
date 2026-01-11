@@ -22,7 +22,7 @@ const ContactForm = () => {
    const form = useRef<HTMLFormElement>(null);
 
    const { submit: sendEmail, isSubmitting: isSubmittingEmail } = useFormSubmission<void, ServiceResult<{ text: string }>>(
-      async (_data?: void) => {
+      async () => {
          if (!form.current) {
             throw new Error('Form ref not available');
          }
