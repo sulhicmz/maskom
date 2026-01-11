@@ -26,7 +26,6 @@ const nextConfig: NextConfig = {
         fs: false,
       };
 
-      // Optimasi untuk Cloudflare Pages (khusus bundle client)
       config.optimization = {
         ...config.optimization,
         splitChunks: {
@@ -48,6 +47,34 @@ const nextConfig: NextConfig = {
             swiper: {
               test: /[\\/]node_modules[\\/]swiper[\\/]/,
               name: 'swiper',
+              chunks: 'async',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+            toastify: {
+              test: /[\\/]node_modules[\\/]react-toastify[\\/]/,
+              name: 'toastify',
+              chunks: 'async',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+            paginate: {
+              test: /[\\/]node_modules[\\/]react-paginate[\\/]/,
+              name: 'paginate',
+              chunks: 'async',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+            modalVideo: {
+              test: /[\\/]node_modules[\\/]react-modal-video[\\/]/,
+              name: 'modal-video',
+              chunks: 'async',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+            emailjs: {
+              test: /[\\/]node_modules[\\/](@emailjs|emailjs-com)[\\/]/,
+              name: 'emailjs',
               chunks: 'async',
               priority: 10,
               reuseExistingChunk: true,
