@@ -6,6 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { authService } from '@/services/auth';
 import { createSignUpFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
+import FormField from './FormField';
+import LoadingButton from './LoadingButton';
 
 import icon from "@/assets/images/icon/google.png"
 
@@ -16,7 +18,7 @@ interface FormData {
 }
 const SignUpForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createSignUpFormSchema()), });
-   
+
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
       async (data: FormData) => {
          return await authService.register({
@@ -30,52 +32,41 @@ const SignUpForm = () => {
 
    return (
       <form onSubmit={handleSubmit(onSubmit)} className="user-form" noValidate>
-         <div className="form-group">
-            <label htmlFor="signup_name">Nama lengkap</label>
-            <input
-               id="signup_name"
-               {...register("name")}
-               className="form-control"
-               type="text"
-               placeholder="Contoh: Andi Wijaya"
-               aria-invalid={!!errors.name}
-               aria-describedby="signup_name_error"
-               disabled={isSubmitting}
-            />
-            <p id="signup_name_error" className="form_error" role="alert">{errors.name?.message}</p>
-         </div>
-         <div className="form-group">
-            <label htmlFor="signup_email">Email kantor</label>
-            <input
-               id="signup_email"
-               {...register("email")}
-               className="form-control"
-               type="email"
-               placeholder="nama@perusahaan.co.id"
-               aria-invalid={!!errors.email}
-               aria-describedby="signup_email_error"
-               disabled={isSubmitting}
-            />
-            <p id="signup_email_error" className="form_error" role="alert">{errors.email?.message}</p>
-         </div>
-         <div className="form-group">
-            <label htmlFor="signup_password">Kata sandi</label>
-            <input
-               id="signup_password"
-               type="password"
-               {...register("password")}
-               className="form-control"
-               placeholder="Minimal 8 karakter"
-               aria-invalid={!!errors.password}
-               aria-describedby="signup_password_error"
-               disabled={isSubmitting}
-            />
-            <p id="signup_password_error" className="form_error" role="alert">{errors.password?.message}</p>
-         </div>
+         <FormField
+            id="signup_name"
+            label="Nama lengkap"
+            type="text"
+            placeholder="Contoh: Andi Wijaya"
+            register={register("name")}
+            error={errors.name}
+            disabled={isSubmitting}
+         />
+         <FormField
+            id="signup_email"
+            label="Email kantor"
+            type="email"
+            placeholder="nama@perusahaan.co.id"
+            register={register("email")}
+            error={errors.email}
+            disabled={isSubmitting}
+         />
+         <FormField
+            id="signup_password"
+            label="Kata sandi"
+            type="password"
+            placeholder="Minimal 8 karakter"
+            register={register("password")}
+            error={errors.password}
+            disabled={isSubmitting}
+         />
          <div className="form-group mb-25">
-            <button type="submit" className="theme-btn style-one" disabled={isSubmitting} aria-live="polite" aria-busy={isSubmitting}>
-               {isSubmitting ? 'Mendaftarkan...' : 'Daftarkan akun'}
-            </button>
+            <LoadingButton
+               className="theme-btn style-one"
+               isLoading={isSubmitting}
+               loadingText="Mendaftarkan..."
+            >
+               Daftarkan akun
+            </LoadingButton>
          </div>
          <div className="form-group">
             <button type="button" className="theme-btn style-one" disabled={isSubmitting} aria-label="Daftar dengan Google Workspace (Fitur akan segera hadir)">
