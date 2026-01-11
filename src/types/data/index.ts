@@ -1,4 +1,19 @@
 import { StaticImageData } from "next/image";
+import { JSX } from "react";
+
+export interface ContactInfoItem {
+   id: number;
+   icon: string;
+   title: string;
+   info: JSX.Element;
+}
+
+export interface FeatureHomeOneItem {
+   id: number;
+   icon: string;
+   title: string;
+   desc: string;
+}
 
 export interface BaseDataItem {
   id: number;

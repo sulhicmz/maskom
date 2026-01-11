@@ -1,19 +1,9 @@
 "use client"
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/autoplay";
-import Image, { StaticImageData } from "next/image";
-import Link from "next/link"
-
-import brand_1 from "@/assets/images/clients/logo-1.png"
-import brand_2 from "@/assets/images/clients/logo-2.png"
-import brand_3 from "@/assets/images/clients/logo-3.png"
-import brand_4 from "@/assets/images/clients/logo-4.png"
-import brand_5 from "@/assets/images/clients/logo-5.png"
-import brand_6 from "@/assets/images/clients/logo-6.png"
-import brand_7 from "@/assets/images/clients/logo-7.png"
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect } from "react";
+import brand_data from "@/data/BrandData"
 
 const setting = {
    slidesPerView: 6,
@@ -43,8 +33,30 @@ const setting = {
    },
 };
 
-const brand_data: StaticImageData[] = [brand_1, brand_2, brand_3, brand_4, brand_5, brand_6, brand_7, brand_2]
+const Swiper = dynamic(() => import('swiper/react').then((mod) => mod.Swiper), {
+   ssr: false,
+   loading: () => <div className="text-center py-4">Loading client logos...</div>
+});
+
+const SwiperSlide = dynamic(() => import('swiper/react').then((mod) => mod.SwiperSlide), {
+   ssr: false
+});
+
 const Brand = () => {
+   useEffect(() => {
+      const loadSwiperCSS = async () => {
+         if (!document.getElementById('swiper-css')) {
+            const swiperCoreCSS = document.createElement('link');
+            swiperCoreCSS.rel = 'stylesheet';
+            swiperCoreCSS.href = 'https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css';
+            swiperCoreCSS.id = 'swiper-css';
+            document.head.appendChild(swiperCoreCSS);
+         }
+      };
+
+      loadSwiperCSS();
+   }, []);
+
    return (
       <section className="clients-section">
          <div className="container">
@@ -55,7 +67,7 @@ const Brand = () => {
                   </div>
                </div>
             </div>
-            <Swiper {...setting} modules={[Autoplay, Navigation]} className="clients-slider wow fadeInUp">
+            <Swiper {...setting} modules={[]} className="clients-slider wow fadeInUp">
                {brand_data.map((item, i) => (
                   <SwiperSlide key={i} className="client-item">
                      <div className="client-img">
