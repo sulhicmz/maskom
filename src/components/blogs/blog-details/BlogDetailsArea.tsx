@@ -1,7 +1,11 @@
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import BlogForm from "@/components/forms/BlogForm"
+import dynamic from "next/dynamic"
+const BlogForm = dynamic(() => import("@/components/forms/BlogForm"), {
+   ssr: false,
+   loading: () => <div className="text-center py-5">Memuat formulir komentar...</div>
+})
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
 import { InnerBlogPost } from "@/types/data"
 

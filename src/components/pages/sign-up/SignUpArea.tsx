@@ -1,5 +1,8 @@
 import Image from "next/image"
-import SignUpForm from "@/components/forms/SignUpForm"
+import dynamic from "next/dynamic"
+const SignUpForm = dynamic(() => import("@/components/forms/SignUpForm"), {
+   loading: () => <div className="text-center py-5">Memuat formulir pendaftaran...</div>
+})
 
 import login_img1 from "@/assets/images/gallery/robot.png"
 import login_img2 from "@/assets/images/gallery/base.png"

@@ -1,10 +1,13 @@
 import type { ServiceErrorCodeType } from '@/services/common';
+import type { CircuitBreakerState } from '@/utils/resilience';
 
 export interface IAuthService {
     login(credentials: LoginCredentials): Promise<AuthResult>;
     register(userData: RegisterData): Promise<AuthResult>;
     logout(): Promise<AuthResult>;
     getCurrentUser(): Promise<User | null>;
+    getCircuitBreakerState(): CircuitBreakerState;
+    resetCircuitBreaker(): void;
 }
 
 export interface LoginCredentials {

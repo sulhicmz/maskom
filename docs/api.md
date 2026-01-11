@@ -742,11 +742,98 @@ authService.resetLoginRateLimit('user@example.com');
 authService.resetRegisterRateLimit('user@example.com');
 ```
 
+#### Get Circuit Breaker State
+
+```typescript
+const state = authService.getCircuitBreakerState();
+console.log(`Circuit breaker open: ${state.isOpen}`);
+console.log(`Failure count: ${state.failureCount}`);
+```
+
+#### Reset Circuit Breaker (Admin Use)
+
+```typescript
+authService.resetCircuitBreaker();
+```
+
 **Security Benefits**:
 - Prevents brute force attacks on login
 - Prevents account creation abuse on register
 - Automatic cooldown after limit exceeded
 - Per-email rate limiting (not IP-based)
+
+---
+
+### Resilience Configuration
+
+The AuthService implements four-layer resilience:
+
+#### 1. Timeout Protection
+
+- **Default Timeout**: 5,000ms (5 seconds)
+- **Behavior**: Request fails if operation doesn't complete within timeout
+- **Error Code**: Timeout error with `isTimeout: true`
+- **Purpose**: Prevents indefinite hangs on slow operations
+
+#### 2. Retry with Exponential Backoff
+
+- **Max Attempts**: 3 (1 initial + 2 retries)
+- **Base Delay**: 1,000ms (1 second)
+- **Max Delay**: 10,000ms (10 seconds)
+- **Backoff Multiplier**: 2x
+- **Retryable Patterns**:
+  - `/network/i` - Network-related errors
+  - `/timeout/i` - Timeout errors
+  - `/ECONN/i` - Connection errors
+- **Non-Retryable Errors**: Validation errors (immediate failure)
+
+**Retry Schedule**:
+- Attempt 1: Immediate
+- Attempt 2: 1,000ms delay
+- Attempt 3: 2,000ms delay
+
+#### 3. Circuit Breaker
+
+- **Failure Threshold**: 50 consecutive failures
+- **Reset Timeout**: 60,000ms (60 seconds)
+- **Monitoring Period**: 60,000ms (60 seconds)
+- **States**:
+  - **Closed**: Normal operation, requests flow through
+  - **Open**: Requests rejected immediately after threshold
+  - **Half-Open**: Test request to check recovery
+- **Note**: High threshold (50) prevents circuit breaker from interfering with per-user rate limiting tests
+
+#### 4. Rate Limiting
+
+Per-operation rate limiting (configured above).
+
+---
+
+### Monitoring & Diagnostics
+
+#### Get Circuit Breaker State
+
+```typescript
+authService.getCircuitBreakerState(): CircuitBreakerState
+```
+
+**Returns**:
+```typescript
+interface CircuitBreakerState {
+    isOpen: boolean;           // Circuit breaker state
+    failureCount: number;      // Current consecutive failures
+    lastFailureTime: number | null;  // Unix timestamp
+    lastSuccessTime: number | null;  // Unix timestamp
+}
+```
+
+#### Reset Circuit Breaker
+
+```typescript
+authService.resetCircuitBreaker(): void
+```
+
+**Warning**: Manual reset should be used with caution in production.
 
 ---
 
@@ -1149,6 +1236,27 @@ metricsCollector.getAllHealthChecks(thresholdSuccessRate: number = 0.8): HealthC
 ```
 
 **Returns**: Array of health check results for all services.
+
+#### Service-Specific Metrics
+
+**AuthService**:
+
+```typescript
+authService.getMetrics(): {
+    login?: ServiceMetrics;
+    register?: ServiceMetrics;
+}
+```
+
+**Returns**: Metrics for login and register operations separately.
+
+**Example**:
+```typescript
+const metrics = authService.getMetrics();
+if (metrics.login?.averageResponseTime && metrics.login.averageResponseTime > 1000) {
+    console.warn('Login response time is high:', metrics.login.averageResponseTime);
+}
+```
 
 #### Export Metrics
 

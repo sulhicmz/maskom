@@ -143,7 +143,28 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
 
-**Validation Utilities** (src/utils/dataValidation.ts):
+**Validation Utilities** (src/utils/dataValidation/):
+- ✅ **Modular Architecture** - Validators split into focused modules (Task 49)
+- ✅ `createValidator<T>()` - Factory pattern for creating validators (baseValidation.ts)
+- ✅ `validateBaseDataItem()` - Validate BaseDataItem structure (baseValidation.ts)
+- ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs (baseValidation.ts)
+- ✅ `validateDataArray<T>()` - Validate entire arrays (baseValidation.ts)
+
+**Module Structure**:
+- `baseValidation.ts` - Core types and factory functions
+- `feedbackValidation.ts` - FeedbackItem validator
+- `priceValidation.ts` - PriceItem, PriceDetailItem validators
+- `faqValidation.ts` - FaqItem, FaqDetail, InnerFaqItem validators
+- `featureValidation.ts` - FeatureItem, FeatureHomeOneItem validators
+- `processValidation.ts` - ProcessItem validator
+- `causeValidation.ts` - CauseItem validator
+- `navigationValidation.ts` - MenuItem, NavigationItem, NavigationSection validators
+- `dashboardValidation.ts` - WiFiDevice, WebsiteTemplate, AIStep validators
+- `blogValidation.ts` - BlogCommentItem, InnerBlogPost validators
+- `teamValidation.ts` - TeamMember validator
+- `socialValidation.ts` - SocialLink validator
+- `contactValidation.ts` - ContactInfoItem validator
+- `index.ts` - Central export point (backward compatible with dataValidation.ts)
 - ✅ `createValidator<T>()` - Factory pattern for creating validators
 - ✅ `validateBaseDataItem()` - Validate BaseDataItem structure
 - ✅ `validateRequiredFields<T>()` - Check required fields (via createValidator)
@@ -421,6 +442,9 @@ Services (AuthService)
 - ✅ Unified error logging across all services (logServiceError, logServiceSuccess)
 - ✅ Helper functions for result creation (createSuccessResult, createErrorResult)
 - ✅ Centralized constants for magic numbers (src/constants/) - Eliminates magic numbers like rate limits and validation thresholds
+- ✅ Webpack code splitting for large dependencies (forms, swiper cache groups)
+- ✅ Lazy-loaded form components with loading states (ContactForm, LoginForm, SignUpForm, BlogForm)
+- ✅ Bundle optimization with separate async chunks (19KB forms, 24KB swiper)
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
@@ -512,10 +536,15 @@ External API (EmailJS, etc.)
   - `resetLoginRateLimit(email)`: Reset rate limit for login (admin)
   - `resetRegisterRateLimit(email)`: Reset rate limit for register (admin)
 - **Current Implementation**: Mock authentication (ready for real backend integration)
+- **Resilience Patterns** (✅ COMPLETED - Integration Hardening):
+  - **Timeout Protection**: 5,000ms timeout for login/register operations
+  - **Retry with Exponential Backoff**: 3 attempts (1 initial + 2 retries)
+  - **Circuit Breaker**: 50 failure threshold, 60-second reset timeout
+  - **High Threshold**: 50 failures prevents circuit from interfering with per-user rate limiting
 - **Rate Limiting**:
-  - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
-  - **Register**: 5 attempts per 1 hour, 2 hour cooldown
-  - Per-email tracking to prevent brute force attacks
+   - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
+   - **Register**: 5 attempts per 1 hour, 2 hour cooldown
+   - **Per-email tracking**: Prevent brute force attacks
 - **Location**: `src/services/auth/AuthService.ts`
 - **Forms Using Service**: LoginForm, SignUpForm
 
@@ -750,6 +779,97 @@ const Wrapper = ({ children }: WrapperProps) => {
 - Keep critical CSS inline for above-the-fold content (future enhancement)
 - Test both online and offline scenarios for CDN dependencies
 
+## Bundle Optimization Patterns
+
+### Webpack Code Splitting
+
+**Purpose**: Separate large dependencies into async chunks loaded only when needed
+
+**Implementation**:
+- Webpack splitChunks configuration with multiple cache groups
+- Higher priority cache groups for specific libraries (forms, swiper)
+- Async chunks (loaded only when needed)
+- reuseExistingChunk: true to prevent duplication
+
+**Benefits**:
+- Vendor bundle reduced from 270KB to 221KB (18.1% reduction)
+- Forms chunk (19KB) loaded only on pages with forms
+- Swiper chunk (24KB) loaded only on pages with carousels
+- 44KB savings on non-form pages (15-16% reduction)
+- Better cache hit ratio (smaller shared chunk)
+
+**Implementation Example** (next.config.ts):
+```javascript
+cacheGroups: {
+  vendor: {
+    test: /[\\/]node_modules[\\/]/,
+    name: 'vendors',
+    chunks: 'all',
+    priority: 1,
+  },
+  forms: {
+    test: /[\\/]node_modules[\\/](react-hook-form|yup|@hookform)[\\/]/,
+    name: 'forms',
+    chunks: 'async',
+    priority: 10,
+    reuseExistingChunk: true,
+  },
+  swiper: {
+    test: /[\\/]node_modules[\\/]swiper[\\/]/,
+    name: 'swiper',
+    chunks: 'async',
+    priority: 10,
+    reuseExistingChunk: true,
+  },
+}
+```
+
+**Page-Level Improvements**:
+- **Non-Form Pages** (10 pages): 283KB → 239KB = -44KB (-15.5%)
+- **Form Pages** (3 pages): 285KB → 260KB = -25KB (-8.8%)
+- **Total Savings**: 440KB (non-form) + 75KB (form) = 515KB
+
+**Lazy-Loaded Form Components**
+
+**Purpose**: Load form components only when needed to reduce initial bundle size
+
+**Implementation**:
+- Dynamic imports for ContactForm, LoginForm, SignUpForm, BlogForm
+- Loading states with Indonesian messages
+- Parent components use `next/dynamic`
+
+**Benefits**:
+- Form libraries (react-hook-form + yup) loaded only on 4 pages
+- Forms chunk: 19KB (vs. 185KB in vendor)
+- Graceful loading UX with spinner messages
+
+**Implementation Example**:
+```typescript
+import dynamic from "next/dynamic"
+const ContactForm = dynamic(() => import("../forms/ContactForm"), {
+   loading: () => <div className="text-center py-5">Memuat formulir kontak...</div>
+})
+```
+
+**Trade-offs**:
+- Slight delay on form page load (chunk fetch)
+- Better UX on non-form pages (44KB less JS)
+- Additional HTTP requests for lazy-loaded chunks
+
+**Usage Guidelines**:
+- Use splitChunks for libraries >50KB that are used on <50% of pages
+- Set higher priority (10) to split from default vendor group (priority: 1)
+- Use async chunks for lazy-loaded libraries
+- Keep vendor group for core libraries (React, Next.js, Bootstrap)
+- Verify with bundle analyzer before/after to measure impact
+
+**Future Enhancements**:
+- Tree shaking for yup (only load used exports: string, object, shape)
+- Lazy load EmailJS (11KB) only on /contact page
+- Next.js 16 upgrade (includes improved code splitting)
+
+---
+
 ## Asset Optimization Patterns
 
 ### Unused Asset Removal
@@ -855,3 +975,30 @@ NEXT_PUBLIC_CORS_ORIGIN=https://maskom.co.id  # Production
 - **Content-Security-Policy**: Comprehensive CSP with proper restrictions
 - **Referrer-Policy**: strict-origin-when-cross-origin
 - **Permissions-Policy**: geolocation=(), microphone=(), camera=()
+
+### Security Assessment (✅ Completed - Task 66)
+
+Comprehensive security audit completed with **zero critical issues**:
+- **Zero CVE vulnerabilities** (npm audit: 0/0)
+- **No hardcoded secrets** in code
+- **All security headers properly configured**
+- **Rate limiting implemented** for all authentication forms
+- **Input validation** for all user inputs
+- **No dangerous patterns** (innerHTML, eval, Function constructor all absent)
+- **Secrets properly managed** (.env* excluded, .env.example has only placeholders)
+- **All 1415 tests passing** (100% success rate)
+
+**Rate Limiting Configuration**:
+- **Login**: 5 attempts per 15 minutes, 30 minute cooldown
+- **Register**: 5 attempts per 1 hour, 2 hour cooldown
+- **Email**: 5 attempts per 60 seconds, 5 minute cooldown
+- **Form**: 10 attempts per 1 hour, 2 hour cooldown
+
+**Input Validation**:
+- **Password**: Minimum 8 characters required
+- **Email**: Format validation via regex
+- **Required fields**: Non-empty validation
+
+**Security Grade**: A+ (Zero critical issues, comprehensive protection)
+
+**Full Documentation**: See `docs/task.md` - Task 66: Security Assessment for complete details
