@@ -5,8 +5,8 @@ import React from "react"
 const Feedback = React.memo(() => {
    return (
       <section className="testimonial-section testimonial-shape-section p-r z-1 bg_cover pt-110 pb-90"
-         id="testimoni"
-         style={{ backgroundImage: `url(/assets/images/bg/testimonial-bg.jpg)` }}>
+          id="testimoni"
+          style={{ backgroundImage: `url(/assets/images/bg/testimonial-bg.webp)` }}>
          <div className="shape shape-one"><span className="circle"></span></div>
          <div className="shape shape-two"><span className="circle"></span></div>
          <div className="container">

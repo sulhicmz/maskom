@@ -8,7 +8,7 @@ import logo from "@/assets/images/logo/blue-logo.png"
 
 const FooterTwo = () => {
    return (
-      <footer className="footer-v3 bg_cover pt-80" style={{ backgroundImage: `url(/assets/images/bg/pattern-bg.jpg)` }}>
+      <footer className="footer-v3 bg_cover pt-80" style={{ backgroundImage: `url(/assets/images/bg/pattern-bg.webp)` }}>
          <div className="container">
             <div className="footer-widget-area pb-45">
                <div className="row">
