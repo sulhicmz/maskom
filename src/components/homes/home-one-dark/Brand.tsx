@@ -1,12 +1,9 @@
 "use client"
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/autoplay";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link"
 import React from "react"
+import { useEffect } from "react";
 import brand_data from "@/data/BrandDataDark"
 
 const setting = {
@@ -37,7 +34,30 @@ const setting = {
    },
 };
 
+const Swiper = dynamic(() => import('swiper/react').then((mod) => mod.Swiper), {
+   ssr: false,
+   loading: () => <div className="text-center py-4">Loading client logos...</div>
+});
+
+const SwiperSlide = dynamic(() => import('swiper/react').then((mod) => mod.SwiperSlide), {
+   ssr: false
+});
+
 const Brand = React.memo(() => {
+   useEffect(() => {
+      const loadSwiperCSS = async () => {
+         if (!document.getElementById('swiper-css')) {
+            const swiperCoreCSS = document.createElement('link');
+            swiperCoreCSS.rel = 'stylesheet';
+            swiperCoreCSS.href = 'https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css';
+            swiperCoreCSS.id = 'swiper-css';
+            document.head.appendChild(swiperCoreCSS);
+         }
+      };
+
+      loadSwiperCSS();
+   }, []);
+
    return (
       <section className="clients-section">
          <div className="container">
@@ -48,7 +68,7 @@ const Brand = React.memo(() => {
                   </div>
                </div>
             </div>
-            <Swiper {...setting} modules={[Autoplay, Navigation]} className="clients-slider wow fadeInUp">
+            <Swiper {...setting} modules={[]} className="clients-slider wow fadeInUp">
                {brand_data.map((item, i) => (
                   <SwiperSlide key={i} className="client-item">
                      <div className="client-img">
