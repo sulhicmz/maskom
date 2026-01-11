@@ -1,8 +1,19 @@
 import emailjs from '@emailjs/browser';
-import type { IEmailService, EmailSendParams, EmailSendResult, EmailSendOptions } from './types';
+import type { IEmailService, EmailSendParams, EmailSendOptions, ServiceMetrics } from './types';
+import type { ServiceResult } from '@/services/common';
 import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
 import { emailRateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
+import { 
+    ServiceCredentialsError, 
+    ServiceTimeoutError, 
+    ServiceRateLimitError,
+    ServiceCircuitBreakerError,
+    logServiceError,
+    logServiceSuccess,
+    createSuccessResult,
+    createErrorResult
+} from '@/services/common';
 
 class EmailService implements IEmailService {
     private serviceId: string;
@@ -16,7 +27,7 @@ class EmailService implements IEmailService {
         this.publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
 
         if (!this.serviceId || !this.templateId || !this.publicKey) {
-            console.warn('EmailJS credentials not configured in environment variables');
+            logServiceWarning('EmailService', 'constructor', 'EmailJS credentials not configured in environment variables');
         }
 
         this.circuitBreaker = new CircuitBreaker({
@@ -26,15 +37,14 @@ class EmailService implements IEmailService {
         });
     }
 
-    async sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult> {
+    async sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>> {
         const startTime = Date.now();
 
         if (!this.serviceId || !this.templateId || !this.publicKey) {
+            const error = new ServiceCredentialsError('EmailJS credentials not configured');
             metricsCollector.recordCall('EmailService', false, 'credentials_not_configured');
-            return {
-                success: false,
-                error: 'EmailJS credentials not configured'
-            };
+            logServiceError(error, { service: 'EmailService', operation: 'sendEmail' });
+            return createErrorResult(error);
         }
 
         const identifier = options?.identifier || params.templateParams.user_email;
@@ -43,12 +53,9 @@ class EmailService implements IEmailService {
             const limitCheck = emailRateLimiter.check(identifier);
             if (!limitCheck.allowed) {
                 const responseTime = Date.now() - startTime;
+                const error = new ServiceRateLimitError(limitCheck.error || 'Too many requests');
                 metricsCollector.recordCall('EmailService', false, 'rate_limit', responseTime);
-                return {
-                    success: false,
-                    error: limitCheck.error,
-                    rateLimited: true
-                };
+                return createErrorResult(error, undefined, { rateLimited: true });
             }
         }
 
@@ -66,7 +73,8 @@ class EmailService implements IEmailService {
                 );
 
                 if (!retryResult.success || !retryResult.data) {
-                    throw retryResult.error || new Error('Email send failed after retries');
+                    const error = retryResult.error || new Error('Email send failed after retries');
+                    throw error;
                 }
 
                 return retryResult.data;
@@ -78,29 +86,30 @@ class EmailService implements IEmailService {
 
             const responseTime = Date.now() - startTime;
             metricsCollector.recordCall('EmailService', true, undefined, responseTime);
+            logServiceSuccess('EmailService', 'sendEmail', responseTime);
 
-            return {
-                success: true,
-                text: result.text
-            };
+            return createSuccessResult('Email sent successfully', { text: result.text });
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             const responseTime = Date.now() - startTime;
-            
             let errorType = 'unknown';
-            if (errorMessage.includes('timeout')) {
+            
+            if (error instanceof ServiceTimeoutError || (error instanceof Error && error.message.includes('timeout'))) {
                 errorType = 'timeout';
-            } else if (errorMessage.includes('circuit breaker')) {
+            } else if (error instanceof ServiceCircuitBreakerError || (error instanceof Error && error.message.includes('circuit breaker'))) {
                 errorType = 'circuit_breaker';
             }
             
             metricsCollector.recordCall('EmailService', false, errorType, responseTime);
-            console.error('Email send failed:', errorMessage);
             
-            return {
-                success: false,
-                error: errorMessage
-            };
+            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+            if (!(standardizedError instanceof ServiceCredentialsError || 
+                  standardizedError instanceof ServiceTimeoutError || 
+                  standardizedError instanceof ServiceRateLimitError || 
+                  standardizedError instanceof ServiceCircuitBreakerError)) {
+                logServiceError(standardizedError, { service: 'EmailService', operation: 'sendEmail' });
+            }
+            
+            return createErrorResult(standardizedError.message);
         }
     }
 
@@ -126,10 +135,14 @@ class EmailService implements IEmailService {
         this.circuitBreaker.reset();
     }
 
-    getMetrics() {
+    getMetrics(): ServiceMetrics | undefined {
         return metricsCollector.getMetrics('EmailService');
     }
 }
 
 const emailServiceInstance = new EmailService();
 export default emailServiceInstance;
+
+function logServiceWarning(service: string, operation: string, message: string) {
+    console.warn(`[${service}] ${operation} warning:`, message);
+}

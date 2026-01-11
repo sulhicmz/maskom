@@ -1,7 +1,14 @@
-import type { IAuthService, LoginCredentials, RegisterData, AuthResult, User } from './types';
+import type { IAuthService, LoginCredentials, RegisterData, User, AuthResult } from './types';
 import { validateEmail, validatePassword } from '@/utils/validation';
 import { RateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
+import { 
+    ServiceErrorCode, 
+    ServiceValidationError,
+    logServiceError,
+    logServiceSuccess,
+    createErrorResult
+} from '@/services/common';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -27,41 +34,39 @@ class AuthService implements IAuthService {
             if (!rateLimitCheck.allowed) {
                 metricsCollector.recordCall('AuthService.login', false, 'rate_limit');
                 const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
-                return {
-                    success: false,
-                    error: rateLimitCheck.error?.includes('Too many attempts')
+                return createErrorResult(
+                    rateLimitCheck.error?.includes('Too many attempts')
                         ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
                         : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                };
+                    ServiceErrorCode.RATE_LIMIT,
+                    { rateLimited: true }
+                );
             }
 
             if (!credentials.email || !credentials.password) {
                 this.loginRateLimiter.recordAttempt(credentials.email);
                 metricsCollector.recordCall('AuthService.login', false, 'validation');
-                return {
-                    success: false,
-                    error: 'Email dan kata sandi diperlukan',
-                };
+                const error = new ServiceValidationError('Email dan kata sandi diperlukan');
+                logServiceError(error, { service: 'AuthService', operation: 'login' });
+                return createErrorResult(error);
             }
 
             const emailValidation = validateEmail(credentials.email);
             if (!emailValidation.valid) {
                 this.loginRateLimiter.recordAttempt(credentials.email);
                 metricsCollector.recordCall('AuthService.login', false, 'validation');
-                return {
-                    success: false,
-                    error: emailValidation.error || 'Format email tidak valid',
-                };
+                const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
+                logServiceError(error, { service: 'AuthService', operation: 'login' });
+                return createErrorResult(error);
             }
 
             const passwordValidation = validatePassword(credentials.password);
             if (!passwordValidation.valid) {
                 this.loginRateLimiter.recordAttempt(credentials.email);
                 metricsCollector.recordCall('AuthService.login', false, 'validation');
-                return {
-                    success: false,
-                    error: passwordValidation.error || 'Kata sandi tidak valid',
-                };
+                const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
+                logServiceError(error, { service: 'AuthService', operation: 'login' });
+                return createErrorResult(error);
             }
 
             this.currentUser = {
@@ -71,6 +76,8 @@ class AuthService implements IAuthService {
             };
 
             metricsCollector.recordCall('AuthService.login', true);
+            logServiceSuccess('AuthService', 'login');
+            
             return {
                 success: true,
                 message: 'Berhasil masuk ke portal',
@@ -80,9 +87,14 @@ class AuthService implements IAuthService {
         } catch (error) {
             this.loginRateLimiter.recordAttempt(credentials.email);
             metricsCollector.recordCall('AuthService.login', false, 'unknown');
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat login';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'login' });
+            
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Terjadi kesalahan saat login',
+                error: errorMessage,
+                errorCode: ServiceErrorCode.UNKNOWN,
             };
         }
     }
@@ -93,41 +105,39 @@ class AuthService implements IAuthService {
             if (!rateLimitCheck.allowed) {
                 metricsCollector.recordCall('AuthService.register', false, 'rate_limit');
                 const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
-                return {
-                    success: false,
-                    error: rateLimitCheck.error?.includes('Too many attempts')
+                return createErrorResult(
+                    rateLimitCheck.error?.includes('Too many attempts')
                         ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
                         : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                };
+                    ServiceErrorCode.RATE_LIMIT,
+                    { rateLimited: true }
+                );
             }
 
             if (!userData.name || !userData.email || !userData.password) {
                 this.registerRateLimiter.recordAttempt(userData.email);
                 metricsCollector.recordCall('AuthService.register', false, 'validation');
-                return {
-                    success: false,
-                    error: 'Nama, email, dan kata sandi diperlukan',
-                };
+                const error = new ServiceValidationError('Nama, email, dan kata sandi diperlukan');
+                logServiceError(error, { service: 'AuthService', operation: 'register' });
+                return createErrorResult(error);
             }
 
             const emailValidation = validateEmail(userData.email);
             if (!emailValidation.valid) {
                 this.registerRateLimiter.recordAttempt(userData.email);
                 metricsCollector.recordCall('AuthService.register', false, 'validation');
-                return {
-                    success: false,
-                    error: emailValidation.error || 'Format email tidak valid',
-                };
+                const error = new ServiceValidationError(emailValidation.error || 'Format email tidak valid');
+                logServiceError(error, { service: 'AuthService', operation: 'register' });
+                return createErrorResult(error);
             }
 
             const passwordValidation = validatePassword(userData.password);
             if (!passwordValidation.valid) {
                 this.registerRateLimiter.recordAttempt(userData.email);
                 metricsCollector.recordCall('AuthService.register', false, 'validation');
-                return {
-                    success: false,
-                    error: passwordValidation.error || 'Kata sandi tidak valid',
-                };
+                const error = new ServiceValidationError(passwordValidation.error || 'Kata sandi tidak valid');
+                logServiceError(error, { service: 'AuthService', operation: 'register' });
+                return createErrorResult(error);
             }
 
             this.currentUser = {
@@ -137,6 +147,8 @@ class AuthService implements IAuthService {
             };
 
             metricsCollector.recordCall('AuthService.register', true);
+            logServiceSuccess('AuthService', 'register');
+            
             return {
                 success: true,
                 message: 'Registrasi berhasil dikirim',
@@ -146,9 +158,14 @@ class AuthService implements IAuthService {
         } catch (error) {
             this.registerRateLimiter.recordAttempt(userData.email);
             metricsCollector.recordCall('AuthService.register', false, 'unknown');
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat registrasi';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'register' });
+            
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Terjadi kesalahan saat registrasi',
+                error: errorMessage,
+                errorCode: ServiceErrorCode.UNKNOWN,
             };
         }
     }
@@ -156,15 +173,21 @@ class AuthService implements IAuthService {
     async logout(): Promise<AuthResult> {
         try {
             this.currentUser = null;
+            logServiceSuccess('AuthService', 'logout');
 
             return {
                 success: true,
                 message: 'Berhasil keluar',
             };
         } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat logout';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'logout' });
+            
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Terjadi kesalahan saat logout',
+                error: errorMessage,
+                errorCode: ServiceErrorCode.UNKNOWN,
             };
         }
     }

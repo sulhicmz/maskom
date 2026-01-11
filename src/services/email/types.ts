@@ -1,7 +1,10 @@
+import type { ServiceResult } from '@/services/common';
+
 export interface IEmailService {
-    sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult>;
+    sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>>;
     getCircuitBreakerState(): CircuitBreakerState;
     resetCircuitBreaker(): void;
+    getMetrics(): ServiceMetrics | undefined;
 }
 
 export interface EmailSendParams {
@@ -17,16 +20,23 @@ export interface EmailSendOptions {
     identifier?: string;
 }
 
-export interface EmailSendResult {
-    success: boolean;
-    text?: string;
-    error?: string;
-    rateLimited?: boolean;
-}
-
 export type CircuitBreakerState = {
     isOpen: boolean;
     failureCount: number;
     lastFailureTime: number | null;
     lastSuccessTime: number | null;
+};
+
+export type ServiceMetrics = {
+    serviceName: string;
+    totalCalls: number;
+    successCalls: number;
+    failureCalls: number;
+    timeoutCalls: number;
+    rateLimitCalls: number;
+    circuitBreakerOpenCount: number;
+    lastError?: string;
+    lastSuccessTime?: number;
+    lastFailureTime?: number;
+    averageResponseTime?: number;
 };

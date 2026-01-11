@@ -1,3 +1,5 @@
+import type { ServiceErrorCodeType } from '@/services/common';
+
 export interface IAuthService {
     login(credentials: LoginCredentials): Promise<AuthResult>;
     register(userData: RegisterData): Promise<AuthResult>;
@@ -20,8 +22,10 @@ export interface AuthResult {
     success: boolean;
     message?: string;
     error?: string;
+    errorCode?: ServiceErrorCodeType;
     user?: User;
     token?: string;
+    metadata?: Record<string, unknown>;
 }
 
 export interface User {

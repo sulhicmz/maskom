@@ -6,10 +6,160 @@ This document provides comprehensive API specifications for all external service
 
 ## Table of Contents
 
+- [Common Service Types](#common-service-types)
 - [Email Service API](#email-service-api)
 - [Authentication Service API](#authentication-service-api)
 - [Error Response Standards](#error-response-standards)
 - [Resilience Patterns](#resilience-patterns)
+
+---
+
+## Common Service Types
+
+### Location
+
+**Types**: `src/services/common/types.ts`
+
+**Error Classes**: `src/services/common/ServiceException.ts`
+
+**Logger**: `src/services/common/logger.ts`
+
+**Result Helpers**: `src/services/common/resultHelpers.ts`
+
+---
+
+### ServiceResult<T>
+
+All service methods return a standardized `ServiceResult<T>` interface:
+
+```typescript
+interface ServiceResult<T = void> {
+    success: boolean;          // Operation success status
+    message?: string;          // Success message (on success)
+    data?: T;                 // Result data (on success)
+    error?: string;            // Error message (on failure)
+    errorCode?: ServiceErrorCodeType;  // Standardized error code (on failure)
+    metadata?: Record<string, unknown>;  // Additional metadata
+}
+```
+
+**Success Example**:
+```typescript
+{
+    success: true,
+    message: 'Email sent successfully',
+    data: { text: 'OK' }
+}
+```
+
+**Error Example**:
+```typescript
+{
+    success: false,
+    error: 'Invalid email format',
+    errorCode: 'VALIDATION_ERROR',
+    metadata: {
+        isRetryable: false,
+        isTimeout: false
+    }
+}
+```
+
+---
+
+### Standard Error Codes
+
+All services use standardized error codes defined in `ServiceErrorCode`:
+
+| Code | Description | Retryable | Use Case |
+|------|-------------|------------|-----------|
+| `VALIDATION_ERROR` | Input validation failed | No | Invalid email, password too short |
+| `RATE_LIMIT_EXCEEDED` | Rate limit exceeded | No | Too many requests within time window |
+| `TIMEOUT` | Request timeout | Yes | External API didn't respond within timeout |
+| `CIRCUIT_BREAKER_OPEN` | Circuit breaker is open | No | Service degraded, temporary unavailable |
+| `CREDENTIALS_MISSING` | Missing API credentials | No | Environment variables not configured |
+| `NETWORK_ERROR` | Network-related failure | Yes | Connection errors, DNS failures |
+| `UNKNOWN_ERROR` | Unclassified error | No | Unexpected errors |
+
+---
+
+### Service Exception Classes
+
+Custom exception classes for standardized error handling:
+
+| Class | Error Code | Is Retryable | Is Timeout | Use Case |
+|--------|-------------|---------------|-------------|-----------|
+| `ServiceException` | Custom | Configurable | Configurable | Base exception class |
+| `ServiceTimeoutError` | `TIMEOUT` | Yes | Yes | Request timeouts |
+| `ServiceRateLimitError` | `RATE_LIMIT_EXCEEDED` | No | No | Rate limit exceeded |
+| `ServiceValidationError` | `VALIDATION_ERROR` | No | No | Validation failures |
+| `ServiceCircuitBreakerError` | `CIRCUIT_BREAKER_OPEN` | No | No | Circuit breaker open |
+| `ServiceCredentialsError` | `CREDENTIALS_MISSING` | No | No | Missing credentials |
+| `ServiceNetworkError` | `NETWORK_ERROR` | Yes | No | Network errors |
+
+**Example Usage**:
+```typescript
+import { ServiceValidationError } from '@/services/common';
+
+throw new ServiceValidationError('Invalid email format');
+```
+
+---
+
+### Helper Functions
+
+**createSuccessResult<T>**:
+```typescript
+createSuccessResult<T>(
+    message: string,
+    data?: T,
+    metadata?: Record<string, unknown>
+): ServiceResult<T>
+```
+
+**createErrorResult<T>**:
+```typescript
+createErrorResult<T = void>(
+    error: string | ServiceException,
+    errorCode?: ServiceErrorCodeType,
+    metadata?: Record<string, unknown>
+): ServiceResult<T>
+```
+
+**mapToServiceResult<T>**:
+```typescript
+mapToServiceResult<T>(
+    success: boolean,
+    successMessage: string,
+    errorMessage: string,
+    data?: T,
+    errorCode?: ServiceErrorCodeType
+): ServiceResult<T>
+```
+
+---
+
+### Service Logging
+
+Standardized logging utilities for consistent error handling:
+
+```typescript
+logServiceError(error: unknown, options: { service: string; operation: string; includeDetails?: boolean }): void
+logServiceSuccess(service: string, operation: string, duration?: number): void
+logServiceWarning(service: string, operation: string, message: string): void
+```
+
+**Example**:
+```typescript
+import { logServiceError, logServiceSuccess } from '@/services/common';
+
+try {
+    const result = await service.call();
+    logServiceSuccess('EmailService', 'sendEmail', duration);
+} catch (error) {
+    logServiceError(error, { service: 'EmailService', operation: 'sendEmail' });
+}
+```
 
 ---
 
@@ -29,7 +179,7 @@ This document provides comprehensive API specifications for all external service
 
 #### Send Email
 
-**Method**: `sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult>`
+**Method**: `sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>>`
 
 **Description**: Sends an email using configured EmailJS template with built-in resilience patterns (rate limiting, timeout, retry, circuit breaker).
 
@@ -58,21 +208,23 @@ interface EmailSendOptions {
 
 #### Validation Rules
 
-- `fromName`: 1-100 characters, no HTML tags
-- `fromEmail`: Must be valid email format
-- `subject`: 1-200 characters
-- `message`: 1-5000 characters
+- `user_name`: Required, no HTML tags
+- `user_email`: Required, must be valid email format
+- `message`: Required, 1-5000 characters
 
 ---
 
 ### Response
 
-#### Success Response (200 OK)
+#### Success Response
 
 ```typescript
-interface EmailSendResult {
-    success: true;
-    text: string;  // EmailJS success message (e.g., "OK")
+{
+    success: true,
+    message: 'Email sent successfully',
+    data: {
+        text: string;  // EmailJS response text (e.g., "OK")
+    }
 }
 ```
 
@@ -86,16 +238,64 @@ All error responses follow the [Error Response Standards](#error-response-standa
 {
     "success": false,
     "error": "Too many attempts. Please try again in X seconds.",
-    "rateLimited": true
+    "errorCode": "RATE_LIMIT_EXCEEDED",
+    "metadata": {
+        "rateLimited": true
+    }
 }
 ```
 
-**400 Bad Request**
+**400 Bad Request - Missing Credentials**
 
 ```json
 {
     "success": false,
-    "error": "EmailJS credentials not configured"
+    "error": "EmailJS credentials not configured",
+    "errorCode": "CREDENTIALS_MISSING",
+    "metadata": {
+        "isRetryable": false,
+        "isTimeout": false
+    }
+}
+```
+
+**408 Request Timeout**
+
+```json
+{
+    "success": false,
+    "error": "EmailJS request timed out",
+    "errorCode": "TIMEOUT",
+    "metadata": {
+        "isRetryable": true,
+        "isTimeout": true
+    }
+}
+```
+
+**502 Bad Gateway - Retry Exhausted**
+
+```json
+{
+    "success": false,
+    "error": "Email send failed after retries",
+    "errorCode": "NETWORK_ERROR",
+    "metadata": {
+        "isRetryable": true
+    }
+}
+```
+
+**503 Service Unavailable - Circuit Breaker**
+
+```json
+{
+    "success": false,
+    "error": "Circuit breaker is open. Service temporarily unavailable.",
+    "errorCode": "CIRCUIT_BREAKER_OPEN",
+    "metadata": {
+        "isRetryable": false
+    }
 }
 ```
 
@@ -370,7 +570,12 @@ All error responses follow the [Error Response Standards](#error-response-standa
 ```json
 {
     "success": false,
-    "error": "Email dan kata sandi diperlukan"
+    "error": "Email dan kata sandi diperlukan",
+    "errorCode": "VALIDATION_ERROR",
+    "metadata": {
+        "isRetryable": false,
+        "isTimeout": false
+    }
 }
 ```
 
@@ -379,7 +584,11 @@ All error responses follow the [Error Response Standards](#error-response-standa
 ```json
 {
     "success": false,
-    "error": "Format email tidak valid"
+    "error": "Format email tidak valid",
+    "errorCode": "VALIDATION_ERROR",
+    "metadata": {
+        "isRetryable": false
+    }
 }
 ```
 
@@ -388,7 +597,24 @@ All error responses follow the [Error Response Standards](#error-response-standa
 ```json
 {
     "success": false,
-    "error": "Kata sandi minimal 8 karakter"
+    "error": "Kata sandi minimal 8 karakter",
+    "errorCode": "VALIDATION_ERROR",
+    "metadata": {
+        "isRetryable": false
+    }
+}
+```
+
+**429 Too Many Requests**
+
+```json
+{
+    "success": false,
+    "error": "Terlalu banyak percobaan. Silakan coba lagi dalam X detik.",
+    "errorCode": "RATE_LIMIT_EXCEEDED",
+    "metadata": {
+        "rateLimited": true
+    }
 }
 ```
 
@@ -397,7 +623,8 @@ All error responses follow the [Error Response Standards](#error-response-standa
 ```json
 {
     "success": false,
-    "error": "Terjadi kesalahan saat login"
+    "error": "Terjadi kesalahan saat login",
+    "errorCode": "UNKNOWN_ERROR"
 }
 ```
 
@@ -666,9 +893,11 @@ When adding a new external service integration:
 
 1. **Create Service Interface**: Define contract in `src/services/[service]/types.ts`
 2. **Implement Service**: Create service class in `src/services/[service]/Service.ts`
-3. **Apply Resilience**: Use all three resilience patterns
-4. **Add Tests**: Create comprehensive test suite
-5. **Document**: Update this API documentation
+3. **Use Standard Types**: Import from `@/services/common` for `ServiceResult<T>` and error classes
+4. **Apply Resilience**: Use all three resilience patterns
+5. **Standardize Error Handling**: Use `createSuccessResult`, `createErrorResult`, and `logServiceError`
+6. **Add Tests**: Create comprehensive test suite
+7. **Document**: Update this API documentation
 
 ---
 
@@ -677,6 +906,16 @@ When adding a new external service integration:
 ```typescript
 // src/services/newservice/NewService.ts
 import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
+import {
+    ServiceResult,
+    ServiceTimeoutError,
+    ServiceNetworkError,
+    logServiceError,
+    logServiceSuccess,
+    createSuccessResult,
+    createErrorResult,
+    ServiceErrorCode
+} from '@/services/common';
 
 class NewService implements INewService {
     private circuitBreaker: CircuitBreaker;
@@ -689,25 +928,46 @@ class NewService implements INewService {
         });
     }
 
-    async callExternalApi(params: Params): Promise<Result> {
-        return this.circuitBreaker.execute(async () => {
-            const retryResult = await withRetry(
-                () => this.callWithTimeout(params),
-                {
-                    maxAttempts: 3,
-                    baseDelayMs: 1000,
-                    maxDelayMs: 10000,
-                    backoffMultiplier: 2,
-                    retryableErrors: [/network/i, /timeout/i, /ECONN/i]
-                }
-            );
+    async callExternalApi(params: Params): Promise<ServiceResult<{ id: string }>> {
+        const startTime = Date.now();
 
-            if (!retryResult.success || !retryResult.data) {
-                throw retryResult.error || new Error('API call failed after retries');
+        try {
+            const result = await this.circuitBreaker.execute(async () => {
+                const retryResult = await withRetry(
+                    () => this.callWithTimeout(params),
+                    {
+                        maxAttempts: 3,
+                        baseDelayMs: 1000,
+                        maxDelayMs: 10000,
+                        backoffMultiplier: 2,
+                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+                    }
+                );
+
+                if (!retryResult.success || !retryResult.data) {
+                    throw retryResult.error || new ServiceNetworkError('API call failed after retries');
+                }
+
+                return retryResult.data;
+            });
+
+            const duration = Date.now() - startTime;
+            logServiceSuccess('NewService', 'callExternalApi', duration);
+
+            return createSuccessResult('API call successful', { id: result.id });
+        } catch (error) {
+            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+
+            if (standardizedError.message.includes('timeout')) {
+                const timeoutError = new ServiceTimeoutError(standardizedError.message);
+                logServiceError(timeoutError, { service: 'NewService', operation: 'callExternalApi' });
+                return createErrorResult(timeoutError);
             }
 
-            return retryResult.data;
-        });
+            const networkError = new ServiceNetworkError(standardizedError.message);
+            logServiceError(networkError, { service: 'NewService', operation: 'callExternalApi' });
+            return createErrorResult(networkError);
+        }
     }
 
     private async callWithTimeout(params: Params) {
