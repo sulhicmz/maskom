@@ -9,7 +9,6 @@ const mockedUseBreakpoint = useBreakpoint as jest.Mock;
 
 jest.mock("next/image", () => {
   return function Image({ src, alt }: { src: string; alt: string }) {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} />;
   };
 });

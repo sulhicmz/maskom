@@ -5,7 +5,7 @@ import DashboardData from "@/data/DashboardData";
 
 jest.mock("next/image", () => ({
   __esModule: true,
-  default: (props: { src: string; alt: string; width?: number; height?: number; className?: string; loading?: "eager" | "lazy" }) => <img {...props} alt={props.alt || ""} />, // eslint-disable-line @next/next/no-img-element
+  default: (props: { src: string; alt: string; width?: number; height?: number; className?: string; loading?: "eager" | "lazy" }) => <img {...props} alt={props.alt || ""} />,
 }));
 
 jest.mock("next/dynamic", () => ({

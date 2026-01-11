@@ -13,7 +13,6 @@ jest.mock('next/image', () => ({
     className: string; 
     loading?: 'lazy' | 'eager' | undefined 
   }) => (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt}
