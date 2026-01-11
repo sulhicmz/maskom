@@ -1,10 +1,12 @@
 import { 
     ServiceResult, 
     ServiceErrorCode, 
-    ServiceErrorCodeType,
+    ServiceErrorCodeType 
+} from './types';
+import { 
     ServiceException, 
     isServiceException 
-} from './';
+} from './ServiceException';
 
 export function createSuccessResult<T>(
     message: string,
