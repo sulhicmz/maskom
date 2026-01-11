@@ -1,20 +1,15 @@
 "use client"
 import { home_1_price } from "@/data/PriceData";
 import Link from "next/link";
-import { useState } from "react";
 import SectionTitle from "@/components/common/SectionTitle";
 import AnimationWrapper from "@/components/common/AnimationWrapper";
+import { useTabs } from "@/hooks/useTabs";
 
 const tab_title: string[] = ["Kontrak 12 Bulan", "Kontrak 36 Bulan"];
 
 const Price = () => {
 
-   const [activeTab, setActiveTab] = useState(0);
-
-   // Handle tab click event
-   const handleTabClick = (index: number) => {
-      setActiveTab(index);
-   };
+   const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
 
    return (
       <section className="pricing-section" id="paket">

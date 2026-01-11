@@ -2,12 +2,13 @@
 
 import inner_faq_data from "@/data/InnerFaqData";
 import { useState, useEffect } from "react";
+import { useTabs } from "@/hooks/useTabs";
 
 const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
 const FaqArea = () => {
-  const [activeTab, setActiveTab] = useState(0);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
 
   useEffect(() => {
     if (inner_faq_data[activeTab]?.faq_details?.length) {
@@ -16,11 +17,6 @@ const FaqArea = () => {
       setActiveId(null);
     }
   }, [activeTab]);
-
-  // Handle tab click event
-  const handleTabClick = (index: number) => {
-    setActiveTab(index);
-  };
 
   return (
     <section className="faqs-section pt-115 pb-80">

@@ -1,34 +1,15 @@
 "use client"
 import { pricing_price } from "@/data/PriceData";
 import Link from "next/link";
-import { useState } from "react";
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
+import { useTabs } from "@/hooks/useTabs";
 
 const tab_title: string[] = ["Konektivitas Terkelola", "Keamanan & Dukungan"];
 
 const PricingArea = () => {
 
-   const [activeTab, setActiveTab] = useState(0);
-
-   const handleTabClick = (index: number) => {
-      setActiveTab(index);
-   };
-
-   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-         event.preventDefault();
-         handleTabClick(index);
-      }
-      if (event.key === 'ArrowRight') {
-         event.preventDefault();
-         handleTabClick((index + 1) % tab_title.length);
-      }
-      if (event.key === 'ArrowLeft') {
-         event.preventDefault();
-         handleTabClick((index - 1 + tab_title.length) % tab_title.length);
-      }
-   };
+   const { activeTab, handleTabClick, handleKeyDown } = useTabs({ tabCount: tab_title.length });
 
    return (
       <section className="pricing-section pt-110" aria-label="Pricing Plans">
