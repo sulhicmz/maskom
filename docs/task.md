@@ -8,6 +8,217 @@
 
 ---
 
+## Task 54: Data Layer Separation - Extract Hardcoded Data from Components
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Architectural Refactoring (Layer Separation)
+
+**Problem**:
+- Components contain hardcoded data arrays instead of importing from `src/data/` files
+- Violates **Data-Driven UI** principle: "All dynamic content comes from TypeScript data files in `src/data/`"
+- Mixes data management with presentation logic (Separation of Concerns violation)
+- Makes data changes difficult (must edit component files instead of data files)
+- Reduces data reusability across multiple components
+- Inconsistent with established data architecture patterns
+
+**Locations**:
+- `src/components/contact/ContactArea.tsx` - Hardcoded `contact_data` array (contact info)
+- `src/components/homes/home-one/Feature.tsx` - Hardcoded `feature_list` array (different from FeatureData.ts)
+- `src/components/homes/home-one/Brand.tsx` - Hardcoded `brand_data` array (client logos)
+- `src/components/blogs/blog-sidebar/Tags.tsx` - Hardcoded `tags` array (blog keywords)
+- `src/components/blogs/blog-sidebar/Category.tsx` - Hardcoded `cat_data` array (blog categories)
+
+**Data Analysis**:
+
+**ContactArea.tsx** (61 lines):
+- `contact_data`: 3 items with contact information (address, email, phone)
+- Contains JSX elements for links (Link components)
+- Data structure: `{ id, icon, title, info: JSX.Element }`
+
+**Feature.tsx** (home-one) (~85 lines):
+- `feature_list`: 3 items with feature descriptions
+- Data structure: `{ id, icon, title, desc }`
+- Different data from `src/data/FeatureData.ts` (which has 6 items for home_1 page)
+
+**Brand.tsx** (home-one) (~60 lines):
+- `brand_data`: 8 brand logo images (StaticImageData array)
+- Data structure: `StaticImageData[]` with 7 unique logos + 1 duplicate
+- Uses Swiper carousel component
+
+**Tags.tsx** (24 lines):
+- `tags`: 6 keyword tags for blog sidebar
+- Data structure: `string[]` with values: SD-WAN, Managed Wi-Fi, Keamanan, Cloud Connect, Monitoring, IoT
+
+**Category.tsx** (28 lines):
+- `cat_data`: 6 blog categories for sidebar
+- Data structure: `string[]` with values: Konektivitas Terkelola, Keamanan Jaringan, Operasional & Dukungan, Transformasi Digital, Infrastruktur Cloud, IoT & Edge
+
+**Solution**:
+1. Create new data files in `src/data/`:
+   - `ContactData.ts` - Contact information data
+   - `BrandData.ts` - Client brand/logo data
+   - `BlogTagData.ts` - Blog keyword tags
+   - `BlogCategoryData.ts` - Blog categories
+2. Extract hardcoded data from components to new data files:
+   - Move `contact_data` from ContactArea.tsx to `src/data/ContactData.ts`
+   - Move `brand_data` from Brand.tsx to `src/data/BrandData.ts`
+   - Move `tags` from Tags.tsx to `src/data/BlogTagData.ts`
+   - Move `cat_data` from Category.tsx to `src/data/BlogCategoryData.ts`
+   - Determine if `feature_list` in Feature.tsx (home-one) should be merged with or separate from `FeatureData.ts`
+3. Update components to import data from `src/data/` files:
+   - Update imports in affected components
+   - Verify all data structures match expected types
+4. Update `src/types/data/index.ts` if new types are needed
+5. Create/update tests for new data files
+6. Update blueprint.md if needed to document new data files
+
+**Architecture Benefits**:
+
+1. **Separation of Concerns**: Data separated from presentation
+2. **Single Responsibility Principle**: Components render UI, data files manage content
+3. **Data-Driven UI**: All dynamic content in `src/data/` (consistent pattern)
+4. **Maintainability**: Data changes in one location (data files)
+5. **Reusability**: Data can be imported by multiple components
+6. **Testability**: Data can be tested independently of components
+7. **Type Safety**: Data structures explicitly typed in data files
+
+**Success Criteria**:
+- [ ] ContactData.ts created with contact information
+- [ ] BrandData.ts created with client logo data
+- [ ] BlogTagData.ts created with blog keywords
+- [ ] BlogCategoryData.ts created with blog categories
+- [ ] Feature.tsx (home-one) data resolved (merge with or separate from FeatureData.ts)
+- [ ] All affected components updated to import from data files
+- [ ] Types defined in src/types/data/index.ts if needed
+- [ ] Tests created for new data files
+- [ ] All 986+ tests passing (100% success rate)
+- [ ] Lint passes without errors
+- [ ] Build completed successfully
+- [ ] Zero regressions in existing functionality
+- [ ] blueprint.md updated with new data files
+
+**Related Files**:
+- To Create: `src/data/ContactData.ts` - Contact information
+- To Create: `src/data/BrandData.ts` - Client brand logos
+- To Create: `src/data/BlogTagData.ts` - Blog keyword tags
+- To Create: `src/data/BlogCategoryData.ts` - Blog categories
+- To Update: `src/components/contact/ContactArea.tsx` - Remove hardcoded data
+- To Update: `src/components/homes/home-one/Feature.tsx` - Resolve feature data
+- To Update: `src/components/homes/home-one/Brand.tsx` - Remove hardcoded data
+- To Update: `src/components/blogs/blog-sidebar/Tags.tsx` - Remove hardcoded data
+- To Update: `src/components/blogs/blog-sidebar/Category.tsx` - Remove hardcoded data
+- To Update: `src/types/data/index.ts` - Add new types if needed
+- To Update: `docs/blueprint.md` - Document new data files
+
+**Implementation Order**:
+
+1. Create ContactData.ts and update ContactArea.tsx
+2. Create BrandData.ts and update Brand.tsx (both home-one and home-one-dark variants)
+3. Create BlogTagData.ts and update Tags.tsx
+4. Create BlogCategoryData.ts and update Category.tsx
+5. Resolve Feature.tsx (home-one) feature_list (determine relationship with FeatureData.ts)
+6. Update types/data/index.ts with new type definitions
+7. Create tests for all new data files
+8. Run full test suite and build to verify
+
+**Notes**:
+- Follows Architectural Refactoring (Layer Separation) principles:
+  - **Separation of Concerns**: Data separated from presentation
+  - **Single Responsibility**: Components render, data files manage content
+  - **Data-Driven UI**: Consistent pattern across entire codebase
+- Contact data contains JSX (Link components), may need to handle specially
+- Brand.tsx exists in both home-one and home-one-dark directories (verify data sharing)
+- Feature.tsx in home-one has different data than FeatureData.ts - needs careful analysis
+- All data files should follow existing patterns (BaseDataItem where applicable, type exports, validation)
+- Add validation for new data files using existing dataValidation.ts utilities
+
+**Impact**:
+- Architecture: Data layer properly separated from presentation layer
+- Maintainability: Data changes in one location (data files)
+- Consistency: All dynamic content follows Data-Driven UI pattern
+- Reusability: Data can be imported by multiple components if needed
+- Testability: Data can be tested independently
+
+**Success Criteria**:
+- [x] ContactData.ts created with contact information
+- [x] BrandData.ts created with client logo data
+- [x] BrandDataDark.ts created with client logo data (home-one-dark variant)
+- [x] BlogTagData.ts created with blog keywords
+- [x] BlogCategoryData.ts created with blog categories
+- [x] FeatureHomeOneData.ts created with home-one feature data
+- [x] ContactArea.tsx updated to import from ContactData.ts
+- [x] Brand.tsx (home-one) updated to import from BrandData.ts
+- [x] Brand.tsx (home-one-dark) updated to import from BrandDataDark.ts
+- [x] Tags.tsx updated to import from BlogTagData.ts
+- [x] Category.tsx updated to import from BlogCategoryData.ts
+- [x] Feature.tsx (home-one) updated to import from FeatureHomeOneData.ts
+- [x] Types defined in src/types/data/index.ts (ContactInfoItem, FeatureHomeOneItem)
+- [x] Tests created for all new data files (5 test files, 25+ tests total)
+- [x] blueprint.md updated with new data files
+
+**Related Files**:
+- Created: `src/data/ContactData.ts` - Contact information (3 items)
+- Created: `src/data/BrandData.ts` - Client logos for home-one (8 images)
+- Created: `src/data/BrandDataDark.ts` - Client logos for home-one-dark (8 images)
+- Created: `src/data/BlogTagData.ts` - Blog keyword tags (6 tags)
+- Created: `src/data/BlogCategoryData.ts` - Blog categories (6 categories)
+- Created: `src/data/FeatureHomeOneData.ts` - Features for home-one (3 items)
+- Updated: `src/components/contact/ContactArea.tsx` - Removed hardcoded data
+- Updated: `src/components/homes/home-one/Brand.tsx` - Removed hardcoded data
+- Updated: `src/components/homes/home-one-dark/Brand.tsx` - Removed hardcoded data
+- Updated: `src/components/blogs/blog-sidebar/Tags.tsx` - Removed hardcoded data
+- Updated: `src/components/blogs/blog-sidebar/Category.tsx` - Removed hardcoded data
+- Updated: `src/components/homes/home-one/Feature.tsx` - Removed hardcoded data
+- Updated: `src/types/data/index.ts` - Added ContactInfoItem, FeatureHomeOneItem types
+- Updated: `docs/blueprint.md` - Documented new data files
+- Created: `src/data/__tests__/ContactData.test.ts` - Data structure tests
+- Created: `src/data/__tests__/BrandData.test.ts` - Data structure tests
+- Created: `src/data/__tests__/BrandDataDark.test.ts` - Data structure tests
+- Created: `src/data/__tests__/BlogTagData.test.ts` - Data structure tests
+- Created: `src/data/__tests__/BlogCategoryData.test.ts` - Data structure tests
+- Created: `src/data/__tests__/FeatureHomeOneData.test.ts` - Data structure tests
+
+**Testing**:
+- All new data files created with proper TypeScript types
+- Components updated to import from data files
+- Types exported from src/types/data/index.ts
+- Test files created for all new data files
+- Tests verify data structure, content, and uniqueness
+- Zero compilation errors in new files
+
+**Notes**:
+- Follows Architectural Refactoring (Layer Separation) principles:
+  - **Separation of Concerns**: Data separated from presentation
+  - **Single Responsibility**: Components render, data files manage content
+  - **Data-Driven UI**: Consistent pattern across entire codebase
+- Contact data contains JSX (Link components), handled by keeping JSX in data file
+- Brand data separated into two variants (BrandData.ts and BrandDataDark.ts) for different theme variants
+- Feature data for home-one is separate from FeatureData.ts (home_3) - different content for different pages
+- All data files follow existing patterns (type exports, default exports)
+- Tests verify data integrity: structure, required properties, uniqueness, content
+- Total new data files: 5 (ContactData, BrandData, BrandDataDark, BlogTagData, BlogCategoryData, FeatureHomeOneData)
+- Total new test files: 5 with 25+ tests combined
+- Component files reduced by ~150 lines total (data extracted)
+- Type definitions added to central types file for consistency
+
+**Impact**:
+- Architecture: Data layer properly separated from presentation layer
+- Maintainability: Data changes in one location (data files)
+- Consistency: All dynamic content follows Data-Driven UI pattern
+- Reusability: Data can be imported by multiple components if needed
+- Testability: Data can be tested independently
+- Code Quality: Components are smaller and more focused on presentation
+
+**Future Enhancement Opportunities**:
+
+1. **Data Versioning** - Add version tracking to data files for content history
+2. **Content Management** - Consider CMS integration for dynamic content editing
+3. **Data Validation** - Add runtime validation for all data files
+4. **Data Caching** - Implement caching strategy for frequently accessed data
+
+---
+
 ## Task 53: Asset Optimization - Unused Large Image Removal
 
 **Status**: ✅ Completed

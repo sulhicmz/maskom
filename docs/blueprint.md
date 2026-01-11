@@ -126,7 +126,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | FeedbackData.ts | FeedbackItem | Yes | Yes | Yes | Testimonials |
 | MenuData.ts | MenuItem | No | Yes | No | Navigation menu |
 | FaqData.ts | FaqItem | Yes | Yes | No | FAQ items |
-| FeatureData.ts | FeatureItem | Yes | Yes | No | Feature cards |
+| FeatureData.ts | FeatureItem | Yes | Yes | No | Feature cards (home_3) |
 | ProcessData.ts | ProcessItem | Yes | Yes | No | Process steps |
 | CauseData.ts | CauseItem | Yes | Yes | No | Cause cards |
 | PriceData.ts | PriceItem | Yes | Yes | No | Pricing tables |
@@ -134,6 +134,12 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | SocialMediaData.ts | SocialLink | No | No | No | Social links |
 | InnerFaqData.ts | InnerFaqItem | No | Yes | No | FAQ categories |
 | DashboardData.ts | WiFiDevice, etc. | No | Yes | No | Dashboard widgets |
+| ContactData.ts | ContactInfoItem | No | Yes | No | Contact information |
+| BrandData.ts | StaticImageData[] | No | No | No | Client logos (home-one) |
+| BrandDataDark.ts | StaticImageData[] | No | No | No | Client logos (home-one-dark) |
+| BlogTagData.ts | string[] | No | No | No | Blog keyword tags |
+| BlogCategoryData.ts | string[] | No | No | No | Blog categories |
+| FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | Feature cards (home-one) |
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
 

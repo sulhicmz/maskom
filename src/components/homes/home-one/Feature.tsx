@@ -2,34 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 import feature_img from "@/assets/images/gallery/feature-img.svg"
-
-interface DataType {
-   id: number;
-   icon: string;
-   title: string;
-   desc: string;
-}
-
-const feature_list: DataType[] = [
-   {
-      id: 1,
-      icon: "flaticon-communication",
-      title: "Jaringan Siap Ekspansi",
-      desc: "Skalakan kapasitas bandwidth dan jumlah lokasi tanpa mengganti arsitektur dari awal.",
-   },
-   {
-      id: 2,
-      icon: "flaticon-security",
-      title: "Keamanan Berlapis",
-      desc: "Proteksi firewall, anti-DDoS, dan segmentasi jaringan menjaga data kritikal tetap aman.",
-   },
-   {
-      id: 3,
-      icon: "flaticon-support",
-      title: "Operasional Terpantau",
-      desc: "Monitoring proaktif, alert otomatis, dan tim support responsif siap membantu kapan pun.",
-   },
-];
+import feature_list, { type FeatureHomeOneItem } from "@/data/FeatureHomeOneData"
 
 const Feature = React.memo(() => {
    return (

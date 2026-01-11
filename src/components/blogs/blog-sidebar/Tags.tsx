@@ -1,11 +1,4 @@
-const tags: string[] = [
-   "SD-WAN",
-   "Managed Wi-Fi",
-   "Keamanan",
-   "Cloud Connect",
-   "Monitoring",
-   "IoT",
-];
+import tags from "@/data/BlogTagData";
 
 const Tags = () => {
    return (
