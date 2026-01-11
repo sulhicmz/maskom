@@ -1,6 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
+
 /*---========================
-        20. Wrapper css 
-=======================----*/
+        20. Wrapper css
+ =======================----*/
 
 .intro-wrapper {
     padding: 50px 55px 0;

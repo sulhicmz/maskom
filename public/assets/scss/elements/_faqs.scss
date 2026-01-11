@@ -1,7 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*---========================
-        12. Tabs css 
-=======================----*/
+        12. Tabs css
+ =======================----*/
 
 .accordion-card{
     &.style-one{

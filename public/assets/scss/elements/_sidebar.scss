@@ -1,8 +1,10 @@
-
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*---========================
-        11. Sidebar css 
-=======================----*/
+        11. Sidebar css
+ =======================----*/
 
 
 .sidebar-widget-area{

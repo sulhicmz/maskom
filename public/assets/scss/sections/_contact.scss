@@ -1,7 +1,10 @@
+@use '../variables' as *;
+@use '../mixin' as *;
+@use '../extend' as *;
 
 /*---========================
-        17. Contact css 
-=======================----*/
+        17. Contact css
+ =======================----*/
 
 .form-control{
     padding: 15px 30px;
