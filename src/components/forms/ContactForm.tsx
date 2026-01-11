@@ -51,6 +51,8 @@ const ContactForm = () => {
                   register={register("user_name")}
                   error={errors.user_name}
                   disabled={isSubmittingEmail}
+                  required
+                  description="Masukkan nama lengkap Anda"
                />
             </div>
             <div className="col-lg-6">
@@ -62,6 +64,8 @@ const ContactForm = () => {
                   register={register("user_email")}
                   error={errors.user_email}
                   disabled={isSubmittingEmail}
+                  required
+                  description="Gunakan email perusahaan Anda (contoh: nama@perusahaan.co.id)"
                />
             </div>
             <div className="col-lg-12">
@@ -74,6 +78,9 @@ const ContactForm = () => {
                   error={errors.message}
                   disabled={isSubmittingEmail}
                   rows={8}
+                  required
+                  description="Jelaskan kebutuhan atau pertanyaan Anda secara detail"
+                  maxLength={500}
                />
             </div>
             <div className="col-lg-12">

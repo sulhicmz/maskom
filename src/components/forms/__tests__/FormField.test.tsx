@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { UseFormRegisterReturn, FieldError } from 'react-hook-form';
 import FormField from '../FormField';
 
@@ -391,6 +391,338 @@ describe('FormField', () => {
       const input = screen.getByPlaceholderText('email@example.com');
       expect(input).toHaveAttribute('type', 'email');
       expect(input).toBeDisabled();
+    });
+  });
+
+  describe('Required Field Indicator', () => {
+    it('does not render required indicator when required is false', () => {
+      render(<FormField {...baseProps} required={false} />);
+
+      const requiredIndicator = screen.queryByLabelText('wajib diisi');
+      expect(requiredIndicator).not.toBeInTheDocument();
+    });
+
+    it('does not render required indicator when required is undefined', () => {
+      render(<FormField {...baseProps} />);
+
+      const requiredIndicator = screen.queryByLabelText('wajib diisi');
+      expect(requiredIndicator).not.toBeInTheDocument();
+    });
+
+    it('renders required indicator asterisk when required is true', () => {
+      render(<FormField {...baseProps} required={true} />);
+
+      const label = screen.getByText(/Test Label/);
+      const requiredIndicator = screen.getByLabelText('wajib diisi');
+
+      expect(label).toBeInTheDocument();
+      expect(label).toHaveTextContent('Test Label*');
+      expect(requiredIndicator).toBeInTheDocument();
+      expect(requiredIndicator).toHaveTextContent('*');
+    });
+
+    it('sets aria-required to false when required is false', () => {
+      render(<FormField {...baseProps} required={false} />);
+
+      const input = screen.getByLabelText('Test Label');
+      expect(input).toHaveAttribute('aria-required', 'false');
+    });
+
+    it('sets aria-required to true when required is true', () => {
+      render(<FormField {...baseProps} required={true} />);
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-required', 'true');
+    });
+  });
+
+  describe('Field Descriptions', () => {
+    it('does not render description when description is undefined', () => {
+      render(<FormField {...baseProps} />);
+
+      const description = screen.queryByTestId('test-id_description');
+      expect(description).not.toBeInTheDocument();
+    });
+
+    it('renders description when description prop is provided', () => {
+      render(
+        <FormField
+          {...baseProps}
+          description="This is a field description"
+        />
+      );
+
+      const description = screen.getByText('This is a field description');
+      expect(description).toBeInTheDocument();
+      expect(description).toHaveClass('form-description');
+    });
+
+    it('associates description with input using aria-describedby', () => {
+      render(
+        <FormField
+          {...baseProps}
+          description="Field description text"
+        />
+      );
+
+      const input = screen.getByLabelText('Test Label');
+      const description = screen.getByText('Field description text');
+
+      expect(input).toHaveAttribute('aria-describedby', 'test-id_description');
+      expect(description).toHaveAttribute('id', 'test-id_description');
+    });
+
+    it('associates both description and error using aria-describedby', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'Required field',
+      };
+
+      render(
+        <FormField
+          {...baseProps}
+          description="Field description"
+          error={mockError}
+        />
+      );
+
+      const input = screen.getByLabelText('Test Label');
+      expect(input).toHaveAttribute('aria-describedby', 'test-id_description test-id_error');
+    });
+  });
+
+  describe('Visual Error State', () => {
+    it('does not apply error class when error is undefined', () => {
+      render(<FormField {...baseProps} />);
+
+      const input = screen.getByLabelText('Test Label');
+      expect(input).not.toHaveClass('form-control-error');
+    });
+
+    it('applies error class when error is provided', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'Required',
+      };
+
+      render(<FormField {...baseProps} error={mockError} />);
+
+      const input = screen.getByLabelText('Test Label');
+      expect(input).toHaveClass('form-control-error');
+    });
+
+    it('applies error class to textarea when error is provided', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'Required',
+      };
+
+      render(<FormField {...baseProps} type="textarea" error={mockError} />);
+
+      const textarea = screen.getByRole('textbox');
+      expect(textarea).toHaveClass('form-control-error');
+    });
+  });
+
+  describe('Character Count for Textarea', () => {
+    it('does not render character count when maxLength is undefined', () => {
+      render(<FormField {...baseProps} type="textarea" />);
+
+      const charCount = screen.queryByText(/karakter/);
+      expect(charCount).not.toBeInTheDocument();
+    });
+
+    it('renders character count when maxLength is provided for textarea', () => {
+      render(
+        <FormField {...baseProps} type="textarea" maxLength={500} />
+      );
+
+      const charCount = screen.getByText(/karakter/);
+      expect(charCount).toBeInTheDocument();
+      expect(charCount).toHaveClass('char-count');
+      expect(charCount).toHaveTextContent('0 / 500 karakter');
+    });
+
+    it('updates character count as user types', () => {
+      render(
+        <FormField {...baseProps} type="textarea" maxLength={100} />
+      );
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const charCount = screen.getByText(/karakter/);
+
+      expect(charCount).toHaveTextContent('0 / 100 karakter');
+
+      fireEvent.change(textarea, { target: { value: 'Hello' } });
+      expect(charCount).toHaveTextContent('5 / 100 karakter');
+
+      fireEvent.change(textarea, { target: { value: 'Hello World' } });
+      expect(charCount).toHaveTextContent('11 / 100 karakter');
+    });
+
+    it('sets aria-live="off" on character count', () => {
+      render(
+        <FormField {...baseProps} type="textarea" maxLength={200} />
+      );
+
+      const charCount = screen.getByText(/karakter/);
+      expect(charCount).toHaveAttribute('aria-live', 'off');
+    });
+
+    it('sets maxLength attribute on textarea', () => {
+      render(
+        <FormField {...baseProps} type="textarea" maxLength={300} />
+      );
+
+      const textarea = screen.getByRole('textbox');
+      expect(textarea).toHaveAttribute('maxlength', '300');
+    });
+
+    it('does not render character count for non-textarea fields', () => {
+      render(<FormField {...baseProps} maxLength={100} />);
+
+      const charCount = screen.queryByText(/karakter/);
+      expect(charCount).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Password Visibility Toggle', () => {
+    it('does not render toggle button for non-password fields', () => {
+      render(<FormField {...baseProps} type="text" />);
+
+      const toggleButton = screen.queryByRole('button', {
+        name: /tampilkan|sembunyikan/i,
+      });
+      expect(toggleButton).not.toBeInTheDocument();
+    });
+
+    it('renders toggle button for password fields', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button', {
+        name: /tampilkan/i,
+      });
+      expect(toggleButton).toBeInTheDocument();
+      expect(toggleButton).toHaveClass('password-toggle');
+    });
+
+    it('displays password input type initially', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const input = document.querySelector('#test-id') as HTMLInputElement;
+      expect(input).toHaveAttribute('type', 'password');
+    });
+
+    it('toggles to text type when clicked', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button', {
+        name: /tampilkan/i,
+      });
+      const input = document.querySelector('#test-id') as HTMLInputElement;
+
+      expect(input).toHaveAttribute('type', 'password');
+
+      if (toggleButton) fireEvent.click(toggleButton);
+
+      expect(input).toHaveAttribute('type', 'text');
+    });
+
+    it('updates aria-label when toggling password visibility', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button', {
+        name: /tampilkan kata sandi/i,
+      });
+
+      expect(toggleButton).toHaveAttribute('aria-label', 'Tampilkan kata sandi');
+
+      if (toggleButton) fireEvent.click(toggleButton);
+
+      expect(toggleButton).toHaveAttribute('aria-label', 'Sembunyikan kata sandi');
+    });
+
+    it('updates aria-pressed when toggling password visibility', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button');
+
+      expect(toggleButton).toHaveAttribute('aria-pressed', 'false');
+
+      if (toggleButton) fireEvent.click(toggleButton);
+
+      expect(toggleButton).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('contains eye icon when password is hidden', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button');
+      const eyeIcon = toggleButton?.querySelector('.fa-eye');
+
+      expect(eyeIcon).toBeInTheDocument();
+    });
+
+    it('contains eye-slash icon when password is visible', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button');
+
+      if (toggleButton) fireEvent.click(toggleButton);
+
+      const eyeSlashIcon = toggleButton?.querySelector('.fa-eye-slash');
+      expect(eyeSlashIcon).toBeInTheDocument();
+    });
+
+    it('has aria-hidden="true" on icon', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const toggleButton = screen.queryByRole('button');
+      const icon = toggleButton?.querySelector('i');
+
+      expect(icon).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('disables toggle button when input is disabled', () => {
+      render(<FormField {...baseProps} type="password" disabled={true} />);
+
+      const input = document.querySelector('#test-id') as HTMLInputElement;
+      const toggleButton = screen.queryByRole('button');
+
+      expect(input).toBeDisabled();
+      expect(toggleButton).toBeDisabled();
+    });
+  });
+
+  describe('Input Wrapper for Password Toggle', () => {
+    it('wraps non-password input without wrapper', () => {
+      render(<FormField {...baseProps} type="text" />);
+
+      const input = screen.getByRole('textbox');
+      const wrapper = input.closest('.input-wrapper');
+
+      expect(wrapper).not.toBeInTheDocument();
+    });
+
+    it('wraps password input with wrapper div', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const input = document.querySelector('#test-id') as HTMLInputElement;
+      const wrapper = input?.closest('.input-wrapper');
+
+      expect(wrapper).toBeInTheDocument();
+      expect(wrapper).toHaveClass('input-wrapper');
+    });
+
+    it('positions toggle button inside wrapper', () => {
+      render(<FormField {...baseProps} type="password" />);
+
+      const input = document.querySelector('#test-id') as HTMLInputElement;
+      const wrapper = input?.closest('.input-wrapper');
+      const toggleButton = wrapper?.querySelector('.password-toggle');
+
+      expect(toggleButton).toBeInTheDocument();
+      expect(wrapper).toContainElement(toggleButton as HTMLElement);
     });
   });
 });

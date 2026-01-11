@@ -306,3 +306,65 @@
 p.form_error{
     color: red;
 }
+
+.required-indicator {
+    color: var(--blue-color);
+    margin-left: 2px;
+    font-weight: 600;
+}
+
+.form-description {
+    font-size: 14px;
+    color: var(--text-color);
+    margin: 5px 0 10px 0;
+    line-height: 1.5;
+}
+
+.form-control-error {
+    border-color: #dc3545 !important;
+    background-color: #fff8f8 !important;
+    &:focus {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+    }
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.input-wrapper .form-control {
+    flex: 1;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-color);
+    z-index: 5;
+    &:focus {
+        outline: none;
+        color: var(--blue-color);
+    }
+    &:hover {
+        color: var(--blue-color);
+    }
+    i {
+        font-size: 18px;
+    }
+}
+
+.char-count {
+    font-size: 12px;
+    color: var(--gray-color);
+    text-align: right;
+    margin-top: 4px;
+}

@@ -41,6 +41,8 @@ const SignUpForm = () => {
             register={register("name")}
             error={errors.name}
             disabled={isSubmitting}
+            required
+            description="Masukkan nama lengkap sesuai identitas"
          />
          <FormField
             id="signup_email"
@@ -50,6 +52,8 @@ const SignUpForm = () => {
             register={register("email")}
             error={errors.email}
             disabled={isSubmitting}
+            required
+            description="Gunakan email perusahaan Anda"
          />
          <FormField
             id="signup_password"
@@ -59,6 +63,8 @@ const SignUpForm = () => {
             register={register("password")}
             error={errors.password}
             disabled={isSubmitting}
+            required
+            description="Minimal 8 karakter, gunakan kombinasi huruf dan angka"
          />
          <div className="form-group mb-25">
             <LoadingButton

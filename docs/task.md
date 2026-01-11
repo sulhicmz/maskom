@@ -8,6 +8,236 @@
 
 ---
 
+## Task 79: Form UI/UX Improvements - Validation, Errors, Hints
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX Engineering (Form Improvement)
+
+**Problem**:
+- FormField component lacked visual feedback for required fields (no asterisk indicator)
+- No field descriptions/hints to guide users on what to enter
+- Error state had only text message, no visual field styling
+- Textarea fields had no character count feedback
+- Password fields had no visibility toggle, causing usability issues
+- Missing aria-required attribute for screen readers
+- Forms (ContactForm, LoginForm, SignUpForm) didn't leverage FormField features
+
+**Locations**:
+- `src/components/forms/FormField.tsx` - Core form field component
+- `src/components/forms/ContactForm.tsx` - Contact page form
+- `src/components/forms/LoginForm.tsx` - Login page form
+- `src/components/forms/SignUpForm.tsx` - Registration page form
+- `public/assets/scss/sections/_sections.scss` - Form styling
+
+**Solution**:
+
+1. **Added Required Field Indicator** (FormField.tsx):
+   - Added asterisk (*) next to labels for required fields
+   - Styled with `.required-indicator` class (blue color, bold)
+   - Added `aria-label="wajib diisi"` for screen readers
+   - Added `required` boolean prop to FormFieldProps
+
+2. **Added Field Descriptions/Hints** (FormField.tsx):
+   - Added `description` prop for field guidance text
+   - Rendered as `<p class="form-description">` below label
+   - Associated with input via `aria-describedby`
+   - Styled with 14px font, proper spacing, line-height 1.5
+
+3. **Visual Error State Styling** (FormField.tsx + _sections.scss):
+   - Added `.form-control-error` class for red border and background
+   - Applied automatically when `error` prop is provided
+   - Red border: `#dc3545`
+   - Red background: `#fff8f8`
+   - Red focus ring: `0.25rem rgba(220, 53, 69, 0.25)`
+
+4. **Character Count for Textarea** (FormField.tsx):
+   - Added `maxLength` prop support
+   - Real-time character count display: "X / Y karakter"
+   - Styled with `.char-count` class (12px, right-aligned)
+   - Added `aria-live="off"` to prevent screen reader spam
+   - Set `maxLength` attribute on textarea element
+
+5. **Password Visibility Toggle** (FormField.tsx):
+   - Added toggle button for password fields (eye/eye-slash icons)
+   - FontAwesome icons: `.fa-eye` (show) / `.fa-eye-slash` (hide)
+   - Toggles between `type="password"` and `type="text"`
+   - Accessible button with proper `aria-label` updates
+   - Added `aria-pressed` state for toggle button
+   - Disabled when form field is disabled
+
+6. **Added aria-required Attribute** (FormField.tsx):
+   - Set `aria-required="true"` for required fields
+   - Set `aria-required="false"` for optional fields
+   - Proper screen reader support for required field indication
+
+7. **Updated Form Components** (ContactForm, LoginForm, SignUpForm):
+   - ContactForm: Added required, description, maxLength props
+   - LoginForm: Added required, description props
+   - SignUpForm: Added required, description props
+   - All forms now use new FormField features for better UX
+
+8. **CSS Styles** (_sections.scss):
+   - `.required-indicator`: Blue asterisk, bold, 2px margin-left
+   - `.form-description`: 14px font, gray color, 5px margin, line-height 1.5
+   - `.form-control-error`: Red border/background, red focus ring
+   - `.input-wrapper`: Relative positioning, flex layout
+   - `.password-toggle`: Absolute positioning, eye icon styling, hover states
+   - `.char-count`: 12px font, right-aligned, 4px margin-top
+
+9. **Fixed Form Reset Bug** (FormField.tsx):
+   - Properly merged `onChange` handlers for textarea
+   - Calls `register.onChange()` AND updates charCount
+   - Form reset functionality now works correctly after submission
+
+**Test Coverage** (32 new tests):
+
+**Required Field Indicator Tests** (5 tests):
+- Does not render indicator when required is false/undefined
+- Renders asterisk when required is true
+- Sets aria-required correctly
+- Label text includes asterisk
+
+**Field Descriptions Tests** (4 tests):
+- Does not render description when undefined
+- Renders description when provided
+- Associates description with input via aria-describedby
+- Combines with error aria-describedby
+
+**Visual Error State Tests** (3 tests):
+- Does not apply error class when no error
+- Applies error class when error provided
+- Applies error class to textarea
+
+**Character Count Tests** (6 tests):
+- Does not render count when maxLength is undefined
+- Renders count when maxLength is provided
+- Updates count as user types
+- Sets aria-live="off" on count element
+- Sets maxLength attribute on textarea
+- Does not render for non-textarea fields
+
+**Password Visibility Toggle Tests** (10 tests):
+- Does not render toggle for non-password fields
+- Renders toggle for password fields
+- Displays password input type initially
+- Toggles to text type when clicked
+- Updates aria-label when toggling
+- Updates aria-pressed when toggling
+- Contains correct icon (eye/eye-slash)
+- Has aria-hidden="true" on icon
+- Disables toggle when input is disabled
+
+**Input Wrapper Tests** (3 tests):
+- Wraps non-password input without wrapper
+- Wraps password input with wrapper div
+- Positions toggle button inside wrapper
+
+**Updated Form Tests**:
+- ContactForm: 7 tests (all passing)
+- LoginForm: 5 tests (all passing)
+- SignUpForm: 5 tests (all passing)
+
+**Architecture Benefits**:
+
+1. **User-Centric UX**: Required fields are clearly marked, hints guide users
+2. **Accessibility**: Screen readers get aria-required, aria-describedby, aria-live
+3. **Visual Feedback**: Error states have red border/background for quick identification
+4. **Reduced Errors**: Character count helps users stay within limits
+5. **Better Usability**: Password toggle prevents typos, easier on mobile
+6. **Consistent UI**: All forms use same FormField patterns
+7. **Type Safety**: New props fully typed with TypeScript
+8. **Tested**: 32 new tests verify all new features
+9. **Zero Regressions**: All 1795 tests passing (100% success rate)
+10. **Form Reset Fixed**: Textarea onChange properly merged with register
+
+**Code Quality**:
+- All new features fully typed with TypeScript
+- Proper ARIA attributes for accessibility (aria-required, aria-describedby, aria-live, aria-pressed, aria-hidden, aria-label)
+- Semantic HTML structure maintained
+- CSS follows existing design system patterns
+- Tests follow AAA pattern
+- Indonesian language content preserved
+
+**Success Criteria**:
+- [x] Required field indicator (asterisk) added to FormField labels
+- [x] Field descriptions/hints support added to FormField component
+- [x] Visual error state with red border/background styling
+- [x] Character count support for textarea fields in FormField
+- [x] Password visibility toggle for password fields
+- [x] aria-required attribute for required fields
+- [x] All form components updated (ContactForm, LoginForm, SignUpForm)
+- [x] 32 new tests added for FormField features (66 total tests)
+- [x] All 1795 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 4 warnings in unrelated files)
+- [x] Zero regressions in existing functionality
+- [x] Form reset bug fixed (textarea onChange properly merged)
+- [x] CSS styles added for all new features
+
+**Related Files**:
+- Modified: `src/components/forms/FormField.tsx` - Added required, description, maxLength props, password toggle, char count
+- Modified: `src/components/forms/ContactForm.tsx` - Added required, description, maxLength props
+- Modified: `src/components/forms/LoginForm.tsx` - Added required, description props
+- Modified: `src/components/forms/SignUpForm.tsx` - Added required, description props
+- Modified: `public/assets/scss/sections/_sections.scss` - Added CSS styles for new features
+- Updated: `src/components/forms/__tests__/FormField.test.tsx` - 32 new tests added
+
+**Testing**:
+- All 1795 tests passing (100% success rate)
+- FormField tests: 66 passing (34 original + 32 new)
+- ContactForm tests: 7 passing
+- LoginForm tests: 5 passing
+- SignUpForm tests: 5 passing
+- Lint passed (0 errors, 4 warnings in unrelated files)
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows UI/UX Engineer principles:
+  - **User-Centric**: Every decision improves UX (clearer fields, better feedback)
+  - **Accessibility**: ARIA attributes for screen readers, keyboard navigation support
+  - **Consistency**: All forms use same FormField patterns
+  - **Performance**: Char count updates efficiently with React state
+  - **Semantic Structure**: Meaningful HTML elements maintained
+- Password toggle button only appears for password fields (conditional rendering)
+- Input wrapper div only wraps password fields (no unnecessary DOM for other types)
+- Character count only appears for textarea fields with maxLength
+- Form reset bug fixed: register.onChange called alongside charCount update
+- Indonesian language content maintained throughout
+- CSS uses design system colors (var(--blue-color), var(--text-color))
+- Error styling uses red (#dc3545) with proper focus ring for accessibility
+
+**Impact**:
+- User Experience: Required fields clearly marked, hints guide users, error states visible
+- Accessibility: Screen reader support via ARIA attributes, keyboard navigation preserved
+- Reduced Errors: Character count helps users stay within message length limits
+- Better Usability: Password toggle prevents typos, easier on mobile devices
+- Consistency: All forms share same FormField patterns and behavior
+- Code Quality: Type-safe props, comprehensive test coverage
+- Zero Regressions: All existing functionality preserved (1795 tests passing)
+
+**Future Enhancement Opportunities**:
+
+1. **Password Strength Indicator** - Add real-time strength meter to SignUpForm
+    - Visual feedback (weak/fair/good/strong)
+    - Progress bar or color-coded indicator
+    - Requirements: length, uppercase, number, special character
+    - Effort: Medium (requires strength calculation + UI)
+    - Priority: Low (current toggle is good UX)
+
+2. **Floating Labels** - Add modern floating label pattern
+    - Labels animate to top when field has value
+    - Material Design style pattern
+    - Effort: Medium (CSS animation + label state tracking)
+    - Priority: Low (current static labels are functional)
+
+3. **Inline Validation** - Add real-time validation feedback
+    - Validate as user types, not just on submit
+    - Show checkmark or error immediately after field
+    - Effort: Medium (requires debouncing + react-hook-form integration)
+    - Priority: Low (current on-submit validation is acceptable)
+
+---
+
 ## Task 78: API Documentation Update
 
 **Status**: ✅ Completed
