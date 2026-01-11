@@ -1,6 +1,7 @@
 import type { IAuthService, LoginCredentials, RegisterData, AuthResult, User } from './types';
 import { validateEmail, validatePassword } from '@/utils/validation';
 import { RateLimiter } from '@/utils/rateLimiter';
+import metricsCollector from '@/utils/metrics';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -24,6 +25,7 @@ class AuthService implements IAuthService {
         try {
             const rateLimitCheck = this.loginRateLimiter.check(credentials.email);
             if (!rateLimitCheck.allowed) {
+                metricsCollector.recordCall('AuthService.login', false, 'rate_limit');
                 const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
                 return {
                     success: false,
@@ -35,6 +37,7 @@ class AuthService implements IAuthService {
 
             if (!credentials.email || !credentials.password) {
                 this.loginRateLimiter.recordAttempt(credentials.email);
+                metricsCollector.recordCall('AuthService.login', false, 'validation');
                 return {
                     success: false,
                     error: 'Email dan kata sandi diperlukan',
@@ -44,6 +47,7 @@ class AuthService implements IAuthService {
             const emailValidation = validateEmail(credentials.email);
             if (!emailValidation.valid) {
                 this.loginRateLimiter.recordAttempt(credentials.email);
+                metricsCollector.recordCall('AuthService.login', false, 'validation');
                 return {
                     success: false,
                     error: emailValidation.error || 'Format email tidak valid',
@@ -53,6 +57,7 @@ class AuthService implements IAuthService {
             const passwordValidation = validatePassword(credentials.password);
             if (!passwordValidation.valid) {
                 this.loginRateLimiter.recordAttempt(credentials.email);
+                metricsCollector.recordCall('AuthService.login', false, 'validation');
                 return {
                     success: false,
                     error: passwordValidation.error || 'Kata sandi tidak valid',
@@ -65,6 +70,7 @@ class AuthService implements IAuthService {
                 email: credentials.email,
             };
 
+            metricsCollector.recordCall('AuthService.login', true);
             return {
                 success: true,
                 message: 'Berhasil masuk ke portal',
@@ -73,6 +79,7 @@ class AuthService implements IAuthService {
             };
         } catch (error) {
             this.loginRateLimiter.recordAttempt(credentials.email);
+            metricsCollector.recordCall('AuthService.login', false, 'unknown');
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Terjadi kesalahan saat login',
@@ -84,6 +91,7 @@ class AuthService implements IAuthService {
         try {
             const rateLimitCheck = this.registerRateLimiter.check(userData.email);
             if (!rateLimitCheck.allowed) {
+                metricsCollector.recordCall('AuthService.register', false, 'rate_limit');
                 const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
                 return {
                     success: false,
@@ -95,6 +103,7 @@ class AuthService implements IAuthService {
 
             if (!userData.name || !userData.email || !userData.password) {
                 this.registerRateLimiter.recordAttempt(userData.email);
+                metricsCollector.recordCall('AuthService.register', false, 'validation');
                 return {
                     success: false,
                     error: 'Nama, email, dan kata sandi diperlukan',
@@ -104,6 +113,7 @@ class AuthService implements IAuthService {
             const emailValidation = validateEmail(userData.email);
             if (!emailValidation.valid) {
                 this.registerRateLimiter.recordAttempt(userData.email);
+                metricsCollector.recordCall('AuthService.register', false, 'validation');
                 return {
                     success: false,
                     error: emailValidation.error || 'Format email tidak valid',
@@ -113,6 +123,7 @@ class AuthService implements IAuthService {
             const passwordValidation = validatePassword(userData.password);
             if (!passwordValidation.valid) {
                 this.registerRateLimiter.recordAttempt(userData.email);
+                metricsCollector.recordCall('AuthService.register', false, 'validation');
                 return {
                     success: false,
                     error: passwordValidation.error || 'Kata sandi tidak valid',
@@ -125,6 +136,7 @@ class AuthService implements IAuthService {
                 email: userData.email,
             };
 
+            metricsCollector.recordCall('AuthService.register', true);
             return {
                 success: true,
                 message: 'Registrasi berhasil dikirim',
@@ -133,6 +145,7 @@ class AuthService implements IAuthService {
             };
         } catch (error) {
             this.registerRateLimiter.recordAttempt(userData.email);
+            metricsCollector.recordCall('AuthService.register', false, 'unknown');
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Terjadi kesalahan saat registrasi',
@@ -191,6 +204,15 @@ class AuthService implements IAuthService {
     resetAllRateLimits(): void {
         this.loginRateLimiter.resetAll();
         this.registerRateLimiter.resetAll();
+    }
+
+    getMetrics() {
+        const loginMetrics = metricsCollector.getMetrics('AuthService.login');
+        const registerMetrics = metricsCollector.getMetrics('AuthService.register');
+        return {
+            login: loginMetrics,
+            register: registerMetrics,
+        };
     }
 
     private generateUserId(email: string): string {

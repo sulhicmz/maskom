@@ -2,6 +2,7 @@ import emailjs from '@emailjs/browser';
 import type { IEmailService, EmailSendParams, EmailSendResult, EmailSendOptions } from './types';
 import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
 import { emailRateLimiter } from '@/utils/rateLimiter';
+import metricsCollector from '@/utils/metrics';
 
 class EmailService implements IEmailService {
     private serviceId: string;
@@ -26,7 +27,10 @@ class EmailService implements IEmailService {
     }
 
     async sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<EmailSendResult> {
+        const startTime = Date.now();
+
         if (!this.serviceId || !this.templateId || !this.publicKey) {
+            metricsCollector.recordCall('EmailService', false, 'credentials_not_configured');
             return {
                 success: false,
                 error: 'EmailJS credentials not configured'
@@ -38,6 +42,8 @@ class EmailService implements IEmailService {
         if (!options?.skipRateLimit) {
             const limitCheck = emailRateLimiter.check(identifier);
             if (!limitCheck.allowed) {
+                const responseTime = Date.now() - startTime;
+                metricsCollector.recordCall('EmailService', false, 'rate_limit', responseTime);
                 return {
                     success: false,
                     error: limitCheck.error,
@@ -70,13 +76,27 @@ class EmailService implements IEmailService {
                 emailRateLimiter.recordAttempt(identifier);
             }
 
+            const responseTime = Date.now() - startTime;
+            metricsCollector.recordCall('EmailService', true, undefined, responseTime);
+
             return {
                 success: true,
                 text: result.text
             };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const responseTime = Date.now() - startTime;
+            
+            let errorType = 'unknown';
+            if (errorMessage.includes('timeout')) {
+                errorType = 'timeout';
+            } else if (errorMessage.includes('circuit breaker')) {
+                errorType = 'circuit_breaker';
+            }
+            
+            metricsCollector.recordCall('EmailService', false, errorType, responseTime);
             console.error('Email send failed:', errorMessage);
+            
             return {
                 success: false,
                 error: errorMessage
@@ -97,11 +117,17 @@ class EmailService implements IEmailService {
     }
 
     getCircuitBreakerState() {
-        return this.circuitBreaker.getState();
+        const state = this.circuitBreaker.getState();
+        metricsCollector.recordCircuitBreakerState('EmailService', state.isOpen);
+        return state;
     }
 
     resetCircuitBreaker() {
         this.circuitBreaker.reset();
+    }
+
+    getMetrics() {
+        return metricsCollector.getMetrics('EmailService');
     }
 }
 

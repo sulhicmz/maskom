@@ -729,6 +729,378 @@ class NewService implements INewService {
 
 ---
 
+## Integration Monitoring & Metrics
+
+### Overview
+
+The integration monitoring system provides observability for all external service integrations, tracking calls, failures, timeouts, rate limits, and circuit breaker states.
+
+### Location
+
+**Metrics Collector**: `src/utils/metrics/metricsCollector.ts`
+
+**Types**: `src/utils/metrics/types.ts`
+
+---
+
+### Metrics Data Types
+
+#### MetricData
+
+```typescript
+interface MetricData {
+    name: string;              // Metric name (e.g., "EmailService.total_calls")
+    timestamp: number;          // Unix timestamp
+    value: number;            // Metric value
+    tags?: Record<string, string>;  // Additional metadata
+}
+```
+
+#### ServiceMetrics
+
+```typescript
+interface ServiceMetrics {
+    serviceName: string;           // Service name
+    totalCalls: number;            // Total API calls
+    successCalls: number;           // Successful calls
+    failureCalls: number;           // Failed calls
+    timeoutCalls: number;           // Timeout errors
+    rateLimitCalls: number;         // Rate limit errors
+    circuitBreakerOpenCount: number;  // Circuit breaker opens
+    lastError?: string;            // Last error message
+    lastSuccessTime?: number;       // Last success timestamp
+    lastFailureTime?: number;       // Last failure timestamp
+    averageResponseTime?: number;   // Average response time (ms)
+}
+```
+
+#### HealthCheckResult
+
+```typescript
+interface HealthCheckResult {
+    serviceName: string;      // Service name
+    healthy: boolean;         // Health status
+    message: string;          // Health message
+    metrics: ServiceMetrics;   // Current metrics
+    checkedAt: number;        // Check timestamp
+}
+```
+
+---
+
+### Metrics Collector API
+
+#### Record Call
+
+```typescript
+metricsCollector.recordCall(
+    serviceName: string,     // Service name (e.g., "EmailService")
+    success: boolean,       // Success or failure
+    errorType?: string,      // Error type (e.g., "timeout", "rate_limit")
+    responseTime?: number    // Response time in milliseconds
+): void
+```
+
+**Example**:
+```typescript
+metricsCollector.recordCall('EmailService', true, undefined, 150);
+metricsCollector.recordCall('AuthService.login', false, 'rate_limit');
+```
+
+#### Record Circuit Breaker State
+
+```typescript
+metricsCollector.recordCircuitBreakerState(
+    serviceName: string,     // Service name
+    isOpen: boolean          // Circuit breaker state
+): void
+```
+
+**Example**:
+```typescript
+const state = circuitBreaker.getState();
+metricsCollector.recordCircuitBreakerState('EmailService', state.isOpen);
+```
+
+#### Get Metrics
+
+```typescript
+metricsCollector.getMetrics(serviceName: string): ServiceMetrics | undefined
+```
+
+**Returns**: Service metrics for the specified service, or `undefined` if service has no metrics.
+
+#### Get All Metrics
+
+```typescript
+metricsCollector.getAllMetrics(): ServiceMetrics[]
+```
+
+**Returns**: Array of all service metrics.
+
+#### Get Success Rate
+
+```typescript
+metricsCollector.getSuccessRate(serviceName: string): number
+```
+
+**Returns**: Success rate as a decimal (0-1), or 1 if no calls recorded.
+
+**Example**:
+```typescript
+const successRate = metricsCollector.getSuccessRate('EmailService');
+console.log(`Success rate: ${(successRate * 100).toFixed(1)}%`);
+```
+
+#### Get Failure Rate
+
+```typescript
+metricsCollector.getFailureRate(serviceName: string): number
+```
+
+**Returns**: Failure rate as a decimal (0-1), or 0 if no calls recorded.
+
+#### Health Check
+
+```typescript
+metricsCollector.healthCheck(
+    serviceName: string,                  // Service name
+    thresholdSuccessRate: number = 0.8    // Success rate threshold (default: 80%)
+): HealthCheckResult
+```
+
+**Returns**: Health check result with status and current metrics.
+
+**Example**:
+```typescript
+const health = metricsCollector.healthCheck('EmailService', 0.9);
+if (health.healthy) {
+    console.log('EmailService is healthy:', health.message);
+} else {
+    console.warn('EmailService is degraded:', health.message);
+    console.log('Metrics:', health.metrics);
+}
+```
+
+#### Get All Health Checks
+
+```typescript
+metricsCollector.getAllHealthChecks(thresholdSuccessRate: number = 0.8): HealthCheckResult[]
+```
+
+**Returns**: Array of health check results for all services.
+
+#### Export Metrics
+
+```typescript
+metricsCollector.exportMetrics(): MetricData[]
+```
+
+**Returns**: Array of `MetricData` objects for integration with monitoring systems (e.g., Prometheus, Datadog).
+
+**Example**:
+```typescript
+const exportedMetrics = metricsCollector.exportMetrics();
+exportedMetrics.forEach(metric => {
+    console.log(`Metric: ${metric.name}, Value: ${metric.value}`);
+});
+```
+
+---
+
+### Integrated Services
+
+#### EmailService
+
+**Metrics Tracked**:
+- Total calls, success/failure counts
+- Timeout errors
+- Rate limit errors
+- Circuit breaker state changes
+- Average response time
+
+**Usage**:
+```typescript
+import emailService from '@/services/email';
+import metricsCollector from '@/utils/metrics';
+
+// Send email (metrics automatically recorded)
+await emailService.sendEmail({ templateParams: { ... } });
+
+// Get email service metrics
+const emailMetrics = metricsCollector.getMetrics('EmailService');
+console.log('Email service metrics:', emailMetrics);
+
+// Check health
+const health = metricsCollector.healthCheck('EmailService');
+console.log('Email service health:', health.message);
+```
+
+**New Method**:
+```typescript
+emailService.getMetrics(): ServiceMetrics | undefined
+```
+
+#### AuthService
+
+**Metrics Tracked**:
+- Login calls (success/failure)
+- Register calls (success/failure)
+- Validation errors
+- Rate limit errors
+
+**Usage**:
+```typescript
+import { authService } from '@/services/auth';
+import metricsCollector from '@/utils/metrics';
+
+// Login (metrics automatically recorded)
+await authService.login({ email: '...', password: '...' });
+
+// Get auth service metrics
+const authMetrics = metricsCollector.getMetrics('AuthService.login');
+const registerMetrics = metricsCollector.getMetrics('AuthService.register');
+
+// Health check for login
+const loginHealth = metricsCollector.healthCheck('AuthService.login');
+console.log('Login health:', loginHealth.message);
+```
+
+**New Method**:
+```typescript
+authService.getMetrics(): {
+    login?: ServiceMetrics;
+    register?: ServiceMetrics;
+}
+```
+
+---
+
+### Monitoring Best Practices
+
+#### 1. Regular Health Checks
+
+Check service health at regular intervals:
+
+```typescript
+// Check health every 60 seconds
+setInterval(() => {
+    const healthChecks = metricsCollector.getAllHealthChecks(0.9);
+    healthChecks.forEach(health => {
+        if (!health.healthy) {
+            alert(`Service ${health.serviceName} is degraded!`);
+        }
+    });
+}, 60000);
+```
+
+#### 2. Alert on Degraded Services
+
+Set up alerts for service degradation:
+
+```typescript
+const thresholdSuccessRate = 0.9;  // 90% success rate threshold
+
+const healthChecks = metricsCollector.getAllHealthChecks(thresholdSuccessRate);
+const degradedServices = healthChecks.filter(h => !h.healthy);
+
+if (degradedServices.length > 0) {
+    console.error('Degraded services:', degradedServices);
+    // Send alert to monitoring system
+}
+```
+
+#### 3. Export to Monitoring Systems
+
+Export metrics for integration with external monitoring:
+
+```typescript
+const metrics = metricsCollector.exportMetrics();
+
+// Send to monitoring system (e.g., Prometheus, Datadog, CloudWatch)
+metrics.forEach(metric => {
+    monitoringSystem.push({
+        metric: metric.name,
+        value: metric.value,
+        timestamp: metric.timestamp,
+        tags: metric.tags,
+    });
+});
+```
+
+#### 4. Reset Metrics Periodically
+
+Reset metrics to prevent memory growth:
+
+```typescript
+// Reset metrics every 24 hours
+setInterval(() => {
+    metricsCollector.resetAll();
+    console.log('Metrics reset');
+}, 86400000);  // 24 hours
+```
+
+#### 5. Track Response Time Trends
+
+Monitor response time trends:
+
+```typescript
+const metrics = metricsCollector.getMetrics('EmailService');
+if (metrics?.averageResponseTime) {
+    if (metrics.averageResponseTime > 5000) {  // 5 seconds
+        console.warn('EmailService response time is high:', metrics.averageResponseTime);
+    }
+}
+```
+
+---
+
+### Success Rate Thresholds
+
+Recommended thresholds for different service types:
+
+| Service Type | Critical | Warning | Healthy |
+|--------------|----------|----------|----------|
+| Critical (Email, Auth) | < 90% | 90-95% | > 95% |
+| Important (API Integrations) | < 80% | 80-90% | > 90% |
+| Standard (Analytics, Logging) | < 70% | 70-85% | > 85% |
+
+---
+
+### Error Type Tracking
+
+The metrics collector tracks the following error types:
+
+| Error Type | Description | Example |
+|------------|-------------|----------|
+| `credentials_not_configured` | Missing API credentials | EmailJS credentials not configured |
+| `rate_limit` | Rate limit exceeded | Too many requests |
+| `timeout` | Request timeout | EmailJS request timed out |
+| `circuit_breaker` | Circuit breaker is open | Service temporarily unavailable |
+| `validation` | Input validation failed | Invalid email format |
+| `unknown` | Unhandled error | Unexpected error occurred |
+
+---
+
+### Metrics Export Format
+
+Exported metrics follow a consistent naming convention:
+
+```
+{serviceName}.{metric_name}
+```
+
+Available metrics:
+- `{serviceName}.total_calls` - Total number of calls
+- `{serviceName}.success_calls` - Number of successful calls
+- `{serviceName}.failure_calls` - Number of failed calls
+- `{serviceName}.timeout_calls` - Number of timeout errors
+- `{serviceName}.rate_limit_calls` - Number of rate limit errors
+- `{serviceName}.circuit_breaker_open_count` - Number of circuit breaker opens
+- `{serviceName}.average_response_time` - Average response time in milliseconds
+
+---
+
 ## Versioning
 
 ### API Versioning Strategy
@@ -742,7 +1114,15 @@ class NewService implements INewService {
 
 ## Changelog
 
-### v1.0.0 (Current)
+### v1.1.0 (Current)
+- Integration monitoring & metrics layer
+- Real-time service health checks
+- Metrics export for external monitoring systems
+- Success/failure rate tracking
+- Response time monitoring
+- Circuit breaker state tracking
+
+### v1.0.0
 - Initial EmailService implementation
 - Resilience patterns (timeout, retry, circuit breaker)
 - Standardized error response format
