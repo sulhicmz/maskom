@@ -7,7 +7,7 @@ const Cta = () => {
    return (
       <section className="cta-section">
          <div className="cta-bg-wrapper-two black-dark-bg bg_cover pt-50 pb-30"
-            style={{ backgroundImage: "url(/assets/images/bg/faq-bg.jpg)" }}>
+            style={{ backgroundImage: "url(/assets/images/bg/faq-bg.webp)" }}>
             <div className="shape shape-one"><span className="circle"></span></div>
             <div className="shape shape-two"><span className="circle"></span></div>
             <div className="container">
