@@ -28,6 +28,12 @@ const eslintConfig = [
       "@typescript-eslint/triple-slash-reference": "off",
     },
   },
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
 ];
 
 export default eslintConfig;
