@@ -1,25 +1,27 @@
 import {
-  BaseDataItem,
-  FeedbackItem,
-  FaqItem,
-  PriceItem,
-  PriceDetailItem,
-  FeatureItem,
-  ProcessItem,
-  CauseItem,
-  MenuItem,
-  WiFiDevice,
-  WebsiteTemplate,
-  AIStep,
-  BlogCommentItem,
-  TeamMember,
-  InnerBlogPost,
-  InnerFaqItem,
-  FaqDetail,
-  SocialLink,
-  NavigationItem,
-  NavigationSection,
-} from "@/types/data";
+   BaseDataItem,
+   ContactInfoItem,
+   FeatureHomeOneItem,
+   FeedbackItem,
+   FaqItem,
+   PriceItem,
+   PriceDetailItem,
+   FeatureItem,
+   ProcessItem,
+   CauseItem,
+   MenuItem,
+   WiFiDevice,
+   WebsiteTemplate,
+   AIStep,
+   BlogCommentItem,
+   TeamMember,
+   InnerBlogPost,
+   InnerFaqItem,
+   FaqDetail,
+   SocialLink,
+   NavigationItem,
+   NavigationSection,
+ } from "@/types/data";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -136,6 +138,13 @@ function createValidator<T>(config: ValidationConfig<T>): (item: T) => Validatio
               }
             });
           }
+        } else if (Array.isArray(value) && value.length > 0 && field.itemValidator) {
+          value.forEach((item: unknown, index: number) => {
+            const error = field.itemValidator!(item, index);
+            if (error) {
+              errors.push(error);
+            }
+          });
         }
       }
     }
@@ -511,30 +520,87 @@ export const validateNavigationItem = createValidator<NavigationItem>({
 });
 
 export const validateNavigationSection = createValidator<NavigationSection>({
-  typeName: "NavigationSection",
-  stringFields: [],
-  arrayFields: [
-    {
-      key: "items",
-      required: true,
-      itemValidator: (navItem: unknown) => {
-        const result = validateNavigationItem(navItem as NavigationItem);
-        return result.errors.length > 0 ? result.errors[0] : null;
-      },
-    },
-  ],
-  customRules: [
-    (item) => {
-      if (typeof item.title !== "string" || item.title.trim() === "") {
-        return "NavigationSection: title must be a non-empty string";
-      }
-      return null;
-    },
-    (item) => {
-      if (!Array.isArray(item.items) || item.items.length === 0) {
-        return `NavigationSection[${item.title}]: items must be a non-empty array`;
-      }
-      return null;
-    },
-  ],
+   typeName: "NavigationSection",
+   stringFields: [],
+   arrayFields: [
+     {
+       key: "items",
+       required: true,
+       itemValidator: (navItem: unknown) => {
+         const result = validateNavigationItem(navItem as NavigationItem);
+         return result.errors.length > 0 ? result.errors[0] : null;
+       },
+     },
+   ],
+   customRules: [
+     (item) => {
+       if (typeof item.title !== "string" || item.title.trim() === "") {
+         return "NavigationSection: title must be a non-empty string";
+       }
+       return null;
+     },
+     (item) => {
+       if (!Array.isArray(item.items) || item.items.length === 0) {
+         return `NavigationSection[${item.title}]: items must be a non-empty array`;
+       }
+       return null;
+     },
+   ],
+});
+
+export const validateContactInfoItem = createValidator<ContactInfoItem>({
+   typeName: "ContactInfoItem",
+   numberFields: [
+     { key: "id", required: true, min: 1 },
+   ],
+   stringFields: [
+     { key: "icon", required: true },
+     { key: "title", required: true },
+   ],
+   arrayFields: [
+     {
+       key: "lines",
+       required: false,
+       itemValidator: (line: unknown) => {
+         if (typeof line !== "string" || line.trim() === "") {
+           return "ContactInfoItem: lines array items must be non-empty strings";
+         }
+         return null;
+       },
+     },
+     {
+       key: "links",
+       required: false,
+       itemValidator: (link: unknown) => {
+         const linkObj = link as { text: string; href: string; target?: string; rel?: string };
+         const errors: string[] = [];
+
+         if (typeof linkObj.text !== "string" || linkObj.text.trim() === "") {
+           errors.push("links text must be a non-empty string");
+         }
+
+         if (typeof linkObj.href !== "string" || linkObj.href.trim() === "") {
+           errors.push("links href must be a non-empty string");
+         }
+
+         if (linkObj.target && !["_blank", "_self"].includes(linkObj.target)) {
+           errors.push("links target must be either '_blank' or '_self'");
+         }
+
+         return errors.length > 0 ? `ContactInfoItem: ${errors.join(", ")}` : null;
+       },
+     },
+   ],
+});
+
+export const validateFeatureHomeOneItem = createValidator<FeatureHomeOneItem>({
+   typeName: "FeatureHomeOneItem",
+   numberFields: [
+     { key: "id", required: true, min: 1 },
+   ],
+   stringFields: [
+     { key: "icon", required: true },
+     { key: "title", required: true },
+     { key: "desc", required: true },
+   ],
 });

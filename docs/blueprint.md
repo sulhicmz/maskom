@@ -153,7 +153,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateRange()` - Number range validation (via createValidator)
 - ✅ `validateEnum<T>()` - Enum value validation (via createValidator)
 
-**Implemented Validators** (21 total):
+**Implemented Validators** (23 total):
 - ✅ `validateFeedbackItem` - Testimonials with rating validation
 - ✅ `validateFaqItem` - FAQ questions and answers
 - ✅ `validatePriceItem` - Pricing packages with nested PriceDetailItem validation
@@ -173,14 +173,17 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateSocialLink` - Social media links with target validation
 - ✅ `validateNavigationItem` - Navigation items
 - ✅ `validateNavigationSection` - Navigation sections
+- ✅ `validateContactInfoItem` - Contact information with lines and links arrays (Task 63)
+- ✅ `validateFeatureHomeOneItem` - Feature cards for home-one page (Task 63)
 - ✅ `validateDataArray<T>()` - Validate entire arrays
 - ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
 
 **Testing**:
-- ✅ 64 comprehensive tests (100% passing)
+- ✅ 75 comprehensive tests (100% passing)
 - ✅ All validators tested with valid and invalid inputs
 - ✅ Duplicate ID detection verified
 - ✅ Custom rule validation tested
+- ✅ Optional array item validation (lines, links arrays)
 
 ### Data Indexing (✅ COMPLETED - Task 40 Phase 2)
 
