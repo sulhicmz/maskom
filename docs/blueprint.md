@@ -961,11 +961,15 @@ await sharp('public/assets/images/bg/testimonial-bg.jpg').webp({ quality: 85 }).
 - `pattern-bg.jpg` (113KB) → `pattern-bg.webp` (14KB) = **99KB saved (87.6% reduction)**
 - `testimonial-bg.jpg` (55KB) → `testimonial-bg.webp` (3.9KB) = **51KB saved (92.8% reduction)**
 - `hero-bg-1.png` (124KB) → Kept as PNG (WebP version larger)
-- **Total Savings: 150KB → 18KB per page load = 132KB savings (88% reduction)**
+- `faq-bg.jpg` (28.2KB) → `faq-bg.webp` (2.5KB) = **25.7KB saved (91.3% reduction)** (Task 76)
+- `base.png` (35.5KB) → Kept as PNG (WebP version larger) (Task 76)
+
+**Cumulative Total Savings: 175.7KB across 4 optimized images (Task 73 + Task 76)**
 
 **Pages Improved**:
 - **Home page** (`/`, `/home-one`, `/home-one-dark`): 51KB saved
-- **All 17 pages** with FooterTwo component: 99KB saved
+- **All 18 pages** with FooterTwo component: 99KB saved
+- **FAQ page** (`/faq`): 25.7KB saved (Task 76)
 
 **Usage Guidelines**:
 - Test multiple quality settings (50-85) to find optimal balance
