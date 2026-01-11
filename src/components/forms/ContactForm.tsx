@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import { emailService } from '@/services/email';
 import { createContactFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
+import type { ServiceResult } from '@/services/common';
 import FormField from './FormField';
 import LoadingButton from './LoadingButton';
 
@@ -20,7 +21,7 @@ const ContactForm = () => {
 
    const form = useRef<HTMLFormElement>(null);
 
-   const { submit: sendEmail, isSubmitting: isSubmittingEmail } = useFormSubmission(
+   const { submit: sendEmail, isSubmitting: isSubmittingEmail } = useFormSubmission<void, ServiceResult<{ text: string }>>(
       async () => {
          if (!form.current) {
             throw new Error('Form ref not available');
@@ -38,8 +39,8 @@ const ContactForm = () => {
       { successMessage: 'Pesan berhasil dikirim', resetForm: reset }
    );
 
-   return (
-      <form ref={form} onSubmit={handleSubmit(sendEmail)} className="contact-form" noValidate>
+    return (
+       <form ref={form} onSubmit={handleSubmit(() => sendEmail())} className="contact-form" noValidate>
          <div className="row">
             <div className="col-lg-6">
                <FormField

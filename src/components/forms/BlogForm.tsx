@@ -15,15 +15,15 @@ interface FormData {
 const BlogForm = () => {
    const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createBlogFormSchema()), });
 
-   const { submit: onSubmit, isSubmitting } = useFormSubmission(
-      async () => {
-         return { success: true, message: 'Komentar berhasil dikirim' };
-      },
-      { successMessage: 'Komentar berhasil dikirim', resetForm: reset }
-   );
+    const { submit: onSubmit, isSubmitting } = useFormSubmission(
+       async () => {
+          return { success: true, message: 'Komentar berhasil dikirim' };
+       },
+       { successMessage: 'Komentar berhasil dikirim', resetForm: reset }
+    );
 
-   return (
-      <form onSubmit={handleSubmit(onSubmit)} className="comment-form" noValidate>
+    return (
+       <form onSubmit={handleSubmit(() => onSubmit())} className="comment-form" noValidate>
          <div className="row">
             <div className="col-lg-12">
                <div className="form_group">

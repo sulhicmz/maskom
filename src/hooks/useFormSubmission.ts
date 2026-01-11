@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
+export type BaseResult = {
+    success: boolean;
+    message?: string;
+    error?: string;
+    metadata?: Record<string, unknown>;
+};
+
 export interface FormSubmissionOptions<T> {
     onSuccess?: (result: T) => void;
     onError?: (error: string) => void;
@@ -8,21 +15,14 @@ export interface FormSubmissionOptions<T> {
     successMessage?: string;
 }
 
-export type ServiceResult = {
-    success: boolean;
-    message?: string;
-    error?: string;
-    rateLimited?: boolean;
-};
-
-export function useFormSubmission<T>(
-    serviceCall: (data: T) => Promise<ServiceResult>,
-    options: FormSubmissionOptions<ServiceResult> = {}
+export function useFormSubmission<TData = void, TResult extends BaseResult = BaseResult>(
+    serviceCall: (data?: TData) => Promise<TResult>,
+    options: FormSubmissionOptions<TResult> = {}
 ) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { onSuccess, onError, resetForm, successMessage } = options;
 
-    const submit = async (data: T): Promise<ServiceResult> => {
+    const submit = async (data?: TData): Promise<TResult> => {
         setIsSubmitting(true);
         try {
             const result = await serviceCall(data);
@@ -37,7 +37,7 @@ export function useFormSubmission<T>(
                 if (resetForm) {
                     resetForm();
                 }
-            } else if (result.rateLimited) {
+            } else if (result.metadata?.rateLimited) {
                 toast.error(result.error || 'Terlalu banyak percobaan. Silakan coba lagi nanti.', { position: 'top-center' });
                 onError?.(result.error || 'Rate limited');
             } else {
