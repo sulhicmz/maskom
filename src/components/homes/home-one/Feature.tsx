@@ -2,7 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 import feature_img from "@/assets/images/gallery/feature-img.svg"
-import feature_list, { type FeatureHomeOneItem } from "@/data/FeatureHomeOneData"
+import feature_list from "@/data/FeatureHomeOneData"
 
 const Feature = React.memo(() => {
    return (

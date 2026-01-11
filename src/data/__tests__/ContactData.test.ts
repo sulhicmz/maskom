@@ -16,8 +16,28 @@ describe('ContactData', () => {
             expect(item).toHaveProperty('id');
             expect(item).toHaveProperty('icon');
             expect(item).toHaveProperty('title');
-            expect(item).toHaveProperty('info');
+            expect(item).toHaveProperty('lines');
          });
+      });
+
+      it('first item should have lines but no links', () => {
+         const firstItem = contact_data[0];
+         expect(firstItem.lines).toHaveLength(2);
+         expect(firstItem.links).toBeUndefined();
+      });
+
+      it('second item should have links but no lines', () => {
+         const secondItem = contact_data[1];
+         expect(secondItem.lines).toHaveLength(0);
+         expect(secondItem.links).toBeDefined();
+         expect(secondItem.links).toHaveLength(2);
+      });
+
+      it('third item should have links but no lines', () => {
+         const thirdItem = contact_data[2];
+         expect(thirdItem.lines).toHaveLength(0);
+         expect(thirdItem.links).toBeDefined();
+         expect(thirdItem.links).toHaveLength(2);
       });
 
       it('each id should be unique', () => {

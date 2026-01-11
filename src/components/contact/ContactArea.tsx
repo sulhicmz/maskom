@@ -1,5 +1,5 @@
 import Link from "next/link";
-import contact_data, { type ContactInfoItem } from "@/data/ContactData";
+import contact_data from "@/data/ContactData";
 
 const ContactArea = () => {
    return (
@@ -14,7 +14,16 @@ const ContactArea = () => {
                         </div>
                         <div className="content">
                            <h5>{item.title}</h5>
-                           {item.info}
+                           {item.lines.map((line, idx) => (
+                              <p key={idx}>{line}</p>
+                           ))}
+                           {item.links?.map((link, idx) => (
+                              <p key={idx}>
+                                 <Link href={link.href} {...(link.target && { target: link.target })} {...(link.rel && { rel: link.rel })}>
+                                    {link.text}
+                                 </Link>
+                              </p>
+                           ))}
                         </div>
                      </div>
                   </div>
