@@ -3,10 +3,23 @@ export interface ValidationRule<T = unknown> {
     validate: (value: T) => boolean;
     errorMessage: string;
 }
+import { VALIDATION } from '@/constants';
+
+export interface ValidationRule<T = unknown> {
+    name: string;
+    validate: (value: T) => boolean;
+    errorMessage: string;
+}
 
 export interface NumberValidationRule extends ValidationRule<number> {
     min?: number;
     max?: number;
+}
+
+export interface StringValidationRule extends ValidationRule<string> {
+    minLength?: number;
+    maxLength?: number;
+    pattern?: RegExp;
 }
 
 export interface StringValidationRule extends ValidationRule<string> {
@@ -26,8 +39,8 @@ export const EmailRule: ValidationRule<string> & { pattern: RegExp } = {
 
 export const PasswordRule: StringValidationRule = {
     name: 'password',
-    minLength: 8,
-    validate: (value: string) => value.length >= 8,
+    minLength: VALIDATION.MIN_PASSWORD_LENGTH,
+    validate: (value: string) => value.length >= VALIDATION.MIN_PASSWORD_LENGTH,
     errorMessage: 'Kata sandi minimal 8 karakter'
 };
 
