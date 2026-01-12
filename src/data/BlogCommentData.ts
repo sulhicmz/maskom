@@ -8,14 +8,14 @@ const blogComments: BlogCommentItem[] = [
     id: 1,
     avatar: comment_1,
     name: "Martin Kukish",
-    date: "27 Aug, 2023",
+    date: "2023-08-27",
     content: "amet porta metus. Cras a mivel odio mollis maximus non at nibhprofessor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur It is a long established fact that a reader",
   },
   {
     id: 2,
     avatar: comment_2,
     name: "Wade Warren",
-    date: "27 Aug, 2023",
+    date: "2023-08-27",
     content: "amet porta metus. Cras a mivel odio mollis maximus non at nibhprofessor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur It is a long established fact that a reader",
   },
 ];
