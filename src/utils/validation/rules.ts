@@ -1,8 +1,3 @@
-export interface ValidationRule<T = unknown> {
-    name: string;
-    validate: (value: T) => boolean;
-    errorMessage: string;
-}
 import { VALIDATION } from '@/constants';
 
 export interface ValidationRule<T = unknown> {
@@ -14,12 +9,6 @@ export interface ValidationRule<T = unknown> {
 export interface NumberValidationRule extends ValidationRule<number> {
     min?: number;
     max?: number;
-}
-
-export interface StringValidationRule extends ValidationRule<string> {
-    minLength?: number;
-    maxLength?: number;
-    pattern?: RegExp;
 }
 
 export interface StringValidationRule extends ValidationRule<string> {

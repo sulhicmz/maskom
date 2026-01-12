@@ -386,7 +386,7 @@ Validation Rules (src/utils/validation/rules.ts)
     ↓
 Direct Adapter (src/utils/validation/directAdapter.ts)
     ↓
-Service Validation (src/utils/validation.ts)
+Service Validation (src/utils/validation/index.ts)
     ↓
 Services (AuthService)
 ```
@@ -417,6 +417,8 @@ Services (AuthService)
 **4. Central Export** (`src/utils/validation/index.ts`):
 - Exports all rules, adapters, and types
 - Single import point for validation utilities
+- **Unified export structure** - removed redundant `validation.ts` file (Task 104)
+- All validation utilities accessible via `@/utils/validation` import path
 
 ### Benefits
 
