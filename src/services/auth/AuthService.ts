@@ -7,7 +7,6 @@ import {
     ServiceValidationError,
     executeWithResilience,
     RateLimitExceededError,
-    createSuccessResult,
     createErrorResult
 } from '@/services/common';
 import { RATE_LIMITS } from '@/constants';

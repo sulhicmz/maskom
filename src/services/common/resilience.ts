@@ -4,10 +4,10 @@ import { RateLimiter } from '@/utils/rateLimiter';
 import { logServiceError, logServiceSuccess } from './logger';
 
 export interface RetryOptions {
-    maxAttempts?: number;
-    baseDelayMs?: number;
-    maxDelayMs?: number;
-    backoffMultiplier?: number;
+    maxAttempts: number;
+    baseDelayMs: number;
+    maxDelayMs: number;
+    backoffMultiplier: number;
     retryableErrors?: RegExp[];
 }
 
@@ -115,10 +115,10 @@ export async function executeWithResilience<T, TData = void>(
 
         metricsCollector.recordCall(operationName, false, errorType, responseTime);
 
-        if (!(error instanceof RateLimitExceededError) && 
-            errorObj.message.indexOf('timeout') === -1 && 
+        if (!(error instanceof RateLimitExceededError) &&
+            errorObj.message.indexOf('timeout') === -1 &&
             errorObj.message.indexOf('circuit breaker') === -1) {
-            logServiceError(errorObj, { operation: operationName });
+            logServiceError(errorObj, { service: serviceName, operation: methodName });
         }
 
         throw error;

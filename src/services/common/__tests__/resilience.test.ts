@@ -166,9 +166,10 @@ describe('executeWithResilience', () => {
                         identifier: 'test@example.com',
                         circuitBreaker: mockCircuitBreaker,
                     },
-                    mockOperationFn
-                );
-            } catch (error) {
+                mockOperationFn
+            );
+                fail('Should have thrown RateLimitExceededError');
+            } catch {
                 // Expected error
             }
 
@@ -206,7 +207,8 @@ describe('executeWithResilience', () => {
                     },
                     mockOperationFn
                 );
-            } catch (error) {
+                fail('Should have thrown error');
+            } catch {
                 // Expected error
             }
 
@@ -251,7 +253,8 @@ describe('executeWithResilience', () => {
                     },
                     mockOperationFn
                 );
-            } catch (error) {
+                fail('Should have thrown timeout error');
+            } catch {
                 // Expected error
             }
 
@@ -297,7 +300,8 @@ describe('executeWithResilience', () => {
                     },
                     mockOperationFn
                 );
-            } catch (error) {
+                fail('Should have thrown error');
+            } catch {
                 // Expected error
             }
 
@@ -323,7 +327,8 @@ describe('executeWithResilience', () => {
                     },
                     mockOperationFn
                 );
-            } catch (error) {
+                fail('Should have thrown error');
+            } catch {
                 // Expected error
             }
 
@@ -342,9 +347,10 @@ describe('executeWithResilience', () => {
                     circuitBreaker: mockCircuitBreaker,
                     recordRateLimitOnFailure: false,
                 },
-                    mockOperationFn
-                );
-            } catch (error) {
+                mockOperationFn
+            );
+                fail('Should have thrown error');
+            } catch {
                 // Expected error
             }
 

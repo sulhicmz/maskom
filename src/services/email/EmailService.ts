@@ -8,7 +8,6 @@ import {
     ServiceCredentialsError, 
     ServiceRateLimitError,
     logServiceError,
-    logServiceSuccess,
     logServiceWarning,
     createSuccessResult,
     createErrorResult,
