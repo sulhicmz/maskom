@@ -1,5 +1,6 @@
 import { filterItems } from "@/utils/dataFilters";
 import { ProcessItem } from "@/types/data";
+import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
 
 import work_1 from "@/assets/images/gallery/work-1.svg"
 import work_2 from "@/assets/images/gallery/work-2.svg"
@@ -34,3 +35,4 @@ const process_data: ProcessItem[] = [
 export default process_data;
 
 export const home_1_process = filterItems(process_data, "home_1");
+export const processByPage: PageIndex<ProcessItem> = createPageIndex(process_data);

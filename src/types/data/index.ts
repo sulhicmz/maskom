@@ -99,6 +99,7 @@ export interface AIStep {
 
 export interface BlogCommentItem {
   id: number;
+  blogId: number;
   avatar: StaticImageData;
   name: string;
   date: string;

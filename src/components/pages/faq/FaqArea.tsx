@@ -1,13 +1,14 @@
 "use client";
 
 import inner_faq_data from "@/data/InnerFaqData";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useTabs } from "@/hooks/useTabs";
+import { useAccordion } from "@/hooks/useAccordion";
 
 const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
 const FaqArea = () => {
-  const [activeId, setActiveId] = useState<number | null>(null);
+  const { activeId, toggle, setActiveId } = useAccordion({ initialId: null });
   const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
 
   useEffect(() => {
@@ -16,7 +17,7 @@ const FaqArea = () => {
     } else {
       setActiveId(null);
     }
-  }, [activeTab]);
+  }, [activeTab, setActiveId]);
 
   return (
     <section className="faqs-section pt-115 pb-80">
@@ -44,26 +45,26 @@ const FaqArea = () => {
               {inner_faq_data[activeTab] && inner_faq_data[activeTab].faq_details ? (
                 <div className="section-content-box">
                   <div className="accordion" id="accordionTwo">
-                    {inner_faq_data[activeTab].faq_details.map((item) => (
-                      <div key={item.id} className="accordion-card style-two mb-15">
-                        <div className="accordion-header">
-                          <h6
-                            onClick={() => setActiveId(item.id)}
-                            className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
-                          >
-                            {item.title}
-                          </h6>
-                        </div>
-                        <div
-                          id={`collapse${item.id}`}
-                          className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}
-                        >
-                          <div className="accordion-content">
-                            <p>{item.desc}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                     {inner_faq_data[activeTab].faq_details.map((item) => (
+                       <div key={item.id} className="accordion-card style-two mb-15">
+                         <div className="accordion-header">
+                           <h6
+                             onClick={() => toggle(item.id)}
+                             className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
+                           >
+                             {item.title}
+                           </h6>
+                         </div>
+                         <div
+                           id={`collapse${item.id}`}
+                           className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}
+                         >
+                           <div className="accordion-content">
+                             <p>{item.desc}</p>
+                           </div>
+                         </div>
+                       </div>
+                     ))}
                   </div>
                 </div>
               ) : (

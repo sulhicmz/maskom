@@ -1,4 +1,5 @@
 import { InnerFaqItem } from "@/types/data";
+import { createIdIndex, type IdIndex } from "@/utils/dataIndex";
 
 const inner_faq_data: InnerFaqItem[] = [
    {
@@ -79,3 +80,4 @@ const inner_faq_data: InnerFaqItem[] = [
 ];
 
 export default inner_faq_data;
+export const innerFaqById: IdIndex<InnerFaqItem> = createIdIndex(inner_faq_data);

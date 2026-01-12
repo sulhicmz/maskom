@@ -1,5 +1,6 @@
 import { filterItems } from "@/utils/dataFilters";
 import { CauseItem } from "@/types/data";
+import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
 
 const cause_data: CauseItem[] = [
    {
@@ -49,3 +50,4 @@ const cause_data: CauseItem[] = [
 export default cause_data;
 
 export const home_1_cause = filterItems(cause_data, "home_1");
+export const causeByPage: PageIndex<CauseItem> = createPageIndex(cause_data);

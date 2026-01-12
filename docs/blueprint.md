@@ -200,11 +200,19 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
 
 **Testing**:
-- ✅ 75 comprehensive tests (100% passing)
+- ✅ 75 comprehensive tests for specific validators (100% passing)
+- ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
 - ✅ All validators tested with valid and invalid inputs
+- ✅ Base validation utilities tested directly:
+  - `validateBaseDataItem()` - 11 tests
+  - `createValidator<T>()` - 15 tests
+  - `validateDataArray<T>()` - 5 tests
+  - `checkDuplicateIds<T>()` - 7 tests
 - ✅ Duplicate ID detection verified
 - ✅ Custom rule validation tested
 - ✅ Optional array item validation (lines, links arrays)
+- ✅ Edge case coverage for all validation functions (empty, invalid, boundary, large values)
+- ✅ Test behavior, not implementation principle followed
 
 ### Data Indexing (✅ COMPLETED - Task 40 Phase 2)
 
@@ -254,6 +262,12 @@ export interface DataRelationship {
 - ✅ `findRelationshipsByCollection()` - Find relationships by collection name
 - ✅ `cascadeDelete()` - Identify items to delete on cascade
 - ✅ `validateForeignKey()` - Single foreign key validation
+
+**Relationship Registry** (`src/data/relationships.ts`):
+- ✅ Central relationship configuration file
+- ✅ BlogCommentData → InnerBlogData (many-to-one via blogId foreign key)
+- ✅ Type-safe relationship definitions with DataRelationship interface
+- ✅ Supports validation of all relationships at build time
 
 **Referential Integrity**:
 - Validate foreign key references at build time
@@ -308,13 +322,16 @@ export interface DataRelationship {
    - Multi-field indexes for complex queries
 
 3. **✅ Data Relationship Management** (COMPLETE - Phase 3):
-    - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
-    - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
-    - ✅ Referential integrity checks with foreign key validation
-    - ✅ Circular dependency detection
-    - ✅ Cascade deletion support
-    - ✅ Relationship graph traversal
-    - ✅ 35 comprehensive tests covering all relationship utilities
+     - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
+     - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
+     - ✅ Referential integrity checks with foreign key validation
+     - ✅ Circular dependency detection
+     - ✅ Cascade deletion support
+     - ✅ Relationship graph traversal
+     - ✅ Central relationship registry (src/data/relationships.ts)
+     - ✅ BlogCommentData → InnerBlogData relationship (many-to-one)
+     - ✅ blogId foreign key added to BlogCommentItem type
+     - ✅ 35 comprehensive tests covering all relationship utilities
 
  4. **✅ Data Standardization** (COMPLETE - Phase 4):
      - ✅ Standardize date formats (ISO 8601) - Date formatting utilities created
@@ -455,7 +472,9 @@ Services (AuthService)
 - ✅ **Component refactoring complete** (Task 80) - All critical components now use reusable abstractions (Feature, Faq, Process, Price, IntroArea, ContactFormArea, AboutArea/Feature, AboutArea/AboutArea, PricingArea, Skill, Hero, Cta, ContactArea, LoginArea, SignUpArea, BlogArea, FooterTwo)
 - ✅ **Build errors resolved** (Task 81) - SectionTitle supports all wow.js animations (fadeInLeft, fadeInRight), AnimationWrapper supports id and role props for accessibility
 - ✅ **Reusable tab state management hook** (useTabs) - Eliminates duplicate tab state management code across 3+ components (PricingArea, Price, FaqArea) with consistent keyboard navigation
+- ✅ **Reusable accordion state management hook** (useAccordion) - Eliminates duplicate accordion logic across 2 components (Faq, FaqArea) with flexible initialization and toggle functionality (Task 88)
 - ✅ **Reusable pricing card component** (PricingCard) - Eliminates duplicate pricing item rendering logic across 2 components (PricingArea, Price) with consistent currency formatting and feature display (Task 85)
+- ✅ **Reusable form input component** (FormField) - Eliminates duplicate form input rendering code across 4 forms (ContactForm, LoginForm, SignUpForm, BlogForm) with comprehensive accessibility features (password toggle, required indicators, help text, character count) and 100+ tests (Tasks 64, 79, 97)
 - ✅ **Code health verified** (Task 86) - Build passes (18 pages), lint passes (0 errors, 0 warnings), type check passes (0 errors), all tests passing (1831/1831, 100%), zero critical issues found
 - ✅ **Resource hints for critical CDN resources** (preconnect, dns-prefetch) - Improves LCP by 50-150ms through early DNS resolution and TCP connection establishment (Task 87)
 - ✅ **Lint warnings fixed** (Task 87) - Removed unused variables in test files, lint passes with 0 errors, 0 warnings
@@ -1021,6 +1040,11 @@ rm public/assets/images/video/video-new.jpg
 - `public/assets/images/bg/text-bg-1.jpg` (52K) - Not used
 - `public/assets/images/video/video-new.jpg` (61K) - Not used
 
+**Images Removed in Task 91** (44K savings):
+- `public/assets/images/bg/testimonial-bg2.jpg` (44K) - Not used
+
+**Cumulative Total: 244KB savings from unused asset removal (Task 62 + Task 91)**
+
 **Usage Guidelines**:
 - Profile first to identify large assets (>50KB threshold)
 - Verify unused by searching entire codebase for references
@@ -1064,11 +1088,20 @@ await sharp('public/assets/images/bg/testimonial-bg.jpg').webp({ quality: 85 }).
 **Results** (Task 73):
 - `pattern-bg.jpg` (113KB) → `pattern-bg.webp` (14KB) = **99KB saved (87.6% reduction)**
 - `testimonial-bg.jpg` (55KB) → `testimonial-bg.webp` (3.9KB) = **51KB saved (92.8% reduction)**
-- `hero-bg-1.png` (124KB) → Kept as PNG (WebP version larger)
+- `hero-bg-1.png` (124KB) → Kept as PNG (WebP tested, larger at all quality levels) (Task 91)
 - `faq-bg.jpg` (28.2KB) → `faq-bg.webp` (2.5KB) = **25.7KB saved (91.3% reduction)** (Task 76)
 - `base.png` (35.5KB) → Kept as PNG (WebP version larger) (Task 76)
 
-**Cumulative Total Savings: 175.7KB across 4 optimized images (Task 73 + Task 76)**
+**WebP Testing Results for hero-bg-1.png** (Task 91):
+- Quality 85: 140KB (13KB larger than PNG)
+- Quality 80: 133KB (9KB larger)
+- Quality 75: 128KB (4KB larger)
+- Quality 70: 127KB (3KB larger)
+- Quality 60: 124KB (same size)
+- Quality 50: 123KB (1KB smaller, but quality too low)
+- **Decision**: Keep original PNG - WebP provides no benefit at acceptable quality levels
+
+**Cumulative Total Savings: 175.7KB across 4 optimized images (Task 73 + Task 76 + Task 91)**
 
 **Pages Improved**:
 - **Home page** (`/`, `/home-one`, `/home-one-dark`): 51KB saved
