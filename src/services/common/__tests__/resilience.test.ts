@@ -13,7 +13,9 @@ describe('executeWithResilience', () => {
 
     beforeEach(() => {
         mockCircuitBreaker = {
-            execute: jest.fn().mockResolvedValue('test result'),
+            execute: jest.fn().mockImplementation(async (callback: () => Promise<unknown>) => {
+                return await callback();
+            }),
             getState: jest.fn().mockReturnValue({ isOpen: false }),
             reset: jest.fn(),
         } as unknown as jest.Mocked<CircuitBreaker>;
@@ -240,7 +242,7 @@ describe('executeWithResilience', () => {
         });
 
         it('should handle timeout errors', async () => {
-            mockCircuitBreaker.execute.mockRejectedValue(new Error('testOperation timed out'));
+            mockCircuitBreaker.execute.mockRejectedValue(new Error('testoperation timed out'));
 
             try {
                 await executeWithResilience<string, void>(
@@ -360,7 +362,7 @@ describe('executeWithResilience', () => {
 
     describe('edge cases', () => {
         it('should work without rate limiter when not provided', async () => {
-            await executeWithResilience<string, void>(
+            const result = await executeWithResilience<string, void>(
                 {
                     operationName: 'TestService.testOperation',
                     circuitBreaker: mockCircuitBreaker,
@@ -373,7 +375,7 @@ describe('executeWithResilience', () => {
         });
 
         it('should work without identifier when skipRateLimit is true', async () => {
-            await executeWithResilience<string, void>(
+            const result = await executeWithResilience<string, void>(
                 {
                     operationName: 'TestService.testOperation',
                     rateLimiter: mockRateLimiter,
@@ -387,7 +389,7 @@ describe('executeWithResilience', () => {
         });
 
         it('should handle undefined data parameter', async () => {
-            await executeWithResilience<string, void>(
+            const result = await executeWithResilience<string, void>(
                 {
                     operationName: 'TestService.testOperation',
                     rateLimiter: mockRateLimiter,
