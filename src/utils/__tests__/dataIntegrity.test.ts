@@ -9,6 +9,7 @@ import {
   validateWiFiDevice,
   validateWebsiteTemplate,
   validateAIStep,
+  validateBlogTagItem,
   validateBlogCommentItem,
   validateTeamMember,
   validateInnerBlogPost,
@@ -24,6 +25,7 @@ import ProcessData from "@/data/ProcessData";
 import CauseData from "@/data/CauseData";
 import MenuData from "@/data/MenuData";
 import DashboardData from "@/data/DashboardData";
+import BlogTagData from "@/data/BlogTagData";
 import BlogCommentData from "@/data/BlogCommentData";
 import TeamData from "@/data/TeamData";
 import InnerBlogData from "@/data/InnerBlogData";
@@ -141,6 +143,18 @@ describe("Data Integrity Validation", () => {
         const result = validateAIStep(item);
         if (!result.isValid) {
           console.error(`AIStep errors:`, result.errors);
+        }
+        expect(result.isValid).toBe(true);
+      });
+    });
+  });
+
+  describe("BlogTagData", () => {
+    it("should pass validation for all items", () => {
+      BlogTagData.forEach((item) => {
+        const result = validateBlogTagItem(item);
+        if (!result.isValid) {
+          console.error(`BlogTagItem errors:`, result.errors);
         }
         expect(result.isValid).toBe(true);
       });

@@ -8,12 +8,14 @@ const BlogForm = dynamic(() => import("@/components/forms/BlogForm"), {
 })
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
 import { InnerBlogPost } from "@/types/data"
+import { tagsById } from "@/data/BlogTagData"
 
 import blog_thumb from "@/assets/images/blog/blog-single-1.jpg"
 import quote from "@/assets/images/icon/right-quote.png"
 import thumb_2 from "@/assets/images/blog/blog-single-2.jpg"
 
 const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
+   const tag = single_blog?.tagId ? tagsById.get(single_blog.tagId)?.name : null;
    return (
       <section className="blog-details-section pt-120 pb-80">
          <div className="container">
@@ -26,12 +28,12 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                         </div>
                         <div className="post-content wow fadeInUp">
                            <h3 className="title">{single_blog?.title ? single_blog.title : "Strategi Maskom menjaga pengalaman pelanggan omni-channel"}</h3>
-                            <div className="post-meta mb-35">
-                               <time><i className="far fa-calendar-alt"></i>15
-                                  Mar 2024</time>
-                               <span><i className="far fa-user-circle"></i>{single_blog?.user ?? "Tim Editorial Maskom"}</span>
-                               <span><i className="far fa-tag"></i>{single_blog?.tag ?? "Managed Service"}</span>
-                            </div>
+                             <div className="post-meta mb-35">
+                                <time><i className="far fa-calendar-alt"></i>15
+                                   Mar 2024</time>
+                                <span><i className="far fa-user-circle"></i>{single_blog?.user ?? "Tim Editorial Maskom"}</span>
+                                <span><i className="far fa-tag"></i>{tag ?? "Managed Service"}</span>
+                             </div>
                            <p>Maskom mendampingi jaringan retail nasional dalam menjaga konsistensi pengalaman pelanggan antara toko fisik dan kanal digital. Seluruh kasir, aplikasi loyalty, layanan click & collect, hingga dashboard manajemen dihubungkan melalui jaringan managed service yang dipantau 24/7.</p>
                            <p>Dengan pendekatan tersebut, tim IT pelanggan tidak lagi mengelola perangkat secara manual per gerai. Maskom menghadirkan otomatisasi konfigurasi, segmentasi VLAN, serta laporan kesehatan jaringan yang dapat diakses kapan saja melalui portal pelanggan.</p>
                            <blockquote className="mb-35">

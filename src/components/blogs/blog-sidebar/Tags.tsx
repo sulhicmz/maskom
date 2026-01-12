@@ -7,8 +7,8 @@ const Tags = () => {
          <AnimationWrapper animation="fadeInUp">
             <h3 className="widget-title">Keywords</h3>
             <div className="tagcloud">
-               {tags.map((tag, i) => (
-                  <span key={i}>{tag}</span>
+               {tags.map((tag) => (
+                  <span key={tag.id}>{tag.name}</span>
                ))}
             </div>
          </AnimationWrapper>

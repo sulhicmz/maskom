@@ -677,27 +677,12 @@ describe("dataValidation", () => {
         title: "Blog Title",
         desc: "Blog description",
         date: "15 Mar 2024",
-        user: "Author",
-        tag: "Tech",
+         user: "Author",
+         tagId: 1,
       };
       const result = validateInnerBlogPost(item);
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject blog post with empty tag", () => {
-      const item: InnerBlogPost = {
-        id: 1,
-        thumb: mockStaticImageData,
-        title: "Blog Title",
-        desc: "Blog description",
-        date: "15 Mar 2024",
-        user: "Author",
-        tag: "",
-      };
-      const result = validateInnerBlogPost(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("InnerBlogPost[1]: tag must be a non-empty string");
     });
 
     it("should reject blog post with empty user", () => {
@@ -708,7 +693,7 @@ describe("dataValidation", () => {
         desc: "Blog description",
         date: "15 Mar 2024",
         user: "",
-        tag: "Tech",
+        tagId: 1,
       };
       const result = validateInnerBlogPost(item);
       expect(result.isValid).toBe(false);

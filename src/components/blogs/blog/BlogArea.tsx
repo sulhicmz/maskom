@@ -6,6 +6,7 @@ import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
+import { tagsById } from "@/data/BlogTagData"
 
 const ReactPaginate = dynamic(() => import("react-paginate"), {
   ssr: false,
@@ -47,7 +48,7 @@ const BlogArea = () => {
                                  <div className="post-meta">
                                     <span><time><i className="flaticon-clock"></i>{formatBlogDate(item.date)}</time></span>
                                     <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
-                                    <span><span><i className="flaticon-price-tag"></i>{item.tag}</span></span>
+                                     <span><span><i className="flaticon-price-tag"></i>{tagsById.get(item.tagId)?.name ?? ''}</span></span>
                                  </div>
                                   <div className="post-share">
                                      <div className="share-btn"><i className="flaticon-share"></i></div>
