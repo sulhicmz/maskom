@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link";
+import React from "react";
 import type { PriceDetailItem } from "@/types/data";
 import AnimationWrapper from "@/components/common/AnimationWrapper";
 
@@ -8,7 +9,7 @@ interface PricingCardProps {
    animation?: "none" | "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight";
 }
 
-const PricingCard = ({ item, animation = "fadeInUp" }: PricingCardProps) => {
+const PricingCard = React.memo(({ item, animation = "fadeInUp" }: PricingCardProps) => {
    return (
       <AnimationWrapper animation={animation}>
          <div className="pricing-item style-one mb-40">
@@ -37,6 +38,8 @@ const PricingCard = ({ item, animation = "fadeInUp" }: PricingCardProps) => {
          </div>
       </AnimationWrapper>
    )
-}
+})
+
+PricingCard.displayName = "PricingCard"
 
 export default PricingCard;
