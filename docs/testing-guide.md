@@ -4,12 +4,12 @@ This document provides comprehensive guidance for testing in the Maskom codebase
 
 ## Overview
 
-The Maskom project uses **Jest** and **React Testing Library** for testing with over **870 tests** across **47 test files**. Test coverage includes components, hooks, utilities, services, and data validation.
+The Maskom project uses **Jest** and **React Testing Library** for testing with over **1976 tests** across **83 test suites**. Test coverage includes components, hooks, utilities, services, and data validation.
 
 ### Test Statistics
 
-- **Total Test Files**: 47
-- **Total Tests**: 872+
+- **Total Test Suites**: 83
+- **Total Tests**: 1976
 - **Success Rate**: 100% (all tests passing)
 - **Test Framework**: Jest 29.x with React Testing Library
 - **Code Coverage**: See coverage reports after running `npm test -- --coverage`
@@ -414,13 +414,13 @@ describe('UseSticky', () => {
 
 ### Current Coverage Areas
 
-| Category | Test Files | Tests | Coverage |
+| Category | Test Suites | Tests | Coverage |
 |----------|-------------|--------|----------|
-| Components | ~35 | ~700+ | High |
-| Utilities | ~7 | ~100+ | 100% |
-| Services | ~2 | ~40 | 100% |
-| Hooks | ~2 | ~20 | 100% |
-| **Total** | **47** | **872+** | **~90%** |
+| Components | ~60 | ~1500+ | High |
+| Utilities | ~10 | ~200+ | 100% |
+| Services | ~5 | ~100+ | 100% |
+| Hooks | ~5 | ~50 | 100% |
+| **Total** | **83** | **1976** | **~90%** |
 
 ### High Priority Test Coverage
 
@@ -676,7 +676,7 @@ If tests are flaky (intermittently fail):
 
 The Maskom project has a robust testing foundation with:
 
-- **872+ tests** across **47 test files**
+- **1976 tests** across **83 test suites**
 - **100% test success rate**
 - Comprehensive coverage for components, utilities, services, and hooks
 - Clear testing patterns and standards
