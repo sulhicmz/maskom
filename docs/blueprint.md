@@ -479,6 +479,7 @@ Services (AuthService)
 - ✅ **Resource hints for critical CDN resources** (preconnect, dns-prefetch) - Improves LCP by 50-150ms through early DNS resolution and TCP connection establishment (Task 87)
 - ✅ **Lint warnings fixed** (Task 87) - Removed unused variables in test files, lint passes with 0 errors, 0 warnings
 - ✅ **Date format standardization** (Task 40 Phase 4) - All dates stored in ISO 8601 format (YYYY-MM-DD) with formatting utilities for display (formatBlogDate, formatCommentDate, formatDate, isValidISODate, toISODate)
+- ✅ **Reusable Brand carousel component** (Brand) - Eliminates duplicate carousel logic across 2 components (home-one/Brand, home-one-dark/Brand) with Swiper configuration, CSS loading, and React.memo optimization (Task 94)
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
