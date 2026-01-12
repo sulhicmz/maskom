@@ -364,6 +364,62 @@ Access-Control-Max-Age: 86400
 
 ---
 
+## Code Sanitizer: Build Errors & Lint Warnings (Jan 12, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Code Sanitizer (Build & Lint Fixes)
+
+**Problem**:
+- Build failed with type error in `src/services/common/resilience.ts:79`
+- `RetryOptions.maxAttempts` type mismatch: optional vs required
+- Lint warnings: 8 unused variables/imports across services and test files
+- Build blocking - no changes can be merged until fixed
+
+**Solution**:
+1. **Fixed Type Error** (src/services/common/resilience.ts):
+    - Changed `RetryOptions.maxAttempts` from optional (`maxAttempts?: number`) to required (`maxAttempts: number`)
+    - Matches `src/utils/resilience/types.ts` interface definition
+    - Resolves build error at line 79
+
+2. **Fixed Missing Logger Property** (src/services/common/resilience.ts):
+    - Added missing `service` and `operation` properties to `logServiceError` call
+    - Changed from `{ operation: operationName }` to `{ service: serviceName, operation: methodName }`
+    - Matches `LoggerOptions` interface requirements
+
+3. **Removed Unused Imports**:
+    - `createSuccessResult` from `src/services/auth/AuthService.ts` (line 10)
+    - `logServiceSuccess` from `src/services/email/EmailService.ts` (line 11)
+
+4. **Fixed Unused Test Variables** (src/services/common/__tests__/resilience.test.ts):
+    - Removed unused `_error` variable declarations from 6 catch blocks
+    - Changed `} catch (_error) {` to `} catch {` for cleaner code
+
+**Verification**:
+- ✅ Build passes: 18 pages generated successfully
+- ✅ Lint clean: 0 errors, 0 warnings
+- ✅ All tests passing: 100% success rate
+- ✅ No TODO/FIXME/HACK comments found in source code
+- ✅ Zero regressions in existing functionality
+
+**Related Files**:
+- ✅ Modified: `src/services/common/resilience.ts` - Fixed type and logger call
+- ✅ Modified: `src/services/auth/AuthService.ts` - Removed unused import
+- ✅ Modified: `src/services/email/EmailService.ts` - Removed unused import
+- ✅ Modified: `src/services/common/__tests__/resilience.test.ts` - Fixed unused variables
+
+**Impact**:
+- Build Status: Now passing (was blocking)
+- Code Quality: Eliminated dead code (unused imports)
+- Type Safety: Resolved type mismatch in resilience layer
+- Test Coverage: All tests passing with no regressions
+- Lint Status: Clean (0 errors, 0 warnings)
+
+**Verification Date**: 2026-01-12
+**Related PR**: #131 (agent → main)
+
+---
+
 ## Task 114: Critical Path Testing - HomeOneDark Page Component Test Coverage (Jan 12, 2026)
 
 **Status**: ✅ Completed
