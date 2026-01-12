@@ -1,3 +1,5 @@
+import "@testing-library/jest-dom";
+
 // Mock next/image module before importing
 jest.mock("next/image", () => ({
     __esModule: true,
