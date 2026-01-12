@@ -34,6 +34,7 @@ const mockAvatar2 = {
 const mockComments = [
    {
      id: 1,
+     blogId: 1,
      name: 'John Doe',
      avatar: mockAvatar1,
      date: '2026-01-10',
@@ -41,12 +42,13 @@ const mockComments = [
    },
    {
      id: 2,
+     blogId: 1,
      name: 'Jane Smith',
      avatar: mockAvatar2,
      date: '2026-01-09',
      content: 'I found this post very helpful. Thanks for sharing!',
    },
-];
+ ];
 
 describe('BlogComment', () => {
   it('renders comment section with title', () => {
@@ -250,6 +252,7 @@ describe('BlogComment', () => {
     const longComment = [
       {
         id: 1,
+        blogId: 1,
         name: 'Test User',
         avatar: mockAvatar1,
         date: '2026-01-10',
@@ -266,6 +269,7 @@ describe('BlogComment', () => {
     const specialComment = [
       {
         id: 1,
+        blogId: 1,
         name: 'Test User',
         avatar: mockAvatar1,
         date: '2026-01-10',
