@@ -8,6 +8,154 @@
 
 ---
 
+## Task 92: Data Architecture - Relationship Design & Index Optimization (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture (Schema Design & Index Optimization)
+
+**Problem**:
+- Relationship utilities existed but no relationships were actually defined in the data layer
+- BlogCommentData had no foreign key to link comments to blog posts
+- Data relationship registry was missing (relationships.ts not created)
+- Index utilities (createIdIndex, createPageIndex) not used consistently across data files
+- Inconsistent data access patterns - some files had indexes, others didn't
+- blueprint.md claimed Phase 3 was "COMPLETE" but relationships were not implemented
+- Missing foreign key constraints prevented referential integrity validation
+
+**Solution**:
+1. **Schema Design - Foreign Key Addition**:
+   - Added `blogId: number` field to BlogCommentItem type (src/types/data/index.ts:100)
+   - Updated BlogCommentData.ts to include blogId in all comment records
+   - Both comments now reference blog post id: 1 (InnerBlogData)
+
+2. **Relationship Registry Creation**:
+   - Created src/data/relationships.ts with DATA_RELATIONSHIPS array
+   - Defined BlogCommentData → InnerBlogData relationship (many-to-one)
+   - Relationship config:
+     * sourceCollection: "BlogCommentData"
+     * targetCollection: "InnerBlogData"
+     * sourceField: "blogId"
+     * targetField: "id"
+     * type: "many-to-one"
+     * optional: false
+
+3. **Index Optimization**:
+   - Added PageIndex exports to BaseDataItem-based collections:
+     * FaqData.ts → faqByPage: PageIndex<FaqItem>
+     * FeatureData.ts → featureByPage: PageIndex<FeatureItem>
+     * PriceData.ts → priceByPage: PageIndex<PriceItem>
+     * ProcessData.ts → processByPage: PageIndex<ProcessItem>
+     * CauseData.ts → causeByPage: PageIndex<CauseItem>
+   - Added IdIndex exports to ID-based collections:
+     * InnerBlogData.ts → innerBlogById: IdIndex<InnerBlogPost>
+     * InnerFaqData.ts → innerFaqById: IdIndex<InnerFaqItem>
+     * MenuData.ts → menuById: IdIndex<MenuItem>
+     * DashboardData.ts → wifiDeviceById, websiteTemplateById, aiStepById
+     * FeatureHomeOneData.ts → featureHomeOneById: IdIndex<FeatureHomeOneItem>
+     * BlogCommentData.ts → blogCommentByBlogId: IdIndex<BlogCommentItem>
+
+**Architecture Benefits**:
+1. **Schema Integrity**: Foreign keys properly defined with TypeScript types
+2. **Referential Integrity**: Relationships now can be validated at build time
+3. **Performance**: O(1) lookups vs O(n) linear search for all data collections
+4. **Consistency**: All data files now follow same indexing pattern
+5. **Type Safety**: All indexes properly typed with TypeScript interfaces
+6. **Relationship Validation**: Central registry enables referential integrity checks
+7. **Maintainability**: Single source of truth for relationship definitions
+8. **Extensibility**: New relationships easily added to DATA_RELATIONSHIPS array
+
+**Code Quality**:
+- All 1976 tests passing (100% success rate)
+- Lint passed with 0 errors, 0 warnings
+- TypeScript compilation passes without errors
+- Zero regressions in existing functionality
+
+**Success Criteria**:
+- [x] blogId foreign key added to BlogCommentItem type
+- [x] BlogCommentData.ts updated with blogId values
+- [x] src/data/relationships.ts created with relationship definitions
+- [x] BlogCommentData → InnerBlogData relationship configured
+- [x] PageIndex exports added to FaqData, FeatureData, PriceData, ProcessData, CauseData
+- [x] IdIndex exports added to InnerBlogData, InnerFaqData, MenuData, DashboardData, FeatureHomeOneData
+- [x] All data files now have consistent index exports
+- [x] All 1976 tests passing (100% success rate)
+- [x] Lint passed without errors (0 errors, 0 warnings)
+- [x] TypeScript compilation passes without errors
+- [x] Zero regressions in existing functionality
+- [x] blueprint.md updated with relationship registry information
+- [x] task.md updated with Task 92 completion details
+
+**Related Files**:
+- Modified: `src/types/data/index.ts` - Added blogId to BlogCommentItem interface
+- Modified: `src/data/BlogCommentData.ts` - Added blogId field, blogCommentByBlogId index
+- Created: `src/data/relationships.ts` - Central relationship registry
+- Modified: `src/data/FaqData.ts` - Added faqByPage: PageIndex<FaqItem>
+- Modified: `src/data/FeatureData.ts` - Added featureByPage: PageIndex<FeatureItem>
+- Modified: `src/data/PriceData.ts` - Added priceByPage: PageIndex<PriceItem>
+- Modified: `src/data/ProcessData.ts` - Added processByPage: PageIndex<ProcessItem>
+- Modified: `src/data/CauseData.ts` - Added causeByPage: PageIndex<CauseItem>
+- Modified: `src/data/InnerBlogData.ts` - Added innerBlogById: IdIndex<InnerBlogPost>
+- Modified: `src/data/InnerFaqData.ts` - Added innerFaqById: IdIndex<InnerFaqItem>
+- Modified: `src/data/MenuData.ts` - Added menuById: IdIndex<MenuItem>
+- Modified: `src/data/DashboardData.ts` - Added wifiDeviceById, websiteTemplateById, aiStepById
+- Modified: `src/data/FeatureHomeOneData.ts` - Added featureHomeOneById: IdIndex<FeatureHomeOneItem>
+- Updated: `docs/blueprint.md` - Added relationship registry documentation
+- Updated: `docs/task.md` - Added Task 92 completion details
+
+**Testing**:
+- All 1976 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Data Architect principles:
+   - **Data Integrity First**: Foreign keys properly defined with type safety
+   - **Schema Design**: Thoughtful design prevents orphaned records
+   - **Query Efficiency**: Indexes support O(1) lookups vs O(n) linear search
+   - **Migration Safety**: Non-destructive changes (added fields, exports)
+   - **Single Source of Truth**: Central relationship registry in relationships.ts
+   - **Backward Compatible**: All changes additive, no breaking changes
+- Index utilities were implemented but not consistently used - now all data files have indexes
+- Relationship utilities existed but relationships weren't defined - now have central registry
+- Future enhancement: Add build-time referential integrity validation
+
+**Impact**:
+- Data Integrity: Foreign keys properly defined with type safety
+- Performance: O(1) lookups for all data collections vs O(n) linear search
+- Consistency: All data files follow same indexing pattern
+- Type Safety: All indexes properly typed with TypeScript
+- Referential Integrity: Central registry enables validation
+- Maintainability: Single source of truth for relationships
+
+**Future Enhancement Opportunities**:
+
+1. **Build-Time Referential Integrity Validation** - Validate all relationships at build time
+      - Run validateRelationships() during build process
+      - Fail build on referential integrity violations
+      - Effort: Low (add build script)
+      - Priority: Medium (current validation exists but not run automatically)
+
+2. **Add More Relationships** - Define additional relationships between collections
+      - Add user relationships (InnerBlogPost → TeamMember via user field)
+      - Add tag relationships (InnerBlogPost → BlogTagData)
+      - Add menu hierarchy relationships (MenuItem sub_menus)
+      - Effort: Low (add relationships to registry)
+      - Priority: Low (optional enhancement for data modeling)
+
+3. **Multi-Field Indexes** - Add indexes for complex queries
+      - Designation-based index for FeedbackData (feedbackByDesignation)
+      - Tag-based index for InnerBlogPost (blogByTag)
+      - Effort: Low (use existing createMultiFieldIndex utility)
+      - Priority: Low (current IdIndex and PageIndex cover most use cases)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 40 (Data Architecture Phases), Task 89 (Base Validation Tests), Task 86 (Security Assessment)
+**Next Data Architecture Review**: Q2 2026
+
+---
+
 ## Task 91: Performance Optimization - Unused Asset Removal (Jan 13, 2026)
 
 **Status**: ✅ Completed

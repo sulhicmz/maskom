@@ -1,4 +1,5 @@
 import { WiFiDevice, WebsiteTemplate, AIStep } from "@/types/data";
+import { createIdIndex, type IdIndex } from "@/utils/dataIndex";
 
 const wifiDevices: WiFiDevice[] = [
   { id: 1, name: "Device 1", ip: "192.168.1.10", status: "Online" },
@@ -23,3 +24,6 @@ const DashboardData = {
 };
 
 export default DashboardData;
+export const wifiDeviceById: IdIndex<WiFiDevice> = createIdIndex(wifiDevices);
+export const websiteTemplateById: IdIndex<WebsiteTemplate> = createIdIndex(websiteTemplates);
+export const aiStepById: IdIndex<AIStep> = createIdIndex(aiAutomationSteps);

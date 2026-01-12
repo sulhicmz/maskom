@@ -1,5 +1,6 @@
 import { filterItems } from "@/utils/dataFilters";
 import { PriceItem } from "@/types/data";
+import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
 
 const price_data: PriceItem[] = [
    {
@@ -263,3 +264,4 @@ export default price_data;
 
 export const home_1_price = filterItems(price_data, "home_1");
 export const pricing_price = filterItems(price_data, "pricing");
+export const priceByPage: PageIndex<PriceItem> = createPageIndex(price_data);

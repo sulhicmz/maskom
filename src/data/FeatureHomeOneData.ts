@@ -1,9 +1,5 @@
-export interface FeatureHomeOneItem {
-   id: number;
-   icon: string;
-   title: string;
-   desc: string;
-}
+import type { FeatureHomeOneItem } from "@/types/data";
+import { createIdIndex, type IdIndex } from "@/utils/dataIndex";
 
 const feature_home_one: FeatureHomeOneItem[] = [
    {
@@ -27,3 +23,4 @@ const feature_home_one: FeatureHomeOneItem[] = [
 ];
 
 export default feature_home_one;
+export const featureHomeOneById: IdIndex<FeatureHomeOneItem> = createIdIndex(feature_home_one);

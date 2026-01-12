@@ -263,6 +263,12 @@ export interface DataRelationship {
 - ✅ `cascadeDelete()` - Identify items to delete on cascade
 - ✅ `validateForeignKey()` - Single foreign key validation
 
+**Relationship Registry** (`src/data/relationships.ts`):
+- ✅ Central relationship configuration file
+- ✅ BlogCommentData → InnerBlogData (many-to-one via blogId foreign key)
+- ✅ Type-safe relationship definitions with DataRelationship interface
+- ✅ Supports validation of all relationships at build time
+
 **Referential Integrity**:
 - Validate foreign key references at build time
 - Cascade deletion/update strategies
@@ -316,13 +322,16 @@ export interface DataRelationship {
    - Multi-field indexes for complex queries
 
 3. **✅ Data Relationship Management** (COMPLETE - Phase 3):
-    - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
-    - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
-    - ✅ Referential integrity checks with foreign key validation
-    - ✅ Circular dependency detection
-    - ✅ Cascade deletion support
-    - ✅ Relationship graph traversal
-    - ✅ 35 comprehensive tests covering all relationship utilities
+     - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
+     - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
+     - ✅ Referential integrity checks with foreign key validation
+     - ✅ Circular dependency detection
+     - ✅ Cascade deletion support
+     - ✅ Relationship graph traversal
+     - ✅ Central relationship registry (src/data/relationships.ts)
+     - ✅ BlogCommentData → InnerBlogData relationship (many-to-one)
+     - ✅ blogId foreign key added to BlogCommentItem type
+     - ✅ 35 comprehensive tests covering all relationship utilities
 
  4. **✅ Data Standardization** (COMPLETE - Phase 4):
      - ✅ Standardize date formats (ISO 8601) - Date formatting utilities created

@@ -1,5 +1,6 @@
 
 import { MenuItem } from "@/types/data";
+import { createIdIndex, type IdIndex } from "@/utils/dataIndex";
 
 const menu_data: MenuItem[] = [
     {
@@ -53,3 +54,4 @@ const menu_data: MenuItem[] = [
 ];
 
 export default menu_data;
+export const menuById: IdIndex<MenuItem> = createIdIndex(menu_data);

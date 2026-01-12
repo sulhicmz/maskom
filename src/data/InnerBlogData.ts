@@ -1,4 +1,5 @@
 import { InnerBlogPost } from "@/types/data";
+import { createIdIndex, type IdIndex } from "@/utils/dataIndex";
 
 import blog_thumb1 from "@/assets/images/blog/blog-3.jpg"
 import blog_thumb2 from "@/assets/images/blog/blog-4.jpg"
@@ -53,3 +54,4 @@ const inner_blog_data: InnerBlogPost[] = [
 ];
 
 export default inner_blog_data;
+export const innerBlogById: IdIndex<InnerBlogPost> = createIdIndex(inner_blog_data);

@@ -1,5 +1,6 @@
 import { filterItems } from "@/utils/dataFilters";
 import { FeatureItem } from "@/types/data";
+import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
 
 const feature_data: FeatureItem[] = [
    {
@@ -95,3 +96,4 @@ export default feature_data;
 
 export const home_3_feature = filterItems(feature_data, "home_3");
 export const about_feature = filterItems(feature_data, "about");
+export const featureByPage: PageIndex<FeatureItem> = createPageIndex(feature_data);

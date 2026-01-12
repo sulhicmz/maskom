@@ -1,5 +1,6 @@
 import { filterItems } from "@/utils/dataFilters";
 import { FaqItem } from "@/types/data";
+import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
 
 const faq_data: FaqItem[] = [
    {
@@ -80,3 +81,4 @@ export default faq_data;
 export const home_1_faq = filterItems(faq_data, "home_1");
 export const home_2_faq = filterItems(faq_data, "home_2");
 export const home_3_faq = filterItems(faq_data, "home_3");
+export const faqByPage: PageIndex<FaqItem> = createPageIndex(faq_data);
