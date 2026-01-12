@@ -1,3 +1,4 @@
+import React from "react"
 import HeaderOne from "@/layouts/headers/HeaderOne"
 import Feedback from "@/components/homes/home-one/Feedback"
 import Faq from "@/components/homes/home-one/Faq"
@@ -24,4 +25,4 @@ const UseCases = () => {
    )
 }
 
-export default UseCases
+export default React.memo(UseCases)

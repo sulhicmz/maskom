@@ -1,3 +1,4 @@
+import React from "react";
 import Image from "next/image";
 import { WebsiteTemplate } from "@/types/data";
 
@@ -42,7 +43,7 @@ const WebsiteBuilder = ({ templates, editorPlaceholder = "Edit your website cont
         <button className="btn btn-secondary ms-2">Publish</button>
       </div>
     </div>
-  );
+   );
 };
 
-export default WebsiteBuilder;
+export default React.memo(WebsiteBuilder);

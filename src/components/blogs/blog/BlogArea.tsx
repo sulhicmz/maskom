@@ -1,4 +1,5 @@
 "use client"
+import React, { useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
@@ -19,7 +20,7 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
 
 const BlogArea = () => {
 
-   const blog = inner_blog_data;
+   const blog = useMemo(() => inner_blog_data, []);
    const itemsPerPage = 3;
 
    const { currentItems, pageCount, handlePageClick } = usePagination({
@@ -85,4 +86,4 @@ const BlogArea = () => {
    )
 }
 
-export default BlogArea
+export default React.memo(BlogArea)

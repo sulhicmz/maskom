@@ -1,3 +1,4 @@
+import React from "react"
 import about_img1 from "@/assets/images/about/about-1.jpg"
 import about_img2 from "@/assets/images/about/about-2.jpg"
 import about_img3 from "@/assets/images/about/about-3.jpg"
@@ -66,4 +67,4 @@ const AboutArea = () => {
    )
 }
 
-export default AboutArea
+export default React.memo(AboutArea)
