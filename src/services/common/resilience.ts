@@ -69,13 +69,14 @@ export async function executeWithResilience<T, TData = void>(
     }
 
     try {
-        let operation = () => operationFn(data as TData);
-
-        if (timeoutMs) {
-            operation = () => withTimeout(operationFn(data as TData), { timeoutMs, timeoutError: `${methodName} timed out` });
-        }
-
         const result = await circuitBreaker.execute(async () => {
+            let operation = () => operationFn(data as TData);
+
+            if (timeoutMs) {
+                const timeoutError = `${methodName} timed out`;
+                operation = () => withTimeout(operationFn(data as TData), { timeoutMs, timeoutError });
+            }
+
             const retryResult = await withRetry(operation, retryOptions);
 
             if (!retryResult.success || !retryResult.data) {
@@ -100,10 +101,11 @@ export async function executeWithResilience<T, TData = void>(
         let errorType = 'unknown';
 
         const errorObj = error instanceof Error ? error : new Error('Unknown error');
-        
-        if (errorObj.message.indexOf('timeout') !== -1) {
+        const lowerMessage = errorObj.message.toLowerCase();
+
+        if (lowerMessage.indexOf('timeout') !== -1 || lowerMessage.indexOf('timed out') !== -1) {
             errorType = 'timeout';
-        } else if (errorObj.message.indexOf('circuit breaker') !== -1) {
+        } else if (lowerMessage.indexOf('circuit breaker') !== -1) {
             errorType = 'circuit_breaker';
         } else if (error instanceof RateLimitExceededError) {
             errorType = 'rate_limit';
