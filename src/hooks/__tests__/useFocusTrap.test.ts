@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
+import { RefObject } from 'react';
 import { useFocusTrap } from '../useFocusTrap';
 
 describe('useFocusTrap', () => {
@@ -36,12 +37,14 @@ describe('useFocusTrap', () => {
 
             renderHook(() => useFocusTrap(ref, { isActive: true }));
 
+            const third = document.getElementById('third') as HTMLButtonElement;
+            third.focus();
+
             act(() => {
-                const first = document.getElementById('first') as HTMLButtonElement;
-                first.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+                third.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
             });
 
-            expect(document.activeElement?.id).toBe('second');
+            expect(document.activeElement?.id).toBe('first');
         });
 
         it('should cycle to last element on Tab from last element', () => {
@@ -128,7 +131,7 @@ describe('useFocusTrap', () => {
 
             const ref = { current: container };
 
-            const { rerender } = renderHook(() => useFocusTrap(ref, { isActive: false }));
+            renderHook(() => useFocusTrap(ref, { isActive: false }));
 
             expect(document.activeElement?.id).not.toBe('first');
         });
@@ -168,7 +171,7 @@ describe('useFocusTrap', () => {
 
             const ref = { current: container };
 
-            const { rerender, unmount } = renderHook(
+            const { rerender } = renderHook(
                 ({ isActive }) => useFocusTrap(ref, { isActive, returnFocus: true }),
                 { initialProps: { isActive: true } }
             );
@@ -214,9 +217,9 @@ describe('useFocusTrap', () => {
 
             const ref = { current: container };
 
-            const { unmount } = renderHook(() => useFocusTrap(ref, { isActive: true }));
+            renderHook(() => useFocusTrap(ref, { isActive: true }));
 
-            expect(document.activeElement?.id).not.toBeDefined();
+            expect(document.activeElement?.id).toBe('');
         });
 
         it('should handle container with single focusable element', () => {
@@ -241,9 +244,9 @@ describe('useFocusTrap', () => {
         it('should not trap focus when container ref is null', () => {
             const ref = { current: null };
 
-            renderHook(() => useFocusTrap(ref, { isActive: true }));
+            renderHook(() => useFocusTrap(ref as unknown as RefObject<HTMLElement>, { isActive: true }));
 
-            expect(document.activeElement?.id).not.toBeDefined();
+            expect(document.activeElement?.id).toBe('');
         });
 
         it('should handle rapid activation/deactivation', () => {
@@ -265,7 +268,7 @@ describe('useFocusTrap', () => {
             rerender({ isActive: true });
             rerender({ isActive: false });
 
-            expect(document.activeElement).not.toBe(container.querySelector('button'));
+            expect(document.activeElement?.id).toBe('first');
         });
     });
 

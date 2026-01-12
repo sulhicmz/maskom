@@ -24,9 +24,9 @@ export const useFocusTrap = (
         }
 
         const container = containerRef.current;
-        const focusableElements = container.querySelectorAll<HTMLElement>(
+        const focusableElements = Array.from(container.querySelectorAll<HTMLElement>(
             focusSelector
-        );
+        ));
         const firstFocusable = focusableElements[0];
         const lastFocusable = focusableElements[focusableElements.length - 1];
 
