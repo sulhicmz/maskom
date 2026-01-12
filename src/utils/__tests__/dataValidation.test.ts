@@ -591,6 +591,7 @@ describe("dataValidation", () => {
     it("should validate a valid blog comment", () => {
       const item: BlogCommentItem = {
         id: 1,
+        blogId: 1,
         avatar: mockStaticImageData,
         name: "John Doe",
         date: "27 Aug, 2023",
@@ -604,6 +605,7 @@ describe("dataValidation", () => {
     it("should reject blog comment with empty name", () => {
       const item: BlogCommentItem = {
         id: 1,
+        blogId: 1,
         avatar: mockStaticImageData,
         name: "",
         date: "27 Aug, 2023",
@@ -617,6 +619,7 @@ describe("dataValidation", () => {
     it("should reject blog comment with empty content", () => {
       const item: BlogCommentItem = {
         id: 1,
+        blogId: 1,
         avatar: mockStaticImageData,
         name: "John Doe",
         date: "27 Aug, 2023",
