@@ -123,8 +123,8 @@ describe('Feature', () => {
 
   it('renders feature image', () => {
     render(<Feature />);
-    
-    const featureImage = screen.getByAltText('features image');
+
+    const featureImage = screen.getByAltText('Ilustrasi visual keunggulan layanan konektivitas Maskom');
     expect(featureImage).toBeInTheDocument();
   });
 
@@ -199,10 +199,10 @@ describe('Feature', () => {
 
   it('renders feature image in proper column', () => {
     const { container } = render(<Feature />);
-    
+
     const secondColumn = container.querySelector('.col-xl-7');
-    const featureImage = screen.getByAltText('features image');
-    
+    const featureImage = screen.getByAltText('Ilustrasi visual keunggulan layanan konektivitas Maskom');
+
     expect(secondColumn).toContainElement(featureImage);
   });
 

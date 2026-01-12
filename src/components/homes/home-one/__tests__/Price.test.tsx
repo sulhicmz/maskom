@@ -14,34 +14,34 @@ describe('Price', () => {
   });
 
   it('renders first tab as active by default', () => {
-    render(<Price />);
+     render(<Price />);
 
-    const tabs = screen.getAllByRole('button');
-    const firstTab = tabs[0];
-    const secondTab = tabs[1];
+     const tabs = screen.getAllByRole('tab');
+     const firstTab = tabs[0];
+     const secondTab = tabs[1];
 
-    expect(firstTab).toHaveClass('active');
-    expect(secondTab).not.toHaveClass('active');
-  });
+     expect(firstTab).toHaveClass('active');
+     expect(secondTab).not.toHaveClass('active');
+   });
 
   it('switches active tab on click', () => {
-    render(<Price />);
+     render(<Price />);
 
-    const tabs = screen.getAllByRole('button');
-    const secondTab = tabs[1];
+     const tabs = screen.getAllByRole('tab');
+     const secondTab = tabs[1];
 
-    fireEvent.click(secondTab);
+     fireEvent.click(secondTab);
 
-    expect(tabs[0]).not.toHaveClass('active');
-    expect(secondTab).toHaveClass('active');
-  });
+     expect(tabs[0]).not.toHaveClass('active');
+     expect(secondTab).toHaveClass('active');
+   });
 
   it('switches back to first tab when clicking first tab', () => {
-    render(<Price />);
+     render(<Price />);
 
-    const tabs = screen.getAllByRole('button');
-    const firstTab = tabs[0];
-    const secondTab = tabs[1];
+     const tabs = screen.getAllByRole('tab');
+     const firstTab = tabs[0];
+     const secondTab = tabs[1];
 
     fireEvent.click(secondTab);
     fireEvent.click(firstTab);
@@ -85,9 +85,9 @@ describe('Price', () => {
   });
 
   it('maintains tab state independently from other interactions', () => {
-    render(<Price />);
+     render(<Price />);
 
-    const tabs = screen.getAllByRole('button');
+     const tabs = screen.getAllByRole('tab');
     const firstTab = tabs[0];
     const secondTab = tabs[1];
 
@@ -100,22 +100,22 @@ describe('Price', () => {
   });
 
   it('handles multiple tab switches correctly', () => {
-    render(<Price />);
+     render(<Price />);
 
-    const tabs = screen.getAllByRole('button');
-    const firstTab = tabs[0];
-    const secondTab = tabs[1];
+     const tabs = screen.getAllByRole('tab');
+     const firstTab = tabs[0];
+     const secondTab = tabs[1];
 
-    fireEvent.click(firstTab);
-    expect(firstTab).toHaveClass('active');
+     fireEvent.click(firstTab);
+     expect(firstTab).toHaveClass('active');
 
-    fireEvent.click(secondTab);
-    expect(secondTab).toHaveClass('active');
+     fireEvent.click(secondTab);
+     expect(secondTab).toHaveClass('active');
 
-    fireEvent.click(firstTab);
-    expect(firstTab).toHaveClass('active');
+     fireEvent.click(firstTab);
+     expect(firstTab).toHaveClass('active');
 
-    fireEvent.click(secondTab);
-    expect(secondTab).toHaveClass('active');
+     fireEvent.click(secondTab);
+     expect(secondTab).toHaveClass('active');
+   });
   });
-});

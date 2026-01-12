@@ -49,7 +49,7 @@ const Brand = React.memo(({ brandData, title }: BrandProps) => {
                     {brandData.map((item: StaticImageData, i: number) => (
                         <SwiperSlide key={i} className="client-item">
                             <div className="client-img">
-                                <Link href="/"><Image src={item} alt="client-logo" /></Link>
+                                <Link href="/" aria-label={`Kunjungi website partner ${i + 1}`}><Image src={item} alt={`Logo partner bisnis ${i + 1}`} /></Link>
                             </div>
                         </SwiperSlide>
                     ))}

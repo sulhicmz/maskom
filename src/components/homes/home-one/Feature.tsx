@@ -20,25 +20,25 @@ const Feature = React.memo(() => {
                         animation="fadeInDown"
                      />
                      <div className="iconic-info-list">
-                        {feature_list.map((item) => (
-                           <AnimationWrapper key={item.id} animation="fadeInUp" className="iconic-info-box style-two mb-30">
-                              <div className="icon">
-                                 <i className={item.icon}></i>
-                              </div>
-                              <div className="content">
-                                 <h4>{item.title}</h4>
-                                 <p>{item.desc}</p>
-                              </div>
-                           </AnimationWrapper>
-                        ))}
+                         {feature_list.map((item) => (
+                            <AnimationWrapper key={item.id} animation="fadeInUp" className="iconic-info-box style-two mb-30">
+                               <div className="icon">
+                                  <i className={item.icon} aria-hidden="true"></i>
+                               </div>
+                               <div className="content">
+                                  <h4>{item.title}</h4>
+                                  <p>{item.desc}</p>
+                               </div>
+                            </AnimationWrapper>
+                         ))}
                      </div>
                   </div>
                </div>
-               <div className="col-xl-7">
-                  <AnimationWrapper animation="fadeInRight" className="section-image-box style-one mb-50">
-                     <Image src={feature_img} alt="features image" />
-                  </AnimationWrapper>
-               </div>
+                <div className="col-xl-7">
+                   <AnimationWrapper animation="fadeInRight" className="section-image-box style-one mb-50">
+                      <Image src={feature_img} alt="Ilustrasi visual keunggulan layanan konektivitas Maskom" />
+                   </AnimationWrapper>
+                </div>
             </div>
          </div>
       </section>
