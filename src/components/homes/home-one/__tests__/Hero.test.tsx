@@ -71,8 +71,8 @@ describe('Hero', () => {
 
   it('renders dashboard image', () => {
     render(<Hero />);
-    
-    const dashboardImage = screen.getByAltText('dashboard image');
+
+    const dashboardImage = screen.getByAltText('Dashboard monitoring infrastruktur jaringan Maskom');
     expect(dashboardImage).toBeInTheDocument();
   });
 
@@ -153,7 +153,7 @@ describe('Hero', () => {
     const { container } = render(<Hero />);
     
     const heroImageBox = container.querySelector('.hero-one_image-box');
-    const dashboardImage = screen.getByAltText('dashboard image');
+    const dashboardImage = screen.getByAltText('Dashboard monitoring infrastruktur jaringan Maskom');
     
     expect(heroImageBox).toContainElement(dashboardImage);
   });

@@ -35,12 +35,12 @@ describe('Faq', () => {
   });
 
   it('renders all FAQ questions', () => {
-    render(<Faq />);
+     render(<Faq />);
 
-    expect(screen.getByText('Apa saja cakupan layanan Maskom?')).toBeInTheDocument();
-    expect(screen.getByText('Seberapa cepat proses instalasi jaringan?')).toBeInTheDocument();
-    expect(screen.getByText('Bagaimana mekanisme dukungan teknis Maskom?')).toBeInTheDocument();
-  });
+     expect(screen.getByText('Apa saja cakupan layanan Maskom?')).toBeInTheDocument();
+     expect(screen.getByText('Seberapa cepat proses instalasi jaringan?')).toBeInTheDocument();
+     expect(screen.getByText('Bagaimana mekanisme dukungan teknis Maskom?')).toBeInTheDocument();
+   });
 
   it('renders first FAQ as active by default', () => {
     render(<Faq />);
@@ -148,12 +148,12 @@ describe('Faq', () => {
   });
 
   it('has proper accordion structure with id references', () => {
-    render(<Faq />);
+     render(<Faq />);
 
-    const collapses = document.querySelectorAll('.accordion-collapse');
-    expect(collapses.length).toBe(3);
-    expect(collapses[0]).toHaveAttribute('id', 'collapse1');
-  });
+     const collapses = document.querySelectorAll('.accordion-collapse');
+     expect(collapses.length).toBe(3);
+     expect(collapses[0]).toHaveAttribute('id', 'faq-collapse-1');
+   });
 
   it('has proper accordion cards structure', () => {
     render(<Faq />);
@@ -222,14 +222,14 @@ describe('Faq', () => {
   });
 
   it('has proper question headings with correct class', () => {
-    render(<Faq />);
-
-    const headings = screen.getAllByText(/Apa saja|Seberapa cepat|Bagaimana mekanisme/);
-    headings.forEach(heading => {
-      expect(heading.tagName).toBe('H6');
-      expect(heading).toHaveClass('accordion-title');
-    });
-  });
+     render(<Faq />);
+ 
+     const headings = screen.getAllByText(/Apa saja|Seberapa cepat|Bagaimana mekanisme/);
+     headings.forEach(heading => {
+       expect(heading.tagName).toBe('BUTTON');
+       expect(heading).toHaveClass('accordion-title');
+     });
+   });
 
   it('has proper answer content structure', () => {
     render(<Faq />);

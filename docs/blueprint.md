@@ -463,6 +463,8 @@ Services (AuthService)
 - ✅ Helper functions for result creation (createSuccessResult, createErrorResult)
 - ✅ Centralized constants for magic numbers (src/constants/) - Eliminates magic numbers like rate limits and validation thresholds
 - ✅ Swiper configuration centralization (SWIPER_CONFIG) - Configuration separated from component logic for reusability and consistency (Task 95)
+- ✅ **OpenAPI specification** (docs/openapi-spec.yaml) - Machine-readable API spec (OpenAPI 3.0.3) for code generation and automated testing
+- ✅ **Postman collection** (docs/postman-collection.json) - Ready-to-use collection with all API endpoints, examples, and integration tests
 - ✅ Webpack code splitting for large dependencies (forms, swiper cache groups)
 - ✅ Lazy-loaded form components with loading states (ContactForm, LoginForm, SignUpForm, BlogForm)
 - ✅ Bundle optimization with separate async chunks (19KB forms, 24KB swiper)
@@ -1151,12 +1153,18 @@ See `docs/task.md` for ongoing architectural improvements and prioritized refact
 
 Comprehensive API specifications for all external service integrations are documented in `docs/api.md`.
 
+**Quick Start Resources**:
+- **OpenAPI Specification**: `docs/openapi-spec.yaml` - Machine-readable API spec (OpenAPI 3.0.3)
+- **Postman Collection**: `docs/postman-collection.json` - Ready-to-use Postman collection with all endpoints and tests
+
+**Documentation Contents**:
 - Email Service API with resilience patterns
 - Authentication Service API (login, register, logout, getCurrentUser)
 - Integration Monitoring & Metrics API
 - Error response standards
 - Rate limiting configuration
 - Adding new integrations guide
+- Using OpenAPI specification and Postman collection
 
 ## Security Configuration
 

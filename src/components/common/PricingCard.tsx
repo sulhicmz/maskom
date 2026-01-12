@@ -28,13 +28,13 @@ const PricingCard = React.memo(({ item, animation = "fadeInUp" }: PricingCardPro
                {item.note && <p className="mt-10">{item.note}</p>}
                <Link href="/contact" className="theme-btn style-two">{item.btn}</Link>
             </div>
-            <div className="pricing-body">
-               <ul className="check-list style-one">
-                  {item.feature.map((list, i) => (
-                     <li key={i}><i className="flaticon-check"></i>{list}</li>
-                  ))}
-               </ul>
-            </div>
+             <div className="pricing-body">
+                <ul className="check-list style-one">
+                   {item.feature.map((list, i) => (
+                      <li key={i}><i className="flaticon-check" aria-hidden="true"></i>{list}</li>
+                   ))}
+                </ul>
+             </div>
          </div>
       </AnimationWrapper>
    )

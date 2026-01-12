@@ -1,0 +1,665 @@
+{
+  "info": {
+    "name": "Maskom API Collection",
+    "description": "Comprehensive Postman collection for Maskom external service integrations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token from login/register"
+    }
+  ],
+  "item": [
+    {
+      "name": "Email Service",
+      "item": [
+        {
+          "name": "Send Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateParams\": {\n    \"user_name\": \"John Doe\",\n    \"user_email\": \"john@example.com\",\n    \"message\": \"Hello, I would like to inquire about your services.\"\n  },\n  \"skipRateLimit\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Email - Rate Limit Bypass (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateParams\": {\n    \"user_name\": \"Admin Test\",\n    \"user_email\": \"admin@maskom.co.id\",\n    \"message\": \"Admin test email\"\n  },\n  \"skipRateLimit\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Email - Invalid Email (Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateParams\": {\n    \"user_name\": \"Test User\",\n    \"user_email\": \"invalid-email\",\n    \"message\": \"Test message\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/email/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["email", "send"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication Service",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.token) {",
+                  "  pm.collectionVariables.set('token', jsonData.token);",
+                  "  pm.test('Token saved to collection variables', true);",
+                  "} else {",
+                  "  pm.test('Login failed or no token returned', false);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Credentials (Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"wrong@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Invalid Email (Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Missing Fields (Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.token) {",
+                  "  pm.collectionVariables.set('token', jsonData.token);",
+                  "  pm.test('Token saved to collection variables', true);",
+                  "} else {",
+                  "  pm.test('Registration failed or no token returned', false);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Short Password (Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"short\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Invalid Email (Error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"invalid-email\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('token', '');",
+                  "pm.test('Token cleared from collection variables', true);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/current-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "current-user"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Monitoring Service",
+      "item": [
+        {
+          "name": "Get Email Service Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/metrics/EmailService",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "metrics", "EmailService"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Auth Login Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/metrics/AuthService.login",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "metrics", "AuthService.login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Auth Register Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/metrics/AuthService.register",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "metrics", "AuthService.register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/metrics/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "metrics", "all"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check - Email Service",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/health/EmailService?thresholdSuccessRate=0.9",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "health", "EmailService"],
+              "query": [
+                {
+                  "key": "thresholdSuccessRate",
+                  "value": "0.9"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check - Auth Login",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/health/AuthService.login?thresholdSuccessRate=0.8",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "health", "AuthService.login"],
+              "query": [
+                {
+                  "key": "thresholdSuccessRate",
+                  "value": "0.8"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check - Auth Register",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/health/AuthService.register?thresholdSuccessRate=0.8",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "health", "AuthService.register"],
+              "query": [
+                {
+                  "key": "thresholdSuccessRate",
+                  "value": "0.8"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check - All Services",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/health/all?thresholdSuccessRate=0.8",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "health", "all"],
+              "query": [
+                {
+                  "key": "thresholdSuccessRate",
+                  "value": "0.8"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Integration Tests",
+      "item": [
+        {
+          "name": "Complete Auth Flow",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Create unique email for each test run",
+                  "var timestamp = Date.now();",
+                  "pm.collectionVariables.set('testEmail', 'test' + timestamp + '@example.com');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "item": [
+            {
+              "name": "1. Register User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.test('Registration successful', jsonData.success === true);",
+                      "pm.test('User object returned', jsonData.user !== undefined);",
+                      "pm.test('Token returned', jsonData.token !== undefined);",
+                      "if (jsonData.success) {",
+                      "  pm.collectionVariables.set('token', jsonData.token);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Integration Test User\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"testpassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "register"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "2. Get Current User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.test('User retrieved successfully', jsonData.id !== undefined);",
+                      "pm.test('Email matches', jsonData.email === pm.collectionVariables.get('testEmail'));",
+                      "pm.test('Name matches', jsonData.name === 'Integration Test User');"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/auth/current-user",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "current-user"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "3. Logout",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.test('Logout successful', jsonData.success === true);",
+                      "pm.test('Logout message present', jsonData.message !== undefined);"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/logout",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "logout"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Email Service with Validation",
+          "item": [
+            {
+              "name": "1. Send Valid Email",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.test('Email sent successfully', jsonData.success === true);",
+                      "pm.test('Response text present', jsonData.data !== undefined);"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"templateParams\": {\n    \"user_name\": \"Test User\",\n    \"user_email\": \"test@example.com\",\n    \"message\": \"Test message from Postman\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/email/send",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["email", "send"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "2. Send Email - Missing Name (Error)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "pm.test('Request failed as expected', jsonData.success === false);",
+                      "pm.test('Validation error code', jsonData.errorCode === 'VALIDATION_ERROR');"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"templateParams\": {\n    \"user_email\": \"test@example.com\",\n    \"message\": \"Test message\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/email/send",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["email", "send"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

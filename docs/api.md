@@ -4,7 +4,22 @@
 
 This document provides comprehensive API specifications for all external service integrations in the Maskom application.
 
+## Quick Start
+
+**OpenAPI Specification**: [docs/openapi-spec.yaml](openapi-spec.yaml)
+- Machine-readable API specification (OpenAPI 3.0.3)
+- Import into tools like Swagger UI, Postman, or API clients
+- Standard format for automated testing and code generation
+
+**Postman Collection**: [docs/postman-collection.json](postman-collection.json)
+- Ready-to-use Postman collection with all API endpoints
+- Pre-configured request examples and tests
+- Authentication flow automation (login → register → logout)
+
 ## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Common Service Types](#common-service-types)
 
 - [Common Service Types](#common-service-types)
 - [Email Service API](#email-service-api)
@@ -1476,6 +1491,102 @@ Available metrics:
 - Resilience patterns (timeout, retry, circuit breaker)
 - Standardized error response format
 - API documentation
+
+---
+
+## Using the OpenAPI Specification
+
+### Importing into Tools
+
+**Swagger UI (Local)**
+```bash
+# Serve OpenAPI spec with Swagger UI
+docker run -p 8080:8080 -e SWAGGER_JSON=/openapi.yaml -v $(pwd):/openapi.yaml swaggerapi/swagger-ui
+# Or use online viewer: https://editor.swagger.io/
+```
+
+**Postman**
+1. Open Postman
+2. Click "Import"
+3. Select "Upload Files"
+4. Choose `docs/openapi-spec.yaml`
+5. Postman will auto-generate collections from the spec
+6. Alternatively, use the pre-configured `docs/postman-collection.json`
+
+**Code Generation**
+```bash
+# Generate TypeScript client with OpenAPI Generator
+docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate \
+  -i /local/docs/openapi-spec.yaml \
+  -g typescript-axios \
+  -o /local/generated/client
+
+# Generate API client with specific settings
+npx @openapitools/openapi-generator-cli generate \
+  -i docs/openapi-spec.yaml \
+  -g typescript-axios \
+  -o src/services/generated \
+  --additional-properties=supportsES6=true
+```
+
+### Validation
+
+Validate the OpenAPI spec:
+```bash
+# Install validator
+npm install -g @apidevtools/swagger-cli
+
+# Validate spec
+swagger-cli validate docs/openapi-spec.yaml
+```
+
+---
+
+## Using the Postman Collection
+
+### Import Steps
+
+1. Download [Postman](https://www.postman.com/downloads/)
+2. Open Postman
+3. Click "Import" in the top left
+4. Select `docs/postman-collection.json`
+5. Collection will appear in "Collections" sidebar
+
+### Collection Structure
+
+The collection is organized into folders:
+- **Email Service** - Email sending endpoints
+- **Authentication Service** - Login, register, logout, current user
+- **Monitoring Service** - Metrics and health check endpoints
+- **Integration Tests** - Pre-configured test flows (auth flow, email validation)
+
+### Environment Variables
+
+The collection uses two variables:
+- `baseUrl` - API base URL (default: http://localhost:3000/api)
+- `token` - JWT token (auto-populated after successful login/register)
+
+To configure:
+1. Click the "eye" icon in the top right
+2. Click "Edit"
+3. Set `baseUrl` to your API URL
+4. `token` will be auto-managed by login/register/logout flows
+
+### Running Tests
+
+1. Open the "Integration Tests" folder
+2. Click the folder name to run all tests in sequence
+3. Each test includes assertion scripts (Postman Tests tab)
+4. Results will show in the Test Results panel
+
+### Authentication Flow
+
+The collection includes an automated auth flow:
+1. Run "Register" (token saved to collection variables)
+2. Run "Get Current User" (uses token automatically)
+3. Run "Logout" (token cleared from collection variables)
+
+Login/Logout requests include test scripts to automatically manage the `token` variable.
 
 ---
 

@@ -19,18 +19,18 @@ const Faq = () => {
          <div className="container">
             <div className="row">
                <div className="col-xl-6">
-                  <div className="contact-two_image-box p-r z-1 mb-50">
-                     <AnimationWrapper animation="fadeInLeft" className="image-one">
-                        <Image src={faq_1} alt="Contact Image" />
-                     </AnimationWrapper>
-                     <AnimationWrapper animation="fadeInRight" className="image-two">
-                        <Image src={faq_2} alt="Contact Image" />
-                     </AnimationWrapper>
-                     <AnimationWrapper animation="fadeInDown" className="image-three">
-                        <Image src={faq_3} alt="Contact Image" />
-                     </AnimationWrapper>
-                     <Image src={faq_shape} className="shape-one" alt="Contact Image" />
-                  </div>
+                   <div className="contact-two_image-box p-r z-1 mb-50">
+                      <AnimationWrapper animation="fadeInLeft" className="image-one">
+                         <Image src={faq_1} alt="Ilustrasi profesional dukungan layanan Maskom" />
+                      </AnimationWrapper>
+                      <AnimationWrapper animation="fadeInRight" className="image-two">
+                         <Image src={faq_2} alt="Ilustrasi tim support teknis Maskom" />
+                      </AnimationWrapper>
+                      <AnimationWrapper animation="fadeInDown" className="image-three">
+                         <Image src={faq_3} alt="Ilustrasi layanan dukungan 24/7" />
+                      </AnimationWrapper>
+                      <Image src={faq_shape} className="shape-one" alt="Elemen dekoratif visual FAQ" />
+                   </div>
                </div>
                <div className="col-xl-6">
                   <div className="section-content-box pl-xl-45 mb-30">
@@ -40,22 +40,41 @@ const Faq = () => {
                         className="mb-55"
                         animation="fadeInDown"
                      />
-                        <AnimationWrapper animation="fadeInUp" className="accordion" id="accordionOne">
-                           {home_1_faq.map((item) => (
-                             <div key={item.id} className="accordion-card style-one mb-15">
-                                <div className="accordion-header">
-                                   <h6 onClick={() => toggle(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >
+                         <AnimationWrapper animation="fadeInUp" className="accordion" id="accordionOne" role="presentation">
+                            {home_1_faq.map((item) => (
+                              <div key={item.id} className="accordion-card style-one mb-15">
+                                 <div className="accordion-header">
+                                     <button
+                                        type="button"
+                                        id={`faq-button-${item.id}`}
+                                        onClick={() => toggle(item.id)}
+                                        onKeyDown={(e) => {
+                                           if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                                              e.preventDefault();
+                                              toggle(item.id);
+                                           }
+                                        }}
+                                        className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
+                                        aria-expanded={activeId === item.id}
+                                        aria-controls={`faq-collapse-${item.id}`}
+                                        aria-label={item.question}
+                                     >
                                        {item.question}
-                                    </h6>
-                                </div>
-                                <div id="collapse1" className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}>
-                                   <div className="accordion-content">
-                                      <p>{item.answer}</p>
-                                   </div>
-                                </div>
-                             </div>
-                          ))}
-                       </AnimationWrapper>
+                                    </button>
+                                 </div>
+                                 <div
+                                    id={`faq-collapse-${item.id}`}
+                                    role="region"
+                                    aria-labelledby={`faq-button-${item.id}`}
+                                    className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}
+                                 >
+                                    <div className="accordion-content">
+                                       <p>{item.answer}</p>
+                                    </div>
+                                 </div>
+                              </div>
+                           ))}
+                        </AnimationWrapper>
                   </div>
                </div>
             </div>
