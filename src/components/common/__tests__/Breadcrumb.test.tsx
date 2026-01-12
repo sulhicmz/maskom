@@ -65,7 +65,7 @@ describe('Breadcrumb', () => {
     expect(wrapper).toBeInTheDocument();
     expect(wrapper).toHaveClass('bg_cover');
     expect(wrapper).toHaveStyle({
-      backgroundImage: 'url(/assets/images/bg/page-banner.jpg)',
+      backgroundImage: 'url(/assets/images/bg/page-banner.webp)',
     });
   });
 
@@ -189,7 +189,7 @@ describe('Breadcrumb', () => {
     const wrapper = container.querySelector('.page-banner-wrapper');
     const style = wrapper?.getAttribute('style');
     expect(style).toContain('background');
-    expect(style).toContain('/assets/images/bg/page-banner.jpg');
+    expect(style).toContain('/assets/images/bg/page-banner.webp');
   });
 
   it('has both shape-one and shape-two', () => {

@@ -4,7 +4,7 @@ const LoginForm = dynamic(() => import("@/components/forms/LoginForm"), {
    loading: () => <div className="text-center py-5">Memuat formulir masuk...</div>
 })
 
-import login_img1 from "@/assets/images/gallery/robot.png"
+import login_img1 from "@/assets/images/gallery/robot.webp"
 import login_img2 from "@/assets/images/gallery/base.png"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
