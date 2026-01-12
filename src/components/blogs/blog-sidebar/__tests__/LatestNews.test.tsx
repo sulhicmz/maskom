@@ -161,12 +161,12 @@ describe('LatestNews', () => {
 
     it('should have animation classes', () => {
       const { container } = render(<LatestNews />);
-      
+
       const widget = container.querySelector('.sidebar-widget');
       expect(widget).toBeInTheDocument();
-      
-      const animatedDiv = widget.querySelector('.wow.fadeInUp');
-      expect(animatedDiv).toBeInTheDocument();
+
+      expect(widget?.classList.contains('wow')).toBe(true);
+      expect(widget?.classList.contains('fadeInUp')).toBe(true);
     });
 
     it('should have post thumbnail content class', () => {

@@ -106,8 +106,8 @@ describe('Tags', () => {
       
       const widget = container.querySelector('.sidebar-widget');
       expect(widget).toBeInTheDocument();
-      
-      const animatedDiv = widget.querySelector('.wow.fadeInUp');
+
+      const animatedDiv = widget!.querySelector('.wow.fadeInUp');
       expect(animatedDiv).toBeInTheDocument();
     });
   });
