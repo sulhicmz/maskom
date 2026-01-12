@@ -69,7 +69,7 @@ describe('AIAutomation', () => {
       const { container } = render(<AIAutomation steps={mockSteps} />);
       
       const progressBar = container.querySelector('.progress-bar');
-      expect(progressBar).toHaveStyle({ width: '33.33333333333333%' });
+      expect(progressBar).toHaveStyle({ width: '33%' });
     });
 
     it('should disable Previous button on first step', () => {
@@ -119,7 +119,7 @@ describe('AIAutomation', () => {
       fireEvent.click(screen.getByText('Next'));
       
       const progressBar = container.querySelector('.progress-bar');
-      expect(progressBar).toHaveStyle({ width: '66.66666666666666%' });
+      expect(progressBar).toHaveStyle({ width: '67%' });
     });
 
     it('should change Next button to Finish on last step', () => {
@@ -157,10 +157,10 @@ describe('AIAutomation', () => {
       
       fireEvent.click(screen.getByText('Next'));
       const progressBar = container.querySelector('.progress-bar');
-      expect(progressBar).toHaveStyle({ width: '66.66666666666666%' });
+      expect(progressBar).toHaveStyle({ width: '67%' });
       
       fireEvent.click(screen.getByText('Previous'));
-      expect(progressBar).toHaveStyle({ width: '33.33333333333333%' });
+      expect(progressBar).toHaveStyle({ width: '33%' });
     });
   });
 

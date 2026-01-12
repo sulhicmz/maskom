@@ -74,9 +74,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
 function ErrorFallback({ errorId, onReset, onReload }: { errorId: string; onReset: () => void; onReload: () => void }) {
     return (
-        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light" role="alert" aria-live="assertive" aria-atomic="true">
             <div className="text-center p-5">
-                <div className="mb-4">
+                <div className="mb-4" aria-hidden="true">
                     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="40" cy="40" r="38" stroke="#dc3545" strokeWidth="4" />
                         <path d="M40 25V40" stroke="#dc3545" strokeWidth="4" strokeLinecap="round" />
@@ -88,18 +88,18 @@ function ErrorFallback({ errorId, onReset, onReload }: { errorId: string; onRese
                     Maaf, terjadi kesalahan tak terduga. Tim kami telah diberitahu.
                 </p>
                 <p className="text-muted mb-4">
-                    Kode Error: <code className="bg-light px-2 py-1 rounded">{errorId}</code>
+                    Kode Error: <code className="bg-light px-2 py-1 rounded" aria-label={`Kode error: ${errorId}`}>{errorId}</code>
                 </p>
-                <div className="d-flex gap-2 justify-content-center flex-wrap">
-                    <button className="btn btn-primary" onClick={onReload}>
+                <div className="d-flex gap-2 justify-content-center flex-wrap" role="group" aria-label="Tindakan pemulihan">
+                    <button className="btn btn-primary" onClick={onReload} aria-label="Muat ulang halaman saat ini">
                         Muat Ulang Halaman
                     </button>
-                    <button className="btn btn-outline-secondary" onClick={onReset}>
+                    <button className="btn btn-outline-secondary" onClick={onReset} aria-label="Coba ulang tindakan yang gagal">
                         Coba Lagi
                     </button>
                 </div>
                 <p className="text-muted mt-4 mb-0">
-                    Masalah berlanjut? <Link href="/contact">Hubungi Kami</Link>
+                    Masalah berlanjut? <Link href="/contact" aria-label="Hubungi tim dukungan kami">Hubungi Kami</Link>
                 </p>
             </div>
         </div>

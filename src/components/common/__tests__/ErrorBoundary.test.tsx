@@ -121,7 +121,7 @@ describe("ErrorBoundary", () => {
             );
 
             expect(screen.getByRole("button", { name: /muat ulang halaman/i })).toBeInTheDocument();
-            expect(screen.getByRole("button", { name: /coba lagi/i })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /coba ulang tindakan yang gagal/i })).toBeInTheDocument();
         });
 
         it("reloads page when Muat Ulang button clicked", () => {
@@ -161,7 +161,7 @@ describe("ErrorBoundary", () => {
             expect(screen.queryByText("Child Component")).not.toBeInTheDocument();
             expect(screen.getByText("Terjadi Kesalahan")).toBeInTheDocument();
 
-            const resetButton = screen.getByRole("button", { name: /coba lagi/i });
+            const resetButton = screen.getByRole("button", { name: /coba ulang tindakan yang gagal/i });
             fireEvent.click(resetButton);
 
             rerender(<TestComponent />);

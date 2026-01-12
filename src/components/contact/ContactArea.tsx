@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import contact_data from "@/data/ContactData";
 import AnimationWrapper from "@/components/common/AnimationWrapper"
@@ -35,4 +36,4 @@ const ContactArea = () => {
    )
 }
 
-export default ContactArea
+export default React.memo(ContactArea)
