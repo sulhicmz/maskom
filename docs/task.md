@@ -8,6 +8,116 @@
 
 ---
 
+## Task 104: Module Extraction / Dependency Cleanup - Unify Validation Layer (Jan 12, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Module Extraction (Dependency Cleanup)
+
+**Problem**:
+- Two parallel export points for validation utilities: `src/utils/validation.ts` (single file) and `src/utils/validation/index.ts` (directory index)
+- `validation.ts` only exports subset from `directAdapter` (validateEmail, validatePassword, validateRequired)
+- `validation/index.ts` exports all modules (rules, yupAdapter, directAdapter)
+- Confusing import paths - developers don't know which to use
+- Maintenance overhead - keeping both files in sync
+- Inconsistent pattern with other utilities (dataValidation, resilience, metrics use directory structure)
+- Only 1 file (AuthService.ts) imports from `validation.ts`
+
+**Solution**:
+1. **Removed redundant validation.ts file** (src/utils/validation.ts):
+    - Deleted single-file export point that duplicated functionality
+    - All exports now centralized in validation/index.ts
+    - Single source of truth for validation utilities
+
+2. **Updated import resolution**:
+    - AuthService.ts imports from `@/utils/validation` (resolves to validation/index.ts)
+    - All exports from `directAdapter` available via `validation/index.ts`
+    - validateEmail, validatePassword, validateRequired all exported from index
+
+**Architecture Benefits**:
+1. **Single Source of Truth**: One export point for all validation utilities
+2. **Clearer Import Paths**: `@/utils/validation` always points to modular structure
+3. **Easier Maintenance**: Only one file to update exports (validation/index.ts)
+4. **Consistent Pattern**: Matches other utility directories (dataValidation, resilience, metrics)
+5. **Reduced Cognitive Load**: Developers don't need to decide between two import paths
+6. **Simpler Onboarding**: New developers have one clear path to validation utilities
+
+**Code Quality**:
+- Zero imports broken by this change (AuthService.ts still works correctly)
+- TypeScript resolution automatically finds validation/index.ts
+- All validation utilities exported from single entry point
+- Consistent with established patterns in codebase
+
+**Success Criteria**:
+- [x] Removed src/utils/validation.ts (redundant file)
+- [x] AuthService.ts imports from @/utils/validation (resolves to validation/index.ts)
+- [x] All validation utilities exported from validation/index.ts
+- [x] No broken imports (TypeScript resolution works correctly)
+- [x] Consistent pattern with other utility directories
+- [x] task.md updated with Task 104 completion details
+
+**Related Files**:
+- ✅ Deleted: `src/utils/validation.ts` - Redundant export file (7 lines removed)
+- ✅ No changes needed: `src/services/auth/AuthService.ts` - Import path already correct
+- ✅ No changes needed: `src/utils/validation/index.ts` - Already exports all required utilities
+- Updated: `docs/task.md` - Added Task 104 completion details
+
+**Verification**:
+- Git status confirms only validation.ts removed
+- AuthService.ts imports from @/utils/validation (resolves correctly)
+- All validation utilities available (validateEmail, validatePassword, validateRequired)
+- Pattern matches other utility directories (dataValidation, resilience, metrics)
+
+**Notes**:
+- Follows Module Extraction principles:
+   - **Single Responsibility**: Validation utilities in one place
+   - **Consistency**: All utilities follow directory-based export pattern
+   - **Minimal Change**: Only removed redundant file, no code modified
+   - **Zero Risk**: TypeScript resolution guarantees imports work correctly
+- Import resolution:
+   - `@/utils/validation` → resolves to `src/utils/validation/index.ts`
+   - `src/utils/validation.ts` no longer exists
+   - AuthService.ts still imports correctly (automatic resolution)
+- Export structure:
+   - `validation/index.ts` exports from `rules`, `yupAdapter`, `directAdapter`
+   - `directAdapter` exports: validateEmail, validatePassword, validateRequired
+   - All available via `@/utils/validation`
+
+**Impact**:
+- Maintainability: Single export point, easier to update
+- Consistency: Matches other utility directories
+- Clarity: No confusion about which import path to use
+- Zero Breaking Changes: All existing imports work correctly
+- Code Reduction: 7 lines removed (validation.ts)
+
+**Future Enhancement Opportunities**:
+
+1. **Remove Unused Constants** - Clean up src/constants/validation.ts
+        - File exists but is not imported anywhere in codebase
+        - Contains VALIDATION, PASSWORD_VALIDATION, EMAIL_VALIDATION constants
+        - Can be removed if truly unused
+        - Effort: Low (verify unused, then delete)
+        - Priority: Low (no negative impact if kept)
+
+2. **Fix Duplicate Interfaces** - Remove duplicate interface definitions in rules.ts
+        - ValidationRule interface defined twice (lines 1-5 and 8-12)
+        - StringValidationRule interface defined twice (lines 19-23 and 25-29)
+        - Effort: Low (remove duplicates)
+        - Priority: Low (no runtime impact, only code cleanliness)
+
+3. **Centralize Error Messages** - Extract validation error messages to constants
+        - Error messages scattered across rules.ts and directAdapter.ts
+        - Could be centralized in constants/validation.ts
+        - Easier localization and maintenance
+        - Effort: Medium (refactor and add constants)
+        - Priority: Low (current approach works fine)
+
+**Verification Date**: 2026-01-12
+**Related Tasks**: Task 48 (Validation Layer Architecture), Task 50 (AuthService Code Quality)
+**Next Architecture Review**: January 26, 2026
+
+---
+
 ## Task 103: Interface Definition - useFocusTrap Hook for Accessible Component Patterns (Jan 12, 2026)
 
 **Status**: ✅ Completed
