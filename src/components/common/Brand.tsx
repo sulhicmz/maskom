@@ -4,39 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import type { StaticImageData } from "next/image";
+import { SWIPER_CONFIG } from "@/constants/swiper";
 
 interface BrandProps {
     brandData: StaticImageData[];
     title: string;
 }
-
-const BRAND_SWIPER_CONFIG = {
-    slidesPerView: 6,
-    loop: true,
-    autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-    },
-    pagination: false,
-    navigation: false,
-    breakpoints: {
-        '1400': {
-            slidesPerView: 6,
-        },
-        '1200': {
-            slidesPerView: 5,
-        },
-        '768': {
-            slidesPerView: 4,
-        },
-        '576': {
-            slidesPerView: 3,
-        },
-        '0': {
-            slidesPerView: 2,
-        },
-    },
-};
 
 const Swiper = dynamic(() => import('swiper/react').then((mod) => mod.Swiper), {
     ssr: false,
@@ -72,7 +45,7 @@ const Brand = React.memo(({ brandData, title }: BrandProps) => {
                         </div>
                     </div>
                 </div>
-                <Swiper {...BRAND_SWIPER_CONFIG} modules={[]} className="clients-slider wow fadeInUp">
+                <Swiper {...SWIPER_CONFIG} modules={[]} className="clients-slider wow fadeInUp">
                     {brandData.map((item: StaticImageData, i: number) => (
                         <SwiperSlide key={i} className="client-item">
                             <div className="client-img">

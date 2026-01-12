@@ -134,6 +134,136 @@
 
 ---
 
+## Task 95: Module Extraction - Swiper Configuration Centralization (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Configuration Architecture (Constants Extraction)
+
+**Problem**:
+- Swiper configuration was defined inline in `src/components/common/Brand.tsx` component
+- Configuration was component-local (BRAND_SWIPER_CONFIG) instead of centralized constant
+- Future carousel components (Testimonials, Features) would duplicate similar configurations
+- Mixed concerns: Configuration logic in component file
+- Established pattern in constants directory not followed for Swiper settings
+- Changes to carousel behavior require editing component files instead of configuration layer
+
+**Locations**:
+- `src/components/common/Brand.tsx` - Brand carousel with inline Swiper configuration
+- `src/constants/` - Existing constants directory with rateLimits.ts and validation.ts patterns
+
+**Solution**:
+1. **Created Swiper configuration constant** (src/constants/swiper.ts):
+    - Extracted BRAND_SWIPER_CONFIG to SWIPER_CONFIG constant
+    - Preserved all configuration settings (slidesPerView, loop, autoplay, pagination, navigation)
+    - Maintained responsive breakpoints for different screen sizes
+    - Added TypeScript type export (SwiperBreakpoints) for type safety
+    - Followed existing constants pattern (rateLimits.ts, validation.ts)
+
+2. **Updated Brand.tsx**:
+    - Removed local BRAND_SWIPER_CONFIG constant definition
+    - Added import from @/constants/swiper for SWIPER_CONFIG
+    - Updated Swiper component to use SWIPER_CONFIG instead of BRAND_SWIPER_CONFIG
+    - No behavior change, configuration values identical
+
+3. **Updated constants exports** (src/constants/index.ts):
+    - Added export * from './swiper' to main constants index
+    - Enables centralized import of all constants from single location
+
+**Architecture Benefits**:
+1. **Single Responsibility Principle**: Configuration separated from component logic
+2. **DRY Principle**: Single source of truth for carousel configurations
+3. **Modularity**: Configuration in dedicated constants layer
+4. **Maintainability**: Changes to carousel behavior in one location (constants file)
+5. **Consistency**: Follows existing constants pattern (rateLimits, validation)
+6. **Extensibility**: Future carousel components can reuse SWIPER_CONFIG or create variants
+7. **Type Safety**: SwiperBreakpoints type for configuration validation
+8. **Testability**: Configuration can be tested independently of components
+
+**Code Quality**:
+- Configuration extracted to constants directory (following established pattern)
+- Brand.tsx reduced by 26 lines (configuration removed)
+- All 1976 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated successfully
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+
+**Success Criteria**:
+- [x] Created src/constants/swiper.ts with SWIPER_CONFIG constant
+- [x] Brand.tsx updated to import SWIPER_CONFIG from constants
+- [x] Removed local BRAND_SWIPER_CONFIG from Brand.tsx
+- [x] Updated src/constants/index.ts to export swiper constants
+- [x] All 1976 tests passing (100% success rate)
+- [x] Lint passed without errors (0 errors, 0 warnings)
+- [x] Build passed successfully (18 pages generated)
+- [x] Zero regressions in existing functionality
+- [x] blueprint.md updated with Swiper configuration pattern
+- [x] task.md updated with Task 95 completion details
+
+**Related Files**:
+- Created: `src/constants/swiper.ts` - Swiper configuration constant (30 lines)
+- Modified: `src/components/common/Brand.tsx` - Now imports SWIPER_CONFIG from constants (26 lines removed, 66 lines total)
+- Modified: `src/constants/index.ts` - Added export * from './swiper' (4 lines total)
+- Updated: `docs/blueprint.md` - Added Swiper configuration pattern to Good Patterns
+- Updated: `docs/task.md` - Added Task 95 completion details
+
+**Testing**:
+- All 1976 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated successfully
+- Brand carousel renders correctly with centralized configuration
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Configuration Architecture principles:
+   - **Single Source of Truth**: SWIPER_CONFIG defined once, used everywhere
+   - **Separation of Concerns**: Configuration in constants, component handles rendering
+   - **Pattern Consistency**: Follows existing constants directory pattern (rateLimits, validation)
+   - **Type Safety**: TypeScript types for configuration validation
+- Brand.tsx: 92 lines → 66 lines = **26 lines removed (28.3% reduction)**
+- Configuration pattern established for future carousel components
+- Future Swiper-based components can create variants (TESTIMONIAL_SWIPER_CONFIG, FEATURE_SWIPER_CONFIG)
+- Extensible breakpoints support via SwiperBreakpoints type
+- Zero behavior change - only architecture improvement
+
+**Impact**:
+- Maintainability: Changes to carousel configuration in one location
+- Code Duplication: Eliminated 26 lines of inline configuration
+- Consistency: All carousel configurations follow same pattern
+- Extensibility: Future carousel components can reuse or extend pattern
+- Type Safety: SwiperBreakpoints type ensures valid configuration
+- Test Coverage: All 1976 tests passing (no regressions)
+
+**Future Enhancement Opportunities**:
+
+1. **Swiper Configuration Variants** - Create specialized configs for different carousel types
+      - TESTIMONIAL_SWIPER_CONFIG for testimonials carousel (different slidesPerView, autoplay)
+      - FEATURE_SWIPER_CONFIG for features carousel (different breakpoints, navigation)
+      - TEAM_SWIPER_CONFIG for team carousel (pagination enabled)
+      - Effort: Low (create variants in swiper.ts)
+      - Priority: Low (current SWIPER_CONFIG covers Brand carousel needs)
+
+2. **Carousel Hook** - Extract carousel CSS loading and initialization logic
+      - Create useCarousel hook for Swiper CSS loading and configuration
+      - Reusable across all carousel components (Brand, Testimonials, Features, Team)
+      - Handles dynamic Swiper CSS injection
+      - Effort: Low (extract CSS loading useEffect to hook)
+      - Priority: Low (Brand.tsx CSS loading is straightforward)
+
+3. **Configuration Factory** - Generate Swiper configs with base settings
+      - Create createSwiperConfig(baseSettings, overrides) factory function
+      - Allows easy creation of configuration variants with shared base settings
+      - Effort: Medium (implement factory pattern)
+      - Priority: Low (current approach is clear and maintainable)
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: Task 94 (Module Extraction - Duplicate Brand Component Logic), Task 83 (Bundle Optimization - Webpack Code Splitting)
+**Next Constants Review**: March 2026
+
+---
+
 ## Task 92: Data Architecture - Relationship Design & Index Optimization (Jan 13, 2026)
 
 **Status**: ✅ Completed
