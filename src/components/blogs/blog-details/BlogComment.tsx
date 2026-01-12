@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BlogCommentItem } from "@/types/data";
+import { formatCommentDate } from "@/utils/dateFormat";
 
 interface BlogCommentProps {
   comments: BlogCommentItem[];
@@ -19,7 +20,7 @@ const BlogComment = ({ comments }: BlogCommentProps) => {
                         </div>
                         <div className="ac-postbox__comment-name">
                            <h5>{comment.name}</h5>
-                           <span className="post-meta">{comment.date}</span>
+                           <span className="post-meta">{formatCommentDate(comment.date)}</span>
                         </div>
                      </div>
                      <div className="ac-postbox__comment-text">
@@ -33,7 +34,7 @@ const BlogComment = ({ comments }: BlogCommentProps) => {
             ))}
           </ul>
        </div>
-    );
+     );
 }
 
 export default BlogComment

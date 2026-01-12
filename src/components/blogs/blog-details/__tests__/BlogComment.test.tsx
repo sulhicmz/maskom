@@ -32,20 +32,20 @@ const mockAvatar2 = {
 };
 
 const mockComments = [
-  {
-    id: 1,
-    name: 'John Doe',
-    avatar: mockAvatar1,
-    date: 'January 10, 2026',
-    content: 'Great article! Very informative and well-written.',
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    avatar: mockAvatar2,
-    date: 'January 9, 2026',
-    content: 'I found this post very helpful. Thanks for sharing!',
-  },
+   {
+     id: 1,
+     name: 'John Doe',
+     avatar: mockAvatar1,
+     date: '2026-01-10',
+     content: 'Great article! Very informative and well-written.',
+   },
+   {
+     id: 2,
+     name: 'Jane Smith',
+     avatar: mockAvatar2,
+     date: '2026-01-09',
+     content: 'I found this post very helpful. Thanks for sharing!',
+   },
 ];
 
 describe('BlogComment', () => {
@@ -71,9 +71,9 @@ describe('BlogComment', () => {
 
   it('renders comment dates', () => {
     render(<BlogComment comments={mockComments} />);
-
-    expect(screen.getByText('January 10, 2026')).toBeInTheDocument();
-    expect(screen.getByText('January 9, 2026')).toBeInTheDocument();
+    
+    expect(screen.getByText('10 Jan 2026')).toBeInTheDocument();
+    expect(screen.getByText('09 Jan 2026')).toBeInTheDocument();
   });
 
   it('renders comment content', () => {
@@ -176,8 +176,8 @@ describe('BlogComment', () => {
 
   it('renders post-meta class for date', () => {
     render(<BlogComment comments={mockComments} />);
-
-    const postMetas = screen.getAllByText(/January 10, 2026|January 9, 2026/);
+    
+    const postMetas = screen.getAllByText(/10 Jan 2026|09 Jan 2026/);
     postMetas.forEach(meta => {
       expect(meta).toHaveClass('post-meta');
     });
@@ -252,7 +252,7 @@ describe('BlogComment', () => {
         id: 1,
         name: 'Test User',
         avatar: mockAvatar1,
-        date: 'January 10, 2026',
+        date: '2026-01-10',
         content: longContent,
       },
     ];
@@ -268,7 +268,7 @@ describe('BlogComment', () => {
         id: 1,
         name: 'Test User',
         avatar: mockAvatar1,
-        date: 'January 10, 2026',
+        date: '2026-01-10',
         content: 'Great article! @author #hashtags & more <tags>',
       },
     ];
