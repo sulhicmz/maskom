@@ -11,6 +11,7 @@ import {
     ServiceCircuitBreakerError,
     logServiceError,
     logServiceSuccess,
+    logServiceWarning,
     createSuccessResult,
     createErrorResult
 } from '@/services/common';
@@ -156,7 +157,3 @@ class EmailService implements IEmailService {
 
 const emailServiceInstance = new EmailService();
 export default emailServiceInstance;
-
-function logServiceWarning(service: string, operation: string, message: string) {
-    console.warn(`[${service}] ${operation} warning:`, message);
-}
