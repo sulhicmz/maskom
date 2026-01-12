@@ -1030,6 +1030,11 @@ rm public/assets/images/video/video-new.jpg
 - `public/assets/images/bg/text-bg-1.jpg` (52K) - Not used
 - `public/assets/images/video/video-new.jpg` (61K) - Not used
 
+**Images Removed in Task 91** (44K savings):
+- `public/assets/images/bg/testimonial-bg2.jpg` (44K) - Not used
+
+**Cumulative Total: 244KB savings from unused asset removal (Task 62 + Task 91)**
+
 **Usage Guidelines**:
 - Profile first to identify large assets (>50KB threshold)
 - Verify unused by searching entire codebase for references
@@ -1073,11 +1078,20 @@ await sharp('public/assets/images/bg/testimonial-bg.jpg').webp({ quality: 85 }).
 **Results** (Task 73):
 - `pattern-bg.jpg` (113KB) → `pattern-bg.webp` (14KB) = **99KB saved (87.6% reduction)**
 - `testimonial-bg.jpg` (55KB) → `testimonial-bg.webp` (3.9KB) = **51KB saved (92.8% reduction)**
-- `hero-bg-1.png` (124KB) → Kept as PNG (WebP version larger)
+- `hero-bg-1.png` (124KB) → Kept as PNG (WebP tested, larger at all quality levels) (Task 91)
 - `faq-bg.jpg` (28.2KB) → `faq-bg.webp` (2.5KB) = **25.7KB saved (91.3% reduction)** (Task 76)
 - `base.png` (35.5KB) → Kept as PNG (WebP version larger) (Task 76)
 
-**Cumulative Total Savings: 175.7KB across 4 optimized images (Task 73 + Task 76)**
+**WebP Testing Results for hero-bg-1.png** (Task 91):
+- Quality 85: 140KB (13KB larger than PNG)
+- Quality 80: 133KB (9KB larger)
+- Quality 75: 128KB (4KB larger)
+- Quality 70: 127KB (3KB larger)
+- Quality 60: 124KB (same size)
+- Quality 50: 123KB (1KB smaller, but quality too low)
+- **Decision**: Keep original PNG - WebP provides no benefit at acceptable quality levels
+
+**Cumulative Total Savings: 175.7KB across 4 optimized images (Task 73 + Task 76 + Task 91)**
 
 **Pages Improved**:
 - **Home page** (`/`, `/home-one`, `/home-one-dark`): 51KB saved

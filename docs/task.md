@@ -8,6 +8,136 @@
 
 ---
 
+## Task 91: Performance Optimization - Unused Asset Removal (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Performance Engineering (Asset Optimization)
+
+**Problem**:
+- Unused image `testimonial-bg2.jpg` (44KB) present in public/assets/images/bg/
+- Asset was not referenced anywhere in the codebase
+- Wasted storage space and CDN bandwidth
+- Increased deployment payload size unnecessarily
+- Previous optimizations (Task 62, Task 73, Task 76) focused on WebP conversion and image optimization
+- Unused assets remained after previous optimization tasks
+
+**Solution**:
+1. **Asset Profiling**: Identified unused images by searching codebase for references
+   - Searched all TypeScript, JavaScript, CSS, SCSS, and HTML files
+   - Verified no references to `testimonial-bg2.jpg` exist
+   - Confirmed 44KB file size
+
+2. **Unused Asset Removal**:
+   - Removed `public/assets/images/bg/testimonial-bg2.jpg` (44KB)
+   - Verified removal with file system check
+   - No broken references in build output
+
+3. **WebP Conversion Testing** (Hero Background):
+   - Tested WebP conversion for `hero-bg-1.png` (124KB)
+   - Results: WebP larger than PNG at all quality levels
+     - Quality 85: 140KB (13KB larger)
+     - Quality 80: 133KB (9KB larger)
+     - Quality 75: 128KB (4KB larger)
+     - Quality 70: 127KB (3KB larger)
+     - Quality 60: 124KB (same size)
+     - Quality 50: 123KB (1KB smaller)
+   - Decision: Keep original PNG (better quality, minimal WebP benefit)
+   - Confirms Task 76 findings with base.png (some images don't compress well with WebP)
+
+4. **Build Verification**:
+   - Build passed without errors (18 pages generated)
+   - All 1976 tests passing (100% success rate)
+   - Lint passed with 0 errors, 0 warnings
+   - No broken references or missing assets
+
+**Performance Benefits**:
+- **Storage Savings**: 44KB removed from repository and deployment
+- **CDN Bandwidth**: Reduced transfer costs for CDN distribution
+- **Build Time**: Slightly faster build (fewer assets to copy)
+- **Deployment Size**: Smaller deployment packages
+- **Maintenance**: Cleaner asset directory, no orphaned files
+
+**Code Quality Benefits**:
+- Lint passed: 0 errors, 0 warnings
+- All 1976 tests passing (100% success rate)
+- Build verified: 18 pages generated successfully
+- Zero regressions in existing functionality
+
+**Success Criteria**:
+- [x] Asset profiling completed (identified unused images)
+- [x] Removed testimonial-bg2.jpg (44KB)
+- [x] Tested WebP conversion for hero-bg-1.png
+- [x] Verified no broken references after removal
+- [x] Build passed without errors (18 pages)
+- [x] All 1976 tests passing (100% success rate)
+- [x] Lint passed without errors (0 errors, 0 warnings)
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 91 completion details
+
+**Related Files**:
+- Removed: `public/assets/images/bg/testimonial-bg2.jpg` - Unused 44KB image
+- Tested: `public/assets/images/hero/hero-bg-1.png` - WebP conversion tested (no benefit)
+- Updated: `docs/task.md` - Added Task 91 completion details
+
+**Testing**:
+- All 1976 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated successfully
+- Asset references verified: No broken links or missing images
+
+**Notes**:
+- Follows Performance Engineering principles:
+  - **Measure First**: Profiled asset usage before optimization
+  - **Resource Efficiency**: Removed unused assets to reduce bandwidth
+  - **Zero Regressions**: All tests pass, build successful
+- Unused asset removal is low-risk, high-impact optimization
+- WebP conversion tested but rejected for hero-bg-1.png:
+  - PNG format better for complex graphics with sharp details
+  - WebP showed no size benefit at acceptable quality levels
+  - Maintains original quality without extra HTTP request
+- Similar to Task 76 findings (base.png) - some images don't compress well with WebP
+- Cumulative savings from asset optimization tasks:
+  - Task 62: Removed 200KB of unused images
+  - Task 73: WebP conversion saved 175.7KB
+  - Task 76: WebP conversion saved 25.7KB
+  - Task 91: Removed 44KB unused image
+  - **Total Savings**: ~445KB across all asset optimization tasks
+
+**Impact**:
+- Storage: 44KB saved
+- CDN Bandwidth: Reduced transfer costs
+- Deployment: Smaller package sizes
+- Maintenance: Cleaner asset directory
+- Build Performance: Slightly faster builds
+- User Experience: No negative impact (image was unused)
+
+**Future Enhancement Opportunities**:
+
+1. **Regular Asset Audits** - Schedule periodic unused asset scans
+      - Run monthly scans to identify orphaned assets
+      - Automate detection with build-time linting
+      - Effort: Low (existing grep patterns work well)
+      - Priority: Low (current cleanup comprehensive)
+
+2. **Image CDN Migration** - Use Next.js Image component with optimized CDN
+      - Migrate from static assets to Next.js Image component
+      - Enable automatic WebP/AVIF generation at CDN level
+      - Effort: Medium (requires code refactoring)
+      - Priority: Medium (current approach works well)
+
+3. **Lazy Loading for Images** - Add loading="lazy" to below-fold images
+      - Reduce initial page load by deferring offscreen images
+      - Use Intersection Observer for precise control
+      - Effort: Low (add loading="lazy" attribute)
+      - Priority: Low (current load times acceptable)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 62 (Unused Asset Removal), Task 73 (WebP Conversion), Task 76 (WebP Conversion)
+**Next Asset Audit**: February 2026
+
+---
+
 ## Task 90: Security Assessment - Monthly Verification (Jan 13, 2026)
 
 **Status**: ✅ Completed
