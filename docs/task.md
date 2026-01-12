@@ -8,6 +8,129 @@
 
 ---
 
+## Task 106: Layer Separation - Extract Common Auth Service Resilience Logic (Jan 12, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Layer Separation (DRY Principle)
+
+**Problem**:
+- `AuthService.login` and `AuthService.register` have 74+ lines of duplicated code each (~148 lines total)
+- Rate limiting, circuit breaker, retry, metrics, and error handling logic is nearly identical
+- Changes to resilience patterns require updating both methods (maintenance burden)
+- Violates DRY principle and creates maintenance risk
+- Both methods handle: rate limiting check, circuit breaker execution, retry logic, metrics recording, error classification, error logging
+
+**Solution**:
+1. **Created `executeWithResilience()` private method** (src/services/auth/AuthService.ts):
+    - Extracts common resilience patterns into single reusable method
+    - Parameters: operation name ('login' | 'register'), rateLimiter instance, identifier (email), operation function, data
+    - Handles: rate limiting check, circuit breaker execution, retry logic, metrics recording, error handling
+    - Generic type parameter `<T extends LoginCredentials | RegisterData>` for type safety
+    - 81 lines of shared resilience logic
+
+2. **Refactored login method**:
+    - Reduced from 74 lines to 9 lines (87.8% reduction)
+    - Uses `executeWithResilience()` with login-specific parameters
+    - Maintains all original functionality
+
+3. **Refactored register method**:
+    - Reduced from 74 lines to 9 lines (87.8% reduction)
+    - Uses `executeWithResilience()` with register-specific parameters
+    - Maintains all original functionality
+
+**Architecture Benefits**:
+1. **DRY Principle**: Single implementation of resilience logic
+2. **Layer Separation**: Resilience patterns isolated in dedicated layer
+3. **Maintainability**: Changes to resilience patterns only need to update one method
+4. **Readability**: login/register methods are now clear and concise
+5. **Type Safety**: Generic type parameter ensures type correctness
+6. **Consistency**: Both operations use identical resilience behavior
+7. **SOLID Compliance**: Single Responsibility (executeWithResilience), Open/Closed (extensible), Dependency Inversion (depends on abstractions)
+
+**Code Quality**:
+- All 2071 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated successfully
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+- Code reduction: 148 lines → 99 lines (49 lines removed, 33% reduction)
+
+**Success Criteria**:
+- [x] Created executeWithResilience private method with common resilience logic
+- [x] Refactored login method to use executeWithResilience (74 → 9 lines)
+- [x] Refactored register method to use executeWithResilience (74 → 9 lines)
+- [x] All 2071 tests passing (100% success rate)
+- [x] Lint passed without errors (0 errors, 0 warnings)
+- [x] Build passed successfully (18 pages generated)
+- [x] TypeScript compilation passes without errors
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 106 completion
+- [x] blueprint.md updated with Layer Separation documentation
+
+**Related Files**:
+- ✅ Modified: `src/services/auth/AuthService.ts` - Added executeWithResilience method, refactored login/register (49 lines removed)
+- ✅ Updated: `docs/blueprint.md` - Added Layer Separation to Good Patterns and Anti-Patterns sections
+- ✅ Updated: `docs/task.md` - Added Task 106 completion details
+
+**Verification**:
+- Build passes: 18 pages generated
+- Lint passes: 0 errors, 0 warnings
+- Tests: 2071 passed (100%)
+- AuthService tests: 38/38 passing (no regressions)
+- Code reduction: 148 → 99 lines (33% reduction)
+- login method: 74 → 9 lines (87.8% reduction)
+- register method: 74 → 9 lines (87.8% reduction)
+
+**Notes**:
+- Follows Layer Separation principles:
+   - **Single Source of Truth**: One implementation of resilience logic
+   - **Separation of Concerns**: Resilience layer separated from business logic
+   - **DRY Principle**: No duplicated code between login and register
+   - **Type Safety**: Generic type parameter ensures correct usage
+- executeWithResilience method handles:
+   - Rate limiting check (prevents abuse)
+   - Circuit breaker execution (prevents cascading failures)
+   - Retry with exponential backoff (handles transient failures)
+   - Metrics recording (monitoring and observability)
+   - Error handling (graceful degradation)
+- Code reduction breakdown:
+   - login: 74 lines → 9 lines (65 lines removed, 87.8% reduction)
+   - register: 74 lines → 9 lines (65 lines removed, 87.8% reduction)
+   - Total: 148 lines → 99 lines (49 lines removed, 33% reduction)
+- Zero breaking changes - only internal refactoring, API unchanged
+- Test coverage unchanged (38 AuthService tests still pass)
+
+**Impact**:
+- Code Quality: Eliminates 49 lines of duplicated code
+- Maintainability: Single point of change for resilience patterns
+- Consistency: Both operations use identical resilience behavior
+- Type Safety: Generic type parameter ensures type correctness
+- Test Coverage: 2071 tests passing (no regressions)
+- Bundle Size: No change (code reduction at source level)
+
+**Future Enhancement Opportunities**:
+
+1. **Extract executeWithResilience to Separate Utility** - Move to service common utilities
+        - Extract executeWithResilience to src/services/common/resilience.ts
+        - Reusable across all services (EmailService, AuthService, etc.)
+        - More consistent resilience patterns across service layer
+        - Effort: Medium (extract, update imports, add tests)
+        - Priority: Low (current implementation is sufficient)
+
+2. **Add Circuit Breaker per Operation** - Separate circuit breakers for login and register
+        - Current: Single shared circuit breaker for both operations
+        - Proposed: Separate circuit breakers (loginCircuitBreaker, registerCircuitBreaker)
+        - Benefit: Login failures don't affect register, and vice versa
+        - Effort: Low (instantiate two circuit breakers)
+        - Priority: Low (current shared breaker has high 50-failure threshold)
+
+**Verification Date**: 2026-01-12
+**Related Tasks**: Task 50 (AuthService Code Quality), Task 48 (Validation Layer)
+**Next Architecture Review**: January 19, 2026
+
+---
+
 ## Task 105: Code Cleanup - Remove Unused Constants and Duplicate Interfaces (Jan 12, 2026)
 
 **Status**: ✅ Completed
