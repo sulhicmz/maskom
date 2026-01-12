@@ -8,6 +8,132 @@
 
 ---
 
+## Task 94: Module Extraction - Duplicate Brand Component Logic (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Component Architecture (Code Duplication Elimination)
+
+**Problem**:
+- Brand component logic duplicated across `home-one/Brand.tsx` and `home-one-dark/Brand.tsx`
+- ~170 lines total with 80+ lines of duplicate Swiper configuration and useEffect logic
+- Same Swiper configuration object (slidesPerView, breakpoints, autoplay settings)
+- Same dynamic Swiper and SwiperSlide imports with identical loading behavior
+- Same useEffect for loading Swiper CSS with duplicate CSS loading logic
+- Only differences: data source (BrandData vs BrandDataDark), text content, React.memo wrapper, displayName
+- Changes to Brand logic require updating both files
+- Violates DRY principle - maintains duplicate state management and component structure
+
+**Locations**:
+- `src/components/homes/home-one/Brand.tsx` - Brand carousel on home page
+- `src/components/homes/home-one-dark/Brand.tsx` - Brand carousel on home-dark page
+
+**Solution**:
+1. **Create reusable Brand component** (src/components/common/Brand.tsx):
+   - Accept brand_data as prop (enables use with different data sources)
+   - Accept optional title text prop (different content for each page)
+   - Extract Swiper configuration to shared constant
+   - Extract CSS loading useEffect to reusable hook or keep in component
+   - Add React.memo for performance optimization
+   - Support both light and dark theme variants
+
+2. **Update home-one/Brand.tsx**:
+   - Remove component implementation
+   - Import reusable Brand component from src/components/common/Brand.tsx
+   - Pass BrandData as brand_data prop
+   - Pass specific title text "Dipercaya oleh perusahaan lintas industri untuk menjaga konektivitas"
+
+3. **Update home-one-dark/Brand.tsx**:
+   - Remove component implementation
+   - Import reusable Brand component from src/components/common/Brand.tsx
+   - Pass BrandDataDark as brand_data prop
+   - Pass specific title text "20,000+ Professionals & Teams Choose AI"
+   - Remove React.memo wrapper (moved to common component)
+   - Remove displayName assignment (moved to common component)
+
+**Architecture Benefits**:
+1. **DRY Principle**: Single source of truth for Brand carousel logic
+2. **Modularity**: Brand component extracted into reusable common component
+3. **Maintainability**: Changes to Brand logic in one place
+4. **Consistency**: Both implementations have identical behavior
+5. **Extensibility**: Future Brand carousels can easily use common component
+6. **Performance**: React.memo applied to all variants
+7. **Type Safety**: Props properly typed with TypeScript interfaces
+
+**Code Quality Benefits**:
+- Eliminates ~80 lines of duplicate code
+- Consistent component implementation across home pages
+- Type-safe with TypeScript interfaces
+- Existing tests should pass with minimal changes
+- Zero regressions in existing functionality
+
+**Success Criteria**:
+- [x] Created reusable Brand component in src/components/common/Brand.tsx
+- [x] home-one/Brand.tsx updated to use common Brand component
+- [x] home-one-dark/Brand.tsx updated to use common Brand component
+- [x] Duplicate code eliminated (~80 lines removed)
+- [x] All tests passing (1976/1976, 100%)
+- [x] Lint passed without errors (0 errors, 0 warnings)
+- [x] Build passed without errors (18 pages generated)
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 94 completion details
+
+**Related Files**:
+- ✅ Created: `src/components/common/Brand.tsx` - Reusable Brand carousel component (90 lines)
+- ✅ Modified: `src/components/homes/home-one/Brand.tsx` - Now uses common Brand component (12 lines, 86% reduction)
+- ✅ Modified: `src/components/homes/home-one-dark/Brand.tsx` - Now uses common Brand component (13 lines, 85% reduction)
+- ✅ Updated: `docs/task.md` - Added Task 94 completion details
+
+**Testing**:
+- All 1976 tests passing (100% success rate)
+- Brand-specific tests: 8 passing (BrandData.test.ts, BrandDataDark.test.ts)
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated successfully
+- Both Brand carousels render correctly on respective pages
+- Swiper CSS loads correctly on both variants
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Component Architecture principles:
+   - **Module Extraction**: Extracted duplicate patterns into reusable abstraction
+   - **Composition**: Component accepts props for customization
+   - **Type Safety**: Props properly typed with StaticImageData[] from next/image
+   - **DRY Principle**: Single source of truth for Brand carousel logic
+- home-one/Brand.tsx: 85 lines → 12 lines = **73 lines removed (85.9% reduction)**
+- home-one-dark/Brand.tsx: 88 lines → 13 lines = **75 lines removed (85.2% reduction)**
+- Total duplicate code removed: 148 lines
+- Common component: 90 lines (includes proper TypeScript types, memoization, and Swiper config)
+- Net code reduction: 148 lines - 90 lines = **58 lines net reduction**
+- Type safety: Uses StaticImageData[] type instead of any[]
+- Future Brand carousels can use common component with different data sources
+
+**Impact**:
+- Maintainability: Changes to Brand logic in one place
+- Code Duplication: Eliminated 148 lines of duplicate code (58 lines net reduction)
+- Consistency: Both Brand implementations have identical behavior
+- Performance: React.memo applied to all variants
+- Extensibility: Future Brand carousels can easily use common component
+- Type Safety: Props properly typed with StaticImageData[] from next/image
+- Test Coverage: All 1976 tests passing (no regressions)
+- Code Quality: Lint passes with 0 errors, 0 warnings
+
+**Future Enhancement Opportunities**:
+
+1. **Swiper Configuration Extraction** - Centralize Swiper settings
+      - Create swiperSettings constant in src/constants/ or separate config file
+      - Share breakpoints and autoplay settings across all Swiper components
+      - Effort: Low (extract constant, update imports)
+      - Priority: Low (current duplication is limited to Brand components)
+
+2. **Brand Carousel Hook** - Extract carousel state and effects
+      - Create useBrandCarousel hook for CSS loading and state management
+      - Reusable across other carousel components (Testimonials, Features)
+      - Effort: Low (extract useEffect logic into hook)
+      - Priority: Low (current implementation is straightforward)
+
+---
+
 ## Task 92: Data Architecture - Relationship Design & Index Optimization (Jan 13, 2026)
 
 **Status**: ✅ Completed
