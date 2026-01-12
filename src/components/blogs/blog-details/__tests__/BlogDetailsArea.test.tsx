@@ -36,7 +36,7 @@ describe('BlogDetailsArea', () => {
     desc: 'Test description',
     date: '15 Mar 2024',
     user: 'Test Author',
-    tag: 'Managed Service',
+    tagId: 7,
   };
 
   it('renders blog details section with proper structure', () => {
