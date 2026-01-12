@@ -482,8 +482,9 @@ Services (AuthService)
 - ✅ Webpack code splitting for large dependencies (forms, swiper cache groups)
 - ✅ Lazy-loaded form components with loading states (ContactForm, LoginForm, SignUpForm, BlogForm)
 - ✅ Bundle optimization with separate async chunks (19KB forms, 24KB swiper)
-- ✅ Consolidated validation logic in AuthService (validateCredentials private method)
-- ✅ DRY principle applied to authentication validation (66% code reduction)
+- ✅ Consolidated validation logic in AuthService (validateCredentials private method, Task 50)
+- ✅ DRY principle applied to authentication validation (66% code reduction, Task 50)
+- ✅ **Layer Separation** (executeWithResilience private method, Task 106) - Extracts common resilience patterns (rate limiting, circuit breaker, retry, metrics, error handling) into reusable layer (33% code reduction)
 - ✅ WebP image conversion for better compression (88% size reduction, 132KB savings per page)
 - ✅ **Reusable component abstractions** (SectionTitle, AnimationWrapper, BackgroundSection) - Eliminates code duplication across 16+ section title components and 76+ animation patterns
 - ✅ **Component refactoring complete** (Task 80) - All critical components now use reusable abstractions (Feature, Faq, Process, Price, IntroArea, ContactFormArea, AboutArea/Feature, AboutArea/AboutArea, PricingArea, Skill, Hero, Cta, ContactArea, LoginArea, SignUpArea, BlogArea, FooterTwo)
@@ -512,6 +513,7 @@ Services (AuthService)
 - ❌ Duplicated validation implementations (validation.ts vs formValidation.ts) - FIXED
 - ❌ Magic numbers scattered throughout (rate limits, validation thresholds) - FIXED
 - ❌ Duplicate validation logic in AuthService login/register methods - FIXED (Task 50)
+- ❌ Duplicate resilience logic in AuthService login/register methods - FIXED (Task 106)
 
 ### Integration Patterns (Maintain)
 
@@ -594,11 +596,14 @@ External API (EmailJS, etc.)
    - **Retry with Exponential Backoff**: 3 attempts (1 initial + 2 retries)
    - **Circuit Breaker**: 50 failure threshold, 60-second reset timeout
    - **High Threshold**: 50 failures prevents circuit from interfering with per-user rate limiting
-- **Code Quality** (✅ COMPLETED - Task 50):
-   - **Consolidated Validation**: `validateCredentials()` private method centralizes validation logic
-   - **DRY Principle**: Single validation method eliminates duplicate code in login/register
-   - **Code Reduction**: 71 lines → 24 lines (66% reduction)
-   - **Maintainability**: Single point of change for validation rules
+- **Code Quality** (✅ COMPLETED - Tasks 50 & 106):
+    - **Consolidated Validation**: `validateCredentials()` private method centralizes validation logic (Task 50)
+    - **Layer Separation**: `executeWithResilience()` private method extracts common resilience patterns (Task 106)
+    - **DRY Principle**: Single validation and resilience method eliminates duplicate code in login/register
+    - **Code Reduction**: 
+      - Validation: 71 lines → 24 lines (66% reduction, Task 50)
+      - Resilience: 148 lines → 99 lines (33% reduction, Task 106)
+    - **Maintainability**: Single point of change for validation rules and resilience patterns
 - **Rate Limiting**:
    - **Login**: 5 attempts per 15 minutes, 30 minute cooldown
    - **Register**: 5 attempts per 1 hour, 2 hour cooldown

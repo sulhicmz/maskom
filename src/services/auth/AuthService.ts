@@ -37,6 +37,88 @@ class AuthService implements IAuthService {
         );
     }
 
+    private async executeWithResilience<T extends LoginCredentials | RegisterData>(
+        operation: 'login' | 'register',
+        rateLimiter: RateLimiter,
+        identifier: string,
+        operationFn: (data: T) => Promise<AuthResult>,
+        data: T
+    ): Promise<AuthResult> {
+        const startTime = Date.now();
+
+        const rateLimitCheck = rateLimiter.check(identifier);
+        if (!rateLimitCheck.allowed) {
+            metricsCollector.recordCall(`AuthService.${operation}`, false, 'rate_limit');
+            const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
+            return createErrorResult(
+                rateLimitCheck.error?.includes('Too many attempts')
+                    ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
+                    : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
+                ServiceErrorCode.RATE_LIMIT,
+                { rateLimited: true }
+            );
+        }
+
+        try {
+            const result = await this.circuitBreaker.execute(async () => {
+                const retryResult = await withRetry(
+                    () => operationFn(data),
+                    {
+                        maxAttempts: 3,
+                        baseDelayMs: 1000,
+                        maxDelayMs: 10000,
+                        backoffMultiplier: 2,
+                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+                    }
+                );
+
+                if (!retryResult.success || !retryResult.data) {
+                    const error = retryResult.error;
+                    if (error instanceof ServiceValidationError) {
+                        throw error;
+                    }
+                    throw retryResult.error || new Error(`${operation} failed after retries`);
+                }
+
+                return retryResult.data;
+            });
+
+            rateLimiter.recordAttempt(identifier);
+            const responseTime = Date.now() - startTime;
+            metricsCollector.recordCall(`AuthService.${operation}`, true, undefined, responseTime);
+            logServiceSuccess('AuthService', operation, responseTime);
+
+            return result;
+        } catch (error) {
+            const responseTime = Date.now() - startTime;
+            let errorType = 'unknown';
+
+            if (error instanceof ServiceTimeoutError || (error instanceof Error && error.message.includes('timeout'))) {
+                errorType = 'timeout';
+            } else if (error instanceof ServiceCircuitBreakerError || (error instanceof Error && error.message.includes('circuit breaker'))) {
+                errorType = 'circuit_breaker';
+            } else if (error instanceof ServiceValidationError) {
+                errorType = 'validation';
+            }
+
+            rateLimiter.recordAttempt(identifier);
+            metricsCollector.recordCall(`AuthService.${operation}`, false, errorType, responseTime);
+
+            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+            if (!(standardizedError instanceof ServiceValidationError ||
+                  standardizedError instanceof ServiceTimeoutError ||
+                  standardizedError instanceof ServiceCircuitBreakerError)) {
+                logServiceError(standardizedError, { service: 'AuthService', operation });
+            }
+
+            if (standardizedError instanceof ServiceValidationError) {
+                return createErrorResult(standardizedError);
+            }
+
+            return createErrorResult(standardizedError.message);
+        }
+    }
+
     private validateCredentials(email: string, password: string, requireName: boolean = false, name?: string): void {
         if (requireName && (!name || !email || !password)) {
             const error = new ServiceValidationError('Nama, email, dan kata sandi diperlukan');
@@ -103,155 +185,23 @@ class AuthService implements IAuthService {
     }
 
     async login(credentials: LoginCredentials): Promise<AuthResult> {
-        const startTime = Date.now();
-        
-        const rateLimitCheck = this.loginRateLimiter.check(credentials.email);
-        if (!rateLimitCheck.allowed) {
-            metricsCollector.recordCall('AuthService.login', false, 'rate_limit');
-            const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
-            return createErrorResult(
-                rateLimitCheck.error?.includes('Too many attempts')
-                    ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
-                    : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                ServiceErrorCode.RATE_LIMIT,
-                { rateLimited: true }
-            );
-        }
-
-        try {
-            const result = await this.circuitBreaker.execute(async () => {
-                const retryResult = await withRetry(
-                    () => this.loginWithTimeout(credentials),
-                    {
-                        maxAttempts: 3,
-                        baseDelayMs: 1000,
-                        maxDelayMs: 10000,
-                        backoffMultiplier: 2,
-                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
-                    }
-                );
-
-                if (!retryResult.success || !retryResult.data) {
-                    const error = retryResult.error;
-                    if (error instanceof ServiceValidationError) {
-                        throw error;
-                    }
-                    throw retryResult.error || new Error('Login failed after retries');
-                }
-
-                return retryResult.data;
-            });
-
-            this.loginRateLimiter.recordAttempt(credentials.email);
-            const responseTime = Date.now() - startTime;
-            metricsCollector.recordCall('AuthService.login', true, undefined, responseTime);
-            logServiceSuccess('AuthService', 'login', responseTime);
-
-            return result;
-        } catch (error) {
-            const responseTime = Date.now() - startTime;
-            let errorType = 'unknown';
-            
-            if (error instanceof ServiceTimeoutError || (error instanceof Error && error.message.includes('timeout'))) {
-                errorType = 'timeout';
-            } else if (error instanceof ServiceCircuitBreakerError || (error instanceof Error && error.message.includes('circuit breaker'))) {
-                errorType = 'circuit_breaker';
-            } else if (error instanceof ServiceValidationError) {
-                errorType = 'validation';
-            }
-            
-            this.loginRateLimiter.recordAttempt(credentials.email);
-            metricsCollector.recordCall('AuthService.login', false, errorType, responseTime);
-            
-            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
-            if (!(standardizedError instanceof ServiceValidationError || 
-                  standardizedError instanceof ServiceTimeoutError || 
-                  standardizedError instanceof ServiceCircuitBreakerError)) {
-                logServiceError(standardizedError, { service: 'AuthService', operation: 'login' });
-            }
-            
-            if (standardizedError instanceof ServiceValidationError) {
-                return createErrorResult(standardizedError);
-            }
-            
-            return createErrorResult(standardizedError.message);
-        }
+        return this.executeWithResilience(
+            'login',
+            this.loginRateLimiter,
+            credentials.email,
+            this.loginWithTimeout.bind(this),
+            credentials
+        );
     }
 
     async register(userData: RegisterData): Promise<AuthResult> {
-        const startTime = Date.now();
-        
-        const rateLimitCheck = this.registerRateLimiter.check(userData.email);
-        if (!rateLimitCheck.allowed) {
-            metricsCollector.recordCall('AuthService.register', false, 'rate_limit');
-            const secondsRemaining = Math.ceil(((rateLimitCheck.resetTime || Date.now()) - Date.now()) / 1000);
-            return createErrorResult(
-                rateLimitCheck.error?.includes('Too many attempts')
-                    ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
-                    : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                ServiceErrorCode.RATE_LIMIT,
-                { rateLimited: true }
-            );
-        }
-
-        try {
-            const result = await this.circuitBreaker.execute(async () => {
-                const retryResult = await withRetry(
-                    () => this.registerWithTimeout(userData),
-                    {
-                        maxAttempts: 3,
-                        baseDelayMs: 1000,
-                        maxDelayMs: 10000,
-                        backoffMultiplier: 2,
-                        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
-                    }
-                );
-
-                if (!retryResult.success || !retryResult.data) {
-                    const error = retryResult.error;
-                    if (error instanceof ServiceValidationError) {
-                        throw error;
-                    }
-                    throw retryResult.error || new Error('Registration failed after retries');
-                }
-
-                return retryResult.data;
-            });
-
-            this.registerRateLimiter.recordAttempt(userData.email);
-            const responseTime = Date.now() - startTime;
-            metricsCollector.recordCall('AuthService.register', true, undefined, responseTime);
-            logServiceSuccess('AuthService', 'register', responseTime);
-
-            return result;
-        } catch (error) {
-            const responseTime = Date.now() - startTime;
-            let errorType = 'unknown';
-            
-            if (error instanceof ServiceTimeoutError || (error instanceof Error && error.message.includes('timeout'))) {
-                errorType = 'timeout';
-            } else if (error instanceof ServiceCircuitBreakerError || (error instanceof Error && error.message.includes('circuit breaker'))) {
-                errorType = 'circuit_breaker';
-            } else if (error instanceof ServiceValidationError) {
-                errorType = 'validation';
-            }
-            
-            this.registerRateLimiter.recordAttempt(userData.email);
-            metricsCollector.recordCall('AuthService.register', false, errorType, responseTime);
-            
-            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
-            if (!(standardizedError instanceof ServiceValidationError || 
-                  standardizedError instanceof ServiceTimeoutError || 
-                  standardizedError instanceof ServiceCircuitBreakerError)) {
-                logServiceError(standardizedError, { service: 'AuthService', operation: 'register' });
-            }
-            
-            if (standardizedError instanceof ServiceValidationError) {
-                return createErrorResult(standardizedError);
-            }
-            
-            return createErrorResult(standardizedError.message);
-        }
+        return this.executeWithResilience(
+            'register',
+            this.registerRateLimiter,
+            userData.email,
+            this.registerWithTimeout.bind(this),
+            userData
+        );
     }
 
     async logout(): Promise<AuthResult> {
