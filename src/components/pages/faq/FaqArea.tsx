@@ -4,10 +4,11 @@ import inner_faq_data from "@/data/InnerFaqData";
 import { useEffect } from "react";
 import { useTabs } from "@/hooks/useTabs";
 import { useAccordion } from "@/hooks/useAccordion";
+import React from "react";
 
 const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
-const FaqArea = () => {
+const FaqArea = React.memo(() => {
   const { activeId, toggle, setActiveId } = useAccordion({ initialId: null });
   const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
 
@@ -76,6 +77,8 @@ const FaqArea = () => {
       </div>
     </section>
   );
-};
+});
+
+FaqArea.displayName = "FaqArea"
 
 export default FaqArea;

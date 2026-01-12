@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 interface UseTabsOptions {
   defaultTab?: number;
@@ -15,11 +15,11 @@ export function useTabs(options: UseTabsOptions = {}) {
 
   const [activeTab, setActiveTab] = useState(defaultTab);
 
-  const handleTabClick = (index: number) => {
+  const handleTabClick = useCallback((index: number) => {
     setActiveTab(index);
-  };
+  }, []);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
     if (!enableKeyboardNavigation) return;
 
     if (event.key === 'Enter' || event.key === ' ') {
@@ -34,7 +34,7 @@ export function useTabs(options: UseTabsOptions = {}) {
       event.preventDefault();
       handleTabClick((index - 1 + tabCount) % tabCount);
     }
-  };
+  }, [enableKeyboardNavigation, handleTabClick, tabCount]);
 
   return {
     activeTab,
