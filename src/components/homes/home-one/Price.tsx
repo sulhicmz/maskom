@@ -4,10 +4,11 @@ import SectionTitle from "@/components/common/SectionTitle";
 import AnimationWrapper from "@/components/common/AnimationWrapper";
 import PricingCard from "@/components/common/PricingCard";
 import { useTabs } from "@/hooks/useTabs";
+import React from "react";
 
 const tab_title: string[] = ["Kontrak 12 Bulan", "Kontrak 36 Bulan"];
 
-const Price = () => {
+const Price = React.memo(() => {
 
    const { activeTab, handleTabClick, handleKeyDown } = useTabs({ tabCount: tab_title.length });
 
@@ -17,7 +18,7 @@ const Price = () => {
             <div className="container">
                <div className="row">
                   <div className="col-lg-12">
-                     <SectionTitle 
+                     <SectionTitle
                         subtitle="Paket Layanan"
                         title="Pilih Skema Layanan Sesuai Kebutuhan Anda"
                         description="Seluruh paket sudah termasuk instalasi, monitoring proaktif, dan dukungan engineer Maskom sesuai SLA yang disepakati."
@@ -80,6 +81,8 @@ const Price = () => {
          </div>
       </section>
    )
-}
+})
+
+Price.displayName = "Price"
 
 export default Price
