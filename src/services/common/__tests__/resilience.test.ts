@@ -13,7 +13,7 @@ describe('executeWithResilience', () => {
 
     beforeEach(() => {
         mockCircuitBreaker = {
-            execute: jest.fn().mockImplementation(async (callback: () => Promise<any>) => {
+            execute: jest.fn().mockImplementation(async (callback: () => Promise<unknown>) => {
                 return await callback();
             }),
             getState: jest.fn().mockReturnValue({ isOpen: false }),
