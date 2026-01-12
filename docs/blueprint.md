@@ -460,7 +460,6 @@ Services (AuthService)
 - ✅ **Resource hints for critical CDN resources** (preconnect, dns-prefetch) - Improves LCP by 50-150ms through early DNS resolution and TCP connection establishment (Task 87)
 - ✅ **Lint warnings fixed** (Task 87) - Removed unused variables in test files, lint passes with 0 errors, 0 warnings
 - ✅ **Date format standardization** (Task 40 Phase 4) - All dates stored in ISO 8601 format (YYYY-MM-DD) with formatting utilities for display (formatBlogDate, formatCommentDate, formatDate, isValidISODate, toISODate)
-- ✅ **Blog sidebar components refactored** (Task 88) - All blog sidebar components (Category, LatestNews, Tags, BlogSidebar) now use AnimationWrapper for consistent animation handling (4 components refactored, 4+ duplicate animation class instances eliminated)
 
 ### Anti-Patterns (Fix)
 - ❌ Business logic in presentation components (ContactForm) - FIXED
