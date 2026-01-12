@@ -13,7 +13,7 @@ const inner_blog_data: InnerBlogPost[] = [
       desc: "Maskom membantu perusahaan retail nasional mengonsolidasikan konektivitas kasir, aplikasi loyalty, dan CCTV ke satu jaringan terkelola. Artikel ini membahas bagaimana monitoring proaktif dan segmentasi VLAN menekan keluhan pelanggan hingga 70%.",
       date: "2024-03-15",
       user: "Tim Editorial Maskom",
-      tag: "Managed Service",
+      tagId: 7,
    },
    {
       id: 2,
@@ -22,7 +22,7 @@ const inner_blog_data: InnerBlogPost[] = [
       desc: "Temukan langkah-langkah penting sebelum mengadopsi SD-WAN: mulai dari audit aplikasi kritikal, pemilihan link cadangan, hingga integrasi keamanan firewall yang konsisten di seluruh cabang.",
       date: "2024-03-08",
       user: "Tim Network Engineering",
-      tag: "SD-WAN",
+      tagId: 1,
    },
    {
       id: 3,
@@ -31,7 +31,7 @@ const inner_blog_data: InnerBlogPost[] = [
       desc: "Maskom berbagi pengalaman dalam menyiapkan konektivitas rendah latensi di pabrik manufaktur yang memanfaatkan IoT dan otomatisasi. Kami menguraikan kebutuhan infrastruktur, keamanan, serta pola operasional yang sukses.",
       date: "2024-03-01",
       user: "Solution Architect Maskom",
-      tag: "Infrastruktur",
+      tagId: 8,
    },
    {
       id: 4,
@@ -40,7 +40,7 @@ const inner_blog_data: InnerBlogPost[] = [
       desc: "Artikel ini menjelaskan indikator performa utama (KPI) yang dipantau Maskom seperti health score akses poin, kepuasan pengguna, dan efisiensi operasional tim IT pelanggan.",
       date: "2024-02-21",
       user: "Customer Success Team",
-      tag: "Wi-Fi",
+      tagId: 9,
    },
    {
       id: 5,
@@ -49,7 +49,7 @@ const inner_blog_data: InnerBlogPost[] = [
       desc: "Pelajari bagaimana Maskom menyusun playbook keamanan jaringan, koordinasi dengan SOC, dan simulasi serangan berkala untuk memastikan kesiapan menghadapi ancaman siber.",
       date: "2024-02-12",
       user: "Cybersecurity Specialist",
-      tag: "Keamanan",
+      tagId: 3,
    },
 ];
 

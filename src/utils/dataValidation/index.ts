@@ -55,6 +55,7 @@ import {
 } from "./dashboardValidation";
 
 import {
+  validateBlogTagItem,
   validateBlogCommentItem,
   validateInnerBlogPost,
 } from "./blogValidation";
@@ -102,6 +103,7 @@ export {
   validateWiFiDevice,
   validateWebsiteTemplate,
   validateAIStep,
+  validateBlogTagItem,
   validateBlogCommentItem,
   validateInnerBlogPost,
   validateTeamMember,

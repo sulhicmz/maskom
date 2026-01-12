@@ -97,6 +97,11 @@ export interface AIStep {
   content: string;
 }
 
+export interface BlogTagItem {
+  id: number;
+  name: string;
+}
+
 export interface BlogCommentItem {
   id: number;
   blogId: number;
@@ -120,7 +125,7 @@ export interface InnerBlogPost {
   desc: string;
   date: string;
   user: string;
-  tag: string;
+  tagId: number;
 }
 
 export interface FaqDetail {

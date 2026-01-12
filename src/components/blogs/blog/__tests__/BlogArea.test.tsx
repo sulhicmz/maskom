@@ -158,7 +158,7 @@ describe('BlogArea', () => {
     expect(images.length).toBeGreaterThan(0);
   });
 
-  it('preserves blog data structure (id, thumb, title, desc, date, user, tag)', () => {
+  it('preserves blog data structure (id, thumb, title, desc, date, user, tagId)', () => {
     render(<BlogArea />);
 
     expect(inner_blog_data[0]).toHaveProperty('id');
@@ -166,7 +166,7 @@ describe('BlogArea', () => {
     expect(inner_blog_data[0]).toHaveProperty('desc');
     expect(inner_blog_data[0]).toHaveProperty('date');
     expect(inner_blog_data[0]).toHaveProperty('user');
-    expect(inner_blog_data[0]).toHaveProperty('tag');
+    expect(inner_blog_data[0]).toHaveProperty('tagId');
   });
 
   it('handles pagination state changes', async () => {
