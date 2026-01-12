@@ -491,6 +491,7 @@ Services (AuthService)
 - ✅ Swiper configuration centralization (SWIPER_CONFIG) - Configuration separated from component logic for reusability and consistency (Task 95)
 - ✅ **OpenAPI specification** (docs/openapi-spec.yaml) - Machine-readable API spec (OpenAPI 3.0.3) for code generation and automated testing
 - ✅ **Postman collection** (docs/postman-collection.json) - Ready-to-use collection with all API endpoints, examples, and integration tests
+- ✅ **API Documentation** (docs/api/auth-service.md, docs/api/email-service.md) - Comprehensive API documentation with usage examples, error handling, and resilience patterns (Task 113)
 - ✅ Webpack code splitting for large dependencies (forms, swiper cache groups)
 - ✅ Lazy-loaded form components with loading states (ContactForm, LoginForm, SignUpForm, BlogForm)
 - ✅ Bundle optimization with separate async chunks (19KB forms, 24KB swiper)
@@ -1185,20 +1186,26 @@ See `docs/task.md` for ongoing architectural improvements and prioritized refact
 
 ## API Documentation
 
-Comprehensive API specifications for all external service integrations are documented in `docs/api.md`.
+Comprehensive API specifications for all external service integrations are documented in `docs/api/` directory.
 
 **Quick Start Resources**:
 - **OpenAPI Specification**: `docs/openapi-spec.yaml` - Machine-readable API spec (OpenAPI 3.0.3)
 - **Postman Collection**: `docs/postman-collection.json` - Ready-to-use Postman collection with all endpoints and tests
 
+**Service Documentation**:
+- **Email Service** (`docs/api/email-service.md`) - EmailJS integration with resilience patterns (Task 112)
+- **Auth Service** (`docs/api/auth-service.md`) - Authentication API with login, register, logout, rate limiting (Task 113)
+
 **Documentation Contents**:
-- Email Service API with resilience patterns
-- Authentication Service API (login, register, logout, getCurrentUser)
-- Integration Monitoring & Metrics API
-- Error response standards
-- Rate limiting configuration
-- Adding new integrations guide
-- Using OpenAPI specification and Postman collection
+- Complete API contracts with TypeScript interfaces
+- Request/response formats and examples
+- React component integration examples
+- Resilience patterns (timeout, retry, circuit breaker, rate limiting)
+- Error handling scenarios and error codes
+- Input validation requirements
+- Monitoring and observability guides
+- Best practices and troubleshooting
+- Migration guides for real backend integration
 
 ## Security Configuration
 
