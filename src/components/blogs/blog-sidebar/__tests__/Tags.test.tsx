@@ -105,8 +105,10 @@ describe('Tags', () => {
       const { container } = render(<Tags />);
       
       const widget = container.querySelector('.sidebar-widget');
-      expect(widget).toHaveClass('wow');
-      expect(widget).toHaveClass('fadeInUp');
+      expect(widget).toBeInTheDocument();
+      
+      const animatedDiv = widget.querySelector('.wow.fadeInUp');
+      expect(animatedDiv).toBeInTheDocument();
     });
   });
 

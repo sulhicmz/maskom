@@ -5,6 +5,7 @@ import img_2 from "@/assets/images/blog/post-thumb-2.jpg"
 import img_3 from "@/assets/images/blog/post-thumb-3.jpg"
 import Link from "next/link";
 import { formatBlogDate } from "@/utils/dateFormat";
+import AnimationWrapper from "@/components/common/AnimationWrapper";
 
 interface DataType {
    id: number;
@@ -36,21 +37,23 @@ const latest_news: DataType[] = [
 
 const LatestNews = () => {
    return (
-      <div className="sidebar-widget sidebar-recent-widget mb-35 wow fadeInUp">
-         <h3 className="widget-title">Berita Terbaru</h3>
-         <div className="sidebar-widget-content">
-            <ul className="recent-post-list">
-               {latest_news.map((item) => (
-                  <li key={item.id} className="post-thumbnail-content d-flex align-items-center">
-                     <Image src={item.img} alt="post thumb" />
-                       <div className="post-title-date">
-                          <h6><Link href="/blog-details">{item.title}</Link></h6>
-                          <span className="posted-on"><time>{formatBlogDate(item.date)}</time></span>
-                       </div>
-                  </li>
-               ))}
-            </ul>
-         </div>
+      <div className="sidebar-widget sidebar-recent-widget mb-35">
+         <AnimationWrapper animation="fadeInUp">
+            <h3 className="widget-title">Berita Terbaru</h3>
+            <div className="sidebar-widget-content">
+               <ul className="recent-post-list">
+                  {latest_news.map((item) => (
+                     <li key={item.id} className="post-thumbnail-content d-flex align-items-center">
+                        <Image src={item.img} alt="post thumb" />
+                        <div className="post-title-date">
+                           <h6><Link href="/blog-details">{item.title}</Link></h6>
+                           <span className="posted-on"><time>{formatBlogDate(item.date)}</time></span>
+                        </div>
+                     </li>
+                  ))}
+               </ul>
+            </div>
+         </AnimationWrapper>
       </div>
    )
 }

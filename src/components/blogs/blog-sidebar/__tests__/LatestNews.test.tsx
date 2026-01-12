@@ -163,8 +163,10 @@ describe('LatestNews', () => {
       const { container } = render(<LatestNews />);
       
       const widget = container.querySelector('.sidebar-widget');
-      expect(widget).toHaveClass('wow');
-      expect(widget).toHaveClass('fadeInUp');
+      expect(widget).toBeInTheDocument();
+      
+      const animatedDiv = widget.querySelector('.wow.fadeInUp');
+      expect(animatedDiv).toBeInTheDocument();
     });
 
     it('should have post thumbnail content class', () => {
