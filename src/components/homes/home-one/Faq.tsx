@@ -1,7 +1,6 @@
 "use client"
 import { home_1_faq } from "@/data/FaqData"
 import Image from "next/image"
-import { useState } from "react"
 
 import faq_1 from "@/assets/images/contact/contact-1.svg"
 import faq_2 from "@/assets/images/contact/contact-2.svg"
@@ -9,10 +8,11 @@ import faq_3 from "@/assets/images/contact/contact-3.svg"
 import faq_shape from "@/assets/images/contact/shape-1.png"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
+import { useAccordion } from "@/hooks/useAccordion"
 
 const Faq = () => {
 
-   const [activeId, setActiveId] = useState<number>(home_1_faq[0].id);
+   const { activeId, toggle } = useAccordion({ initialId: home_1_faq[0].id });
 
    return (
       <section className="faqs-section pb-190 pt-110" id="faq">
@@ -40,22 +40,22 @@ const Faq = () => {
                         className="mb-55"
                         animation="fadeInDown"
                      />
-                       <AnimationWrapper animation="fadeInUp" className="accordion" id="accordionOne">
-                          {home_1_faq.map((item) => (
-                            <div key={item.id} className="accordion-card style-one mb-15">
-                               <div className="accordion-header">
-                                  <h6 onClick={() => setActiveId(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >
-                                      {item.question}
-                                   </h6>
-                               </div>
-                               <div id="collapse1" className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}>
-                                  <div className="accordion-content">
-                                     <p>{item.answer}</p>
-                                  </div>
-                               </div>
-                            </div>
-                         ))}
-                      </AnimationWrapper>
+                        <AnimationWrapper animation="fadeInUp" className="accordion" id="accordionOne">
+                           {home_1_faq.map((item) => (
+                             <div key={item.id} className="accordion-card style-one mb-15">
+                                <div className="accordion-header">
+                                   <h6 onClick={() => toggle(item.id)} className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`} >
+                                       {item.question}
+                                    </h6>
+                                </div>
+                                <div id="collapse1" className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}>
+                                   <div className="accordion-content">
+                                      <p>{item.answer}</p>
+                                   </div>
+                                </div>
+                             </div>
+                          ))}
+                       </AnimationWrapper>
                   </div>
                </div>
             </div>
