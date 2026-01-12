@@ -9,6 +9,14 @@ export const DATA_RELATIONSHIPS: DataRelationship[] = [
     type: "many-to-one",
     optional: false,
   },
+  {
+    sourceCollection: "InnerBlogData",
+    targetCollection: "BlogTagData",
+    sourceField: "tagId",
+    targetField: "id",
+    type: "many-to-one",
+    optional: false,
+  },
 ];
 
 export default DATA_RELATIONSHIPS;

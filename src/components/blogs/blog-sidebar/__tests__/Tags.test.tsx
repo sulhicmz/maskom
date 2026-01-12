@@ -12,13 +12,16 @@ describe('Tags', () => {
 
     it('should render all tags', () => {
       render(<Tags />);
-      
+
       expect(screen.getByText('SD-WAN')).toBeInTheDocument();
       expect(screen.getByText('Managed Wi-Fi')).toBeInTheDocument();
       expect(screen.getByText('Keamanan')).toBeInTheDocument();
       expect(screen.getByText('Cloud Connect')).toBeInTheDocument();
       expect(screen.getByText('Monitoring')).toBeInTheDocument();
       expect(screen.getByText('IoT')).toBeInTheDocument();
+      expect(screen.getByText('Managed Service')).toBeInTheDocument();
+      expect(screen.getByText('Infrastruktur')).toBeInTheDocument();
+      expect(screen.getByText('Wi-Fi')).toBeInTheDocument();
     });
 
     it('should render tagcloud container', () => {
@@ -30,16 +33,16 @@ describe('Tags', () => {
   });
 
   describe('Tag Display', () => {
-    it('should render six tags', () => {
+    it('should render nine tags', () => {
       const { container } = render(<Tags />);
-      
+
       const tagElements = container.querySelectorAll('.tagcloud span');
-      expect(tagElements).toHaveLength(6);
+      expect(tagElements).toHaveLength(9);
     });
 
     it('should render tags in correct order', () => {
       const { container } = render(<Tags />);
-      
+
       const tagElements = container.querySelectorAll('.tagcloud span');
       expect(tagElements[0]).toHaveTextContent('SD-WAN');
       expect(tagElements[1]).toHaveTextContent('Managed Wi-Fi');
@@ -47,6 +50,9 @@ describe('Tags', () => {
       expect(tagElements[3]).toHaveTextContent('Cloud Connect');
       expect(tagElements[4]).toHaveTextContent('Monitoring');
       expect(tagElements[5]).toHaveTextContent('IoT');
+      expect(tagElements[6]).toHaveTextContent('Managed Service');
+      expect(tagElements[7]).toHaveTextContent('Infrastruktur');
+      expect(tagElements[8]).toHaveTextContent('Wi-Fi');
     });
 
     it('should render tags as span elements', () => {
@@ -76,10 +82,11 @@ describe('Tags', () => {
 
     it('should render single word tags', () => {
       render(<Tags />);
-      
+
       expect(screen.getByText('Keamanan')).toBeInTheDocument();
       expect(screen.getByText('Monitoring')).toBeInTheDocument();
       expect(screen.getByText('IoT')).toBeInTheDocument();
+      expect(screen.getByText('SD-WAN')).toBeInTheDocument();
     });
   });
 

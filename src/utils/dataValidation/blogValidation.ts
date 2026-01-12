@@ -1,5 +1,11 @@
-import type { BlogCommentItem, InnerBlogPost } from "@/types/data";
+import type { BlogCommentItem, InnerBlogPost, BlogTagItem } from "@/types/data";
 import { createValidator } from "./baseValidation";
+
+export const validateBlogTagItem = createValidator<BlogTagItem>({
+  typeName: "BlogTagItem",
+  numberFields: [{ key: "id", required: true, min: 1 }],
+  stringFields: [{ key: "name", required: true }],
+});
 
 export const validateBlogCommentItem = createValidator<BlogCommentItem>({
   typeName: "BlogCommentItem",
@@ -19,6 +25,5 @@ export const validateInnerBlogPost = createValidator<InnerBlogPost>({
     { key: "desc", required: true },
     { key: "date", required: true },
     { key: "user", required: true },
-    { key: "tag", required: true },
   ],
 });
