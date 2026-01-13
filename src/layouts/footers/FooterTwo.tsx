@@ -17,7 +17,7 @@ const FooterTwo = () => {
                      <AnimationWrapper animation="fadeInUp" className="footer-widget footer_about_widget mb-30">
                         <div className="footer-content">
                            <div className="footer-logo mb-30">
-                              <Link href="/"><Image src={logo} alt="Footer Logo" /></Link>
+                              <Link href="/"><Image src={logo} alt="Maskom - Logo Footer" /></Link>
                            </div>
                            <p>Maskom mendukung transformasi digital dengan layanan konektivitas, keamanan jaringan, dan managed service yang andal untuk berbagai sektor industri.</p>
                            <SocialLinks links={socialLinks} />
@@ -48,12 +48,12 @@ const FooterTwo = () => {
                        <AnimationWrapper animation="fadeInUp" className="footer-widget footer-newsletter-widget mb-30">
                           <h4 className="footer-title">News & Update</h4>
                           <div className="newsletter-content">
-                             <form onSubmit={(e) => e.preventDefault()}>
-                                <div className="form-group mb-30">
-                                   <input type="email" placeholder="enter your email" name="email" required />
-                                   <button className="theme-btn style-one">Subscribe</button>
-                                </div>
-                             </form>
+                           <form onSubmit={(e) => e.preventDefault()}>
+                                 <div className="form-group mb-30">
+                                    <input type="email" placeholder="enter your email" name="email" required aria-label="Email untuk newsletter" />
+                                    <button className="theme-btn style-one" type="submit" aria-label="Subscribe ke newsletter">Subscribe</button>
+                                 </div>
+                              </form>
                              <p>Dapatkan insight terkini dari Maskom mengenai teknologi jaringan dan praktik terbaik pengelolaan infrastruktur.</p>
                           </div>
                        </AnimationWrapper>
