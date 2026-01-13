@@ -21,11 +21,11 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
          <div className="container">
             <div className="row">
                <div className="col-xl-8">
-                  <div className="blog-details-wrapper mb-30">
-                     <article className="blog-post-item mb-60">
-                        <div className="post-thumbnail wow fadeInDown">
-                           {single_blog?.thumb ? <Image src={single_blog.thumb} alt="image" /> : <Image src={blog_thumb} alt="image" />}
-                        </div>
+                   <div className="blog-details-wrapper mb-30">
+                      <article className="blog-post-item mb-60">
+                         <div className="post-thumbnail wow fadeInDown">
+                            {single_blog?.thumb ? <Image src={single_blog.thumb} alt={`Thumbnail gambar artikel: ${single_blog.title}`} /> : <Image src={blog_thumb} alt="Thumbnail gambar placeholder: Artikel Maskom" />}
+                         </div>
                         <div className="post-content wow fadeInUp">
                            <h3 className="title">{single_blog?.title ? single_blog.title : "Strategi Maskom menjaga pengalaman pelanggan omni-channel"}</h3>
                              <div className="post-meta mb-35">
@@ -36,10 +36,10 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                              </div>
                            <p>Maskom mendampingi jaringan retail nasional dalam menjaga konsistensi pengalaman pelanggan antara toko fisik dan kanal digital. Seluruh kasir, aplikasi loyalty, layanan click & collect, hingga dashboard manajemen dihubungkan melalui jaringan managed service yang dipantau 24/7.</p>
                            <p>Dengan pendekatan tersebut, tim IT pelanggan tidak lagi mengelola perangkat secara manual per gerai. Maskom menghadirkan otomatisasi konfigurasi, segmentasi VLAN, serta laporan kesehatan jaringan yang dapat diakses kapan saja melalui portal pelanggan.</p>
-                           <blockquote className="mb-35">
-                              <div className="quote mb-15">
-                                 <Image src={quote} alt="right quote" />
-                              </div>
+                            <blockquote className="mb-35">
+                               <div className="quote mb-15">
+                                  <Image src={quote} alt="Tanda kutip dekoratif" />
+                               </div>
                               <p>“Transparansi monitoring Maskom membuat tim kami bisa mendeteksi gejala penurunan layanan sebelum pelanggan merasakannya. Review bulanan bersama tim Maskom membantu kami berinovasi lebih cepat.”</p>
                               <cite>Head of IT Operations, Klien Retail</cite>
                            </blockquote>
