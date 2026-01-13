@@ -1,4 +1,5 @@
 import Link from "next/link";
+import React from "react";
 
 interface SocialLinksProps {
   links?: Array<{
@@ -20,7 +21,7 @@ const SocialLinks = ({ links, className = "social-link" }: SocialLinksProps) => 
       {links.map((link, index) => (
         <li key={index}>
           <Link href={link.url} target={link.target || '_self'} rel={link.target === '_blank' ? 'noreferrer' : undefined} aria-label={link.ariaLabel}>
-            <i className={link.iconClass}></i>
+            <i className={link.iconClass} aria-hidden="true"></i>
           </Link>
         </li>
       ))}
@@ -28,4 +29,4 @@ const SocialLinks = ({ links, className = "social-link" }: SocialLinksProps) => 
   )
 }
 
-export default SocialLinks
+export default React.memo(SocialLinks)

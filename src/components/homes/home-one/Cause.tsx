@@ -24,9 +24,9 @@ const Cause = React.memo(() => {
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
                      <AnimationWrapper animation="fadeInUp">
                         <div className="iconic-info-box style-one text-center mb-25">
-                           <div className="icon">
-                              <i className={item.icon}></i>
-                           </div>
+                            <div className="icon">
+                               <i className={item.icon} aria-hidden="true"></i>
+                            </div>
                            <div className="content">
                               <h4><Link href="/use-case-details">{item.title}</Link></h4>
                               <p>{item.desc}</p>
