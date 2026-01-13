@@ -12,6 +12,7 @@ import {
 import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS } from '@/constants';
 import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
+import { v4 as uuidv4 } from 'uuid';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -71,7 +72,7 @@ class AuthService implements IAuthService {
         this.validateCredentials(credentials.email, credentials.password, false);
 
         this.currentUser = {
-            id: this.generateUserId(credentials.email),
+            id: this.generateUserId(),
             name: this.extractNameFromEmail(credentials.email),
             email: credentials.email,
         };
@@ -88,7 +89,7 @@ class AuthService implements IAuthService {
         this.validateCredentials(userData.email, userData.password, true, userData.name);
 
         this.currentUser = {
-            id: this.generateUserId(userData.email),
+            id: this.generateUserId(),
             name: userData.name,
             email: userData.email,
         };
@@ -253,15 +254,29 @@ class AuthService implements IAuthService {
         this.circuitBreaker.reset();
     }
 
-    private generateUserId(email: string): string {
-        return `user_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    private generateUserId(): string {
+        return uuidv4();
     }
 
     private extractNameFromEmail(email: string): string {
+        if (!email || !email.includes('@')) {
+            return 'User';
+        }
+
         const localPart = email.split('@')[0];
-        return localPart
-            .split('.')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        
+        if (!localPart || localPart.trim().length === 0) {
+            return 'User';
+        }
+
+        const nameParts = localPart.split('.').filter(part => part.trim().length > 0);
+        
+        if (nameParts.length === 0) {
+            return 'User';
+        }
+
+        return nameParts
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
     }
 }

@@ -1,6 +1,10 @@
 import { authService } from '../AuthService';
 import type { LoginCredentials, RegisterData } from '../types';
 
+jest.mock('uuid', () => ({
+    v4: () => '00000000-0000-4000-8000-000000000000',
+}));
+
 describe('AuthService', () => {
     beforeEach(() => {
         authService.logout();
@@ -84,7 +88,8 @@ describe('AuthService', () => {
 
             const result = await authService.login(credentials);
 
-            expect(result.user?.id).toBe('user_user_name_example_com');
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            expect(result.user?.id).toMatch(uuidRegex);
         });
 
         it('should extract name from email for current user', async () => {
@@ -106,8 +111,31 @@ describe('AuthService', () => {
 
             const result = await authService.login(credentials);
 
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
             expect(result.success).toBe(true);
-            expect(result.user?.id).toBe('user_test_user_example_com');
+            expect(result.user?.id).toMatch(uuidRegex);
+        });
+
+        it('should extract name from email with dots', async () => {
+            const credentials: LoginCredentials = {
+                email: 'john.doe@example.com',
+                password: 'password123',
+            };
+
+            const result = await authService.login(credentials);
+
+            expect(result.user?.name).toBe('John Doe');
+        });
+
+        it('should extract name from email without dots', async () => {
+            const credentials: LoginCredentials = {
+                email: 'john@example.com',
+                password: 'password123',
+            };
+
+            const result = await authService.login(credentials);
+
+            expect(result.user?.name).toBe('John');
         });
     });
 
