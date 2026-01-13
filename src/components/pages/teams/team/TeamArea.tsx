@@ -1,4 +1,5 @@
 "use client"
+import React, { useMemo } from "react"
 import dynamic from "next/dynamic"
 import team_data from "@/data/TeamData"
 import Image from "next/image"
@@ -9,9 +10,9 @@ const ReactPaginate = dynamic(() => import("react-paginate"), {
   loading: () => <div className="ac-pagination text-center mt-30 wow fadeInUp"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
 })
 
-const TeamArea = () => {
+const TeamAreaComponent = () => {
 
-   const team = team_data;
+   const team = useMemo(() => team_data, []);
    const itemsPerPage = 8;
 
    const { currentItems, pageCount, handlePageClick } = usePagination({
@@ -71,5 +72,8 @@ const TeamArea = () => {
       </section>
    )
 }
+
+const TeamArea = React.memo(TeamAreaComponent)
+TeamArea.displayName = "TeamArea"
 
 export default TeamArea

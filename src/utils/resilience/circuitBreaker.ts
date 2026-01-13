@@ -1,10 +1,11 @@
 import type {
     CircuitBreakerOptions,
     CircuitBreakerState,
-    ResilienceError
+    ResilienceError,
+    ICircuitBreaker
 } from './types';
 
-export class CircuitBreaker {
+export class CircuitBreaker implements ICircuitBreaker {
     private state: CircuitBreakerState;
     private readonly options: CircuitBreakerOptions;
 

@@ -4,8 +4,8 @@ import type { ServiceResult } from '@/services/common';
 import { withTimeout, CircuitBreaker } from '@/utils/resilience';
 import { emailRateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
-import { 
-    ServiceCredentialsError, 
+import {
+    ServiceCredentialsError,
     ServiceRateLimitError,
     logServiceError,
     logServiceWarning,
@@ -14,6 +14,7 @@ import {
     executeWithResilience,
     RateLimitExceededError
 } from '@/services/common';
+import { TIMEOUTS } from '@/constants';
 
 class EmailService implements IEmailService {
     private serviceId: string;
@@ -55,7 +56,7 @@ class EmailService implements IEmailService {
                     identifier,
                     circuitBreaker: this.circuitBreaker,
                     skipRateLimit: options?.skipRateLimit || false,
-                    timeoutMs: 10000
+                    timeoutMs: TIMEOUTS.EMAIL_SERVICE
                 },
                 () => this.sendEmailWithTimeout(params)
             );
@@ -81,7 +82,7 @@ class EmailService implements IEmailService {
                 params.templateParams,
                 this.publicKey
             ),
-            { timeoutMs: 10000, timeoutError: 'EmailJS request timed out' }
+            { timeoutMs: TIMEOUTS.EMAIL_SERVICE, timeoutError: 'EmailJS request timed out' }
         );
         return { text: result.text };
     }

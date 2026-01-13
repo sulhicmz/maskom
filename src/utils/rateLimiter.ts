@@ -1,4 +1,4 @@
-import { RATE_LIMITS } from '@/constants';
+import { RATE_LIMITS, MS_TO_SECONDS } from '@/constants';
 
 export interface RateLimitConfig {
     maxAttempts: number;
@@ -13,7 +13,16 @@ export interface RateLimitResult {
     error?: string;
 }
 
-export class RateLimiter {
+export interface IRateLimiter {
+    check(identifier: string): RateLimitResult;
+    recordAttempt(identifier: string): RateLimitResult;
+    reset(identifier: string): void;
+    resetAll(): void;
+    getStatus(identifier: string): { count: number; firstAttempt: number; lockedUntil?: number | null };
+    destroy?(): void;
+}
+
+export class RateLimiter implements IRateLimiter {
     private config: RateLimitConfig;
     private attempts: Map<string, { count: number; firstAttempt: number; lockedUntil?: number }> = new Map();
     private cleanupInterval: NodeJS.Timeout | null = null;
@@ -40,7 +49,7 @@ export class RateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: record.lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / MS_TO_SECONDS)} seconds.`
             };
         }
 
@@ -58,7 +67,7 @@ export class RateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: record.lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / MS_TO_SECONDS)} seconds.`
             };
         }
 
@@ -85,7 +94,7 @@ export class RateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: record.lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / MS_TO_SECONDS)} seconds.`
             };
         }
 
@@ -111,7 +120,7 @@ export class RateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / MS_TO_SECONDS)} seconds.`
             };
         }
 
