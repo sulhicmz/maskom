@@ -88,7 +88,7 @@ Perbarui dokumentasi di atas setiap kali ada perubahan arsitektur, dependensi, a
 - Semua data statis di `src/data/` divalidasi menggunakan utilitas di `src/utils/dataValidation.ts`
 - 21 validator mencakup: FeedbackItem, FaqItem, PriceItem, MenuItem, TeamMember, dll
 - Data indexing untuk O(1) lookup dan relationship management untuk integritas referensial
-- Jalankan `npm test` untuk memastikan semua validasi berjalan dengan benar (1976 tes total)
+- Jalankan `npm test` untuk memastikan semua validasi berjalan dengan benar (2434 tes total)
 - Lihat [docs/blueprint.md](docs/blueprint.md#data-validation--completed---task-40-phase-1) untuk detail lengkap
 
 ## Layanan (Services)
