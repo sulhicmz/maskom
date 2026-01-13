@@ -8,6 +8,98 @@
 
 ---
 
+## Task 121: Fix EmailService Tests - Rate Limit Blocking Circuit Breaker (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Bug Fix (Runtime Test Failures)
+
+**Problem**:
+- 5 tests in EmailService.test.ts were failing after Task 116 (Shared Service Resilience Utility)
+- Rate limiter was blocking requests before circuit breaker could record failures
+- Test expectations didn't match actual behavior with shared resilience utility
+- Tests used same identifier (email address) for all requests, triggering rate limits early
+- Circuit breaker tests couldn't verify breaker behavior because rate limit errors arrived first
+
+**Solution**:
+Updated 5 failing tests to use `skipRateLimit: true` option:
+
+1. **opens circuit breaker after failure threshold**:
+   - Added `skipRateLimit: true` to all 5 sendEmail calls
+   - Circuit breaker now correctly opens after 5 failures
+
+2. **rejects immediately when circuit is open**:
+   - Added `skipRateLimit: true` to all 6 sendEmail calls
+   - Error message now correctly contains "Circuit breaker"
+
+3. **handles timeout errors**:
+   - Added `skipRateLimit: true` to test call
+   - Error message now correctly contains "timed out"
+
+4. **logs error to console on failure**:
+   - Added `skipRateLimit: true` to test call
+   - Console.error spy now correctly captures error logs
+
+5. **allows manual reset of circuit breaker**:
+   - Added `skipRateLimit: true` to all 5 sendEmail calls in loop
+   - Circuit breaker correctly opens and can be reset manually
+
+**Root Cause**:
+- After Task 116, EmailService uses `executeWithResilience()` from shared utility
+- This utility checks rate limits before executing operations through circuit breaker
+- With same identifier, rate limiter blocked 6th+ requests with "Too many attempts" error
+- Circuit breaker never saw 5 consecutive failures, so it never opened
+
+**Code Quality**:
+- All 2240 tests passing (100% success rate) - previously 2235 passing, 5 failing
+- 15 tests in EmailService.test.ts all passing
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated successfully
+- No regressions introduced by test updates
+
+**Success Criteria**:
+- [x] Fixed 5 failing tests in EmailService.test.ts
+- [x] Tests now use skipRateLimit option to test circuit breaker independently
+- [x] All 2240 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build passed successfully (18 pages generated)
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 121 completion
+
+**Related Files**:
+- ✅ Modified: `src/services/email/__tests__/EmailService.test.ts` - Updated 5 tests to use skipRateLimit option
+
+**Testing**:
+- All 2240 tests passing (100% success rate)
+- EmailService tests: 15 passed
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated
+- Circuit breaker behavior now correctly tested
+- Rate limiting behavior tested separately (not affected by changes)
+
+**Notes**:
+- Follows Bug Fix principles:
+   - **Root Cause**: Identified rate limiter blocking circuit breaker tests
+   - **Minimal Changes**: Only added skipRateLimit option, no test logic changes
+   - **Preserve Behavior**: Tests still verify circuit breaker behavior, just skip rate limit
+   - **No Regressions**: All other tests continue to pass
+- Tests were written before Task 116 introduced shared resilience utility
+- This is a test-only fix, no production code changes
+- Rate limiting still works correctly for actual service calls
+- Circuit breaker tests now run independently of rate limiting
+
+**Impact**:
+- Test Coverage: All 2240 tests passing (100% success rate, previously 99.78%)
+- Code Quality: Lint clean, build successful, type safe
+- Verification: Circuit breaker behavior correctly tested
+- Confidence: All tests pass, no regressions
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 116 (Shared Service Resilience Utility)
+**Next Bug Review**: As needed when failures occur
+
+---
+
 ## Task 120: Accessibility Improvements - WCAG 2.1 AA Compliance (Jan 12, 2026)
 
 **Status**: ✅ Completed

@@ -106,11 +106,11 @@ describe('EmailService', () => {
             emailServiceInstance.resetCircuitBreaker();
             mockEmailjsSend.mockRejectedValue(new Error('Service error'));
 
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
 
             const state = emailServiceInstance.getCircuitBreakerState();
             expect(state.isOpen).toBe(true);
@@ -122,13 +122,13 @@ describe('EmailService', () => {
             emailServiceInstance.resetCircuitBreaker();
             mockEmailjsSend.mockRejectedValue(new Error('Service error'));
 
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
-            await emailServiceInstance.sendEmail(validParams);
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
 
-            const result = await emailServiceInstance.sendEmail(validParams);
+            const result = await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
 
             expect(result.success).toBe(false);
             expect(result.error).toContain('Circuit breaker');
@@ -137,15 +137,15 @@ describe('EmailService', () => {
 
         it('handles timeout errors', async () => {
             jest.useRealTimers();
-            mockEmailjsSend.mockImplementation(() => 
+            mockEmailjsSend.mockImplementation(() =>
                 new Promise((resolve) => setTimeout(() => resolve({ text: 'OK', status: 200 }), 15000))
             );
 
-            const result = await emailServiceInstance.sendEmail(validParams);
+            const result = await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
 
             expect(result.success).toBe(false);
             expect(result.error).toContain('timed out');
-            
+
             mockEmailjsSend.mockReset();
         }, 20000);
 
@@ -178,7 +178,7 @@ describe('EmailService', () => {
             const mockError = new Error('Network error');
             mockEmailjsSend.mockRejectedValue(mockError);
 
-            await emailServiceInstance.sendEmail(validParams);
+            await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 '[EmailService] sendEmail failed:',
@@ -235,7 +235,7 @@ describe('EmailService', () => {
             mockEmailjsSend.mockRejectedValue(new Error('Service error'));
 
             for (let i = 0; i < 5; i++) {
-                await emailServiceInstance.sendEmail(validParams);
+                await emailServiceInstance.sendEmail(validParams, { skipRateLimit: true });
             }
 
             expect(emailServiceInstance.getCircuitBreakerState().isOpen).toBe(true);
