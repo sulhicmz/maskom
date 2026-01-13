@@ -176,7 +176,14 @@ export interface RelationshipValidationError {
 }
 
 export interface ReferentialIntegrityResult {
-  isValid: boolean;
-  errors: RelationshipValidationError[];
-  relationshipsValidated: number;
+   isValid: boolean;
+   errors: RelationshipValidationError[];
+   relationshipsValidated: number;
+}
+
+export interface UseCaseSidebarItem {
+   id: number;
+   title: string;
+   link: string;
+   active?: boolean;
 }

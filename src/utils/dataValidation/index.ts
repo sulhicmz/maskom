@@ -69,8 +69,12 @@ import {
 } from "./socialValidation";
 
 import {
-  validateContactInfoItem,
-} from "./contactValidation";
+   validateContactInfoItem,
+} from "./contactValidation"
+
+import {
+   validateUseCaseSidebarItem,
+} from "./useCaseValidation"
 
 export type {
   ValidationResult,
@@ -105,8 +109,9 @@ export {
   validateAIStep,
   validateBlogTagItem,
   validateBlogCommentItem,
-  validateInnerBlogPost,
-  validateTeamMember,
-  validateSocialLink,
-  validateContactInfoItem,
+   validateInnerBlogPost,
+   validateTeamMember,
+   validateSocialLink,
+   validateContactInfoItem,
+   validateUseCaseSidebarItem,
 };

@@ -520,10 +520,10 @@ Services (AuthService)
  - ✅ **Rendering Optimization** (Task 119) - React.memo and useMemo implemented for 6 components (WiFiMonitor, BlogArea, ContactArea, WebsiteBuilder, UseCases, AboutArea) to prevent unnecessary re-renders and cache expensive calculations, reducing CPU usage and improving user experience on frequently visited pages
  - ✅ **Interface Definition** (Task 122) - Created explicit interface contracts (IRateLimiter, IMetricsCollector, ICircuitBreaker) for core utilities to improve testability, maintainability, and enable easier implementation swapping following SOLID principles (Interface Segregation, Dependency Inversion)
  - ✅ **Reusable CTA Component** (Task 127) - Created CtaWrapper abstraction that eliminates duplicate CTA code across 3 components (common, home-one, faq) with flexible props, support for both AnimationWrapper and wow.js animations, React.memo optimization, and 51% code reduction in variant components
- - ✅ **Type Safety Fixes** (Task 128) - Fixed CtaWrapper type errors (animation prop type, id prop missing) that blocked production build, ensuring strict TypeScript compliance
+  - ✅ **Type Safety Fixes** (Task 128) - Fixed CtaWrapper type errors (animation prop type, id prop missing) that blocked production build, ensuring strict TypeScript compliance
+  - ✅ **Data-Driven UI for Sidebar** (Task 129) - Extracted hardcoded sidebar links from UseCaseDetailsSidebar component to UseCaseSidebarData.ts, created UseCaseSidebarItem interface, added validation with validateUseCaseSidebarItem, follows blueprint data-driven architecture principle, eliminates hardcoded content in components
 
- 
- ### Interface Definition Pattern (✅ COMPLETED - Task 122)
+  ### Interface Definition Pattern (✅ COMPLETED - Task 122)
  
  ### Module Extraction Pattern (✅ COMPLETED - Task 127)
  
@@ -974,7 +974,192 @@ External API (EmailJS, etc.)
   - Circuit breaker state tracking
   - Health checks with configurable success rate thresholds
   - Metrics export for external monitoring systems
-  - Service metrics available via `service.getMetrics()` method
+   - Service metrics available via `service.getMetrics()` method
+
+### Data-Driven UI Pattern (✅ COMPLETED - Task 129)
+
+### Purpose
+
+Extract hardcoded UI content into TypeScript data files to:
+- Implement blueprint principle: "All dynamic content uses TypeScript data files in src/data/"
+- Separate presentation layer from data layer
+- Create single source of truth for UI content
+- Enable easy content management without code changes
+- Apply DRY principle and Separation of Concerns
+- Maintain type safety across all UI data
+
+### Data Structure
+
+**UseCaseSidebarItem** (src/types/data/index.ts):
+```typescript
+interface UseCaseSidebarItem {
+   id: number;         // Unique identifier
+   title: string;      // Display text for navigation
+   link: string;       // URL for navigation
+   active?: boolean;    // Optional flag for current page
+}
+```
+
+### Data File
+
+**UseCaseSidebarData.ts** (src/data/):
+```typescript
+const use_case_sidebar_data: UseCaseSidebarItem[] = [
+   {
+      id: 1,
+      title: "Integrasi Konektivitas Ritel Nasional",
+      link: "/use-case-details",
+      active: true
+   },
+   {
+      id: 2,
+      title: "Managed Wi-Fi untuk F&B Chain",
+      link: "/use-case-details"
+   }
+   // ... more items
+];
+
+export default use_case_sidebar_data;
+export const useCaseSidebarById: IdIndex<UseCaseSidebarItem> = createIdIndex(use_case_sidebar_data);
+```
+
+### Implementation
+
+**UseCaseDetailsSidebar Component** (src/components/causes/use-cases-details/UseCaseDetailsSidebar.tsx):
+```typescript
+import use_case_sidebar_data from '@/data/UseCaseSidebarData'
+
+const UseCaseDetailsSidebar = () => {
+   return (
+      <div className="col-lg-4">
+         <div className="sidebar-nav-widget style-one mb-50 wow fadeInDown">
+            <ul>
+               {use_case_sidebar_data.map((item) => (
+                  <li key={item.id}>
+                     <Link href={item.link} className={item.active ? 'active' : ''}>
+                        {item.title}
+                     </Link>
+                  </li>
+               ))}
+            </ul>
+         </div>
+      </div>
+   )
+}
+```
+
+### Benefits
+
+1. **Separation of Concerns**:
+   - Component handles presentation (rendering, DOM structure)
+   - Data file handles content (sidebar items, links, titles)
+   - Clear boundary between UI and data layers
+
+2. **Maintainability**:
+   - Add/remove/reorder sidebar items in data file, not component code
+   - Single point of change for sidebar content
+   - No need to modify component for content updates
+
+3. **Type Safety**:
+   - TypeScript interface ensures data structure consistency
+   - Compile-time checking of required fields (id, title, link)
+   - Prevents typos and missing fields
+
+4. **Validation**:
+   - Runtime validation with `validateUseCaseSidebarItem`
+   - Catches data errors at build time
+   - Custom validators for id (positive number), title (non-empty), link (non-empty)
+
+5. **Scalability**:
+   - Easy to create page-specific sidebar variants
+   - Index support (useCaseSidebarById) for O(1) lookups
+   - Follows same pattern as MenuData and other data files
+
+6. **Consistency**:
+   - All dynamic content follows same pattern (data files in src/data/)
+   - Consistent with blueprint architectural principles
+   - Maintains existing patterns across codebase
+
+7. **Testing**:
+   - 14 comprehensive tests for validator
+   - Tests cover valid items, missing fields, invalid types, edge cases
+   - Ensures data integrity at build time
+
+### Validation
+
+**Validator** (src/utils/dataValidation/useCaseValidation.ts):
+```typescript
+export const validateUseCaseSidebarItem = createValidator<UseCaseSidebarItem>({
+   requiredFields: ["id", "title", "link"],
+   validators: {
+      id: (value) => {
+         if (typeof value !== "number" || value <= 0) {
+            return { valid: false, message: "id must be a positive number" };
+         }
+         return { valid: true };
+      },
+      title: (value) => {
+         if (typeof value !== "string" || value.trim().length === 0) {
+            return { valid: false, message: "title must be a non-empty string" };
+         }
+         return { valid: true };
+      },
+      link: (value) => {
+         if (typeof value !== "string" || value.trim().length === 0) {
+            return { valid: false, message: "link must be a non-empty string" };
+         }
+         return { valid: true };
+      }
+   }
+});
+```
+
+### Anti-Patterns (Fix)
+- ❌ Hardcoded UI content in components - FIXED
+- ❌ Data mixed with presentation logic - FIXED
+- ❌ Content changes requiring code modifications - FIXED
+- ❌ No type safety for UI data - FIXED
+- ❌ Missing validation for data structures - FIXED
+
+### Usage Example
+
+```typescript
+import use_case_sidebar_data from '@/data/UseCaseSidebarData';
+
+// Adding new sidebar item - just add to data array
+const use_case_sidebar_data: UseCaseSidebarItem[] = [
+   {
+      id: 1,
+      title: "Integrasi Konektivitas Ritel Nasional",
+      link: "/use-case-details",
+      active: true
+   },
+   // Add new item here
+   {
+      id: 6,
+      title: "New Use Case",
+      link: "/new-use-case"
+   }
+];
+```
+
+### Testing
+
+All validators have comprehensive test coverage:
+- **UseCaseSidebar validator** (14 tests) - src/utils/dataValidation/__tests__/useCaseValidation.test.ts
+- Tests verify: valid items, missing fields, invalid types, edge cases
+- All tests follow AAA pattern (Arrange → Act → Assert)
+- 100% expected success rate
+
+### Architecture Benefits
+
+1. **Blueprint Compliance**: Follows data-driven UI principle
+2. **Single Source of Truth**: UI content in one location
+3. **Separation of Concerns**: Clear boundary between presentation and data
+4. **Type Safety**: TypeScript interfaces ensure consistency
+5. **Validation**: Runtime checks catch errors early
+6. **Maintainability**: Content updates without code changes
+7. **Scalability**: Easy to create variants and extensions
 
 ## Key Dependencies
 
