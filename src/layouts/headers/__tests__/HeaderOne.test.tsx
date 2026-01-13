@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import HeaderOne from "../HeaderOne";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 
@@ -142,6 +142,209 @@ describe("HeaderOne Component", () => {
       
       const navMenu = document.querySelector(".ac-nav-menu");
       expect(navMenu).toBeInTheDocument();
+    });
+
+    it("opens offcanvas when navbar toggler is clicked", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      expect(toggler).not.toHaveClass("active");
+
+      fireEvent.click(toggler as Element);
+
+      expect(toggler).toHaveClass("active");
+    });
+
+    it("closes offcanvas when navbar toggler is clicked twice", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+
+      fireEvent.click(toggler as Element);
+      expect(toggler).toHaveClass("active");
+
+      fireEvent.click(toggler as Element);
+      expect(toggler).not.toHaveClass("active");
+    });
+
+    it("applies active class to nav overlay when offcanvas is open", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navOverlay = document.querySelector(".nav-overlay");
+
+      expect(navOverlay).not.toHaveClass("active");
+
+      fireEvent.click(toggler as Element);
+
+      expect(navOverlay).toHaveClass("active");
+    });
+
+    it("removes active class from nav overlay when toggler is clicked twice", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navOverlay = document.querySelector(".nav-overlay");
+
+      fireEvent.click(toggler as Element);
+      expect(navOverlay).toHaveClass("active");
+
+      fireEvent.click(toggler as Element);
+      expect(navOverlay).not.toHaveClass("active");
+    });
+
+    it("sets aria-expanded to true when offcanvas is open", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      expect(toggler).toHaveAttribute("aria-expanded", "false");
+
+      fireEvent.click(toggler as Element);
+
+      expect(toggler).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("sets aria-expanded to false when offcanvas is closed", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+
+      fireEvent.click(toggler as Element);
+      expect(toggler).toHaveAttribute("aria-expanded", "true");
+
+      fireEvent.click(toggler as Element);
+      expect(toggler).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("applies menu-on class to ac-nav-menu when offcanvas is open", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navMenu = document.querySelector(".ac-nav-menu");
+
+      expect(navMenu).not.toHaveClass("menu-on");
+
+      fireEvent.click(toggler as Element);
+
+      expect(navMenu).toHaveClass("menu-on");
+    });
+
+    it("removes menu-on class from ac-nav-menu when offcanvas is closed", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navMenu = document.querySelector(".ac-nav-menu");
+
+      fireEvent.click(toggler as Element);
+      expect(navMenu).toHaveClass("menu-on");
+
+      fireEvent.click(toggler as Element);
+      expect(navMenu).not.toHaveClass("menu-on");
+    });
+
+    it("sets aria-hidden to true and tabIndex to -1 when offcanvas is closed", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const navOverlay = document.querySelector(".nav-overlay");
+
+      expect(navOverlay).toHaveAttribute("aria-hidden", "true");
+      expect(navOverlay).toHaveAttribute("tabIndex", "-1");
+    });
+
+    it("sets aria-hidden to false and tabIndex to 0 when offcanvas is open", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navOverlay = document.querySelector(".nav-overlay");
+
+      fireEvent.click(toggler as Element);
+
+      expect(navOverlay).toHaveAttribute("aria-hidden", "false");
+      expect(navOverlay).toHaveAttribute("tabIndex", "0");
+    });
+
+    it("closes offcanvas when nav overlay is clicked", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navOverlay = document.querySelector(".nav-overlay");
+
+      fireEvent.click(toggler as Element);
+      expect(toggler).toHaveClass("active");
+      expect(navOverlay).toHaveClass("active");
+
+      fireEvent.click(navOverlay as Element);
+
+      expect(toggler).not.toHaveClass("active");
+      expect(navOverlay).not.toHaveClass("active");
+    });
+
+    it("resets aria-expanded to false when nav overlay is clicked", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navOverlay = document.querySelector(".nav-overlay");
+
+      fireEvent.click(toggler as Element);
+      expect(toggler).toHaveAttribute("aria-expanded", "true");
+
+      fireEvent.click(navOverlay as Element);
+
+      expect(toggler).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("removes menu-on class from nav menu when nav overlay is clicked", () => {
+      mockedUseSticky.mockReturnValue({ sticky: false });
+      mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
+
+      render(<HeaderOne style={false} />);
+
+      const toggler = document.querySelector(".navbar-toggler");
+      const navOverlay = document.querySelector(".nav-overlay");
+      const navMenu = document.querySelector(".ac-nav-menu");
+
+      fireEvent.click(toggler as Element);
+      expect(navMenu).toHaveClass("menu-on");
+
+      fireEvent.click(navOverlay as Element);
+
+      expect(navMenu).not.toHaveClass("menu-on");
     });
   });
 

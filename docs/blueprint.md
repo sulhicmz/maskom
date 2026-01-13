@@ -171,40 +171,42 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateUniqueId<T>()` - Ensure unique IDs (via checkDuplicateIds)
 - ✅ `validateEmail()` - Email format validation (via createValidator)
 - ✅ `validateDate()` - Date format validation (via createValidator)
-- ✅ `validateRange()` - Number range validation (via createValidator)
-- ✅ `validateEnum<T>()` - Enum value validation (via createValidator)
-
-**Implemented Validators** (24 total):
-- ✅ `validateFeedbackItem` - Testimonials with rating validation
-- ✅ `validateFaqItem` - FAQ questions and answers
-- ✅ `validatePriceItem` - Pricing packages with nested PriceDetailItem validation
-- ✅ `validatePriceDetailItem` - Individual pricing tiers
-- ✅ `validateFeatureItem` - Feature cards
-- ✅ `validateProcessItem` - Process steps
-- ✅ `validateCauseItem` - Cause cards
-- ✅ `validateMenuItem` - Navigation menu with sub-menu validation
-- ✅ `validateWiFiDevice` - Dashboard WiFi devices
-- ✅ `validateWebsiteTemplate` - Website templates
-- ✅ `validateAIStep` - AI process steps
-- ✅ `validateBlogTagItem` - Blog tag items with id and name (Task 101)
-- ✅ `validateBlogCommentItem` - Blog comments
-- ✅ `validateTeamMember` - Team member profiles
-- ✅ `validateInnerBlogPost` - Inner blog posts
-- ✅ `validateFaqDetail` - FAQ detail sections
-- ✅ `validateInnerFaqItem` - FAQ categories with details
-- ✅ `validateSocialLink` - Social media links with target validation
-- ✅ `validateNavigationItem` - Navigation items
-- ✅ `validateNavigationSection` - Navigation sections
-- ✅ `validateContactInfoItem` - Contact information with lines and links arrays (Task 63)
-- ✅ `validateFeatureHomeOneItem` - Feature cards for home-one page (Task 63)
-- ✅ `validateDataArray<T>()` - Validate entire arrays
-- ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
-
+ - ✅ `validateRange()` - Number range validation (via createValidator)
+ - ✅ `validateEnum<T>()` - Enum value validation (via createValidator)
+ 
+**Implemented Validators** (25 total):
+ - ✅ `validateFeedbackItem` - Testimonials with rating validation
+ - ✅ `validateFaqItem` - FAQ questions and answers
+ - ✅ `validatePriceItem` - Pricing packages with nested PriceDetailItem validation
+ - ✅ `validatePriceDetailItem` - Individual pricing tiers
+ - ✅ `validateFeatureItem` - Feature cards
+ - ✅ `validateProcessItem` - Process steps
+ - ✅ `validateCauseItem` - Cause cards
+ - ✅ `validateMenuItem` - Navigation menu with sub-menu validation
+ - ✅ `validateWiFiDevice` - Dashboard WiFi devices
+ - ✅ `validateWebsiteTemplate` - Website templates
+ - ✅ `validateAIStep` - AI process steps
+ - ✅ `validateBlogTagItem` - Blog tag items with id and name (Task 101)
+ - ✅ `validateBlogCommentItem` - Blog comments
+ - ✅ `validateTeamMember` - Team member profiles
+ - ✅ `validateInnerBlogPost` - Inner blog posts
+ - ✅ `validateFaqDetail` - FAQ detail sections
+ - ✅ `validateInnerFaqItem` - FAQ categories with details
+ - ✅ `validateSocialLink` - Social media links with target validation
+ - ✅ `validateNavigationItem` - Navigation items
+ - ✅ `validateNavigationSection` - Navigation sections
+ - ✅ `validateContactInfoItem` - Contact information with lines and links arrays (Task 63)
+ - ✅ `validateFeatureHomeOneItem` - Feature cards for home-one page (Task 63)
+ - ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
+ - ✅ `validateDataArray<T>()` - Validate entire arrays
+ - ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
+ 
 **Testing**:
-- ✅ 75 comprehensive tests for specific validators (100% passing)
-- ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
-- ✅ 7 tests for validateBlogTagItem (100% passing) (Task 102)
-- ✅ All validators tested with valid and invalid inputs
+ - ✅ 107 comprehensive tests for specific validators (100% passing)
+ - ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
+ - ✅ 7 tests for validateBlogTagItem (100% passing) (Task 102)
+ - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
+ - ✅ All validators tested with valid and invalid inputs
 - ✅ Base validation utilities tested directly:
   - `validateBaseDataItem()` - 11 tests
   - `createValidator<T>()` - 15 tests
@@ -775,12 +777,25 @@ interface ICircuitBreaker {
 }
 ```
 
+**IAutoIdGenerator** (src/utils/dataAutoId.ts):
+```typescript
+interface IAutoIdGenerator {
+    next(): number;
+    nextId(): number;
+    reset(startFrom?: number): void;
+    getCurrentId(): number;
+    getUsedIds(): readonly number[];
+    hasUsedId(id: number): boolean;
+}
+```
+
 ### Implementation
 
 All utility classes implement their respective interfaces:
 - **RateLimiter** implements `IRateLimiter`
 - **MetricsCollector** implements `IMetricsCollector`
 - **CircuitBreaker** implements `ICircuitBreaker`
+- **AutoIdGenerator** implements `IAutoIdGenerator`
 
 ### Benefits
 
@@ -846,6 +861,7 @@ All interface contracts have comprehensive test coverage:
 - **RateLimiter interface tests** (14 tests) - src/utils/rateLimiter/__tests__/interface.test.ts
 - **MetricsCollector interface tests** (18 tests) - src/utils/metrics/__tests__/interface.test.ts
 - **CircuitBreaker interface tests** (14 tests) - src/utils/resilience/__tests__/interface.test.ts
+- **AutoIdGenerator interface tests** (17 tests) - src/utils/__tests__/dataAutoId.interface.test.ts
 
 Tests verify:
 - Interface methods are correctly implemented
