@@ -8,10 +8,10 @@ import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/white-logo.svg";
 
-interface ProfType {
+interface HeaderOneProps {
    style: boolean;
 }
-const HeaderOne = memo(({ style }: ProfType) => {
+const HeaderOne = memo(({ style }: HeaderOneProps) => {
 
    const { sticky } = UseSticky();
    const { isBreakpointOn } = useBreakpoint();
