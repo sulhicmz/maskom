@@ -522,11 +522,12 @@ Services (AuthService)
  - ✅ **Reusable CTA Component** (Task 127) - Created CtaWrapper abstraction that eliminates duplicate CTA code across 3 components (common, home-one, faq) with flexible props, support for both AnimationWrapper and wow.js animations, React.memo optimization, and 51% code reduction in variant components
   - ✅ **Type Safety Fixes** (Task 128) - Fixed CtaWrapper type errors (animation prop type, id prop missing) that blocked production build, ensuring strict TypeScript compliance
   - ✅ **Data-Driven UI for Sidebar** (Task 129) - Extracted hardcoded sidebar links from UseCaseDetailsSidebar component to UseCaseSidebarData.ts, created UseCaseSidebarItem interface, added validation with validateUseCaseSidebarItem, follows blueprint data-driven architecture principle, eliminates hardcoded content in components
-  - ✅ **Accessibility Improvements** (Task 132) - Added ARIA labels to search inputs and buttons, replaced generic alt text with descriptive dynamic alt text across 5 components (BlogSidebar, TeamArea, BlogArea, LatestNews, ContactFormArea), improving WCAG 2.1 Level A/AA compliance and screen reader support
+   - ✅ **Accessibility Improvements** (Task 132) - Added ARIA labels to search inputs and buttons, replaced generic alt text with descriptive dynamic alt text across 5 components (BlogSidebar, TeamArea, BlogArea, LatestNews, ContactFormArea), improving WCAG 2.1 Level A/AA compliance and screen reader support
+   - ✅ **Page Layout Standardization** (Task 153) - Created PageBuilder component that eliminates duplicate layout code across 7 pages (pricing, error, Login, sign-up, faq, teams/team) with type-safe PageBuilderConfig interface, single source of truth for page layout, and 23 lines of boilerplate code removed
 
-  ### Interface Definition Pattern (✅ COMPLETED - Task 122)
- 
- ### Module Extraction Pattern (✅ COMPLETED - Task 127)
+   ### Interface Definition Pattern (✅ COMPLETED - Task 122)
+
+  ### Module Extraction Pattern (✅ COMPLETED - Task 127, Task 153)
  
  ### Purpose
  
@@ -642,23 +643,87 @@ Services (AuthService)
  - Lint passes: 0 errors, 0 warnings
  - Build passes: 18 pages generated
  
- ### Architecture Benefits
- 
- 1. **Single Source of Truth**: CtaWrapper defines CTA pattern once
- 2. **SOLID Compliance**:
-    - **Single Responsibility**: CtaWrapper handles CTA rendering
-    - **Open/Closed**: Open to extension via props, closed to modification
- 3. **DRY Principle**: No duplicate CTA code across variants
- 4. **Maintainability**: Single point of change for CTA pattern
- 5. **Consistency**: All CTA variants follow same structure
- 6. **Type Safety**: TypeScript interfaces enforce contracts
- 7. **Performance**: React.memo optimization for all variants
- 
- ### Anti-Patterns (Fix)
- - ❌ Duplicate component logic across multiple files - FIXED
- - ❌ Duplicated React boilerplate code - FIXED
- - ❌ Inconsistent memoization patterns - FIXED
- - ❌ Changes requiring updates to multiple files - FIXED
+  ### Architecture Benefits
+
+  1. **Single Source of Truth**: CtaWrapper defines CTA pattern once
+  2. **SOLID Compliance**:
+     - **Single Responsibility**: CtaWrapper handles CTA rendering
+     - **Open/Closed**: Open to extension via props, closed to modification
+  3. **DRY Principle**: No duplicate CTA code across variants
+  4. **Maintainability**: Single point of change for CTA pattern
+  5. **Consistency**: All CTA variants follow same structure
+  6. **Type Safety**: TypeScript interfaces enforce contracts
+  7. **Performance**: React.memo optimization for all variants
+
+  ### PageBuilder Pattern (✅ COMPLETED - Task 153)
+
+  ### Purpose
+
+  Extract duplicate page layout boilerplate into reusable builder pattern to:
+  - Eliminate 98 lines of layout boilerplate across 7 pages
+  - Create single source of truth for page layout structure
+  - Simplify page creation with declarative API
+  - Apply DRY principle and SOLID (Single Responsibility)
+  - Enable consistent layout patterns across all pages
+
+  ### Component Abstraction
+
+  **PageBuilder** (src/components/common/PageBuilder.tsx):
+
+  ```typescript
+  // Single content variant (Login, sign-up, teams/team, error)
+  interface PageBuilderConfig {
+    title: string;
+    subTitle: string;
+    content: ReactNode;
+    footer?: 'one' | 'two';
+    headerStyle?: boolean;
+    footerStyle?: boolean;
+    footerStyle2?: boolean;
+  }
+
+  // Multi-section variant (pricing, faq)
+  interface PageBuilderWithSectionsConfig {
+    title: string;
+    subTitle: string;
+    sections: ReactNode[];
+    footer?: 'one' | 'two';
+    headerStyle?: boolean;
+    footerStyle?: boolean;
+    footerStyle2?: boolean;
+  }
+
+  export function PageBuilder(config: PageBuilderConfig): JSX.Element
+  export function PageBuilderWithSections(config: PageBuilderWithSectionsConfig): JSX.Element
+  ```
+
+  ### Implementation
+
+  All page index files now use PageBuilder pattern:
+  - **Login**: PageBuilder with single content
+  - **sign-up**: PageBuilder with single content
+  - **teams/team**: PageBuilder with single content
+  - **error**: PageBuilder with single content
+  - **pricing**: PageBuilderWithSections with 3 sections
+  - **faq**: PageBuilderWithSections with 3 sections
+
+  ### Architecture Benefits
+
+  1. **Single Source of Truth**: PageBuilder defines page layout once
+  2. **SOLID Compliance**:
+     - **Single Responsibility**: PageBuilder handles page layout
+     - **Open/Closed**: Open to extension via props, closed to modification
+  3. **DRY Principle**: Eliminates 23 lines of duplicate boilerplate code
+  4. **Maintainability**: Single point of change for page layout structure
+  5. **Consistency**: All pages follow same layout pattern
+  6. **Type Safety**: TypeScript interfaces enforce contracts
+  7. **Code Reduction**: 23 lines removed across 6 page index files
+
+  ### Anti-Patterns (Fix)
+  - ❌ Duplicate component logic across multiple files - FIXED
+  - ❌ Duplicated React boilerplate code - FIXED
+  - ❌ Inconsistent page layout patterns - FIXED
+  - ❌ Changes requiring updates to multiple files - FIXED
  
  ### Interface Definition Pattern (✅ COMPLETED - Task 122)
  
