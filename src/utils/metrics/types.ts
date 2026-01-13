@@ -26,3 +26,17 @@ export interface HealthCheckResult {
     metrics: ServiceMetrics;
     checkedAt: number;
 }
+
+export interface IMetricsCollector {
+    recordCall(serviceName: string, success: boolean, errorType?: string, responseTime?: number): void;
+    recordCircuitBreakerState(serviceName: string, isOpen: boolean): void;
+    getMetrics(serviceName: string): ServiceMetrics | undefined;
+    getAllMetrics(): ServiceMetrics[];
+    getSuccessRate(serviceName: string): number;
+    getFailureRate(serviceName: string): number;
+    healthCheck(serviceName: string, thresholdSuccessRate?: number): HealthCheckResult;
+    getAllHealthChecks(thresholdSuccessRate?: number): HealthCheckResult[];
+    reset(serviceName: string): void;
+    resetAll(): void;
+    exportMetrics(): MetricData[];
+}

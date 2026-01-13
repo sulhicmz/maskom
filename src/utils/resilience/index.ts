@@ -7,5 +7,6 @@ export type {
     RetryOptions,
     CircuitBreakerOptions,
     CircuitBreakerState,
-    RetryResult
+    RetryResult,
+    ICircuitBreaker
 } from './types';

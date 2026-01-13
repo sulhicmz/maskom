@@ -1,6 +1,6 @@
-import type { MetricData, ServiceMetrics, HealthCheckResult } from './types';
+import type { MetricData, ServiceMetrics, HealthCheckResult, IMetricsCollector } from './types';
 
-class MetricsCollector {
+class MetricsCollector implements IMetricsCollector {
     private metrics: Map<string, ServiceMetrics>;
     private responseTimes: Map<string, number[]>;
     private maxResponseTimeSamples: number;
@@ -199,5 +199,6 @@ class MetricsCollector {
     }
 }
 
+export { MetricsCollector };
 export const metricsCollector = new MetricsCollector();
 export default metricsCollector;

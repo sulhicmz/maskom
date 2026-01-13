@@ -36,3 +36,9 @@ export interface RetryResult<T> {
     error?: ResilienceError;
     attemptCount: number;
 }
+
+export interface ICircuitBreaker {
+    execute<T>(fn: () => Promise<T>): Promise<T>;
+    getState(): CircuitBreakerState;
+    reset(): void;
+}

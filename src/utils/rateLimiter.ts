@@ -13,7 +13,16 @@ export interface RateLimitResult {
     error?: string;
 }
 
-export class RateLimiter {
+export interface IRateLimiter {
+    check(identifier: string): RateLimitResult;
+    recordAttempt(identifier: string): RateLimitResult;
+    reset(identifier: string): void;
+    resetAll(): void;
+    getStatus(identifier: string): { count: number; firstAttempt: number; lockedUntil?: number | null };
+    destroy?(): void;
+}
+
+export class RateLimiter implements IRateLimiter {
     private config: RateLimitConfig;
     private attempts: Map<string, { count: number; firstAttempt: number; lockedUntil?: number }> = new Map();
     private cleanupInterval: NodeJS.Timeout | null = null;
