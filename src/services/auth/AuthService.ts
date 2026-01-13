@@ -9,7 +9,7 @@ import {
     RateLimitExceededError,
     createErrorResult
 } from '@/services/common';
-import { RATE_LIMITS } from '@/constants';
+import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS } from '@/constants';
 import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
 
@@ -32,14 +32,14 @@ class AuthService implements IAuthService {
     private async loginWithTimeout(credentials: LoginCredentials): Promise<AuthResult> {
         return withTimeout(
             this.loginWithoutResilience(credentials),
-            { timeoutMs: 5000, timeoutError: 'Login request timed out' }
+            { timeoutMs: TIMEOUTS.AUTH_LOGIN, timeoutError: 'Login request timed out' }
         );
     }
 
     private async registerWithTimeout(userData: RegisterData): Promise<AuthResult> {
         return withTimeout(
             this.registerWithoutResilience(userData),
-            { timeoutMs: 5000, timeoutError: 'Registration request timed out' }
+            { timeoutMs: TIMEOUTS.AUTH_REGISTER, timeoutError: 'Registration request timed out' }
         );
     }
 
@@ -109,7 +109,7 @@ class AuthService implements IAuthService {
                     rateLimiter: this.loginRateLimiter,
                     identifier: credentials.email,
                     circuitBreaker: this.circuitBreaker,
-                    timeoutMs: 5000
+                    timeoutMs: TIMEOUTS.AUTH_LOGIN
                 },
                 this.loginWithTimeout.bind(this),
                 credentials
@@ -118,7 +118,7 @@ class AuthService implements IAuthService {
             return result;
         } catch (error) {
             if (error instanceof RateLimitExceededError && error.limitCheck) {
-                const secondsRemaining = Math.ceil(((error.limitCheck.resetTime || Date.now()) - Date.now()) / 1000);
+                const secondsRemaining = Math.ceil(((error.limitCheck.resetTime || Date.now()) - Date.now()) / MS_TO_SECONDS);
                 return createErrorResult(
                     error.limitCheck.error?.includes('Too many attempts')
                         ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
@@ -129,7 +129,7 @@ class AuthService implements IAuthService {
             }
 
             const standardizedError = error instanceof Error ? error : new Error('Unknown error');
-            
+
             if (standardizedError instanceof ServiceValidationError) {
                 return createErrorResult(standardizedError.message, ServiceErrorCode.VALIDATION);
             }
@@ -146,7 +146,7 @@ class AuthService implements IAuthService {
                     rateLimiter: this.registerRateLimiter,
                     identifier: userData.email,
                     circuitBreaker: this.circuitBreaker,
-                    timeoutMs: 5000
+                    timeoutMs: TIMEOUTS.AUTH_REGISTER
                 },
                 this.registerWithTimeout.bind(this),
                 userData
@@ -155,7 +155,7 @@ class AuthService implements IAuthService {
             return result;
         } catch (error) {
             if (error instanceof RateLimitExceededError && error.limitCheck) {
-                const secondsRemaining = Math.ceil(((error.limitCheck.resetTime || Date.now()) - Date.now()) / 1000);
+                const secondsRemaining = Math.ceil(((error.limitCheck.resetTime || Date.now()) - Date.now()) / MS_TO_SECONDS);
                 return createErrorResult(
                     error.limitCheck.error?.includes('Too many attempts')
                         ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
@@ -166,7 +166,7 @@ class AuthService implements IAuthService {
             }
 
             const standardizedError = error instanceof Error ? error : new Error('Unknown error');
-            
+
             if (standardizedError instanceof ServiceValidationError) {
                 return createErrorResult(standardizedError.message, ServiceErrorCode.VALIDATION);
             }

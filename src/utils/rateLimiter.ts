@@ -1,4 +1,4 @@
-import { RATE_LIMITS } from '@/constants';
+import { RATE_LIMITS, MS_TO_SECONDS } from '@/constants';
 
 export interface RateLimitConfig {
     maxAttempts: number;
@@ -49,7 +49,7 @@ export class RateLimiter implements IRateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: record.lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / MS_TO_SECONDS)} seconds.`
             };
         }
 
@@ -67,7 +67,7 @@ export class RateLimiter implements IRateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: record.lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / MS_TO_SECONDS)} seconds.`
             };
         }
 
@@ -94,7 +94,7 @@ export class RateLimiter implements IRateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: record.lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((record.lockedUntil - now) / MS_TO_SECONDS)} seconds.`
             };
         }
 
@@ -120,7 +120,7 @@ export class RateLimiter implements IRateLimiter {
                 allowed: false,
                 attemptsRemaining: 0,
                 resetTime: lockedUntil,
-                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / 1000)} seconds.`
+                error: `Too many attempts. Please try again in ${Math.ceil((this.config.cooldownMs || this.config.windowMs) / MS_TO_SECONDS)} seconds.`
             };
         }
 

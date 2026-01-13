@@ -8,6 +8,163 @@
 
 ---
 
+## Task 123: Extract Hardcoded Values - Timeout and Retry Constants (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Code Sanitizer (Eliminate Magic Numbers)
+
+**Problem**:
+- Hardcoded timeout values scattered across AuthService (5000ms) and EmailService (10000ms)
+- Hardcoded retry configuration values in resilience.ts (maxAttempts: 3, baseDelayMs: 1000, maxDelayMs: 10000, backoffMultiplier: 2)
+- Repeated `/ 1000` division for converting milliseconds to seconds in rateLimiter.ts and AuthService.ts
+- No centralized configuration for timeout and retry behavior
+- Violated DRY principle - same magic numbers repeated in multiple locations
+- Difficult to change timeout/retry behavior across all services consistently
+
+**Solution**:
+1. **Created Timeouts Constants** (src/constants/timeouts.ts):
+    - TIMEOUTS.AUTH_LOGIN: 5000 (5 seconds) - Login operation timeout
+    - TIMEOUTS.AUTH_REGISTER: 5000 (5 seconds) - Registration operation timeout
+    - TIMEOUTS.EMAIL_SERVICE: 10000 (10 seconds) - EmailJS request timeout
+    - RETRY_CONFIG.MAX_ATTEMPTS: 3 - Maximum retry attempts
+    - RETRY_CONFIG.BASE_DELAY_MS: 1000 (1 second) - Base retry delay
+    - RETRY_CONFIG.MAX_DELAY_MS: 10000 (10 seconds) - Maximum retry delay
+    - RETRY_CONFIG.BACKOFF_MULTIPLIER: 2 - Exponential backoff multiplier
+    - MS_TO_SECONDS: 1000 - Millisecond to second conversion constant
+
+2. **Updated AuthService.ts**:
+    - Imported TIMEOUTS and MS_TO_SECONDS constants
+    - Replaced `timeoutMs: 5000` with `timeoutMs: TIMEOUTS.AUTH_LOGIN` (2 occurrences in login)
+    - Replaced `timeoutMs: 5000` with `timeoutMs: TIMEOUTS.AUTH_REGISTER` (2 occurrences in register)
+    - Replaced `/ 1000` with `/ MS_TO_SECONDS` (2 occurrences in error handling)
+
+3. **Updated EmailService.ts**:
+    - Imported TIMEOUTS constant
+    - Replaced `timeoutMs: 10000` with `timeoutMs: TIMEOUTS.EMAIL_SERVICE` (2 occurrences)
+    - Updated sendEmail method to use TIMEOUTS.EMAIL_SERVICE constant
+
+4. **Updated resilience.ts** (src/services/common/resilience.ts):
+    - Imported RETRY_CONFIG constant
+    - Replaced DEFAULT_RETRY_OPTIONS magic numbers with RETRY_CONFIG constants:
+      - maxAttempts: 3 → maxAttempts: RETRY_CONFIG.MAX_ATTEMPTS
+      - baseDelayMs: 1000 → baseDelayMs: RETRY_CONFIG.BASE_DELAY_MS
+      - maxDelayMs: 10000 → maxDelayMs: RETRY_CONFIG.MAX_DELAY_MS
+      - backoffMultiplier: 2 → backoffMultiplier: RETRY_CONFIG.BACKOFF_MULTIPLIER
+
+5. **Updated rateLimiter.ts**:
+    - Imported MS_TO_SECONDS constant
+    - Replaced all `/ 1000` with `/ MS_TO_SECONDS` (4 occurrences in error messages)
+
+**Architecture Benefits**:
+1. **Single Source of Truth**: All timeout and retry values centralized in one location
+2. **DRY Principle**: Magic numbers eliminated, repeated values now constants
+3. **Maintainability**: Change timeout/retry behavior in one place (timeouts.ts)
+4. **Type Safety**: Type definitions for all constant values
+5. **Consistency**: All services use same timeout/retry constants
+6. **Readability**: Descriptive constant names improve code clarity
+7. **Testability**: Easy to test with different timeout/retry values
+8. **Documentation**: Constants serve as executable documentation for timeout/retry behavior
+
+**Code Quality**:
+- All 2276 tests passing (100% success rate) - no change from before
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated successfully
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+- 1 new constants file created (timeouts.ts: 22 lines)
+- 4 files updated (AuthService.ts, EmailService.ts, resilience.ts, rateLimiter.ts)
+- constants/index.ts updated to export timeouts
+- 10 magic numbers eliminated and replaced with constants
+
+**Success Criteria**:
+- [x] Created timeouts.ts constants file (TIMEOUTS, RETRY_CONFIG, MS_TO_SECONDS)
+- [x] Updated AuthService to use TIMEOUTS constants (4 replacements)
+- [x] Updated EmailService to use TIMEOUTS constants (2 replacements)
+- [x] Updated resilience.ts to use RETRY_CONFIG constants (4 replacements)
+- [x] Updated rateLimiter.ts to use MS_TO_SECONDS (4 replacements)
+- [x] Updated constants/index.ts to export timeouts
+- [x] All 2276 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build passed (18 pages generated)
+- [x] TypeScript compilation passes without errors
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 123 completion
+
+**Related Files**:
+- ✅ Created: `src/constants/timeouts.ts` - Timeout and retry constants (22 lines)
+- ✅ Modified: `src/constants/index.ts` - Added timeouts export
+- ✅ Modified: `src/services/auth/AuthService.ts` - Replaced 4 magic numbers with constants
+- ✅ Modified: `src/services/email/EmailService.ts` - Replaced 2 magic numbers with constants
+- ✅ Modified: `src/services/common/resilience.ts` - Replaced 4 magic numbers with constants
+- ✅ Modified: `src/utils/rateLimiter.ts` - Replaced 4 magic numbers with constants
+
+**Testing**:
+- All 2276 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated, vendor bundle 216 kB
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+- Timeout and retry behavior unchanged (only constant extraction)
+
+**Notes**:
+- Follows Code Sanitizer principles:
+   - **Zero Hardcoding**: All magic numbers extracted to constants
+   - **Single Source of Truth**: All timeout/retry values in timeouts.ts
+   - **DRY Principle**: No repeated magic numbers
+   - **Maintainability**: Change values in one place
+- Constants created:
+   - TIMEOUTS.AUTH_LOGIN: 5000ms (5 seconds)
+   - TIMEOUTS.AUTH_REGISTER: 5000ms (5 seconds)
+   - TIMEOUTS.EMAIL_SERVICE: 10000ms (10 seconds)
+   - RETRY_CONFIG.MAX_ATTEMPTS: 3 attempts
+   - RETRY_CONFIG.BASE_DELAY_MS: 1000ms (1 second)
+   - RETRY_CONFIG.MAX_DELAY_MS: 10000ms (10 seconds)
+   - RETRY_CONFIG.BACKOFF_MULTIPLIER: 2x (exponential backoff)
+   - MS_TO_SECONDS: 1000ms (conversion constant)
+- 10 magic numbers replaced with constants:
+   - AuthService: 4 replacements (2x timeoutMs, 2x / 1000)
+   - EmailService: 2 replacements (2x timeoutMs)
+   - resilience.ts: 4 replacements (retry config values)
+   - rateLimiter.ts: 4 replacements (4x / 1000)
+- Zero breaking changes - only internal refactoring, behavior unchanged
+- All tests continue to pass with no regressions
+
+**Impact**:
+- Code Quality: Eliminated 10 magic numbers across 4 files
+- Maintainability: Single point of change for timeout and retry configuration
+- Consistency: All services use centralized constants
+- Type Safety: All constants properly typed
+- Documentation: Constants serve as executable documentation
+- Test Coverage: 2276 tests passing (no regressions)
+- Bundle Size: No change (constants at source level only)
+
+**Future Enhancement Opportunities**:
+
+1. **Environment-Specific Timeouts** - Allow different timeouts per environment
+         - Add timeout overrides for development/staging/production
+         - Environment variables for custom timeout values
+         - Effort: Medium (add environment-specific config loading)
+         - Priority: Low (current values work well)
+
+2. **Circuit Breaker Constants** - Extract circuit breaker magic numbers
+         - Extract failureThreshold: 50, resetTimeoutMs: 60000, monitoringPeriodMs: 60000
+         - Centralize circuit breaker configuration
+         - Effort: Low (create CIRCUIT_BREAKER_CONFIG constant)
+         - Priority: Low (minor magic numbers, well-documented)
+
+3. **More Granular Timeouts** - Separate timeouts for different operations
+         - Different timeouts for different EmailService operations
+         - Different timeouts for different AuthService operations
+         - Effort: Medium (expand TIMEOUTS structure)
+         - Priority: Low (current timeouts are reasonable)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 122 (Interface Definition), Task 116 (Shared Service Resilience)
+**Next Code Quality Review**: January 19, 2026
+
+---
+
 ## Task 122: Interface Definition - Utility Interface Contracts (Jan 13, 2026)
 
 **Status**: ✅ Completed

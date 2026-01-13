@@ -487,7 +487,8 @@ Services (AuthService)
 - ✅ Exception classes for typed error handling (ServiceException and subclasses)
 - ✅ Unified error logging across all services (logServiceError, logServiceSuccess)
 - ✅ Helper functions for result creation (createSuccessResult, createErrorResult)
-- ✅ Centralized constants for magic numbers (src/constants/) - Eliminates magic numbers like rate limits and validation thresholds
+- ✅ Centralized constants for magic numbers (src/constants/) - Eliminates magic numbers like rate limits, validation thresholds, timeouts, and retry configuration
+- ✅ **Timeout and Retry Constants** (src/constants/timeouts.ts) - Centralized timeout and retry configuration for all services (Task 123) - TIMEOUTS for service timeouts, RETRY_CONFIG for retry behavior, MS_TO_SECONDS for time conversion
 - ✅ Swiper configuration centralization (SWIPER_CONFIG) - Configuration separated from component logic for reusability and consistency (Task 95)
 - ✅ **OpenAPI specification** (docs/openapi-spec.yaml) - Machine-readable API spec (OpenAPI 3.0.3) for code generation and automated testing
 - ✅ **Postman collection** (docs/postman-collection.json) - Ready-to-use collection with all API endpoints, examples, and integration tests

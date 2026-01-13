@@ -2,6 +2,7 @@ import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
 import metricsCollector from '@/utils/metrics';
 import { RateLimiter } from '@/utils/rateLimiter';
 import { logServiceError, logServiceSuccess } from './logger';
+import { RETRY_CONFIG } from '@/constants';
 
 export interface RetryOptions {
     maxAttempts: number;
@@ -24,10 +25,10 @@ export interface ResilienceContext {
 }
 
 const DEFAULT_RETRY_OPTIONS: Required<RetryOptions> = {
-    maxAttempts: 3,
-    baseDelayMs: 1000,
-    maxDelayMs: 10000,
-    backoffMultiplier: 2,
+    maxAttempts: RETRY_CONFIG.MAX_ATTEMPTS,
+    baseDelayMs: RETRY_CONFIG.BASE_DELAY_MS,
+    maxDelayMs: RETRY_CONFIG.MAX_DELAY_MS,
+    backoffMultiplier: RETRY_CONFIG.BACKOFF_MULTIPLIER,
     retryableErrors: [/network/i, /timeout/i, /ECONN/i]
 };
 
