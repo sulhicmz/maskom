@@ -11,9 +11,9 @@ const ContactArea = () => {
                {contact_data.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
                      <AnimationWrapper animation="fadeInUp" className="iconic-info-box style-five mb-40">
-                        <div className="icon">
-                           <i className={item.icon}></i>
-                        </div>
+                         <div className="icon">
+                            <i className={item.icon} aria-hidden="true"></i>
+                         </div>
                         <div className="content">
                            <h5>{item.title}</h5>
                            {item.lines.map((line, idx) => (

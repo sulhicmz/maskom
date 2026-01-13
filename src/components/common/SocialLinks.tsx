@@ -21,7 +21,7 @@ const SocialLinks = ({ links, className = "social-link" }: SocialLinksProps) => 
       {links.map((link, index) => (
         <li key={index}>
           <Link href={link.url} target={link.target || '_self'} rel={link.target === '_blank' ? 'noreferrer' : undefined} aria-label={link.ariaLabel}>
-            <i className={link.iconClass}></i>
+            <i className={link.iconClass} aria-hidden="true"></i>
           </Link>
         </li>
       ))}

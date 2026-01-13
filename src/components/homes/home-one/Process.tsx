@@ -25,9 +25,9 @@ const Process = React.memo(() => {
                   <div key={item.id} className="col-xl-4 col-md-6 col-sm-6">
                      <AnimationWrapper animation="fadeInUp" className="ac-process-item mb-40">
                         <div className="process-inner-content">
-                           <div className="thumbnail">
-                              <Image src={item.img} alt="work image" />
-                           </div>
+                            <div className="thumbnail">
+                               <Image src={item.img} alt={`Ilustrasi ${item.title}`} />
+                            </div>
                            <div className="content">
                               <span className="number">{item.count}</span>
                               <h5>{item.title}</h5>

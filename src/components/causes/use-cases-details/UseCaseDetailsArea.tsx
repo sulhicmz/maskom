@@ -14,9 +14,9 @@ const UseCaseDetailsArea = () => {
                <div className="col-lg-8">
                   <div className="case-details-wrapper mb-50">
                      <div className="usecase-wrapper">
-                        <div className="post-thumbnail mb-30 wow fadeInDown">
-                           <Image src={cause_thumb_1} alt="Case Image" />
-                        </div>
+                         <div className="post-thumbnail mb-30 wow fadeInDown">
+                            <Image src={cause_thumb_1} alt="Ilustrasi modernisasi jaringan ritel nasional Maskom" />
+                         </div>
                         <div className="post-content wow fadeInUp">
                            <h3 className="mb-25">Modernisasi jaringan ritel nasional Maskom</h3>
                            <p>Maskom dipercaya oleh jaringan ritel dengan lebih dari 120 gerai di Jawa dan Sumatera untuk melakukan modernisasi konektivitas. Tantangan utama mitra kami adalah variasi infrastruktur di setiap lokasi, keterbatasan ruang perangkat, dan kebutuhan integrasi ke aplikasi POS, ERP, serta kamera keamanan yang berjalan 24/7.</p>
@@ -26,18 +26,18 @@ const UseCaseDetailsArea = () => {
                            <p>Setelah enam bulan implementasi bertahap, tim operasional mitra mencatat perbaikan signifikan pada stabilitas operasional kasir, aplikasi inventory, dan transaksi digital. Maskom juga menyediakan portal monitoring khusus untuk manajemen sehingga pengambilan keputusan dapat dilakukan berbasis data.</p>
                            <div className="row">
                               <div className="col-lg-6">
-                                 <ul className="check-list style-one mb-25">
-                                    <li><i className="flaticon-check"></i>Uptime rata-rata 99,76% di seluruh gerai sejak bulan ketiga.</li>
-                                    <li><i className="flaticon-check"></i>Waktu penanganan insiden kritikal turun dari 6 jam menjadi 90 menit.</li>
-                                    <li><i className="flaticon-check"></i>Pengelolaan perangkat dilakukan secara remote sehingga tidak perlu kunjungan rutin.</li>
-                                 </ul>
+                                  <ul className="check-list style-one mb-25">
+                                     <li><i className="flaticon-check" aria-hidden="true"></i>Uptime rata-rata 99,76% di seluruh gerai sejak bulan ketiga.</li>
+                                     <li><i className="flaticon-check" aria-hidden="true"></i>Waktu penanganan insiden kritikal turun dari 6 jam menjadi 90 menit.</li>
+                                     <li><i className="flaticon-check" aria-hidden="true"></i>Pengelolaan perangkat dilakukan secara remote sehingga tidak perlu kunjungan rutin.</li>
+                                  </ul>
                               </div>
                               <div className="col-lg-6">
-                                 <ul className="check-list style-one mb-25">
-                                    <li><i className="flaticon-check"></i>Segmentasi jaringan khusus IoT dan POS meningkatkan keamanan pembayaran.</li>
-                                    <li><i className="flaticon-check"></i>Dashboard performa dan laporan SLA otomatis dikirim setiap pekan.</li>
-                                    <li><i className="flaticon-check"></i>Model kontrak fleksibel memungkinkan ekspansi 15 gerai baru tanpa instalasi ulang.</li>
-                                 </ul>
+                                  <ul className="check-list style-one mb-25">
+                                     <li><i className="flaticon-check" aria-hidden="true"></i>Segmentasi jaringan khusus IoT dan POS meningkatkan keamanan pembayaran.</li>
+                                     <li><i className="flaticon-check" aria-hidden="true"></i>Dashboard performa dan laporan SLA otomatis dikirim setiap pekan.</li>
+                                     <li><i className="flaticon-check" aria-hidden="true"></i>Model kontrak fleksibel memungkinkan ekspansi 15 gerai baru tanpa instalasi ulang.</li>
+                                  </ul>
                               </div>
                            </div>
                            <p>Maskom tidak hanya menghadirkan konektivitas, tetapi juga tata kelola operasi. Setiap incident direkam dalam sistem tiket, dianalisis akar masalahnya, dan dibahas dalam monthly service review bersama tim pelanggan untuk memastikan peningkatan berkelanjutan.</p>

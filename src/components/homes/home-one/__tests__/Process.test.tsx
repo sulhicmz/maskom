@@ -98,7 +98,7 @@ describe('Process', () => {
   it('renders process images', () => {
     render(<Process />);
     
-    const images = screen.getAllByAltText('work image');
+    const images = screen.getAllByAltText(/Ilustrasi/);
     expect(images.length).toBe(3);
   });
 

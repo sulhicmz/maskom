@@ -35,17 +35,17 @@ const TeamAreaComponent = () => {
                               <h4><a href="team-details.html">{item.title}</a></h4>
                               <span className="position">{item.designation}</span>
                            </div>
-                           <div className="share-button">
-                              <div className="icon">
-                                 <i className="flaticon-plus-positive-add-mathematical-symbol"></i>
-                              </div>
-                               <ul className="social-link">
-                                  <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                  <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                  <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                  <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                               </ul>
-                           </div>
+                            <div className="share-button">
+                               <div className="icon">
+                                  <i className="flaticon-plus-positive-add-mathematical-symbol" aria-hidden="true"></i>
+                               </div>
+                                <ul className="social-link">
+                                   <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f" aria-hidden="true"></i></button></li>
+                                   <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter" aria-hidden="true"></i></button></li>
+                                   <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in" aria-hidden="true"></i></button></li>
+                                   <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram" aria-hidden="true"></i></button></li>
+                                </ul>
+                            </div>
                         </div>
                      </div>
                   </div>

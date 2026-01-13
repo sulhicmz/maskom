@@ -222,7 +222,7 @@ describe('FooterTwo', () => {
   it('renders footer logo with alt text', () => {
     render(<FooterTwo />);
 
-    const logo = screen.getByAltText('Footer Logo');
+    const logo = screen.getByAltText('Maskom - Logo Footer');
     expect(logo).toBeInTheDocument();
   });
 

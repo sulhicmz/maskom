@@ -26,9 +26,9 @@ const Feature = React.memo(() => {
                {about_feature.map((item) => (
                   <div key={item.id} className="col-lg-4 col-md-6 col-sm-12">
                      <AnimationWrapper animation="fadeInUp" className="iconic-info-box style-four mb-40">
-                        <div className="icon">
-                           <i className={item.icon}></i>
-                        </div>
+                         <div className="icon">
+                            <i className={item.icon} aria-hidden="true"></i>
+                         </div>
                         <div className="content">
                            <h5>{item.title}</h5>
                            <p>{item.desc}</p>
