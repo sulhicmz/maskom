@@ -8,6 +8,194 @@
 
 ---
 
+## Task 149: Module Extraction - PricingTabs Component Duplication (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Module Extraction (DRY Principle)
+
+**Problem**:
+- Price.tsx (89 lines) and PricingArea.tsx (82 lines) have near-identical structure
+- Both components implement same pricing tabs pattern with different data sources
+- Duplicate tab handling logic with useTabs hook in both files
+- Duplicate mapping over pricing data to render PricingCard components
+- Same ARIA attributes and DOM structure duplicated
+- Different only in tab titles, data source, and minor styling differences
+- Changes to pricing tabs behavior require updates to multiple files
+- Violates DRY principle and creates maintenance burden
+
+**Solution**:
+1. **Created PricingTabs Wrapper Component** (src/components/common/PricingTabs.tsx):
+    - Reusable pricing tabs component with configurable data source
+    - Same useTabs hook implementation for tab state management
+    - Flexible props interface: data, tabTitles, sectionTitleProps, wrapperClassName
+    - React.memo optimization for performance
+    - Supports customization via optional styling props
+    - Proper TypeScript typing with PriceDetailItem interface
+
+2. **Refactored Price.tsx** (src/components/homes/home-one/Price.tsx):
+    - Removed duplicate tab handling logic
+    - Removed useTabs hook import (handled by PricingTabs)
+    - Imported PricingTabs component
+    - Replaced manual pricing tabs implementation with PricingTabs
+    - Simplified component to single usage with variant-specific props
+    - Code reduction: 89 lines → 24 lines (73% reduction)
+
+3. **Refactored PricingArea.tsx** (src/components/pages/pricing/PricingArea.tsx):
+    - Removed duplicate tab handling logic
+    - Removed useTabs hook import (handled by PricingTabs)
+    - Imported PricingTabs component
+    - Replaced manual pricing tabs implementation with PricingTabs
+    - Simplified component to single usage with variant-specific props
+    - Code reduction: 82 lines → 23 lines (72% reduction)
+
+**Architecture Benefits**:
+1. **DRY Principle**: Single implementation of pricing tabs pattern for all components
+2. **Code Reduction**: 171 lines → 47 lines + 89 lines (PricingTabs) = 136 lines total (net -35 lines)
+3. **Maintainability**: Changes to pricing tabs behavior only need to update one file (PricingTabs.tsx)
+4. **Type Safety**: TypeScript interface ensures type-safe usage
+5. **Consistency**: All pricing tabs components now follow same pattern
+6. **Performance**: React.memo optimization applied to PricingTabs
+7. **Extensibility**: Easy to add new pricing tab variants with different props
+8. **SOLID Compliance**: Single Responsibility (PricingTabs), Open/Closed (extensible via props)
+
+**Props Interface**:
+
+```typescript
+interface PricingTabsProps {
+    data: PricingDataItem[];
+    tabTitles: string[];
+    sectionTitle: SectionTitleConfig;
+    wrapperClassName?: string;
+    sectionClassName?: string;
+    ariaLabel?: string;
+    tablistAriaLabel?: string;
+    sectionId?: string;
+    idPrefix?: string;
+}
+```
+
+**Usage Example**:
+
+```typescript
+// Price.tsx (home-one variant)
+<PricingTabs
+    data={home_1_price}
+    tabTitles={["Kontrak 12 Bulan", "Kontrak 36 Bulan"]}
+    sectionTitle={{
+        subtitle: "Paket Layanan",
+        title: "Pilih Skema Layanan Sesuai Kebutuhan Anda",
+        description: "Seluruh paket sudah termasuk instalasi, monitoring proaktif, dan dukungan engineer Maskom sesuai SLA yang disepakati.",
+        align: "center",
+        className: "mb-50",
+        animation: "fadeInDown",
+        whiteText: true
+    }}
+    wrapperClassName="black-dark-bg pt-110 pb-80"
+    sectionClassName=""
+    ariaLabel="Paket"
+    sectionId="paket"
+/>
+
+// PricingArea.tsx (pricing page variant)
+<PricingTabs
+    data={pricing_price}
+    tabTitles={["Konektivitas Terkelola", "Keamanan & Dukungan"]}
+    sectionTitle={{
+        subtitle: "Paket Layanan",
+        title: "Investasi Infrastruktur Digital Maskom",
+        description: "Pilih kombinasi layanan konektivitas dan managed service yang selaras dengan roadmap transformasi digital perusahaan Anda.",
+        align: "center",
+        className: "mb-50",
+        animation: "fadeInDown"
+    }}
+    sectionClassName="pt-110"
+    ariaLabel="Pricing Plans"
+    tablistAriaLabel="Pricing Category Tabs"
+    idPrefix="pricing"
+/>
+```
+
+**Code Quality**:
+- PricingTabs.tsx: 89 lines (new reusable component)
+- Price.tsx: 89 lines → 24 lines (-65 lines, 73% reduction)
+- PricingArea.tsx: 82 lines → 23 lines (-59 lines, 72% reduction)
+- 3 files modified (PricingTabs.tsx new, Price.tsx, PricingArea.tsx)
+- React.memo optimization applied to PricingTabs
+- Proper TypeScript typing with PriceDetailItem interface
+- Zero breaking changes - component behavior unchanged
+- All 2362 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated
+- TypeScript compilation: Passes without errors
+
+**Success Criteria**:
+- [x] Created PricingTabs component with flexible props
+- [x] Refactored Price.tsx to use PricingTabs (73% reduction)
+- [x] Refactored PricingArea.tsx to use PricingTabs (72% reduction)
+- [x] Removed duplicate useTabs imports
+- [x] Removed duplicate tab handling logic
+- [x] All 2362 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build passed successfully (18 pages generated)
+- [x] Zero breaking changes - all public APIs unchanged
+- [x] task.md updated with Task 149 completion
+
+**Related Files**:
+- ✅ Created: `src/components/common/PricingTabs.tsx` - Reusable pricing tabs component (89 lines)
+- ✅ Modified: `src/components/homes/home-one/Price.tsx` - Uses PricingTabs (24 lines, -73%)
+- ✅ Modified: `src/components/pages/pricing/PricingArea.tsx` - Uses PricingTabs (23 lines, -72%)
+- ✅ Updated: `docs/task.md` - Documented Task 149 completion
+
+**Testing**:
+- All 2362 tests passing (100% success rate)
+- 100 test suites passing
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated
+- Zero regressions in existing functionality
+- All Price.tsx tests passing (28 tests)
+- All PricingArea.tsx tests passing (30 tests)
+
+**Notes**:
+- Follows Module Extraction principles:
+    - **Single Source of Truth**: One implementation of pricing tabs pattern
+    - **DRY Principle**: No duplicated pricing tabs code across components
+    - **Type Safety**: TypeScript interface ensures type-safe usage
+- Similar pattern as CtaWrapper (Task 127) and PaginationWrapper (Task 135)
+- PricingTabs props:
+    - data: Pricing data array from PriceData
+    - tabTitles: Array of tab label strings
+    - sectionTitle: SectionTitle props for customization
+    - wrapperClassName: Additional classes for outer section div
+    - sectionClassName: Additional classes for section tag
+    - ariaLabel: ARIA label for accessibility
+    - tablistAriaLabel: ARIA label for tablist (optional, defaults to `${ariaLabel} Tabs`)
+    - sectionId: ID attribute for section element (optional)
+    - idPrefix: Prefix for tab/panel IDs (optional, defaults to "price")
+- Code reduction breakdown:
+    - Price.tsx: 89 → 24 lines (-65 lines, -73%)
+    - PricingArea.tsx: 82 → 23 lines (-59 lines, -72%)
+    - PricingTabs.tsx: 89 lines (new reusable component)
+    - Net: -35 lines total, much better organization and maintainability
+- Zero breaking changes - only internal refactoring, all public APIs unchanged
+- Bonus: Follows same abstraction pattern as other reusable components (CtaWrapper, PaginationWrapper)
+- Props interface properly typed with PriceDetailItem from @/types/data
+- SectionTitle animation prop properly typed as specific union type
+
+**Impact**:
+- Code Quality: Eliminates duplicate pricing tabs code across 2 components
+- Maintainability: Single point of change for pricing tabs behavior
+- Consistency: All pricing tabs components now follow same pattern
+- Type Safety: TypeScript interface ensures type-safe usage
+- Extensibility: Easy to add new pricing tab variants in one place
+- Test Coverage: All 2362 tests passing (no regressions)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 127 (Module Extraction - CTA Component), Task 135 (Module Extraction - Pagination Component)
+**Next Architecture Review**: January 19, 2026
+
+---
+
 ## Task 141: Accessibility Improvements - Decorative Icons and Alt Text (Jan 13, 2026)
 
 **Status**: ✅ Completed
@@ -19010,4 +19198,122 @@ All critical paths are comprehensively tested:
 **Verification Date**: 2026-01-14
 **Related Tasks**: Task 89 (Base Validation Tests), Task 86 (Code Health), Task 90 (Security Assessment)
 **Next Test Coverage Review**: Quarterly (April 2026)
+
+---
+
+## Task 150: Remove Unused PostCSS Dependencies (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: STANDARD
+**Type**: Code Cleanup (Remove Dead Code)
+
+**Problem**:
+- PostCSS devDependencies were installed but not configured or used in the project
+- `@fullhuman/postcss-purgecss` (package listed but no postcss.config file)
+- `cssnano` (package listed but no postcss.config file)
+- `postcss-preset-env` (package listed but no postcss.config file)
+- No postcss.config.mjs, postcss.config.js, or postcss.config.json files found in project root
+- Next.js compiles SCSS to CSS using `sass` package (listed in dependencies) without PostCSS
+- Unused dependencies increase node_modules size and npm install time
+- Violates "No Dead Code" principle from Code Sanitizer guidelines
+
+**Solution**:
+1. **Verified PostCSS Configuration Absence**:
+    - Checked for postcss.config files (mjs, js, json) - none found
+    - Checked next.config.ts for PostCSS configuration - none found
+    - Confirmed SCSS compilation handled by Next.js using `sass` package
+    - Verified no references to PostCSS plugins in source code or config files
+
+2. **Removed Unused PostCSS DevDependencies** from package.json:
+    - `@fullhuman/postcss-purgecss` ^7.0.2
+    - `cssnano` ^7.1.2
+    - `postcss-preset-env` ^10.6.1
+
+3. **Verified Safe Removal**:
+    - Ran `npm install` to clean up dependencies
+    - 146 packages removed (including PostCSS plugins and their transitive dependencies)
+    - Verified all tests still pass (2362/2362)
+    - Verified lint passes (0 errors, 0 warnings)
+    - Verified build passes (18 pages generated)
+    - Verified no regressions in existing functionality
+
+**Architecture Benefits**:
+1. **Dependency Management**: Reduced unnecessary dependencies from devDependencies
+2. **Bundle Size**: Reduced node_modules size (146 packages removed)
+3. **Install Time**: Faster `npm install` with fewer packages to download
+4. **Maintainability**: Cleaner dependency list with only active packages
+5. **Code Quality**: Follows "No Dead Code" principle
+6. **Security**: Reduced attack surface with fewer dependencies
+
+**Code Quality**:
+- package.json: 3 devDependencies removed
+- npm install: 146 packages removed
+- All 2362 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated
+- Zero breaking changes - only unused dependencies removed
+
+**Success Criteria**:
+- [x] Verified PostCSS config absence
+- [x] Removed @fullhuman/postcss-purgecss
+- [x] Removed cssnano
+- [x] Removed postcss-preset-env
+- [x] Ran npm install to update dependencies
+- [x] All 2362 tests passing
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build passed (18 pages generated)
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 150 completion
+
+**Related Files**:
+- ✅ Modified: `package.json` - Removed 3 unused PostCSS devDependencies
+- ✅ Updated: `docs/task.md` - Added Task 150 documentation
+
+**Testing**:
+- All 2362 tests passing (100% success rate)
+- 100 test suites passing
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated
+- npm install: 146 packages removed cleanly
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Code Sanitizer guidelines:
+    - **No Dead Code**: Removed unused dependencies
+    - **Build Must Pass**: Verified build passes after removal
+    - **Verify**: Build passes, lint clean, no regressions
+- PostCSS plugins were intended for CSS optimization but never configured
+- Next.js handles SCSS compilation natively via `sass` package
+- Safe to remove as no postcss.config file exists in project
+- Verification steps taken before removal to ensure safety
+
+**Impact**:
+- Dependencies: 3 unused devDependencies removed
+- Node Modules: 146 packages removed (cleaner dependency tree)
+- Install Time: Faster npm install with fewer packages
+- Bundle Size: Reduced node_modules disk usage
+- Code Quality: Cleaner package.json with only active dependencies
+- Build: All builds pass (18 pages)
+- Tests: All 2362 tests pass (no regressions)
+- Lint: Clean (0 errors, 0 warnings)
+
+**Future Enhancement Opportunities**:
+
+1. **Regular Dependency Audits** - Schedule monthly reviews
+    - Use `npm outdated` to identify outdated packages
+    - Use `depcheck` or `npm-check-updates` for unused dependencies
+    - Keep dependencies current and minimal
+    - Effort: Low (30 minutes per month)
+    - Priority: Medium (maintain healthy dependency tree)
+
+2. **PostCSS Optimization** - Add CSS minification if needed
+    - Configure PostCSS with cssnano if CSS minification desired
+    - Override Next.js default CSS optimization
+    - Consider if performance gains justify complexity
+    - Effort: Low (create postcss.config.mjs)
+    - Priority: Low (current CSS size is acceptable)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: N/A (Standalone cleanup task)
+**Next Dependency Review**: Monthly (February 2026)
 

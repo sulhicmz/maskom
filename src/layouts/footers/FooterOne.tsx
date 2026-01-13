@@ -9,12 +9,12 @@ import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/secondary-logo.svg";
 import logo_3 from "@/assets/images/logo/white-logo.svg";
 
-interface ProfType {
+interface FooterOneProps {
    style: boolean;
    style_2: boolean;
 }
 
-const FooterOne = memo(({ style, style_2 }: ProfType) => {
+const FooterOne = memo(({ style, style_2 }: FooterOneProps) => {
    return (
 
       <footer className={`${style ? "footer-v2" : "footer-default bg_cover pt-80"}`}>
