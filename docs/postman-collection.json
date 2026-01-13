@@ -1,20 +1,21 @@
 {
   "info": {
-    "name": "Maskom API Collection",
-    "description": "Comprehensive Postman collection for Maskom external service integrations",
+    "name": "Maskom Frontend Services Testing",
+    "description": "**IMPORTANT**: These are NOT REST API endpoints. These are frontend TypeScript services (EmailService, AuthService) that are tested via Jest. This Postman collection demonstrates the service interfaces but should be used with Jest for actual testing. See docs/api/email-service.md and docs/api/auth-service.md for proper usage examples.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000/api",
-      "type": "string"
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Frontend application URL (services run client-side)"
     },
     {
       "key": "token",
       "value": "",
       "type": "string",
-      "description": "JWT token from login/register"
+      "description": "JWT token from login/register (for reference)"
     }
   ],
   "item": [
@@ -36,9 +37,9 @@
               "raw": "{\n  \"templateParams\": {\n    \"user_name\": \"John Doe\",\n    \"user_email\": \"john@example.com\",\n    \"message\": \"Hello, I would like to inquire about your services.\"\n  },\n  \"skipRateLimit\": false\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/email/send",
+              "raw": "{{baseUrl}} (Frontend Service - see src/services/email/EmailService.ts)",
               "host": ["{{baseUrl}}"],
-              "path": ["email", "send"]
+              "path": []
             }
           },
           "response": []

@@ -1,8 +1,26 @@
 openapi: 3.0.3
 info:
-  title: Maskom API
+  title: Maskom Frontend Services Specification
   description: >
-    Comprehensive API specification for Maskom external service integrations.
+    Comprehensive specification for Maskom frontend service integrations.
+    
+    **IMPORTANT ARCHITECTURE NOTE:**
+    
+    These are **frontend services** (TypeScript classes), NOT REST API endpoints.
+    Services are imported directly by React components and call external APIs client-side.
+    
+    Example usage:
+    ```typescript
+    import emailService from '@/services/email';
+    
+    const result = await emailService.sendEmail({
+        templateParams: {
+            user_name: 'John Doe',
+            user_email: 'john@example.com',
+            message: 'Hello'
+        }
+    });
+    ```
     
     ## Integration Architecture
     
@@ -11,27 +29,46 @@ info:
     
     ## Services
     
-    - **Email Service**: Email sending via EmailJS
-    - **Auth Service**: User authentication (mock implementation, ready for real backend)
-    - **Monitoring Service**: Metrics collection and health checks
+    - **EmailService**: Email sending via EmailJS (client-side integration)
+      - Location: `src/services/email/EmailService.ts`
+      - Documentation: `docs/api/email-service.md`
+      - Tests: `src/services/email/__tests__/EmailService.test.ts`
+      
+    - **AuthService**: User authentication (mock implementation, ready for real backend)
+      - Location: `src/services/auth/AuthService.ts`
+      - Documentation: `docs/api/auth-service.md`
+      - Tests: `src/services/auth/__tests__/AuthService.test.ts`
+      
+    - **Metrics Collector**: Service metrics collection and health checks
+      - Location: `src/utils/metrics/metricsCollector.ts`
+      - Tests: `src/utils/metrics/__tests__/`
     
     ## Authentication
     
-    Services use environment variables for credentials (EmailJS).
-    Auth Service is currently in mock mode with ready-to-use interface.
+    - EmailService uses environment variables for EmailJS credentials
+    - AuthService is currently in mock mode with ready-to-use interface
+    - See `.env.example` for required environment variables
     
     ## Error Codes
     
-    All errors use standardized error codes: VALIDATION_ERROR, RATE_LIMIT_EXCEEDED, TIMEOUT, 
-    CIRCUIT_BREAKER_OPEN, CREDENTIALS_MISSING, NETWORK_ERROR, UNKNOWN_ERROR
+    All errors use standardized error codes:
+    - `VALIDATION_ERROR`: Input validation failed
+    - `RATE_LIMIT_EXCEEDED`: Rate limit exceeded
+    - `TIMEOUT`: Request timed out
+    - `CIRCUIT_BREAKER_OPEN`: Circuit breaker is open
+    - `CREDENTIALS_MISSING`: API credentials not configured
+    - `NETWORK_ERROR`: Network or connection error
+    - `UNKNOWN_ERROR`: Unexpected error
     
     ## Response Format
     
-    All responses follow standard format:
-    - Success: success=true, message=string, data=T
-    - Error: success=false, error=string, errorCode=string, metadata=object
-  
-  version: 1.1.0
+    All services follow standard response format:
+    - Success: `success=true, message=string, data=T`
+    - Error: `success=false, error=string, errorCode=string, metadata=object`
+    
+    See `src/services/common/types.ts` for full type definitions.
+    
+  version: 2.0.0
   contact:
     name: Maskom Development Team
     url: https://maskom.co.id
@@ -40,36 +77,45 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: https://maskom.co.id/api
-    description: Production server
-  - url: http://localhost:3000/api
-    description: Development server
+  - url: https://maskom.co.id
+    description: Production application (frontend)
+  - url: http://localhost:3000
+    description: Development application (frontend)
 
 tags:
-  - name: Email
-    description: Email sending operations
-  - name: Authentication
-    description: User authentication operations
-  - name: Monitoring
-    description: Metrics and health checks
+  - name: Frontend Services
+    description: Frontend TypeScript service classes
 
 paths:
-  /email/send:
+  /services/email/send:
     post:
       tags:
-        - Email
-      summary: Send email
+        - Frontend Services
+      summary: Send email (Frontend Service)
       description: >
-        Sends an email using configured EmailJS template with built-in resilience patterns.
+        **This is NOT a REST API endpoint**. This is a frontend service method.
+        
+        Call this method directly from React components:
+        ```typescript
+        import emailService from '@/services/email';
+        
+        const result = await emailService.sendEmail({
+            templateParams: {
+                user_name: 'John Doe',
+                user_email: 'john@example.com',
+                message: 'Hello'
+            }
+        });
+        ```
         
         **Resilience Configuration:**
         - Rate Limiting: 5 attempts per 60 seconds (per email)
-        - Timeout: 10 seconds
+        - Timeout: 10 seconds (10000ms)
         - Retry: 3 attempts with exponential backoff (1s, 2s)
         - Circuit Breaker: Opens after 5 consecutive failures, resets after 60 seconds
       operationId: sendEmail
       requestBody:
-        required: true
+        description: Email send parameters (passed to service method, not API endpoint)
         content:
           application/json:
             schema:
@@ -85,7 +131,7 @@ paths:
                   skipRateLimit: false
       responses:
         '200':
-          description: Email sent successfully
+          description: Email sent successfully (service returns ServiceResult)
           content:
             application/json:
               schema:
@@ -101,100 +147,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidEmail:
-                  summary: Invalid email format
-                  value:
-                    success: false
-                    error: 'Format email tidak valid'
-                    errorCode: 'VALIDATION_ERROR'
-                    metadata:
-                      isRetryable: false
-                      isTimeout: false
-                missingFields:
-                  summary: Missing required fields
-                  value:
-                    success: false
-                    error: 'Email dan kata sandi diperlukan'
-                    errorCode: 'VALIDATION_ERROR'
-                    metadata:
-                      isRetryable: false
-                      isTimeout: false
-                missingCredentials:
-                  summary: Missing EmailJS credentials
-                  value:
-                    success: false
-                    error: 'EmailJS credentials not configured'
-                    errorCode: 'CREDENTIALS_MISSING'
-                    metadata:
-                      isRetryable: false
-                      isTimeout: false
         '408':
           description: Request timeout
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'EmailJS request timed out'
-                errorCode: 'TIMEOUT'
-                metadata:
-                  isRetryable: true
-                  isTimeout: true
         '429':
           description: Too many requests - rate limit exceeded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Too many attempts. Please try again in 30 seconds.'
-                errorCode: 'RATE_LIMIT_EXCEEDED'
-                metadata:
-                  rateLimited: true
         '502':
           description: Bad gateway - retry exhausted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Email send failed after retries'
-                errorCode: 'NETWORK_ERROR'
-                metadata:
-                  isRetryable: true
         '503':
           description: Service unavailable - circuit breaker open
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Circuit breaker is open. Service temporarily unavailable.'
-                errorCode: 'CIRCUIT_BREAKER_OPEN'
-                metadata:
-                  isRetryable: false
 
-  /auth/login:
+  /services/auth/login:
     post:
       tags:
-        - Authentication
-      summary: Login user
+        - Frontend Services
+      summary: Login user (Frontend Service)
       description: >
-        Authenticates a user with email and password.
+        **This is NOT a REST API endpoint**. This is a frontend service method.
+        
+        Call this method directly from React components:
+        ```typescript
+        import authService from '@/services/auth';
+        
+        const result = await authService.login({
+            email: 'john@example.com',
+            password: 'password123'
+        });
+        ```
         
         **Resilience Configuration:**
         - Rate Limiting: 5 attempts per 15 minutes (per email)
-        - Timeout: 5 seconds
+        - Timeout: 5 seconds (5000ms)
         - Retry: 3 attempts with exponential backoff
         - Circuit Breaker: Opens after 50 consecutive failures
       operationId: login
       requestBody:
-        required: true
+        description: Login credentials (passed to service method, not API endpoint)
         content:
           application/json:
             schema:
@@ -207,79 +210,57 @@ paths:
                   password: "password123"
       responses:
         '200':
-          description: Login successful
+          description: Login successful (service returns AuthResult)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
-              example:
-                success: true
-                message: 'Login berhasil'
-                user:
-                  id: 'user_johnexamplecom'
-                  name: 'John Doe'
-                  email: 'john@example.com'
-                token: 'mock-jwt-token'
         '400':
           description: Bad request - validation error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidEmail:
-                  summary: Invalid email format
-                  value:
-                    success: false
-                    error: 'Format email tidak valid'
-                    errorCode: 'VALIDATION_ERROR'
-                    metadata:
-                      isRetryable: false
-                missingFields:
-                  summary: Missing required fields
-                  value:
-                    success: false
-                    error: 'Email dan kata sandi diperlukan'
-                    errorCode: 'VALIDATION_ERROR'
         '429':
           description: Too many requests - rate limit exceeded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Terlalu banyak percobaan. Silakan coba lagi dalam 900 detik.'
-                errorCode: 'RATE_LIMIT_EXCEEDED'
-                metadata:
-                  rateLimited: true
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Terjadi kesalahan saat login'
-                errorCode: 'UNKNOWN_ERROR'
 
-  /auth/register:
+  /services/auth/register:
     post:
       tags:
-        - Authentication
-      summary: Register new user
+        - Frontend Services
+      summary: Register new user (Frontend Service)
       description: >
-        Registers a new user account.
+        **This is NOT a REST API endpoint**. This is a frontend service method.
+        
+        Call this method directly from React components:
+        ```typescript
+        import authService from '@/services/auth';
+        
+        const result = await authService.register({
+            name: 'Jane Doe',
+            email: 'jane@example.com',
+            password: 'password123'
+        });
+        ```
         
         **Resilience Configuration:**
         - Rate Limiting: 5 attempts per 1 hour (per email)
-        - Timeout: 5 seconds
+        - Timeout: 5 seconds (5000ms)
         - Retry: 3 attempts with exponential backoff
         - Circuit Breaker: Opens after 50 consecutive failures
       operationId: register
       requestBody:
-        required: true
+        description: Registration data (passed to service method, not API endpoint)
         content:
           application/json:
             schema:
@@ -288,94 +269,78 @@ paths:
               valid:
                 summary: Valid registration request
                 value:
-                  name: "John Doe"
-                  email: "john@example.com"
+                  name: "Jane Doe"
+                  email: "jane@example.com"
                   password: "password123"
       responses:
         '200':
-          description: Registration successful
+          description: Registration successful (service returns AuthResult)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
-              example:
-                success: true
-                message: 'Registrasi berhasil'
-                user:
-                  id: 'user_johnexamplecom'
-                  name: 'John Doe'
-                  email: 'john@example.com'
-                token: 'mock-jwt-token'
         '400':
           description: Bad request - validation error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                invalidEmail:
-                  summary: Invalid email format
-                  value:
-                    success: false
-                    error: 'Format email tidak valid'
-                    errorCode: 'VALIDATION_ERROR'
-                    metadata:
-                      isRetryable: false
-                shortPassword:
-                  summary: Password too short
-                  value:
-                    success: false
-                    error: 'Kata sandi minimal 8 karakter'
-                    errorCode: 'VALIDATION_ERROR'
-                    metadata:
-                      isRetryable: false
         '429':
           description: Too many requests - rate limit exceeded
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Terlalu banyak percobaan. Silakan coba lagi dalam 3600 detik.'
-                errorCode: 'RATE_LIMIT_EXCEEDED'
-                metadata:
-                  rateLimited: true
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-              example:
-                success: false
-                error: 'Terjadi kesalahan saat registrasi'
-                errorCode: 'UNKNOWN_ERROR'
 
-  /auth/logout:
+  /services/auth/logout:
     post:
       tags:
-        - Authentication
-      summary: Logout user
-      description: Clears current user session.
+        - Frontend Services
+      summary: Logout user (Frontend Service)
+      description: >
+        **This is NOT a REST API endpoint**. This is a frontend service method.
+        
+        Call this method directly from React components:
+        ```typescript
+        import authService from '@/services/auth';
+        
+        const result = await authService.logout();
+        ```
       operationId: logout
       responses:
         '200':
-          description: Logout successful
+          description: Logout successful (service returns AuthResult)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogoutResponse'
-              example:
-                success: true
-                message: 'Logout berhasil'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /auth/current-user:
+  /services/auth/current-user:
     get:
       tags:
-        - Authentication
-      summary: Get current user
-      description: Retrieves currently authenticated user.
+        - Frontend Services
+      summary: Get current user (Frontend Service)
+      description: >
+        **This is NOT a REST API endpoint**. This is a frontend service method.
+        
+        Call this method directly from React components:
+        ```typescript
+        import authService from '@/services/auth';
+        
+        const user = await authService.getCurrentUser();
+        ```
       operationId: getCurrentUser
       responses:
         '200':
@@ -384,165 +349,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
-              example:
-                id: 'user_johnexamplecom'
-                name: 'John Doe'
-                email: 'john@example.com'
         '204':
           description: No user logged in
 
-  /monitoring/metrics/{serviceName}:
-    get:
-      tags:
-        - Monitoring
-      summary: Get service metrics
-      description: Retrieves metrics for a specific service.
-      operationId: getServiceMetrics
-      parameters:
-        - name: serviceName
-          in: path
-          required: true
-          schema:
-            type: string
-            enum: ['EmailService', 'AuthService.login', 'AuthService.register']
-          description: Service name
-      responses:
-        '200':
-          description: Metrics retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceMetrics'
-              example:
-                serviceName: 'EmailService'
-                totalCalls: 100
-                successCalls: 95
-                failureCalls: 5
-                timeoutCalls: 2
-                rateLimitCalls: 1
-                circuitBreakerOpenCount: 0
-                lastError: null
-                lastSuccessTime: 1736697600000
-                lastFailureTime: 1736697500000
-                averageResponseTime: 1500
-        '404':
-          description: Service not found
-
-  /monitoring/health/{serviceName}:
-    get:
-      tags:
-        - Monitoring
-      summary: Check service health
-      description: Performs health check for a specific service with configurable success rate threshold.
-      operationId: healthCheck
-      parameters:
-        - name: serviceName
-          in: path
-          required: true
-          schema:
-            type: string
-            enum: ['EmailService', 'AuthService.login', 'AuthService.register']
-          description: Service name
-        - name: thresholdSuccessRate
-          in: query
-          required: false
-          schema:
-            type: number
-            format: float
-            minimum: 0
-            maximum: 1
-            default: 0.8
-          description: Success rate threshold (0-1)
-      responses:
-        '200':
-          description: Health check result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HealthCheckResult'
-              examples:
-                healthy:
-                  summary: Service is healthy
-                  value:
-                    serviceName: 'EmailService'
-                    healthy: true
-                    message: 'Service is healthy (95.0% success rate)'
-                    metrics:
-                      serviceName: 'EmailService'
-                      totalCalls: 100
-                      successCalls: 95
-                      failureCalls: 5
-                      averageResponseTime: 1500
-                    checkedAt: 1736697600000
-                degraded:
-                  summary: Service is degraded
-                  value:
-                    serviceName: 'EmailService'
-                    healthy: false
-                    message: 'Service is degraded (70.0% success rate, below threshold 80.0%)'
-                    metrics:
-                      serviceName: 'EmailService'
-                      totalCalls: 100
-                      successCalls: 70
-                      failureCalls: 30
-                      averageResponseTime: 2500
-                    checkedAt: 1736697600000
-        '404':
-          description: Service not found
-
-  /monitoring/metrics/all:
-    get:
-      tags:
-        - Monitoring
-      summary: Get all metrics
-      description: Retrieves metrics for all services.
-      operationId: getAllMetrics
-      responses:
-        '200':
-          description: All metrics retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ServiceMetrics'
-
-  /monitoring/health/all:
-    get:
-      tags:
-        - Monitoring
-      summary: Check all services health
-      description: Performs health check for all services with configurable success rate threshold.
-      operationId: getAllHealthChecks
-      parameters:
-        - name: thresholdSuccessRate
-          in: query
-          required: false
-          schema:
-            type: number
-            format: float
-            minimum: 0
-            maximum: 1
-            default: 0.8
-          description: Success rate threshold (0-1)
-      responses:
-        '200':
-          description: All health checks completed
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/HealthCheckResult'
-
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: JWT token for authenticated requests
-
   schemas:
     EmailSendRequest:
       type: object
@@ -618,6 +428,7 @@ components:
 
     EmailSendResponse:
       type: object
+      description: 'ServiceResult<{ text: string }> - EmailService response type'
       properties:
         success:
           type: boolean
@@ -635,13 +446,14 @@ components:
 
     AuthResponse:
       type: object
+      description: AuthResult - Domain-specific response for authentication operations
       properties:
         success:
           type: boolean
           example: true
         message:
           type: string
-          example: 'Login berhasil'
+          example: 'Berhasil masuk ke portal'
         user:
           $ref: '#/components/schemas/User'
         token:
@@ -651,24 +463,35 @@ components:
 
     LogoutResponse:
       type: object
+      description: AuthResult with message only for logout
       properties:
         success:
           type: boolean
           example: true
         message:
           type: string
-          example: 'Logout berhasil'
+          example: 'Berhasil keluar'
+        error:
+          type: string
+          description: Error message if failed
+        errorCode:
+          type: string
+          description: Error code if failed
 
     UserResponse:
-      $ref: '#/components/schemas/User'
+      description: 'User | null - getCurrentUser response type'
+      oneOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          nullable: true
 
     User:
       type: object
       properties:
         id:
           type: string
-          description: Generated user ID
-          example: 'user_johnexamplecom'
+          description: Generated user ID (UUID v4)
+          example: '550e8400-e29b-41d4-a716-446655440000'
         name:
           type: string
           description: User's display name
@@ -681,6 +504,7 @@ components:
 
     ErrorResponse:
       type: object
+      description: ServiceResult error response
       properties:
         success:
           type: boolean
@@ -711,76 +535,3 @@ components:
             rateLimited:
               type: boolean
               description: Whether request was rate limited
-
-    ServiceMetrics:
-      type: object
-      properties:
-        serviceName:
-          type: string
-          example: 'EmailService'
-        totalCalls:
-          type: integer
-          description: Total API calls
-          example: 100
-        successCalls:
-          type: integer
-          description: Successful calls
-          example: 95
-        failureCalls:
-          type: integer
-          description: Failed calls
-          example: 5
-        timeoutCalls:
-          type: integer
-          description: Timeout errors
-          example: 2
-        rateLimitCalls:
-          type: integer
-          description: Rate limit errors
-          example: 1
-        circuitBreakerOpenCount:
-          type: integer
-          description: Circuit breaker opens
-          example: 0
-        lastError:
-          type: string
-          nullable: true
-          description: Last error message
-          example: 'EmailJS request timed out'
-        lastSuccessTime:
-          type: integer
-          format: int64
-          description: Last success timestamp (Unix epoch)
-          example: 1736697600000
-        lastFailureTime:
-          type: integer
-          format: int64
-          description: Last failure timestamp (Unix epoch)
-          example: 1736697500000
-        averageResponseTime:
-          type: number
-          format: float
-          description: Average response time in milliseconds
-          example: 1500
-
-    HealthCheckResult:
-      type: object
-      properties:
-        serviceName:
-          type: string
-          example: 'EmailService'
-        healthy:
-          type: boolean
-          description: Health status
-          example: true
-        message:
-          type: string
-          description: Health message
-          example: 'Service is healthy (95.0% success rate)'
-        metrics:
-          $ref: '#/components/schemas/ServiceMetrics'
-        checkedAt:
-          type: integer
-          format: int64
-          description: Check timestamp (Unix epoch)
-          example: 1736697600000

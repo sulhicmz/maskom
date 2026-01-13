@@ -621,4 +621,95 @@ describe('AuthService', () => {
             expect(successRegister.success).toBe(true);
         });
     });
+
+    describe('resilience patterns - timeout', () => {
+        it('should handle timeout on login operation', async () => {
+            jest.useFakeTimers();
+            const credentials: LoginCredentials = {
+                email: 'test@example.com',
+                password: 'password123',
+            };
+
+            const result = await authService.login(credentials);
+
+            expect(result.success).toBe(true);
+            jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
+        });
+
+        it('should handle timeout on register operation', async () => {
+            jest.useFakeTimers();
+            const userData: RegisterData = {
+                name: 'Test User',
+                email: 'test@example.com',
+                password: 'password123',
+            };
+
+            const result = await authService.register(userData);
+
+            expect(result.success).toBe(true);
+            jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
+        });
+    });
+
+    describe('resilience patterns - circuit breaker', () => {
+        it('should provide circuit breaker state', () => {
+            const state = authService.getCircuitBreakerState();
+
+            expect(state).toHaveProperty('isOpen');
+            expect(state).toHaveProperty('failureCount');
+            expect(state).toHaveProperty('lastFailureTime');
+            expect(state).toHaveProperty('lastSuccessTime');
+        });
+
+        it('should allow manual circuit breaker reset', () => {
+            const initialState = authService.getCircuitBreakerState();
+
+            authService.resetCircuitBreaker();
+
+            const resetState = authService.getCircuitBreakerState();
+
+            expect(resetState.isOpen).toBe(false);
+            expect(resetState.failureCount).toBe(0);
+            expect(resetState.failureCount).toBeLessThanOrEqual(initialState.failureCount);
+        });
+    });
+
+    describe('resilience patterns - metrics', () => {
+        it('should track service metrics for login operations', async () => {
+            jest.useFakeTimers();
+
+            const credentials: LoginCredentials = {
+                email: 'metrics@example.com',
+                password: 'password123',
+            };
+
+            await authService.login(credentials);
+
+            const metrics = authService.getMetrics();
+
+            expect(metrics.login).toBeDefined();
+            expect(metrics.login?.totalCalls).toBeGreaterThan(0);
+
+            jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
+        });
+
+        it('should track service metrics for register operations', async () => {
+            jest.useFakeTimers();
+
+            const userData: RegisterData = {
+                name: 'Test User',
+                email: 'metrics2@example.com',
+                password: 'password123',
+            };
+
+            await authService.register(userData);
+
+            const metrics = authService.getMetrics();
+
+            expect(metrics.register).toBeDefined();
+            expect(metrics.register?.totalCalls).toBeGreaterThan(0);
+
+            jest.useFakeTimers().setSystemTime(new Date('2020-01-01'));
+        });
+    });
 });

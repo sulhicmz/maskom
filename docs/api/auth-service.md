@@ -952,3 +952,117 @@ The current AuthService implementation is mock-based and ready for real backend 
 - [Integration Architecture - blueprint.md](../blueprint.md)
 - [Rate Limiting Configuration - src/constants/rateLimits.ts](../constants/rateLimits.ts)
 - [Service Common Types - src/services/common/](../services/common/)
+- [Service Health Monitoring - docs/service-health-monitoring.md](../service-health-monitoring.md)
+- [OpenAPI Specification - docs/openapi-spec.yaml](../openapi-spec.yaml)
+- [Postman Collection - docs/postman-collection.json](../postman-collection.json)
+
+## Integration Best Practices
+
+### 1. Error Handling in Components
+
+Always check `result.success` before proceeding:
+
+```typescript
+const result = await authService.login({ email, password });
+
+if (result.success) {
+    toast.success('Berhasil masuk ke portal');
+    router.push('/dashboard');
+} else if (result.metadata?.rateLimited) {
+    const cooldownEnds = new Date(result.metadata.lockedUntil || Date.now());
+    const timeRemaining = Math.ceil((cooldownEnds.getTime() - Date.now()) / 1000);
+    toast.error(`Terlalu banyak percobaan. Silakan coba lagi dalam ${timeRemaining} detik.`);
+} else {
+    toast.error(result.error || 'Gagal masuk');
+}
+```
+
+### 2. Resilience Pattern Awareness
+
+Understand the resilience layers:
+1. Input Validation: Email format, password length (8+ chars)
+2. Rate Limiting: Per-email (login: 5/15min, register: 5/1hr)
+3. Timeout Protection: 5s max per request
+4. Retry with Backoff: 3 attempts (1s → 2s → 4s)
+5. Circuit Breaker: Opens after 50 failures, resets after 60s
+
+### 3. Rate Limit Status Checks
+
+Pre-check rate limit before user action:
+
+```typescript
+const rateLimitStatus = authService.getLoginRateLimitStatus(email);
+
+if (rateLimitStatus.lockedUntil) {
+    const cooldownEnds = new Date(rateLimitStatus.lockedUntil);
+    const timeRemaining = Math.ceil((cooldownEnds.getTime() - Date.now()) / 1000);
+    toast.warning(`Silakan tunggu ${timeRemaining} detik sebelum mencoba lagi.`);
+    return false;
+}
+
+if (rateLimitStatus.attemptsRemaining <= 1) {
+    toast.warning(`Sisa ${rateLimitStatus.attemptsRemaining} percobaan.`);
+}
+
+return true;
+```
+
+### 4. Service Health Monitoring
+
+Monitor AuthService health using metrics:
+
+```typescript
+const metrics = authService.getMetrics();
+
+if (metrics.login?.successRate && metrics.login.successRate < 0.9) {
+    console.warn(`AuthService.login degraded: ${metrics.login.successRate * 100}% success rate`);
+}
+
+if (metrics.register?.successRate && metrics.register.successRate < 0.9) {
+    console.warn(`AuthService.register degraded: ${metrics.register.successRate * 100}% success rate`);
+}
+```
+
+See [Service Health Monitoring](../service-health-monitoring.md) for comprehensive monitoring strategies.
+
+### 5. Circuit Breaker State Checks
+
+Check circuit breaker before critical operations:
+
+```typescript
+const state = authService.getCircuitBreakerState();
+
+if (state.isOpen) {
+    toast.warning('Layanan autentikasi sementara tidak tersedia. Silakan coba lagi nanti.');
+    return;
+}
+```
+
+### 6. Current User Management
+
+Manage current user session:
+
+```typescript
+const user = await authService.getCurrentUser();
+
+if (user) {
+    console.log('Current user:', user);
+} else {
+    console.log('No user authenticated');
+    router.push('/login');
+}
+```
+
+### 7. Metrics Export
+
+Export metrics for external monitoring systems:
+
+```typescript
+import metricsCollector from '@/utils/metrics';
+
+const metricsData = metricsCollector.exportMetrics();
+
+// Send to Prometheus, Datadog, CloudWatch, etc.
+```
+
+See [Service Health Monitoring](../service-health-monitoring.md) for external monitoring integration.

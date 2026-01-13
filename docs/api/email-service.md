@@ -505,3 +505,75 @@ Consider adding:
 - [EmailJS Documentation](https://www.emailjs.com/docs/)
 - [Resilience Patterns - src/utils/resilience/](../utils/resilience/)
 - [Integration Architecture - blueprint.md](../blueprint.md)
+- [Service Health Monitoring - docs/service-health-monitoring.md](./service-health-monitoring.md)
+- [OpenAPI Specification - docs/openapi-spec.yaml](../openapi-spec.yaml)
+- [Postman Collection - docs/postman-collection.json](../postman-collection.json)
+
+## Integration Best Practices
+
+### 1. Error Handling in Components
+
+Always check `result.success` before proceeding:
+
+```typescript
+const result = await emailService.sendEmail({
+    templateParams: { user_name, user_email, message }
+});
+
+if (result.success) {
+    toast.success('Email sent successfully!');
+} else if (result.metadata?.rateLimited) {
+    toast.error(result.error || 'Too many attempts');
+} else {
+    toast.error('Failed to send email');
+}
+```
+
+### 2. Resilience Pattern Awareness
+
+Understand the resilience layers:
+1. Rate Limiting: Per-email (5 per 60s)
+2. Timeout Protection: 10s max per request
+3. Retry with Backoff: 3 attempts (1s → 2s → 4s)
+4. Circuit Breaker: Opens after 5 failures, resets after 60s
+
+### 3. Service Health Monitoring
+
+Monitor EmailService health using metrics:
+
+```typescript
+const metrics = emailService.getMetrics();
+
+if (metrics.successRate < 0.8) {
+    console.warn(`EmailService degraded: ${metrics.successRate * 100}% success rate`);
+}
+```
+
+See [Service Health Monitoring](../service-health-monitoring.md) for comprehensive monitoring strategies.
+
+### 4. Circuit Breaker State Checks
+
+Check circuit breaker before critical operations:
+
+```typescript
+const state = emailService.getCircuitBreakerState();
+
+if (state.isOpen) {
+    toast.warning('Email service temporarily unavailable. Please try again later.');
+    return;
+}
+```
+
+### 5. Metrics Export
+
+Export metrics for external monitoring systems:
+
+```typescript
+import metricsCollector from '@/utils/metrics';
+
+const metricsData = metricsCollector.exportMetrics();
+
+// Send to Prometheus, Datadog, CloudWatch, etc.
+```
+
+See [Service Health Monitoring](../service-health-monitoring.md) for external monitoring integration.
