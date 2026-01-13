@@ -22,15 +22,15 @@ const IntroArea = () => {
             <div className="container">
                <div className="intro-wrapper">
                   <div className="row align-items-center">
-                     <div className="col-xl-6">
-                        <AnimationWrapper animation="fadeInLeft" className="video-one_image-box p-r z-1 mb-50">
-                           <Image src={video_thumb} alt="video image" />
-                           <div className="play-button">
-                              <a onClick={() => setIsVideoOpen(true)} style={{ cursor: "pointer" }} className="video-popup"><i
-                                 className="flaticon-play-button-arrowhead"></i></a>
-                           </div>
-                        </AnimationWrapper>
-                     </div>
+                   <div className="col-xl-6">
+                         <AnimationWrapper animation="fadeInLeft" className="video-one_image-box p-r z-1 mb-50">
+                            <Image src={video_thumb} alt="Video perkenalan layanan Maskom" />
+                            <div className="play-button">
+                               <button type="button" onClick={() => setIsVideoOpen(true)} className="video-popup" aria-label="Tonton video perkenalan Maskom"><i
+                                  className="flaticon-play-button-arrowhead" aria-hidden="true"></i></button>
+                            </div>
+                         </AnimationWrapper>
+                      </div>
                      <div className="col-xl-6">
                         <AnimationWrapper animation="fadeInRight" className="section-content-box text-white mb-50">
                            <SectionTitle 

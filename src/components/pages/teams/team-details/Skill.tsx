@@ -54,18 +54,18 @@ const Skill = () => {
                         </div>
                      </AnimationWrapper>
                   </div>
-                  <div className="col-xl-5">
-                     <AnimationWrapper animation="fadeInRight" className="skill-one_image-box mb-50">
-                        <Image src={skill_thumb} alt="Skill Image" />
-                        <div className="image-overlay">
-                           <div className="play-button d-flex align-items-center">
-                              <a onClick={() => setIsVideoOpen(true)} style={{ cursor: "pointer" }} className="video-popup"><i
-                                 className="flaticon-play-button-arrowhead"></i></a>
-                              <div className="text">Discover my bio</div>
-                           </div>
-                        </div>
-                     </AnimationWrapper>
-                  </div>
+                   <div className="col-xl-5">
+                      <AnimationWrapper animation="fadeInRight" className="skill-one_image-box mb-50">
+                         <Image src={skill_thumb} alt="Demostrasi skill dan kemampuan tim Maskom" />
+                         <div className="image-overlay">
+                            <div className="play-button d-flex align-items-center">
+                               <button type="button" onClick={() => setIsVideoOpen(true)} className="video-popup" aria-label="Tonton video bio"><i
+                                  className="flaticon-play-button-arrowhead" aria-hidden="true"></i></button>
+                               <div className="text">Discover my bio</div>
+                            </div>
+                         </div>
+                      </AnimationWrapper>
+                   </div>
                </div>
             </div>
          </section>

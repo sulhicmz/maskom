@@ -131,12 +131,12 @@ describe('BlogDetailsArea', () => {
 
   it('renders images with alt text', () => {
     render(<BlogDetailsArea />);
-    
-    const images = screen.getAllByAltText('image');
-    expect(images.length).toBeGreaterThan(0);
-    
-    const thumbnail = screen.getByAltText('post thumbnail');
+
+    const thumbnail = screen.getByAltText('Thumbnail gambar placeholder: Artikel Maskom');
     expect(thumbnail).toBeInTheDocument();
+
+    const quoteImage = screen.getByAltText('Tanda kutip dekoratif');
+    expect(quoteImage).toBeInTheDocument();
   });
 
   it('renders post navigation buttons', () => {
@@ -321,15 +321,15 @@ describe('BlogDetailsArea', () => {
 
   it('renders thumbnail from single_blog prop when provided', () => {
     render(<BlogDetailsArea single_blog={mockBlogPost} />);
-    
-    const thumbnail = screen.getByAltText('image');
+
+    const thumbnail = screen.getByAltText('Thumbnail gambar artikel: Test Blog Post Title');
     expect(thumbnail).toBeInTheDocument();
   });
 
   it('renders default thumbnail when single_blog prop not provided', () => {
     render(<BlogDetailsArea />);
-    
-    const thumbnail = screen.getByAltText('image');
+
+    const thumbnail = screen.getByAltText('Thumbnail gambar placeholder: Artikel Maskom');
     expect(thumbnail).toBeInTheDocument();
   });
 

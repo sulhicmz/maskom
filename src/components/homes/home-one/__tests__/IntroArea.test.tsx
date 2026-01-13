@@ -45,7 +45,7 @@ describe('IntroArea', () => {
     it('renders video thumbnail image', () => {
       render(<IntroArea />);
 
-      expect(screen.getByAltText('video image')).toBeInTheDocument();
+      expect(screen.getByAltText('Video perkenalan layanan Maskom')).toBeInTheDocument();
     });
 
     it('renders play button', () => {
@@ -277,18 +277,25 @@ describe('IntroArea', () => {
       expect(contentBox).toBeInTheDocument();
     });
 
-    it('renders play button with proper cursor pointer', () => {
+    it('renders play button with proper ARIA label', () => {
       const { container } = render(<IntroArea />);
 
       const playButton = container.querySelector('.video-popup');
-      expect(playButton).toHaveStyle({ cursor: 'pointer' });
+      expect(playButton).toHaveAttribute('aria-label', 'Tonton video perkenalan Maskom');
     });
 
-    it('renders play icon correctly', () => {
+    it('renders play button as button element for accessibility', () => {
+      const { container } = render(<IntroArea />);
+
+      const playButton = container.querySelector('.video-popup');
+      expect(playButton?.tagName.toLowerCase()).toBe('button');
+    });
+
+    it('renders play icon with aria-hidden', () => {
       const { container } = render(<IntroArea />);
 
       const playIcon = container.querySelector('.flaticon-play-button-arrowhead');
-      expect(playIcon).toBeInTheDocument();
+      expect(playIcon).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('has proper section ID for navigation', () => {

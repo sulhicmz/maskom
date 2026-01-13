@@ -45,7 +45,7 @@ describe('Skill', () => {
     it('renders skill thumbnail image', () => {
       render(<Skill />);
 
-      expect(screen.getByAltText('Skill Image')).toBeInTheDocument();
+      expect(screen.getByAltText('Demostrasi skill dan kemampuan tim Maskom')).toBeInTheDocument();
     });
 
     it('renders play button', () => {
@@ -280,18 +280,25 @@ describe('Skill', () => {
   });
 
   describe('Edge Cases', () => {
-    it('renders play button with proper cursor pointer', () => {
+    it('renders play button with proper ARIA label', () => {
       const { container } = render(<Skill />);
 
       const playButton = container.querySelector('.video-popup');
-      expect(playButton).toHaveStyle({ cursor: 'pointer' });
+      expect(playButton).toHaveAttribute('aria-label', 'Tonton video bio');
     });
 
-    it('renders play icon correctly', () => {
+    it('renders play button as button element for accessibility', () => {
+      const { container } = render(<Skill />);
+
+      const playButton = container.querySelector('.video-popup');
+      expect(playButton?.tagName.toLowerCase()).toBe('button');
+    });
+
+    it('renders play icon with aria-hidden', () => {
       const { container } = render(<Skill />);
 
       const playIcon = container.querySelector('.flaticon-play-button-arrowhead');
-      expect(playIcon).toBeInTheDocument();
+      expect(playIcon).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('renders skill item 1 with 73%', () => {
