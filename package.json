@@ -4,6 +4,12 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "browserslist": [
+    ">0.3%",
+    "not ie 11",
+    "not dead",
+    "not op_mini all"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev",
