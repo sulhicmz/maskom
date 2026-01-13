@@ -1,4 +1,5 @@
 import Link from "next/link";
+import React from "react";
 
 interface SocialLinksProps {
   links?: Array<{
@@ -28,4 +29,4 @@ const SocialLinks = ({ links, className = "social-link" }: SocialLinksProps) => 
   )
 }
 
-export default SocialLinks
+export default React.memo(SocialLinks)
