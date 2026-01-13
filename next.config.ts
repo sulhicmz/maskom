@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
     unoptimized: true, // Cloudflare Pages menangani image optimization
   },
   
+  // Modern browser target to reduce polyfills
+  swcMinify: true,
+  
+  // Konfigurasi kompresi
+  compress: true,
+  
   // Konfigurasi webpack untuk mengurangi ukuran bundle
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -28,14 +34,20 @@ const nextConfig: NextConfig = {
 
       config.optimization = {
         ...config.optimization,
+        usedExports: true,
+        sideEffects: true,
+        providedExports: true,
         splitChunks: {
           chunks: 'all',
+          maxSize: 244000,
+          minSize: 20000,
           cacheGroups: {
             vendor: {
               test: /[\\/]node_modules[\\/]/,
               name: 'vendors',
               chunks: 'all',
               priority: 1,
+              reuseExistingChunk: true,
             },
             forms: {
               test: /[\\/]node_modules[\\/](react-hook-form|yup|@hookform)[\\/]/,
