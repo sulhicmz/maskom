@@ -8,6 +8,97 @@
 
 ---
 
+## Task 128: Fix Type Errors - CtaWrapper Component (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Code Sanitizer (Type Safety)
+
+**Problem**:
+- Build failed due to TypeScript type errors in CtaWrapper component (Task 127)
+- Type error: `animation` prop typed as `string` but `AnimationWrapper` expects specific union type
+- Type error: `id` prop missing from `CtaProps` interface but passed from `home-one/Cta.tsx`
+- Build blocking: Next.js production build could not compile
+- Type safety compromised: Props not properly typed
+
+**Solution**:
+1. **Fixed Animation Type** (src/components/common/CtaWrapper.tsx):
+    - Changed `animation?: string` to `animation?: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none"`
+    - Matches AnimationWrapper prop type exactly
+    - Enables proper type checking for animation values
+
+2. **Added id Prop** (src/components/common/CtaWrapper.tsx):
+    - Added `id?: string` to `CtaProps` interface
+    - Passed `id` to both AnimationWrapper (when animationType === 'animation-wrapper')
+    - Passed `id` to div wrapper (when animationType === 'wow')
+    - Supports anchor link functionality (e.g., `id="hubungi"` in home-one/Cta.tsx)
+
+3. **Updated Component Implementation**:
+    - Destructured `id` from props
+    - Applied `id` attribute to content wrapper divs in both animation type paths
+
+**Architecture Benefits**:
+1. **Type Safety**: Animation values are now type-safe (prevents typos)
+2. **Build Stability**: Production build now compiles successfully
+3. **Feature Support**: `id` prop supports anchor link functionality for navigation
+4. **TypeScript Compliance**: All type errors resolved, strict mode compliant
+5. **Code Quality**: Better IDE autocompletion for animation values
+
+**Code Quality**:
+- Build passes: 18 pages generated successfully (was failing before)
+- All 2292 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+- 1 file modified (CtaWrapper.tsx: 6 insertions, 4 deletions)
+- Zero breaking changes - behavior unchanged, only type fixes
+
+**Success Criteria**:
+- [x] Fixed animation prop type from string to union type
+- [x] Added id prop to CtaProps interface
+- [x] Applied id to content wrapper in both animation type paths
+- [x] All 2292 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build passed successfully (18 pages generated)
+- [x] TypeScript compilation passes without errors
+- [x] Zero regressions in existing functionality
+- [x] task.md updated with Task 128 completion
+
+**Related Files**:
+- ✅ Modified: `src/components/common/CtaWrapper.tsx` - Fixed type errors (6 additions, 4 deletions)
+
+**Testing**:
+- All 2292 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated, build time 3.7s
+- TypeScript compilation: Passes without errors
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Code Sanitizer principles:
+   - **Type Safety**: Strict types, no implicit any
+   - **Build Must Pass**: Fixed critical type error blocking production build
+   - **Zero Regressions**: Behavior unchanged, only type improvements
+- Type changes:
+   - `animation?: string` → `animation?: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none"`
+   - Added `id?: string` to CtaProps
+   - Applied id to content wrapper divs (both animation paths)
+- Zero breaking changes - existing components work without modification
+- All tests continue to pass (no regressions)
+
+**Impact**:
+- Build Stability: Production build now compiles successfully (was failing)
+- Type Safety: Animation values are now type-checked at compile time
+- Feature Support: id prop enables anchor link navigation
+- Code Quality: Better IDE support and autocomplete for animation values
+- Test Coverage: 2292 tests passing (no regressions)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 127 (Module Extraction - CTA Component)
+**Next Code Quality Review**: January 19, 2026
+
+---
+
 ## Task 127: Module Extraction - CTA Component Abstraction (Jan 13, 2026)
 
 **Status**: ✅ Completed

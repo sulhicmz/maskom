@@ -20,11 +20,12 @@ export interface CtaProps {
     contentClassName?: string
     imageBoxClassName?: string
     backgroundImage?: string
-    animation?: string
+    animation?: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none"
     animationType?: 'wow' | 'animation-wrapper'
     shapes?: boolean
     paddingBottom?: string
     extraElements?: React.ReactNode
+    id?: string
 }
 
 const CtaWrapper = React.memo<CtaProps>(({
@@ -41,18 +42,19 @@ const CtaWrapper = React.memo<CtaProps>(({
     animationType = "animation-wrapper",
     shapes = false,
     paddingBottom,
-    extraElements
+    extraElements,
+    id
 }) => {
     const contentWrapper = animationType === 'animation-wrapper'
         ? (
-            <AnimationWrapper animation={animation} className={contentClassName}>
+            <AnimationWrapper animation={animation} className={contentClassName} id={id}>
                 <h2>{heading}</h2>
                 <p>{description}</p>
                 <Link href={buttonLink} className="theme-btn gradient-btn">{buttonText}</Link>
             </AnimationWrapper>
         )
         : (
-            <div className={`${contentClassName} wow ${animation}`}>
+            <div id={id} className={`${contentClassName} wow ${animation}`}>
                 <h2>{heading}</h2>
                 <p>{description}</p>
                 <Link href={buttonLink} className="theme-btn gradient-btn">{buttonText}</Link>
