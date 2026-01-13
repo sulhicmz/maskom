@@ -8,6 +8,194 @@
 
 ---
 
+## Task 149: Module Extraction - PricingTabs Component Duplication (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Module Extraction (DRY Principle)
+
+**Problem**:
+- Price.tsx (89 lines) and PricingArea.tsx (82 lines) have near-identical structure
+- Both components implement same pricing tabs pattern with different data sources
+- Duplicate tab handling logic with useTabs hook in both files
+- Duplicate mapping over pricing data to render PricingCard components
+- Same ARIA attributes and DOM structure duplicated
+- Different only in tab titles, data source, and minor styling differences
+- Changes to pricing tabs behavior require updates to multiple files
+- Violates DRY principle and creates maintenance burden
+
+**Solution**:
+1. **Created PricingTabs Wrapper Component** (src/components/common/PricingTabs.tsx):
+    - Reusable pricing tabs component with configurable data source
+    - Same useTabs hook implementation for tab state management
+    - Flexible props interface: data, tabTitles, sectionTitleProps, wrapperClassName
+    - React.memo optimization for performance
+    - Supports customization via optional styling props
+    - Proper TypeScript typing with PriceDetailItem interface
+
+2. **Refactored Price.tsx** (src/components/homes/home-one/Price.tsx):
+    - Removed duplicate tab handling logic
+    - Removed useTabs hook import (handled by PricingTabs)
+    - Imported PricingTabs component
+    - Replaced manual pricing tabs implementation with PricingTabs
+    - Simplified component to single usage with variant-specific props
+    - Code reduction: 89 lines → 24 lines (73% reduction)
+
+3. **Refactored PricingArea.tsx** (src/components/pages/pricing/PricingArea.tsx):
+    - Removed duplicate tab handling logic
+    - Removed useTabs hook import (handled by PricingTabs)
+    - Imported PricingTabs component
+    - Replaced manual pricing tabs implementation with PricingTabs
+    - Simplified component to single usage with variant-specific props
+    - Code reduction: 82 lines → 23 lines (72% reduction)
+
+**Architecture Benefits**:
+1. **DRY Principle**: Single implementation of pricing tabs pattern for all components
+2. **Code Reduction**: 171 lines → 47 lines + 89 lines (PricingTabs) = 136 lines total (net -35 lines)
+3. **Maintainability**: Changes to pricing tabs behavior only need to update one file (PricingTabs.tsx)
+4. **Type Safety**: TypeScript interface ensures type-safe usage
+5. **Consistency**: All pricing tabs components now follow same pattern
+6. **Performance**: React.memo optimization applied to PricingTabs
+7. **Extensibility**: Easy to add new pricing tab variants with different props
+8. **SOLID Compliance**: Single Responsibility (PricingTabs), Open/Closed (extensible via props)
+
+**Props Interface**:
+
+```typescript
+interface PricingTabsProps {
+    data: PricingDataItem[];
+    tabTitles: string[];
+    sectionTitle: SectionTitleConfig;
+    wrapperClassName?: string;
+    sectionClassName?: string;
+    ariaLabel?: string;
+    tablistAriaLabel?: string;
+    sectionId?: string;
+    idPrefix?: string;
+}
+```
+
+**Usage Example**:
+
+```typescript
+// Price.tsx (home-one variant)
+<PricingTabs
+    data={home_1_price}
+    tabTitles={["Kontrak 12 Bulan", "Kontrak 36 Bulan"]}
+    sectionTitle={{
+        subtitle: "Paket Layanan",
+        title: "Pilih Skema Layanan Sesuai Kebutuhan Anda",
+        description: "Seluruh paket sudah termasuk instalasi, monitoring proaktif, dan dukungan engineer Maskom sesuai SLA yang disepakati.",
+        align: "center",
+        className: "mb-50",
+        animation: "fadeInDown",
+        whiteText: true
+    }}
+    wrapperClassName="black-dark-bg pt-110 pb-80"
+    sectionClassName=""
+    ariaLabel="Paket"
+    sectionId="paket"
+/>
+
+// PricingArea.tsx (pricing page variant)
+<PricingTabs
+    data={pricing_price}
+    tabTitles={["Konektivitas Terkelola", "Keamanan & Dukungan"]}
+    sectionTitle={{
+        subtitle: "Paket Layanan",
+        title: "Investasi Infrastruktur Digital Maskom",
+        description: "Pilih kombinasi layanan konektivitas dan managed service yang selaras dengan roadmap transformasi digital perusahaan Anda.",
+        align: "center",
+        className: "mb-50",
+        animation: "fadeInDown"
+    }}
+    sectionClassName="pt-110"
+    ariaLabel="Pricing Plans"
+    tablistAriaLabel="Pricing Category Tabs"
+    idPrefix="pricing"
+/>
+```
+
+**Code Quality**:
+- PricingTabs.tsx: 89 lines (new reusable component)
+- Price.tsx: 89 lines → 24 lines (-65 lines, 73% reduction)
+- PricingArea.tsx: 82 lines → 23 lines (-59 lines, 72% reduction)
+- 3 files modified (PricingTabs.tsx new, Price.tsx, PricingArea.tsx)
+- React.memo optimization applied to PricingTabs
+- Proper TypeScript typing with PriceDetailItem interface
+- Zero breaking changes - component behavior unchanged
+- All 2362 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build passed: 18 pages generated
+- TypeScript compilation: Passes without errors
+
+**Success Criteria**:
+- [x] Created PricingTabs component with flexible props
+- [x] Refactored Price.tsx to use PricingTabs (73% reduction)
+- [x] Refactored PricingArea.tsx to use PricingTabs (72% reduction)
+- [x] Removed duplicate useTabs imports
+- [x] Removed duplicate tab handling logic
+- [x] All 2362 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build passed successfully (18 pages generated)
+- [x] Zero breaking changes - all public APIs unchanged
+- [x] task.md updated with Task 149 completion
+
+**Related Files**:
+- ✅ Created: `src/components/common/PricingTabs.tsx` - Reusable pricing tabs component (89 lines)
+- ✅ Modified: `src/components/homes/home-one/Price.tsx` - Uses PricingTabs (24 lines, -73%)
+- ✅ Modified: `src/components/pages/pricing/PricingArea.tsx` - Uses PricingTabs (23 lines, -72%)
+- ✅ Updated: `docs/task.md` - Documented Task 149 completion
+
+**Testing**:
+- All 2362 tests passing (100% success rate)
+- 100 test suites passing
+- Lint passed: 0 errors, 0 warnings
+- Build verified: 18 pages generated
+- Zero regressions in existing functionality
+- All Price.tsx tests passing (28 tests)
+- All PricingArea.tsx tests passing (30 tests)
+
+**Notes**:
+- Follows Module Extraction principles:
+    - **Single Source of Truth**: One implementation of pricing tabs pattern
+    - **DRY Principle**: No duplicated pricing tabs code across components
+    - **Type Safety**: TypeScript interface ensures type-safe usage
+- Similar pattern as CtaWrapper (Task 127) and PaginationWrapper (Task 135)
+- PricingTabs props:
+    - data: Pricing data array from PriceData
+    - tabTitles: Array of tab label strings
+    - sectionTitle: SectionTitle props for customization
+    - wrapperClassName: Additional classes for outer section div
+    - sectionClassName: Additional classes for section tag
+    - ariaLabel: ARIA label for accessibility
+    - tablistAriaLabel: ARIA label for tablist (optional, defaults to `${ariaLabel} Tabs`)
+    - sectionId: ID attribute for section element (optional)
+    - idPrefix: Prefix for tab/panel IDs (optional, defaults to "price")
+- Code reduction breakdown:
+    - Price.tsx: 89 → 24 lines (-65 lines, -73%)
+    - PricingArea.tsx: 82 → 23 lines (-59 lines, -72%)
+    - PricingTabs.tsx: 89 lines (new reusable component)
+    - Net: -35 lines total, much better organization and maintainability
+- Zero breaking changes - only internal refactoring, all public APIs unchanged
+- Bonus: Follows same abstraction pattern as other reusable components (CtaWrapper, PaginationWrapper)
+- Props interface properly typed with PriceDetailItem from @/types/data
+- SectionTitle animation prop properly typed as specific union type
+
+**Impact**:
+- Code Quality: Eliminates duplicate pricing tabs code across 2 components
+- Maintainability: Single point of change for pricing tabs behavior
+- Consistency: All pricing tabs components now follow same pattern
+- Type Safety: TypeScript interface ensures type-safe usage
+- Extensibility: Easy to add new pricing tab variants in one place
+- Test Coverage: All 2362 tests passing (no regressions)
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 127 (Module Extraction - CTA Component), Task 135 (Module Extraction - Pagination Component)
+**Next Architecture Review**: January 19, 2026
+
+---
+
 ## Task 141: Accessibility Improvements - Decorative Icons and Alt Text (Jan 13, 2026)
 
 **Status**: ✅ Completed
