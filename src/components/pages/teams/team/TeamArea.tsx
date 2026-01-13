@@ -1,22 +1,16 @@
 "use client"
-import React, { useMemo } from "react"
-import dynamic from "next/dynamic"
+import React from "react"
 import team_data from "@/data/TeamData"
 import Image from "next/image"
 import { usePagination } from "@/hooks/usePagination"
-
-const ReactPaginate = dynamic(() => import("react-paginate"), {
-  ssr: false,
-  loading: () => <div className="ac-pagination text-center mt-30 wow fadeInUp"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
-})
+import PaginationWrapper from "@/components/common/PaginationWrapper"
 
 const TeamAreaComponent = () => {
 
-   const team = useMemo(() => team_data, []);
    const itemsPerPage = 8;
 
    const { currentItems, pageCount, handlePageClick } = usePagination({
-      data: team,
+      data: team_data,
       itemsPerPage,
    });
 
@@ -39,12 +33,12 @@ const TeamAreaComponent = () => {
                               <div className="icon">
                                  <i className="flaticon-plus-positive-add-mathematical-symbol"></i>
                               </div>
-                               <ul className="social-link">
-                                  <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                  <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                  <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                  <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                               </ul>
+                                <ul className="social-link">
+                                   <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                   <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                   <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                   <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                                </ul>
                            </div>
                         </div>
                      </div>
@@ -53,19 +47,12 @@ const TeamAreaComponent = () => {
             </div>
             <div className="row">
                <div className="col-lg-12">
-                  <div className="ac-pagination text-center mt-30 wow fadeInUp">
-                     <nav>
-                        <ReactPaginate
-                           breakLabel="..."
-                           nextLabel={<i className="far fa-angle-right"></i>}
-                           onPageChange={handlePageClick}
-                           pageRangeDisplayed={3}
-                           pageCount={pageCount}
-                           previousLabel={<i className="far fa-angle-left"></i>}
-                           renderOnZeroPageCount={null}
-                        />
-                     </nav>
-                  </div>
+                  <PaginationWrapper
+                     pageCount={pageCount}
+                     onPageChange={handlePageClick}
+                     pageRangeDisplayed={3}
+                     className="text-center mt-30 wow fadeInUp"
+                  />
                </div>
             </div>
          </div>
