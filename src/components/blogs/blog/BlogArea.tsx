@@ -1,18 +1,14 @@
 "use client"
-import React, { useMemo } from "react"
+import React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
+import PaginationWrapper from "@/components/common/PaginationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
-
-const ReactPaginate = dynamic(() => import("react-paginate"), {
-  ssr: false,
-  loading: () => <div className="ac-pagination"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
-})
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
@@ -20,11 +16,10 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
 
 const BlogArea = () => {
 
-   const blog = useMemo(() => inner_blog_data, []);
    const itemsPerPage = 3;
 
    const { currentItems, pageCount, handlePageClick } = usePagination({
-      data: blog,
+      data: inner_blog_data,
       itemsPerPage,
    });
 
@@ -45,7 +40,7 @@ const BlogArea = () => {
                                  <p>{item.desc}</p>
                                  <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                               </div>
-                               <div className="post-meta-wrap">
+                                <div className="post-meta-wrap">
                                  <div className="post-meta">
                                     <span><time><i className="flaticon-clock"></i>{formatBlogDate(item.date)}</time></span>
                                     <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
@@ -64,19 +59,11 @@ const BlogArea = () => {
                            </div>
                         </AnimationWrapper>
                      ))}
-                     <div className="ac-pagination">
-                        <nav>
-                           <ReactPaginate
-                              breakLabel="..."
-                              nextLabel={<i className="far fa-angle-right"></i>}
-                              onPageChange={handlePageClick}
-                              pageRangeDisplayed={3}
-                              pageCount={pageCount}
-                              previousLabel={<i className="far fa-angle-left"></i>}
-                              renderOnZeroPageCount={null}
-                           />
-                        </nav>
-                     </div>
+                     <PaginationWrapper
+                        pageCount={pageCount}
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={3}
+                     />
                   </div>
                </div>
                <BlogSidebar />
