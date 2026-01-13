@@ -36,9 +36,9 @@ const BlogArea = () => {
                   <div className="blogs-wrapper mb-30">
                      {currentItems.map((item) => (
                         <AnimationWrapper key={item.id} animation="fadeInUp" className="blog-post-item style-two mb-60">
-                           <div className="post-thumbnail">
-                              <Link href="/blog-details"><Image src={item.thumb} alt="post post-thumbnail" /></Link>
-                           </div>
+                            <div className="post-thumbnail">
+                               <Link href="/blog-details"><Image src={item.thumb} alt={`Thumbnail gambar artikel: ${item.title}`} /></Link>
+                            </div>
                            <div className="post-content">
                               <div className="entry-content">
                                  <h3 className="title"><Link href="/blog-details">{item.title}</Link></h3>

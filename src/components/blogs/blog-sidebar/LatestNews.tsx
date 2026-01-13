@@ -41,15 +41,15 @@ const LatestNewsComponent = () => {
          <h3 className="widget-title">Berita Terbaru</h3>
          <div className="sidebar-widget-content">
             <ul className="recent-post-list">
-               {latest_news.map((item) => (
-                  <li key={item.id} className="post-thumbnail-content d-flex align-items-center">
-                     <Image src={item.img} alt="post thumb" />
-                       <div className="post-title-date">
-                          <h6><Link href="/blog-details">{item.title}</Link></h6>
-                          <span className="posted-on"><time>{formatBlogDate(item.date)}</time></span>
-                       </div>
-                  </li>
-               ))}
+                {latest_news.map((item) => (
+                   <li key={item.id} className="post-thumbnail-content d-flex align-items-center">
+                      <Image src={item.img} alt={`Thumbnail gambar berita: ${item.title}`} />
+                        <div className="post-title-date">
+                           <h6><Link href="/blog-details">{item.title}</Link></h6>
+                           <span className="posted-on"><time>{formatBlogDate(item.date)}</time></span>
+                        </div>
+                   </li>
+                ))}
             </ul>
          </div>
       </div>

@@ -12,14 +12,14 @@ const BlogSidebarComponent = () => {
          <div className="sidebar-widget-area mb-30">
             <div className="sidebar-widget sidebar-search-widget mb-20">
                <AnimationWrapper animation="fadeInUp">
-                  <div className="sidebar-widget-content">
-                     <form onSubmit={(e)=>e.preventDefault()}>
-                        <div className="search-input">
-                           <input type="text" placeholder="Cari artikel..."/>
-                           <button type="submit"><i className="far fa-search"></i></button>
-                        </div>
-                     </form>
-                  </div>
+                   <div className="sidebar-widget-content">
+                      <form onSubmit={(e)=>e.preventDefault()} role="search">
+                         <div className="search-input">
+                            <input type="text" placeholder="Cari artikel..." aria-label="Cari artikel di blog"/>
+                            <button type="submit" aria-label="Tombol pencarian artikel"><i className="far fa-search" aria-hidden="true"></i></button>
+                         </div>
+                      </form>
+                   </div>
                </AnimationWrapper>
             </div>
             <Category />
