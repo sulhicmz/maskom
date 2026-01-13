@@ -18857,3 +18857,259 @@ All critical paths are comprehensively tested:
 **Related Tasks**: Task 89 (Base Validation Tests), Task 86 (Code Health), Task 90 (Security Assessment)
 **Next Test Coverage Review**: Quarterly (April 2026)
 
+
+---
+
+## Task 142: Refactor - Duplicate Pricing Components (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Code Refactoring (Duplicate Code Elimination)
+
+**Problem**:
+- Near-complete duplication between `/src/components/homes/home-one/Price.tsx` (89 lines) and `/src/components/pages/pricing/PricingArea.tsx` (82 lines)
+- 90% identical code across two pricing components
+- Only differences: data source, tab titles, section title/description, and one styling class (`black-dark-bg`)
+- Maintaining duplicate code increases maintenance burden and risk of inconsistencies
+- Violates DRY (Don't Repeat Yourself) principle
+
+**Suggestion**:
+Extract shared logic into a reusable `PricingSection` component that accepts:
+- Pricing data (price items)
+- Tab configuration (array of tab titles)
+- Section props (title, description, background style)
+- Use data-driven tab configuration
+
+**Expected Impact**:
+- Code reduction: ~70 lines (35 lines per component saved)
+- Maintenance: Single point of change for pricing logic
+- Consistency: Both pricing pages use same component implementation
+- Reusability: Easy to create new pricing variants
+
+**Effort**: Medium
+**Related Files**:
+- `src/components/homes/home-one/Price.tsx` - Duplicate pricing component
+- `src/components/pages/pricing/PricingArea.tsx` - Duplicate pricing component
+- Potential new file: `src/components/common/PricingSection.tsx` - Extracted reusable component
+
+---
+
+## Task 143: Refactor - Duplicate Error Handling in AuthService (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Duplicate Code Elimination)
+
+**Problem**:
+- `login()` and `register()` methods in `/src/services/auth/AuthService.ts` contain 18 lines of nearly identical error handling
+- Lines 121-139 and 158-176 have same patterns:
+  - Same rate limit check pattern
+  - Same error message generation
+  - Same `ServiceValidationError` handling
+  - Same `createErrorResult` fallback
+- Duplicate error handling makes code harder to maintain and error-prone
+- Changes to error handling logic require updates in multiple locations
+
+**Suggestion**:
+Extract into private method `handleAuthError(error: unknown): AuthResult` to:
+- Centralize error handling logic
+- Reduce duplication from 36 lines to 18 lines (50% reduction)
+- Make error handling consistent across auth methods
+- Simplify login() and register() methods
+
+**Expected Impact**:
+- Code reduction: 18 lines (duplicate error handling eliminated)
+- Maintainability: Single point of change for error handling
+- Consistency: Auth methods use identical error handling
+- Readability: Login and register methods focus on business logic
+
+**Effort**: Small
+**Related Files**:
+- `src/services/auth/AuthService.ts` - Lines 121-139, 158-176
+
+---
+
+## Task 144: Refactor - Dual Animation Pattern in CtaWrapper (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Design Simplification)
+
+**Problem**:
+- `CtaWrapper` component supports two animation systems ("animation-wrapper" and "wow.js")
+- Creates code duplication with two separate rendering paths for content and images
+- Depends on both animation libraries simultaneously
+- Maintenance burden of two systems
+- Unclear which animation library should be preferred
+- Lines 48-87 contain duplicated logic for each animation type
+
+**Suggestion**:
+Choose one animation library and remove the other:
+- If migration needed, create temporary wrapper to bridge APIs
+- Simplify CtaWrapper to use single animation system
+- Remove duplicate rendering paths
+- Reduce dependencies (single animation library)
+
+**Expected Impact**:
+- Code reduction: ~20 lines (duplicate rendering paths removed)
+- Dependencies: One less animation library dependency
+- Maintainability: Single animation system to maintain
+- Clarity: Clear which animation approach is used
+
+**Effort**: Medium
+**Related Files**:
+- `src/components/common/CtaWrapper.tsx` - Lines 48-87
+
+---
+
+## Task 145: Refactor - Form Data Extraction Anti-Pattern (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Best Practices)
+
+**Problem**:
+- `ContactForm.tsx` combines `react-hook-form` with manual `useRef` + `FormData` extraction
+- Lines 22-35 bypass react-hook-form's type-safe data handling
+- Requires manual type casting (`as string`)
+- Example anti-pattern:
+  ```typescript
+  const form = useRef<HTMLFormElement>(null);
+  const formData = new FormData(form.current);
+  const templateParams = {
+    user_name: formData.get('user_name') as string,
+    // ...
+  };
+  ```
+
+**Suggestion**:
+Use react-hook-form's `handleSubmit` data directly:
+```typescript
+const { submit: sendEmail } = useFormSubmission<FormData, ServiceResult>(
+  async (data: FormData) => {
+    return await emailService.sendEmail({ templateParams: data });
+  }
+);
+```
+Benefits:
+- Type-safe data handling
+- No manual casting
+- Follows react-hook-form best practices
+- Cleaner, more idiomatic code
+
+**Expected Impact**:
+- Code reduction: ~10 lines (useRef and FormData extraction removed)
+- Type safety: Proper TypeScript typing for form data
+- Best practices: Follows react-hook-form patterns
+- Maintainability: Less manual data extraction logic
+
+**Effort**: Small
+**Related Files**:
+- `src/components/forms/ContactForm.tsx` - Lines 22-35
+
+---
+
+## Task 146: Refactor - Mock Authentication Implementation (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: Architecture Improvement (Production Readiness)
+
+**Problem**:
+- `AuthService.ts` uses mock authentication in production code
+- Hardcoded "mock-jwt-token" string returned as token (line 84, 101)
+- In-memory user storage (`private currentUser`) lost on page refresh (lines 257-259)
+- Email-to-name extraction logic (`extractNameFromEmail`) is not production-grade (lines 261-281)
+- No actual password verification or JWT signing
+- Mock implementation mixed with production code makes it hard to distinguish
+
+**Suggestion**:
+1. Add environment flag to switch between mock/real auth
+2. Implement proper JWT generation/signing using library like `jsonwebtoken`
+3. Store session in localStorage/cookies with proper security
+4. Add interface marker to clearly indicate mock status
+5. Document mock vs production behavior
+
+**Expected Impact**:
+- Production readiness: Real authentication for production
+- Security: Proper JWT signing and session management
+- Clarity: Clear separation between mock and production code
+- Flexibility: Easy to test with mock mode
+
+**Effort**: Large
+**Related Files**:
+- `src/services/auth/AuthService.ts` - Lines 84, 101, 257-259, 261-281
+
+---
+
+## Task 147: Refactor - Inconsistent Naming Conventions (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Code Quality (Naming Standards)
+
+**Problem**:
+- Mix of snake_case, camelCase across codebase
+- Indonesian abbreviations mixed with English terms
+- Inconsistent naming patterns create cognitive overhead
+- Examples:
+  - `testi_data` (FeedbackData.ts) - Indonesian abbreviation
+  - `price_data` (PriceData.ts) - snake_case in camelCase project
+  - `tab_title` (Price.tsx) - snake_case
+  - Mixed English/Indonesian UI text in NavMenu.tsx
+
+**Suggestion**:
+1. Standardize to camelCase for all variables
+2. Use full English words (e.g., `feedbackData` instead of `testi_data`)
+3. Create linting rule to enforce naming conventions
+4. Document naming standards in AGENTS.md or CODING_STANDARDS.md
+
+**Expected Impact**:
+- Consistency: Uniform naming across codebase
+- Readability: Clear, consistent variable names
+- Maintainability: Easier to navigate and understand code
+- Tooling: Linting rules prevent future inconsistencies
+
+**Effort**: Large (systematic refactoring)
+**Related Files**:
+- `src/data/FeedbackData.ts` - `testi_data`
+- `src/data/PriceData.ts` - `price_data`
+- `src/components/homes/home-one/Price.tsx` - `tab_title`
+- `src/layouts/headers/Menu/NavMenu.tsx` - Mixed language UI text
+
+---
+
+## Task 148: Refactor - Type Safety in Error ID Generation (Jan 13, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Code Quality (Type Safety)
+
+**Problem**:
+- Error ID generation in `ErrorBoundary.tsx` uses `Math.random()` (line 110)
+- Possible duplicate IDs due to randomness
+- Function not exported or testable
+- Current implementation:
+  ```typescript
+  function generateErrorId(): string {
+    return `ERR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  }
+  ```
+
+**Suggestion**:
+1. Use UUID library (already installed per Task 134) or implement counter-based generator
+2. Move to utility file and export for testing
+3. Ensure unique error IDs
+4. Add tests for error ID generation
+
+**Expected Impact**:
+- Type safety: Proper unique ID generation
+- Testability: Exported function can be tested
+- Reliability: No duplicate error IDs
+- Reusability: Utility can be used elsewhere
+
+**Effort**: Small
+**Related Files**:
+- `src/components/common/ErrorBoundary.tsx` - Line 110
+- Potential new file: `src/utils/errorUtils.ts` - Error ID generation utility
+
