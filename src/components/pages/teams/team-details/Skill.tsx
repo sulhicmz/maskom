@@ -1,20 +1,13 @@
 "use client"
 import Image from "next/image"
-import { useState } from "react"
-import dynamic from 'next/dynamic'
-
-const VideoPopup = dynamic(() => import("@/modals/VideoPopup"), {
-  ssr: false,
-  loading: () => null
-})
+import { useVideoPopup } from '@/hooks/useVideoPopup';
 
 import skill_thumb from "@/assets/images/team/team-single-2.jpg"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const Skill = () => {
-
-   const [isVideoOpen, setIsVideoOpen] = useState(false);
+   const { openVideo, VideoPopupComponent } = useVideoPopup("Ml4XCF-JS0k");
 
    return (
       <>
@@ -23,7 +16,7 @@ const Skill = () => {
                <div className="row align-items-center">
                   <div className="col-xl-7">
                      <AnimationWrapper animation="fadeInLeft" className="skill-content-box">
-                        <SectionTitle 
+                        <SectionTitle
                            title="My Skills"
                            description="Our goal is to utilize today's ttechnologies to stay ahead of the curve."
                            className="mb-50"
@@ -59,7 +52,7 @@ const Skill = () => {
                          <Image src={skill_thumb} alt="Demostrasi skill dan kemampuan tim Maskom" />
                          <div className="image-overlay">
                             <div className="play-button d-flex align-items-center">
-                               <button type="button" onClick={() => setIsVideoOpen(true)} className="video-popup" aria-label="Tonton video bio"><i
+                               <button type="button" onClick={openVideo} className="video-popup" aria-label="Tonton video bio"><i
                                   className="flaticon-play-button-arrowhead" aria-hidden="true"></i></button>
                                <div className="text">Discover my bio</div>
                             </div>
@@ -70,11 +63,7 @@ const Skill = () => {
             </div>
          </section>
 
-         <VideoPopup
-            isVideoOpen={isVideoOpen}
-            setIsVideoOpen={setIsVideoOpen}
-            videoId={"Ml4XCF-JS0k"}
-         />
+         {VideoPopupComponent}
       </>
    )
 }
