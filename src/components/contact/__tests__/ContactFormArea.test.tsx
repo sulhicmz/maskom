@@ -36,8 +36,15 @@ describe('ContactFormArea', () => {
   it('renders contact images', () => {
     render(<ContactFormArea />);
     
-    const images = screen.getAllByAltText('Contact Image');
-    expect(images.length).toBe(4);
+    const supportImage = screen.getByAltText('Ilustrasi tim dukungan pelanggan Maskom siap membantu');
+    const techImage = screen.getByAltText('Ilustrasi tim teknis bekerja sama');
+    const collabImage = screen.getByAltText('Ilustrasi kolaborasi tim profesional');
+    const decorImage = screen.getByAltText('Elemen dekoratif visual halaman kontak');
+    
+    expect(supportImage).toBeInTheDocument();
+    expect(techImage).toBeInTheDocument();
+    expect(collabImage).toBeInTheDocument();
+    expect(decorImage).toBeInTheDocument();
   });
 
   it('renders contact images with proper classes', () => {
@@ -168,11 +175,15 @@ describe('ContactFormArea', () => {
     const { container } = render(<ContactFormArea />);
     
     const imageBox = container.querySelector('.contact-one_image-box');
-    const images = screen.getAllByAltText('Contact Image');
+    const supportImage = screen.getByAltText('Ilustrasi tim dukungan pelanggan Maskom siap membantu');
+    const techImage = screen.getByAltText('Ilustrasi tim teknis bekerja sama');
+    const collabImage = screen.getByAltText('Ilustrasi kolaborasi tim profesional');
+    const decorImage = screen.getByAltText('Elemen dekoratif visual halaman kontak');
     
-    images.forEach((image) => {
-      expect(imageBox).toContainElement(image);
-    });
+    expect(imageBox).toContainElement(supportImage);
+    expect(imageBox).toContainElement(techImage);
+    expect(imageBox).toContainElement(collabImage);
+    expect(imageBox).toContainElement(decorImage);
   });
 
   it('renders contact form inside section content box', () => {
@@ -220,7 +231,8 @@ describe('ContactFormArea', () => {
   it('renders shape image with alt text', () => {
     render(<ContactFormArea />);
     
-    const images = screen.getAllByAltText('Contact Image');
-    expect(images.length).toBeGreaterThanOrEqual(3);
+    const decorImage = screen.getByAltText('Elemen dekoratif visual halaman kontak');
+    expect(decorImage).toBeInTheDocument();
+    expect(decorImage).toHaveClass('shape-one');
   });
 });

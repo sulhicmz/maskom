@@ -194,10 +194,10 @@ describe('LatestNews', () => {
   describe('Image Attributes', () => {
     it('should set correct alt text on images', () => {
       const { container } = render(<LatestNews />);
-      
+
       const images = container.querySelectorAll('img[data-testid="next-image"]');
       images.forEach(img => {
-        expect(img).toHaveAttribute('alt', 'post thumb');
+        expect(img).toHaveAttribute('alt', expect.stringMatching(/Thumbnail gambar berita:/i));
       });
     });
   });

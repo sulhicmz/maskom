@@ -4,6 +4,35 @@
 
 The AuthService provides a resilient, production-ready abstraction for user authentication and registration. It implements circuit breaker, retry, timeout, and rate limiting patterns to ensure secure and reliable authentication operations.
 
+## Service Type System
+
+### ServiceResult<T>
+
+All services in the application use a standardized response type system:
+
+```typescript
+interface ServiceResult<T = void> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+    errorCode?: ServiceErrorCodeType;
+    metadata?: Record<string, unknown>;
+}
+```
+
+### Domain-Specific Result Types
+
+Some services use domain-specific result types that extend or follow the same structure as `ServiceResult<T>`:
+
+**AuthResult** (AuthService):
+- Domain-specific for authentication operations
+- Contains `user` and `token` fields directly (not in `data`)
+- Same structure as `ServiceResult<T>` but tailored for auth needs
+- Follows same error handling and metadata patterns
+
+This approach allows type safety while maintaining consistency across all services. All services use the same error codes, error handling patterns, and metadata structure.
+
 ## API Contract
 
 ### `IAuthService` Interface
@@ -50,9 +79,11 @@ interface AuthResult {
     token?: string;           // JWT token (on success)
     error?: string;           // Error message (on failure)
     errorCode?: ServiceErrorCode;  // Error code (on failure)
-    rateLimited?: boolean;    // True if blocked by rate limiter
+    metadata?: Record<string, unknown>;  // Additional metadata (e.g., rateLimited)
 }
 ```
+
+**Note**: `AuthResult` is domain-specific for authentication operations. It follows the same structure as `ServiceResult<T>` but includes both `user` and `token` fields directly (instead of a single `data` field) because authentication operations need to return both user information and authentication token simultaneously.
 
 #### User Object
 
@@ -85,7 +116,7 @@ const handleLogin = async (email: string, password: string) => {
     if (result.success) {
         console.log('Login successful:', result.user);
         console.log('Token:', result.token);
-    } else if (result.rateLimited) {
+    } else if (result.metadata?.rateLimited) {
         console.warn('Rate limited:', result.error);
     } else {
         console.error('Login failed:', result.error);
@@ -113,7 +144,7 @@ const LoginForm = () => {
         if (result.success) {
             toast.success('Berhasil masuk ke portal');
             // Redirect to dashboard
-        } else if (result.rateLimited) {
+        } else if (result.metadata?.rateLimited) {
             toast.error(result.error || 'Terlalu banyak percobaan');
         } else {
             toast.error(result.error || 'Gagal masuk');
@@ -196,7 +227,7 @@ const SignUpForm = () => {
         if (result.success) {
             toast.success('Registrasi berhasil dikirim');
             // Redirect to dashboard
-        } else if (result.rateLimited) {
+        } else if (result.metadata?.rateLimited) {
             toast.error(result.error || 'Terlalu banyak percobaan');
         } else {
             toast.error(result.error || 'Gagal registrasi');
@@ -614,32 +645,32 @@ Authentication operations are protected by rate limiting to prevent brute force 
 ### Error Scenarios
 
 1. **Rate Limited**
-    - **Response**: `{ success: false, error: 'Terlalu banyak percobaan. Silakan coba lagi dalam X detik.', rateLimited: true }`
+    - **Response**: `{ success: false, error: 'Terlalu banyak percobaan. Silakan coba lagi dalam X detik.', errorCode: 'RATE_LIMIT_EXCEEDED', metadata: { rateLimited: true } }`
     - **Error Code**: `ServiceErrorCode.RATE_LIMIT`
     - **Action**: Wait for cooldown period
 
 2. **Validation Error**
-    - **Response**: `{ success: false, error: 'Format email tidak valid' | 'Kata sandi tidak valid' }`
+    - **Response**: `{ success: false, error: 'Format email tidak valid' | 'Kata sandi tidak valid', errorCode: 'VALIDATION_ERROR' }`
     - **Error Code**: `ServiceErrorCode.VALIDATION_ERROR`
     - **Action**: Validate input format before retrying
 
 3. **Missing Credentials**
-    - **Response**: `{ success: false, error: 'Email dan kata sandi diperlukan' }`
+    - **Response**: `{ success: false, error: 'Email dan kata sandi diperlukan', errorCode: 'CREDENTIALS_MISSING' }`
     - **Error Code**: `ServiceErrorCode.CREDENTIALS_MISSING`
     - **Action**: Provide required fields
 
 4. **Timeout**
-    - **Response**: `{ success: false, error: 'Login request timed out' | 'Registration request timed out' }`
+    - **Response**: `{ success: false, error: 'Login request timed out' | 'Registration request timed out', errorCode: 'TIMEOUT' }`
     - **Error Code**: `ServiceErrorCode.TIMEOUT`
     - **Action**: Retried automatically (up to 3 attempts)
 
 5. **Circuit Breaker Open**
-    - **Response**: `{ success: false, error: 'Circuit breaker is open' }`
+    - **Response**: `{ success: false, error: 'Circuit breaker is open', errorCode: 'CIRCUIT_BREAKER_OPEN' }`
     - **Error Code**: `ServiceErrorCode.CIRCUIT_BREAKER_OPEN`
     - **Action**: Wait 60 seconds or manually reset (not recommended)
 
 6. **Network Error**
-    - **Response**: `{ success: false, error: 'Network error occurred' }`
+    - **Response**: `{ success: false, error: 'Network error occurred', errorCode: 'NETWORK_ERROR' }`
     - **Error Code**: `ServiceErrorCode.NETWORK_ERROR`
     - **Action**: Retried automatically if matches retryable patterns
 
