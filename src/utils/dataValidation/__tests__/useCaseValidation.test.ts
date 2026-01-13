@@ -39,38 +39,38 @@ describe("validateUseCaseSidebarItem", () => {
    });
 
    describe("should fail validation", () => {
-       it("should fail with missing id", () => {
-          const invalidItem = {
-             title: "Keamanan Jaringan Rumah Sakit",
-             link: "/use-case-details"
-          };
-          const result = validateUseCaseSidebarItem(invalidItem);
-          expect(result.isValid).toBe(false);
-          expect(result.errors.length).toBeGreaterThan(0);
-          expect(result.errors.some(e => typeof e === "string" && e.includes("id"))).toBe(true);
-       });
+      it("should fail with missing id", () => {
+         const invalidItem = {
+            title: "Keamanan Jaringan Rumah Sakit",
+            link: "/use-case-details"
+         };
+         const result = validateUseCaseSidebarItem(invalidItem);
+         expect(result.isValid).toBe(false);
+         expect(result.errors.length).toBeGreaterThan(0);
+         expect(result.errors.some(e => e.field === "id" || e.message.includes("id"))).toBe(true);
+      });
 
-       it("should fail with missing title", () => {
-          const invalidItem = {
-             id: 4,
-             link: "/use-case-details"
-          };
-          const result = validateUseCaseSidebarItem(invalidItem);
-          expect(result.isValid).toBe(false);
-          expect(result.errors.length).toBeGreaterThan(0);
-          expect(result.errors.some(e => typeof e === "string" && e.includes("title"))).toBe(true);
-       });
+      it("should fail with missing title", () => {
+         const invalidItem = {
+            id: 4,
+            link: "/use-case-details"
+         };
+         const result = validateUseCaseSidebarItem(invalidItem);
+         expect(result.isValid).toBe(false);
+         expect(result.errors.length).toBeGreaterThan(0);
+         expect(result.errors.some(e => e.field === "title" || e.message.includes("title"))).toBe(true);
+      });
 
-       it("should fail with missing link", () => {
-          const invalidItem = {
-             id: 5,
-             title: "Interkoneksi Data Center & Cloud"
-          };
-          const result = validateUseCaseSidebarItem(invalidItem);
-          expect(result.isValid).toBe(false);
-          expect(result.errors.length).toBeGreaterThan(0);
-          expect(result.errors.some(e => typeof e === "string" && e.includes("link"))).toBe(true);
-       });
+      it("should fail with missing link", () => {
+         const invalidItem = {
+            id: 5,
+            title: "Interkoneksi Data Center & Cloud"
+         };
+         const result = validateUseCaseSidebarItem(invalidItem);
+         expect(result.isValid).toBe(false);
+         expect(result.errors.length).toBeGreaterThan(0);
+         expect(result.errors.some(e => e.field === "link" || e.message.includes("link"))).toBe(true);
+      });
 
       it("should fail with invalid id type", () => {
          const invalidItem = {
