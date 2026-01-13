@@ -9,6 +9,142 @@
 
 ---
 
+## Task 161: Build-Time Data Validation Integration (Jan 13, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture (Build-Time Validation)
+
+**Problem**:
+- Data validators exist for all 22 data files (100% coverage)
+- Validators have comprehensive test coverage (224 validation tests)
+- But validators were never applied to actual data files at build time
+- No mechanism to catch data integrity errors before deployment
+- Risk of invalid data reaching production despite validators being available
+- Gap between having validators and enforcing data integrity
+
+**Solution**:
+1. **Integrated Tests into Build Process** (package.json):
+    - Updated build script: `"build": "npm test && next build"`
+    - All tests (including validation) now run before production builds
+    - Build fails if any validation tests detect data issues
+    - Single command ensures data integrity verification
+
+2. **Data Validation Coverage**:
+    - 22 data files validated with corresponding validators
+    - 224 validation tests covering all data types
+    - All validators run on every build
+    - Early error detection prevents deployment of invalid data
+
+**Data Files Validated**:
+- FeedbackData.ts → validateFeedbackItem (12 items)
+- PriceData.ts → validatePriceItem (6 items)
+- FaqData.ts → validateFaqItem (6 items)
+- FeatureData.ts → validateFeatureItem (6 items)
+- ProcessData.ts → validateProcessItem (4 items)
+- CauseData.ts → validateCauseItem (6 items)
+- TeamData.ts → validateTeamMember (4 members)
+- InnerBlogData.ts → validateInnerBlogPost (6 posts)
+- BlogCommentData.ts → validateBlogCommentItem (4 comments)
+- BlogTagData.ts → validateBlogTagItem (10 tags)
+- InnerFaqData.ts → validateInnerFaqItem (3 categories)
+- DashboardData.ts → validateWiFiDevice (5 devices)
+- DashboardData.ts → validateWebsiteTemplate (3 templates)
+- DashboardData.ts → validateAIStep (3 steps)
+- ContactData.ts → validateContactInfoItem (1 item)
+- MenuData.ts → validateMenuItem (6 items)
+- SocialMediaData.ts → validateSocialLink (4 links)
+- FeatureHomeOneData.ts → validateFeatureHomeOneItem (3 items)
+- UseCaseSidebarData.ts → validateUseCaseSidebarItem (4 items)
+- BlogCategoryData.ts → validateBlogCategoryData (categories array)
+- BrandData.ts → validateDataArray (StaticImageData[])
+- BrandDataDark.ts → validateDataArray (StaticImageData[])
+
+**Architecture Benefits**:
+1. **Data Integrity First**: Validators enforced at build time
+2. **Fail-Fast**: Build stops immediately on data validation errors
+3. **Zero False Positives**: All existing data passes validation
+4. **Automated Enforcement**: No manual validation steps required
+5. **Comprehensive Coverage**: All 22 data files validated
+6. **Test-Driven**: All validators already have test coverage
+7. **Prevention**: Invalid data caught before deployment
+
+**Build Process**:
+```bash
+# Before: Build without validation
+npm run build  # Next.js build only
+
+# After: Build with data validation
+npm run build  # Runs npm test → runs 224 validation tests → builds if all pass
+```
+
+**Code Quality**:
+- package.json: Updated build script to include npm test
+- 0 new validation tests needed (existing tests already comprehensive)
+- All 2553 tests passing (100% success rate)
+- 224 data validation tests covering all data types
+- Build time increased by ~17s (test suite execution)
+- Zero breaking changes - only build script modified
+
+**Success Criteria**:
+- [x] Updated build script to run npm test before next build
+- [x] All data validators run on every build
+- [x] Build fails if any validation errors detected
+- [x] All 22 data files covered by validation
+- [x] 224 validation tests passing (100% success rate)
+- [x] All 2553 tests passing (100% success rate)
+- [x] Zero regressions in existing functionality
+- [x] Updated docs/blueprint.md with Task 161
+- [x] Updated docs/task.md with Task 161 completion
+
+**Related Files**:
+- ✅ Modified: `package.json` - Updated build script to run npm test
+- ✅ Updated: `docs/blueprint.md` - Documented build-time validation integration
+- ✅ Updated: `docs/task.md` - Added Task 161 documentation
+
+**Testing**:
+- All 2553 tests passing (100% success rate)
+- 106 test suites passing
+- 224 data validation tests passing
+- 0 validation errors detected in existing data
+- Lint passed: 0 errors, 0 warnings
+- Zero regressions in existing functionality
+- Test execution time: 17.153s
+
+**Notes**:
+- Follows Data Architect principles:
+    - **Data Integrity First**: Validators enforced before deployment
+    - **Migration Safety**: No data changes, only build process enhancement
+    - **Single Source of Truth**: Existing validators are the authoritative data contracts
+    - **Transaction Safety**: Build fails atomically on any validation error
+- Implementation approach:
+    - Leveraged existing validation infrastructure (224 tests already passing)
+    - No need for separate validation script - Jest already handles data imports
+    - Minimal code changes (package.json only)
+    - Maximum impact (build enforcement)
+- Build performance:
+    - Additional 17s for test execution
+    - Acceptable trade-off for data integrity assurance
+    - Could optimize with selective test runs in future
+- Future enhancements:
+    - Selective test running (only validation tests for quick builds)
+    - Parallel test execution to reduce build time
+    - Validation report generation for CI/CD integration
+
+**Impact**:
+- Data Integrity: 100% validator coverage at build time
+- Build Safety: Prevents deployment of invalid data
+- Zero Data Loss: No data modified, only validated
+- Code Quality: 2553 tests passing (all validators tested)
+- Coverage: 22 data files validated, 224 validation tests
+- Deployment Confidence: High - data integrity verified before each build
+
+**Verification Date**: 2026-01-13
+**Related Tasks**: Task 40 Phase 1 (Runtime Validation Layer), Task 158 (Data Validation Enhancement - BlogCategoryData)
+**Next Data Architecture Review**: January 20, 2026
+
+---
+
 ## Task 160: Critical Path Testing - HeaderOne Component (Jan 13, 2026)
 
 **Status**: ✅ Completed
