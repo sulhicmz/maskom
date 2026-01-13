@@ -1,3 +1,4 @@
+import React from "react";
 import Image, { StaticImageData } from "next/image";
 
 import img_1 from "@/assets/images/blog/post-thumb-1.jpg"
@@ -34,7 +35,7 @@ const latest_news: DataType[] = [
    },
 ];
 
-const LatestNews = () => {
+const LatestNewsComponent = () => {
    return (
       <div className="sidebar-widget sidebar-recent-widget mb-35 wow fadeInUp">
          <h3 className="widget-title">Berita Terbaru</h3>
@@ -54,5 +55,8 @@ const LatestNews = () => {
       </div>
    )
 }
+
+const LatestNews = React.memo(LatestNewsComponent)
+LatestNews.displayName = "LatestNews"
 
 export default LatestNews

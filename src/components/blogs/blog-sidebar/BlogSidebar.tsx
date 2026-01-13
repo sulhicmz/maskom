@@ -1,11 +1,12 @@
 "use client"
 
+import React from "react"
 import Category from "./Category"
 import LatestNews from "./LatestNews"
 import Tags from "./Tags"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const BlogSidebar = () => {
+const BlogSidebarComponent = () => {
    return (
       <div className="col-xl-4">
          <div className="sidebar-widget-area mb-30">
@@ -28,5 +29,8 @@ const BlogSidebar = () => {
       </div>
    )
 }
+
+const BlogSidebar = React.memo(BlogSidebarComponent)
+BlogSidebar.displayName = "BlogSidebar"
 
 export default BlogSidebar

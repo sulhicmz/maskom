@@ -1,7 +1,8 @@
+import React from "react";
 import tags from "@/data/BlogTagData";
 import AnimationWrapper from "@/components/common/AnimationWrapper";
 
-const Tags = () => {
+const TagsComponent = () => {
    return (
       <div className="sidebar-widget tag-cloud-widget">
          <AnimationWrapper animation="fadeInUp">
@@ -15,5 +16,8 @@ const Tags = () => {
       </div>
    )
 }
+
+const Tags = React.memo(TagsComponent)
+Tags.displayName = "Tags"
 
 export default Tags
