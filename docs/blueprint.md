@@ -954,6 +954,13 @@ External API (EmailJS, etc.)
   - **Code Reuse**: Helper functions reduce boilerplate
   - **Self-Documenting**: Type names and error codes describe behavior
   - **Future-Proof**: Easy to add new services following same patterns
+- **Documentation Alignment** (✅ COMPLETED - Task 131):
+  - Service documentation accurately reflects actual type implementations
+  - `ServiceResult<T>` structure documented with `data` and `metadata` fields
+  - `metadata.rateLimited` used instead of direct `rateLimited` field
+  - Domain-specific types (e.g., `AuthResult`) documented with relationship to `ServiceResult<T>`
+  - Service Type System sections added to documentation
+  - Response examples updated with correct field names (`data.text`, `errorCode`, `metadata`)
 - **Location**: `src/services/common/` (types.ts, ServiceException.ts, logger.ts, resultHelpers.ts, index.ts)
 
 #### Error Handling
