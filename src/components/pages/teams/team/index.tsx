@@ -1,12 +1,14 @@
-import PageLayout from "@/components/common/PageLayout"
-import TeamArea from "./TeamArea"
+import { PageBuilder } from '@/components/common/PageBuilder';
+import TeamArea from "./TeamArea";
 
 const Team = () => {
-   return (
-      <PageLayout breadcrumbTitle="Expert Team Member" breadcrumbSubTitle="Team Member">
-         <TeamArea />
-      </PageLayout>
-   )
-}
+  return (
+    <PageBuilder 
+      title="Expert Team Member" 
+      subTitle="Team Member"
+      content={<TeamArea />}
+    />
+  );
+};
 
-export default Team
+export default Team;

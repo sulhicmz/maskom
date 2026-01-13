@@ -1,12 +1,15 @@
-import PageLayout from "@/components/common/PageLayout"
-import LoginArea from "./LoginArea"
+import { PageBuilder } from '@/components/common/PageBuilder';
+import LoginArea from "./LoginArea";
 
 const Login = () => {
-   return (
-      <PageLayout breadcrumbTitle="Masuk Portal Maskom" breadcrumbSubTitle="Login">
-         <LoginArea />
-      </PageLayout>
-   )
-}
+  return (
+    <PageBuilder 
+      title="Masuk Portal Maskom" 
+      subTitle="Login"
+      headerStyle={true}
+      content={<LoginArea />}
+    />
+  );
+};
 
-export default Login
+export default Login;

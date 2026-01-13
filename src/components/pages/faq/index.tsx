@@ -1,16 +1,20 @@
-import PageLayout from "@/components/common/PageLayout"
-import FaqArea from "./FaqArea"
-import Cta from "./Cta"
-import FaqHome from "@/components/homes/home-one/Faq"
+import { PageBuilderWithSections } from '@/components/common/PageBuilder';
+import FaqArea from "./FaqArea";
+import Cta from "./Cta";
+import FaqHome from "@/components/homes/home-one/Faq";
 
 const Faq = () => {
-   return (
-      <PageLayout breadcrumbTitle="Pertanyaan Umum Maskom" breadcrumbSubTitle="FAQ">
-         <FaqArea />
-         <Cta />
-         <FaqHome />
-      </PageLayout>
-   )
-}
+  return (
+    <PageBuilderWithSections
+      title="Pertanyaan Umum Maskom"
+      subTitle="FAQ"
+      sections={[
+        <FaqArea key="faq-area" />,
+        <Cta key="cta" />,
+        <FaqHome key="faq-home" />
+      ]}
+    />
+  );
+};
 
-export default Faq
+export default Faq;

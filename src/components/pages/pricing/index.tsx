@@ -1,25 +1,21 @@
-import Breadcrumb from "@/components/common/Breadcrumb"
-import HeaderOne from "@/layouts/headers/HeaderOne"
-import PricingArea from "./PricingArea"
-import FooterTwo from "@/layouts/footers/FooterTwo"
-import Process from "@/components/homes/home-one/Process"
-import Cta from "@/components/common/Cta"
+import { PageBuilderWithSections } from '@/components/common/PageBuilder';
+import PricingArea from "./PricingArea";
+import Process from "@/components/homes/home-one/Process";
+import Cta from "@/components/common/Cta";
 
 const Pricing = () => {
-   return (
-      <div className="ac-page-wrapper">
-         <HeaderOne style={true} />
-         <div className="smooth-wrapper">
-            <div id="smooth-content">
-               <Breadcrumb title="Paket Layanan Maskom" sub_title="Harga" />
-               <PricingArea />
-               <Process />
-               <Cta />
-            </div>
-         </div>
-         <FooterTwo />
-      </div>
-   )
-}
+  return (
+    <PageBuilderWithSections
+      title="Paket Layanan Maskom"
+      subTitle="Harga"
+      headerStyle={true}
+      sections={[
+        <PricingArea key="pricing" />,
+        <Process key="process" />,
+        <Cta key="cta" />
+      ]}
+    />
+  );
+};
 
-export default Pricing
+export default Pricing;

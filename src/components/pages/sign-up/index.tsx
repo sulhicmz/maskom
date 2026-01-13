@@ -1,12 +1,14 @@
-import PageLayout from "@/components/common/PageLayout"
-import SignUpArea from "./SignUpArea"
+import { PageBuilder } from '@/components/common/PageBuilder';
+import SignUpArea from "./SignUpArea";
 
 const SignUp = () => {
-   return (
-      <PageLayout breadcrumbTitle="Buat Akun Maskom" breadcrumbSubTitle="Registrasi">
-         <SignUpArea />
-      </PageLayout>
-   )
-}
+  return (
+    <PageBuilder 
+      title="Buat Akun Maskom" 
+      subTitle="Registrasi"
+      content={<SignUpArea />}
+    />
+  );
+};
 
-export default SignUp
+export default SignUp;
