@@ -6,7 +6,16 @@ export interface AutoIdGeneratorOptions {
   collectionName?: string;
 }
 
-export class AutoIdGenerator {
+export interface IAutoIdGenerator {
+  next(): number;
+  nextId(): number;
+  reset(startFrom?: number): void;
+  getCurrentId(): number;
+  getUsedIds(): readonly number[];
+  hasUsedId(id: number): boolean;
+}
+
+export class AutoIdGenerator implements IAutoIdGenerator {
   private static readonly DEFAULT_START = 1;
   private static readonly DEFAULT_INCREMENT = 1;
 

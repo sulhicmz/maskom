@@ -777,12 +777,25 @@ interface ICircuitBreaker {
 }
 ```
 
+**IAutoIdGenerator** (src/utils/dataAutoId.ts):
+```typescript
+interface IAutoIdGenerator {
+    next(): number;
+    nextId(): number;
+    reset(startFrom?: number): void;
+    getCurrentId(): number;
+    getUsedIds(): readonly number[];
+    hasUsedId(id: number): boolean;
+}
+```
+
 ### Implementation
 
 All utility classes implement their respective interfaces:
 - **RateLimiter** implements `IRateLimiter`
 - **MetricsCollector** implements `IMetricsCollector`
 - **CircuitBreaker** implements `ICircuitBreaker`
+- **AutoIdGenerator** implements `IAutoIdGenerator`
 
 ### Benefits
 
@@ -848,6 +861,7 @@ All interface contracts have comprehensive test coverage:
 - **RateLimiter interface tests** (14 tests) - src/utils/rateLimiter/__tests__/interface.test.ts
 - **MetricsCollector interface tests** (18 tests) - src/utils/metrics/__tests__/interface.test.ts
 - **CircuitBreaker interface tests** (14 tests) - src/utils/resilience/__tests__/interface.test.ts
+- **AutoIdGenerator interface tests** (17 tests) - src/utils/__tests__/dataAutoId.interface.test.ts
 
 Tests verify:
 - Interface methods are correctly implemented
