@@ -154,7 +154,7 @@ describe('BlogArea', () => {
   it('renders blog images with proper alt text', () => {
     render(<BlogArea />);
 
-    const images = screen.getAllByAltText(/post post-thumbnail/i);
+    const images = screen.getAllByAltText(/Thumbnail gambar artikel:/i);
     expect(images.length).toBeGreaterThan(0);
   });
 
