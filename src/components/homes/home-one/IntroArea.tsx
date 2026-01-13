@@ -1,20 +1,13 @@
 "use client"
 import Image from 'next/image'
-import { useState } from 'react';
-import dynamic from 'next/dynamic'
-
-const VideoPopup = dynamic(() => import("@/modals/VideoPopup"), {
-  ssr: false,
-  loading: () => null
-})
+import { useVideoPopup } from '@/hooks/useVideoPopup';
 
 import video_thumb from "@/assets/images/gallery/video-1.svg"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
 const IntroArea = () => {
-
-   const [isVideoOpen, setIsVideoOpen] = useState(false);
+   const { openVideo, VideoPopupComponent } = useVideoPopup("Ml4XCF-JS0k");
 
    return (
       <>
@@ -26,14 +19,14 @@ const IntroArea = () => {
                          <AnimationWrapper animation="fadeInLeft" className="video-one_image-box p-r z-1 mb-50">
                             <Image src={video_thumb} alt="Video perkenalan layanan Maskom" />
                             <div className="play-button">
-                               <button type="button" onClick={() => setIsVideoOpen(true)} className="video-popup" aria-label="Tonton video perkenalan Maskom"><i
+                               <button type="button" onClick={openVideo} className="video-popup" aria-label="Tonton video perkenalan Maskom"><i
                                   className="flaticon-play-button-arrowhead" aria-hidden="true"></i></button>
                             </div>
                          </AnimationWrapper>
                       </div>
                      <div className="col-xl-6">
                         <AnimationWrapper animation="fadeInRight" className="section-content-box text-white mb-50">
-                           <SectionTitle 
+                           <SectionTitle
                               subtitle="Tentang Maskom"
                               title="Partner Infrastruktur Digital Untuk Bisnis Anda"
                               className="mb-55"
@@ -51,11 +44,7 @@ const IntroArea = () => {
             </div>
          </section>
 
-         <VideoPopup
-            isVideoOpen={isVideoOpen}
-            setIsVideoOpen={setIsVideoOpen}
-            videoId={"Ml4XCF-JS0k"}
-         />
+         {VideoPopupComponent}
       </>
    )
 }
