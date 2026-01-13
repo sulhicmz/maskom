@@ -47,24 +47,26 @@ const FaqArea = React.memo(() => {
                 <div className="section-content-box">
                   <div className="accordion" id="accordionTwo">
                      {inner_faq_data[activeTab].faq_details.map((item) => (
-                       <div key={item.id} className="accordion-card style-two mb-15">
-                         <div className="accordion-header">
-                           <h6
-                             onClick={() => toggle(item.id)}
-                             className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
-                           >
-                             {item.title}
-                           </h6>
-                         </div>
-                         <div
-                           id={`collapse${item.id}`}
-                           className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}
-                         >
-                           <div className="accordion-content">
-                             <p>{item.desc}</p>
-                           </div>
-                         </div>
-                       </div>
+                        <div key={item.id} className="accordion-card style-two mb-15">
+                          <div className="accordion-header">
+                            <button
+                              onClick={() => toggle(item.id)}
+                              className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
+                              aria-expanded={activeId === item.id}
+                              aria-controls={`collapse${item.id}`}
+                            >
+                              {item.title}
+                            </button>
+                          </div>
+                          <div
+                            id={`collapse${item.id}`}
+                            className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}
+                          >
+                            <div className="accordion-content">
+                              <p>{item.desc}</p>
+                            </div>
+                          </div>
+                        </div>
                      ))}
                   </div>
                 </div>
