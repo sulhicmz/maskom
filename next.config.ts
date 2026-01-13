@@ -18,9 +18,6 @@ const nextConfig: NextConfig = {
     unoptimized: true, // Cloudflare Pages menangani image optimization
   },
   
-  // Modern browser target to reduce polyfills
-  swcMinify: true,
-  
   // Konfigurasi kompresi
   compress: true,
   
