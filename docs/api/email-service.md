@@ -4,6 +4,46 @@
 
 The EmailService provides a resilient, production-ready abstraction for sending emails via EmailJS. It implements circuit breaker, retry, and timeout patterns to ensure reliable email delivery.
 
+## Service Type System
+
+### ServiceResult<T>
+
+All services in the application use a standardized response type system:
+
+```typescript
+interface ServiceResult<T = void> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+    errorCode?: ServiceErrorCodeType;
+    metadata?: Record<string, unknown>;
+}
+```
+
+### Standardized Error Codes
+
+```typescript
+const ServiceErrorCode = {
+    VALIDATION: 'VALIDATION_ERROR',
+    RATE_LIMIT: 'RATE_LIMIT_EXCEEDED',
+    TIMEOUT: 'TIMEOUT',
+    CIRCUIT_BREAKER: 'CIRCUIT_BREAKER_OPEN',
+    CREDENTIALS_MISSING: 'CREDENTIALS_MISSING',
+    UNKNOWN: 'UNKNOWN_ERROR',
+    NETWORK: 'NETWORK_ERROR',
+};
+```
+
+### EmailService Response
+
+EmailService returns `ServiceResult<{ text: string }>`:
+- `data`: Contains `{ text: string }` from EmailJS response
+- `metadata`: May contain `{ rateLimited: boolean }` for rate limit status
+- `errorCode`: Uses `ServiceErrorCode` constants for type-safe error handling
+
+This standardized approach ensures consistent error handling, type safety, and predictable response structure across all services.
+
 ## Environment Variables
 
 ```bash
@@ -45,14 +85,16 @@ interface EmailSendOptions {
 }
 ```
 
-### Response: `EmailSendResult`
+### Response: `ServiceResult<{ text: string }>`
 
 ```typescript
-interface EmailSendResult {
+interface ServiceResult<{ text: string }> {
     success: boolean;        // True if email sent successfully
-    text?: string;          // Success message from EmailJS
+    message?: string;        // Success message
+    data?: { text: string }; // EmailJS response object with text field
     error?: string;         // Error message if failed
-    rateLimited?: boolean;  // True if blocked by rate limiter
+    errorCode?: ServiceErrorCodeType;  // Error code
+    metadata?: { rateLimited?: boolean };  // Additional metadata
 }
 ```
 
@@ -72,11 +114,13 @@ const result = await emailService.sendEmail({
 });
 
 if (result.success) {
-    console.log('Email sent successfully:', result.text);
-} else if (result.rateLimited) {
+    console.log('Email sent successfully:', result.data?.text);
+    console.log('Message:', result.message);
+} else if (result.metadata?.rateLimited) {
     console.warn('Rate limited:', result.error);
 } else {
     console.error('Failed to send email:', result.error);
+    console.error('Error code:', result.errorCode);
 }
 ```
 
@@ -94,7 +138,7 @@ const handleSendEmail = async (formData: FormData) => {
         }
     });
 
-    if (result.rateLimited) {
+    if (result.metadata?.rateLimited) {
         toast.error(result.error || 'Too many attempts. Please try again later.');
         return;
     }
@@ -162,7 +206,10 @@ Email sending is protected by rate limiting to prevent abuse:
 {
     "success": false,
     "error": "Too many attempts. Please try again in X seconds.",
-    "rateLimited": true
+    "errorCode": "RATE_LIMIT_EXCEEDED",
+    "metadata": {
+        "rateLimited": true
+    }
 }
 ```
 
@@ -249,27 +296,27 @@ emailService.resetCircuitBreaker();
 ### Error Scenarios
 
 1. **Rate Limited**
-    - **Response**: `{ success: false, error: 'Too many attempts...', rateLimited: true }`
+    - **Response**: `{ success: false, error: 'Too many attempts...', errorCode: 'RATE_LIMIT_EXCEEDED', metadata: { rateLimited: true } }`
     - **Action**: Wait for cooldown period (5 minutes) or use different identifier
 
 2. **Missing Credentials**
-    - **Response**: `{ success: false, error: 'EmailJS credentials not configured' }`
+    - **Response**: `{ success: false, error: 'EmailJS credentials not configured', errorCode: 'CREDENTIALS_MISSING' }`
     - **Action**: Check environment variables
 
 3. **Timeout**
-    - **Response**: `{ success: false, error: 'EmailJS request timed out' }`
+    - **Response**: `{ success: false, error: 'EmailJS request timed out', errorCode: 'TIMEOUT' }`
     - **Action**: Retried automatically (up to 3 attempts)
 
 4. **Network Error**
-    - **Response**: `{ success: false, error: 'Network error occurred' }`
+    - **Response**: `{ success: false, error: 'Network error occurred', errorCode: 'NETWORK_ERROR' }`
     - **Action**: Retried automatically if matches retryable patterns
 
 5. **Circuit Breaker Open**
-    - **Response**: `{ success: false, error: 'Circuit breaker is open' }`
+    - **Response**: `{ success: false, error: 'Circuit breaker is open', errorCode: 'CIRCUIT_BREAKER_OPEN' }`
     - **Action**: Wait 60 seconds or manually reset (not recommended)
 
 6. **EmailJS Service Error**
-    - **Response**: `{ success: false, error: 'Service error' }`
+    - **Response**: `{ success: false, error: 'Service error', errorCode: 'UNKNOWN_ERROR' }`
     - **Action**: Check EmailJS status, configuration
 
 ### Error Recovery
@@ -300,7 +347,7 @@ const handleSubmit = async (data: FormData) => {
 
     if (result.success) {
         toast.success('Email sent successfully!');
-    } else if (result.rateLimited) {
+    } else if (result.metadata?.rateLimited) {
         toast.error(result.error || 'Too many attempts. Please try again later.');
     } else {
         toast.error('Failed to send email. Please try again.');
