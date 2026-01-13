@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 
 const VideoPopup = dynamic(() => import("@/modals/VideoPopup"), {
@@ -10,7 +10,7 @@ interface UseVideoPopupReturn {
   isVideoOpen: boolean;
   openVideo: () => void;
   closeVideo: () => void;
-  VideoPopupComponent: JSX.Element;
+  VideoPopupComponent: ReactNode;
 }
 
 export function useVideoPopup(videoId: string): UseVideoPopupReturn {
