@@ -352,8 +352,9 @@ export interface DataRelationship {
      - ✅ Consistent date display formatting - formatBlogDate, formatCommentDate utilities
       - ✅ Date validation - isValidISODate function for validation
       - ✅ Date parsing - toISODate function for conversion
-      - Consistent base type usage
-      - ✅ Auto-ID generation (COMPLETE - Task 77)
+       - Consistent base type usage
+       - ✅ Auto-ID generation (COMPLETE - Task 77)
+       - ✅ Applied to PriceData.ts (COMPLETE - Task 175)
 
  5. **✅ Page Registry & Validation** (COMPLETE - Data Architecture Enhancement):
      - ✅ Centralized page registry (VALID_PAGES in src/data/relationships.ts)

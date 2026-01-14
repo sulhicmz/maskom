@@ -1,10 +1,10 @@
 import { filterItems } from "@/utils/dataFilters";
 import { PriceItem } from "@/types/data";
 import { createPageIndex, type PageIndex } from "@/utils/dataIndex";
+import { autoIdArray } from "@/utils/dataAutoId";
 
-const price_data: PriceItem[] = [
+const { data: price_data } = autoIdArray<PriceItem>([
    {
-      id: 1,
       page: "home_1",
       price_details: [
          {
@@ -67,7 +67,6 @@ const price_data: PriceItem[] = [
       ]
    },
    {
-      id: 2,
       page: "home_1",
       price_details: [
          {
@@ -133,7 +132,6 @@ const price_data: PriceItem[] = [
    // pricing page
 
    {
-      id: 3,
       page: "pricing",
       price_details: [
          {
@@ -196,7 +194,6 @@ const price_data: PriceItem[] = [
       ]
    },
    {
-      id: 4,
       page: "pricing",
       price_details: [
          {
@@ -257,8 +254,8 @@ const price_data: PriceItem[] = [
             ],
          },
       ]
-   },
-];
+   }
+], { startFrom: 1 });
 
 export default price_data;
 
