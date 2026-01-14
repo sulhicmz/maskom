@@ -9,6 +9,360 @@
 
 ---
 
+## Task 173: React Optimization - Unnecessary React.memo in Feedback Component (Jan 14, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Performance Engineering (React Optimization)
+
+**Problem**:
+- Feedback component (src/components/homes/home-one/Feedback.tsx) uses React.memo but has no props
+- Component is a function component with zero props: `const Feedback = React.memo(() => {...})`
+- React.memo provides no performance benefit for components without props
+- Unnecessary memoization adds small overhead with no gain
+- Anti-pattern: Using React.memo on stateless, propless components
+
+**Location**:
+- `src/components/homes/home-one/Feedback.tsx` (line 8)
+
+**Solution**:
+1. **Remove unnecessary React.memo** from Feedback component
+   - Change `const Feedback = React.memo(() => {...})` to `const Feedback = () => {...}`
+   - Component has no props, so memoization provides no benefit
+   - Simplify component export to direct function
+
+2. **Update export statement** if needed
+   - Remove `export default React.memo(Feedback)` if used
+   - Use `export default Feedback` instead
+
+**Architecture Benefits**:
+1. **Code Clarity**: Remove unnecessary memoization, making intent clearer
+2. **Performance**: Small overhead reduction (no memo comparison)
+3. **Best Practice Compliance**: Only use React.memo when props exist and change frequently
+4. **Maintainability**: Clearer component structure without redundant optimization
+
+**Success Criteria**:
+- [ ] Removed React.memo from Feedback component
+- [ ] Component still functions correctly after removal
+- [ ] All tests passing (2634 tests)
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+
+**Related Files**:
+- To Modify: `src/components/homes/home-one/Feedback.tsx` - Remove React.memo wrapper
+- To Update: `src/components/homes/home-one/__tests__/Feedback.test.tsx` - Verify no changes needed
+
+**Testing**:
+- Run Feedback component tests
+- Verify rendering behavior unchanged
+- Check for any performance regressions (unlikely)
+
+**Notes**:
+- Follows Performance Engineering principles:
+  - **Measure First**: Component has no props, memoization provides zero benefit
+  - **Simplicity**: Remove unnecessary optimizations
+- This is a simple refactoring with clear benefits
+- Component is stateless and has no props, making React.memo ineffective
+
+**Impact**:
+- Code Quality: -1 React.memo usage, clearer intent
+- Performance: Minimal (negligible overhead reduction)
+- Maintainability: Clearer component without unnecessary optimization
+
+**Priority Justification**:
+- Priority: MEDIUM
+- Impact: Code quality improvement, minimal performance benefit
+- Effort: Small (1-2 lines to change)
+- Risk: Very Low (no behavioral change)
+
+---
+
+## Task 174: React Best Practice - Array Index Keys in Component Loops (Jan 14, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Code Quality (React Best Practice)
+
+**Problem**:
+- 3 components use array index (`key={i}`) instead of stable unique identifiers for list rendering
+- Brand.tsx (src/components/common/Brand.tsx): Uses `key={i}` for SwiperSlide
+- PricingCard.tsx (src/components/common/PricingCard.tsx): Uses index keys
+- Category.tsx (src/components/blogs/blog-sidebar/Category.tsx): Uses index keys
+- Array index as key can cause issues when list order changes (React reconciliation problems)
+- While these components use static data that doesn't change order, best practice is to use stable keys
+- Anti-pattern: Using index as key when item.id or unique identifier is available
+
+**Locations**:
+- `src/components/common/Brand.tsx` (line 50)
+- `src/components/common/PricingCard.tsx`
+- `src/components/blogs/blog-sidebar/Category.tsx`
+
+**Solution**:
+1. **Replace index keys with stable keys** where possible
+   - For Brand.tsx: Check if brandData has IDs, use `key={item.id}` or `key={src}` if available
+   - For PricingCard.tsx: Use item.id if available in price data
+   - For Category.tsx: Use category name or index with prefix if no stable ID
+
+2. **Analyze each component's data source**:
+   - BrandData: StaticImageData[] (no id field, may need to use index with prefix)
+   - PriceData: Has id field, should use `key={item.id}`
+   - CategoryData: string[] (no id field, may need to use string as key)
+
+3. **Document reason if index key must be used**:
+   - If no stable identifier exists, document why index key is acceptable
+   - Add comment explaining that data is static and doesn't reorder
+
+**Architecture Benefits**:
+1. **React Best Practice**: Use stable keys for list rendering
+2. **Avoid Reconciliation Issues**: Stable keys prevent unnecessary re-renders when list order changes
+3. **Documentation**: Clear intent about why index keys are used if necessary
+
+**Success Criteria**:
+- [ ] Analyzed all 3 components with index keys
+- [ ] Replaced index keys with stable identifiers where possible
+- [ ] Documented reason for any remaining index keys
+- [ ] All tests passing (2634 tests)
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+
+**Related Files**:
+- To Review: `src/components/common/Brand.tsx`
+- To Review: `src/components/common/PricingCard.tsx`
+- To Review: `src/components/blogs/blog-sidebar/Category.tsx`
+- To Review: `src/data/BrandData.ts` - Check data structure
+- To Review: `src/data/PriceData.ts` - Verify ID availability
+
+**Testing**:
+- Run component tests for Brand, PricingCard, Category
+- Verify rendering behavior unchanged
+- Check for React reconciliation warnings in console
+
+**Notes**:
+- Follows Code Quality principles:
+  - **Best Practice**: Use stable keys in React lists
+  - **Documentation**: Document exceptions when index key is necessary
+- Index keys are problematic when list changes (inserts, deletes, reorders)
+- Static data that never changes order is acceptable, but stable keys are preferred
+- If no stable identifier exists (BrandData uses StaticImageData[]), consider adding IDs or use unique property (src)
+
+**Priority Justification**:
+- Priority: LOW
+- Impact: Best practice improvement, no functional issue (data is static)
+- Effort: Small-Medium (3 components to review and potentially fix)
+- Risk: Very Low (data is static, doesn't change order)
+
+---
+
+## Task 175: Data Architecture - Apply Auto-ID Generation to Large Data Files (Jan 14, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Data Architecture (Auto-ID Generation)
+
+**Problem**:
+- Task 77 created autoIdArray utility for automatic ID generation
+- Many data files still use manual ID assignment (id: 1, 2, 3, ...)
+- PriceData.ts is largest data file (266 lines) with manual IDs
+- Manual ID assignment increases maintenance burden and risk of duplicate IDs
+- Auto-ID generation provides:
+  - Duplicate prevention (built-in duplicate detection)
+  - Consistent ID sequences
+  - Easier data file maintenance
+- Not all data files benefit from auto-ID (e.g., BlogCategoryData uses strings, BrandData uses StaticImageData)
+
+**Locations**:
+- `src/data/PriceData.ts` (266 lines, 20 ID entries)
+- `src/data/FeedbackData.ts` (114 lines, 10 ID entries)
+- `src/data/FeatureData.ts` (98 lines, 12 ID entries)
+- `src/data/FaqData.ts` (83 lines, 11 ID entries)
+- `src/data/InnerFaqData.ts` (82 lines, 15 ID entries)
+- Other data files with manual IDs
+
+**Solution**:
+1. **Apply autoIdArray to PriceData.ts** (highest priority due to size)
+   - Import autoIdArray from @/utils/dataAutoId
+   - Convert price_data array to use autoIdArray
+   - Maintain existing ID sequences for backward compatibility
+   - Add documentation comment about auto-ID usage
+
+2. **Evaluate other data files for auto-ID eligibility**:
+   - Check if data file has id field and follows BaseDataItem pattern
+   - Evaluate if data file is frequently updated (high benefit)
+   - Consider backward compatibility (existing IDs referenced in components)
+
+3. **Create migration plan** for eligible data files:
+   - PriceData.ts (266 lines, high benefit)
+   - FeedbackData.ts (114 lines, medium benefit)
+   - FeatureData.ts (98 lines, medium benefit)
+   - FaqData.ts, InnerFaqData.ts, TeamData.ts (smaller files)
+
+**Implementation Example** (PriceData.ts):
+```typescript
+import { autoIdArray } from '@/utils/dataAutoId';
+import { PriceItem } from '@/types/data';
+
+// Before: Manual ID assignment
+const price_data: PriceItem[] = [
+    { id: 1, page: "home_1", ... },
+    { id: 2, page: "home_1", ... },
+    // ... more items
+];
+
+// After: Auto-ID generation with backward-compatible start value
+const price_data: PriceItem[] = autoIdArray(
+    [
+        { page: "home_1", ... },
+        { page: "home_1", ... },
+        // ... more items
+    ],
+    { startFrom: 1 } // Maintain existing ID sequence
+);
+```
+
+**Architecture Benefits**:
+1. **Data Integrity**: Automatic duplicate detection prevents ID conflicts
+2. **Maintainability**: Easier to add new items (no manual ID assignment)
+3. **Consistency**: Guaranteed sequential IDs across data file
+4. **Future-Proof**: Utility available for future data file additions
+5. **Follows Task 77**: Leverages existing auto-ID infrastructure
+
+**Success Criteria**:
+- [ ] Applied autoIdArray to PriceData.ts
+- [ ] Maintained backward compatibility (existing IDs unchanged)
+- [ ] All component tests passing (2634 tests)
+- [ ] Data validation tests passing
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+- [ ] Documented auto-ID usage in data files
+
+**Related Files**:
+- To Modify: `src/data/PriceData.ts` - Apply autoIdArray
+- To Review: `src/data/FeedbackData.ts` - Evaluate for auto-ID
+- To Review: `src/data/FeatureData.ts` - Evaluate for auto-ID
+- To Reference: `src/utils/dataAutoId.ts` - Auto-ID utility (created in Task 77)
+- To Update: `docs/task.md` - Document Task 175 completion
+
+**Testing**:
+- Run all tests (2634 tests)
+- Verify PriceData items have correct IDs
+- Verify components using PriceData work correctly
+- Check data validation tests
+
+**Notes**:
+- Follows Data Architect principles:
+  - **Data Integrity First**: Auto-ID prevents duplicate IDs
+  - **Migration Safety**: Maintain backward compatibility
+  - **Future-Proof**: Utility available for future additions
+- Start with PriceData.ts (largest file, highest benefit)
+- Use startFrom option to maintain existing ID sequence (e.g., startFrom: 1)
+- Other data files can be migrated incrementally
+
+**Priority Justification**:
+- Priority: MEDIUM
+- Impact: Improved maintainability, data integrity
+- Effort: Small-Medium (apply utility to 1-2 files initially)
+- Risk: Low (maintain existing ID sequences for backward compatibility)
+
+---
+
+## Task 176: Performance Analysis - React.memo Optimization Gaps (Jan 14, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Performance Engineering (React Optimization Analysis)
+
+**Problem**:
+- 32 components use React.memo for optimization
+- Only 7 components use useCallback/useMemo for prop memoization
+- React.memo effectiveness depends on stable prop references
+- Inline callbacks and objects create new references on every render, breaking React.memo
+- Task 171 fixed Sidebar component by adding useCallback to inline handlers
+- Other components may have same issue (inline callbacks breaking React.memo)
+- Need to identify which React.memo components actually benefit from memoization
+
+**Locations**:
+- 32 components using React.memo across codebase:
+  - src/components/causes/use-cases/index.tsx
+  - src/components/dashboard/WiFiMonitor.tsx, WebsiteBuilder.tsx, Sidebar.tsx
+  - src/components/about/AboutArea.tsx, Feature.tsx
+  - src/components/contact/ContactArea.tsx
+  - src/components/homes/home-one/Cause.tsx, Feedback.tsx, Process.tsx, Faq.tsx, Hero.tsx, Feature.tsx, Price.tsx
+  - src/components/common/SocialLinks.tsx, CtaWrapper.tsx, PaginationWrapper.tsx, PricingCard.tsx, SectionTitle.tsx, Brand.tsx, BackgroundSection.tsx, PricingTabs.tsx, AnimationWrapper.tsx
+  - src/components/pages/teams/team/TeamArea.tsx
+  - src/components/pages/pricing/PricingArea.tsx
+  - src/components/pages/faq/FaqArea.tsx
+  - src/components/blogs/blog-details/BlogComment.tsx
+  - src/components/blogs/blog-sidebar/BlogSidebar.tsx, Tags.tsx, LatestNews.tsx, Category.tsx
+  - src/components/blogs/blog/BlogArea.tsx
+
+**Solution**:
+1. **Analyze all 32 React.memo components** for optimization effectiveness
+   - Check if component accepts props (memoization without props is useless)
+   - Identify inline functions or objects in JSX (breaks React.memo)
+   - Identify props that change frequently (memoization not beneficial)
+
+2. **Create component optimization report**:
+   - List components with unnecessary React.memo (no props or no callbacks)
+   - List components with inline callbacks breaking React.memo
+   - List components that benefit from React.memo (frequently re-rendered parent)
+
+3. **Fix identified issues**:
+   - Remove React.memo from Feedback.tsx (no props, Task 173)
+   - Add useCallback to components with inline handlers
+   - Add useMemo to components with computed values
+
+**Expected Findings**:
+- Some components have no props (Feedback.tsx) - React.memo provides zero benefit
+- Some components have inline onClick handlers - Breaks React.memo optimization
+- Some components have no parent re-render issues - React.memo unnecessary
+- Some components genuinely benefit from memoization (keep React.memo)
+
+**Architecture Benefits**:
+1. **Performance**: Ensure React.memo is effective, not wasteful
+2. **Best Practice**: Correct use of memoization patterns
+3. **Code Quality**: Remove unnecessary optimizations, fix broken ones
+
+**Success Criteria**:
+- [ ] Analyzed all 32 React.memo components
+- [ ] Created optimization report (components to fix, keep, or remove memoization)
+- [ ] Fixed Feedback.tsx (remove React.memo, Task 173)
+- [ ] Fixed components with inline callbacks (add useCallback)
+- [ ] All tests passing (2634 tests)
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Documented findings in Task 176
+
+**Related Files**:
+- To Analyze: All 32 React.memo components (listed above)
+- To Reference: Task 171 - Fixed Sidebar component
+- To Update: docs/task.md - Document findings and fixes
+
+**Testing**:
+- Run all tests (2634 tests)
+- Verify components render correctly after optimizations
+- Check for React warnings in console (key warnings, memo warnings)
+
+**Notes**:
+- Follows Performance Engineering principles:
+  - **Measure First**: Analyze before optimizing
+  - **Best Practice**: Only optimize when beneficial
+- Not all components need React.memo
+- Use React.memo when:
+  - Component has props that change frequently
+  - Component renders expensive operations
+  - Parent component re-renders frequently
+- Remove React.memo when:
+  - Component has no props (like Feedback.tsx)
+  - Props never change
+  - Component renders cheaply
+
+**Priority Justification**:
+- Priority: LOW
+- Impact: Performance improvement, code quality
+- Effort: Medium (analyze 32 components, fix identified issues)
+- Risk: Low (fixing broken optimizations, removing useless ones)
+
+---
+
 ## Task 172: Accessibility Fix - BlogComment aria-label Template Literal (Jan 14, 2026)
 
 **Status**: ✅ Completed
