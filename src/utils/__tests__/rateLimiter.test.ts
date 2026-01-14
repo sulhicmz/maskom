@@ -357,4 +357,94 @@ describe('RateLimiter', () => {
             expect(result.attemptsRemaining).toBe(config.maxAttempts);
         });
     });
+
+    describe('Node.js environment cleanup', () => {
+        beforeEach(() => {
+            Reflect.deleteProperty(global, 'window');
+        });
+
+        afterEach(() => {
+            global.window = new EventTarget() as typeof global.window;
+        });
+
+        it('should start cleanup interval in Node.js environment', (done) => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 500,
+                cooldownMs: 1000
+            });
+
+            testLimiter.recordAttempt('user1');
+            expect(testLimiter.getStatus('user1').count).toBe(1);
+
+            setTimeout(() => {
+                expect(testLimiter.getStatus('user1').count).toBe(0);
+                testLimiter.destroy();
+                done();
+            }, 600);
+        });
+
+        it('should cleanup multiple expired records', (done) => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 500,
+                cooldownMs: 1000
+            });
+
+            testLimiter.recordAttempt('user1');
+            testLimiter.recordAttempt('user2');
+            testLimiter.recordAttempt('user3');
+
+            expect(testLimiter.getStatus('user1').count).toBe(1);
+            expect(testLimiter.getStatus('user2').count).toBe(1);
+            expect(testLimiter.getStatus('user3').count).toBe(1);
+
+            setTimeout(() => {
+                expect(testLimiter.getStatus('user1').count).toBe(0);
+                expect(testLimiter.getStatus('user2').count).toBe(0);
+                expect(testLimiter.getStatus('user3').count).toBe(0);
+                testLimiter.destroy();
+                done();
+            }, 800);
+        });
+
+        it('should not cleanup locked records during cooldown', (done) => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 500,
+                cooldownMs: 2000
+            });
+
+            testLimiter.recordAttempt('user1');
+            testLimiter.recordAttempt('user1');
+            testLimiter.recordAttempt('user1');
+            testLimiter.recordAttempt('user1');
+
+            const status = testLimiter.getStatus('user1');
+            expect(status.count).toBe(4);
+            expect(status.lockedUntil).toBeDefined();
+
+            setTimeout(() => {
+                const afterStatus = testLimiter.getStatus('user1');
+                expect(afterStatus.count).toBe(4);
+                expect(afterStatus.lockedUntil).toBeDefined();
+                testLimiter.destroy();
+                done();
+            }, 600);
+        });
+
+        it('should cleanup interval on destroy', () => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 1000,
+                cooldownMs: 2000
+            });
+
+            testLimiter.recordAttempt('user1');
+            expect(testLimiter.getStatus('user1').count).toBe(1);
+
+            testLimiter.destroy();
+            expect(testLimiter.getStatus('user1').count).toBe(0);
+        });
+    });
 });

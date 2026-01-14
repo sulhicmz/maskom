@@ -8,6 +8,9 @@ import {
   type IdIndex,
   type PageIndex,
   type MultiFieldIndex,
+  MapIdIndex,
+  MapPageIndex,
+  MapMultiFieldIndex,
 } from "@/utils/dataIndex";
 
 interface TestItem {
@@ -302,6 +305,32 @@ describe("dataIndex", () => {
         ["name"]
       );
       expect(index).toBeDefined();
+    });
+  });
+
+  describe("Index class constructors", () => {
+    it("should instantiate MapIdIndex with Map", () => {
+      const map = new Map<number, TestItem>();
+      map.set(1, { id: 1, name: "Item 1", category: "A" });
+      const index = new MapIdIndex(map);
+      expect(index.size).toBe(1);
+      expect(index.get(1)).toEqual({ id: 1, name: "Item 1", category: "A" });
+    });
+
+    it("should instantiate MapPageIndex with Map", () => {
+      const map = new Map<string, TestPageItem[]>();
+      map.set("home", [{ id: 1, page: "home", content: "Home content" }]);
+      const index = new MapPageIndex(map);
+      expect(index.size).toBe(1);
+      expect(index.get("home")).toHaveLength(1);
+    });
+
+    it("should instantiate MapMultiFieldIndex with Map", () => {
+      const map = new Map<string, TestItem[]>();
+      map.set("A", [{ id: 1, name: "Item 1", category: "A" }]);
+      const index = new MapMultiFieldIndex(map);
+      expect(index.size).toBe(1);
+      expect(index.get("A")).toHaveLength(1);
     });
   });
 });

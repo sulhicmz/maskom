@@ -51,6 +51,15 @@ describe("Date Formatting Utilities", () => {
       expect(isValidISODate("2024-00-01")).toBe(false);
       expect(isValidISODate("9999-99-99")).toBe(false);
     });
+
+    it("handles NaN values in date components", () => {
+      expect(isValidISODate("abcd-ef-gh")).toBe(false);
+      expect(isValidISODate("2024-ab-15")).toBe(false);
+      expect(isValidISODate("2024-03-ab")).toBe(false);
+      expect(isValidISODate("xxxx-yy-zz")).toBe(false);
+      expect(isValidISODate("9999999999999-12-31")).toBe(false);
+      expect(isValidISODate("2024-9999999999999-15")).toBe(false);
+    });
   });
 
   describe("formatDate", () => {
