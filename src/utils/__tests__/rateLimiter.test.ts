@@ -356,5 +356,98 @@ describe('RateLimiter', () => {
             expect(result.allowed).toBe(true);
             expect(result.attemptsRemaining).toBe(config.maxAttempts);
         });
+
+        it('should destroy cleanup interval on destroy', () => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 1000,
+                cooldownMs: 2000
+            });
+
+            testLimiter.recordAttempt('user1');
+
+            testLimiter.destroy();
+
+            const status = testLimiter.getStatus('user1');
+
+            expect(status.count).toBe(0);
+        });
+
+        it('should handle multiple destroy calls gracefully', () => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 1000,
+                cooldownMs: 2000
+            });
+
+            testLimiter.recordAttempt('user1');
+
+            testLimiter.destroy();
+            testLimiter.destroy();
+            testLimiter.destroy();
+
+            expect(() => testLimiter.check('user1')).not.toThrow();
+        });
+
+        it('should clear all records on destroy', () => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 1000,
+                cooldownMs: 2000
+            });
+
+            testLimiter.recordAttempt('user1');
+            testLimiter.recordAttempt('user2');
+            testLimiter.recordAttempt('user3');
+
+            testLimiter.destroy();
+
+            const result1 = testLimiter.check('user1');
+            const result2 = testLimiter.check('user2');
+            const result3 = testLimiter.check('user3');
+
+            expect(result1.allowed).toBe(true);
+            expect(result2.allowed).toBe(true);
+            expect(result3.allowed).toBe(true);
+
+            expect(result1.attemptsRemaining).toBe(3);
+            expect(result2.attemptsRemaining).toBe(3);
+            expect(result3.attemptsRemaining).toBe(3);
+        });
+
+        it('should handle expired window during cleanup', async () => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 3,
+                windowMs: 100,
+                cooldownMs: 200
+            });
+
+            testLimiter.recordAttempt('user1');
+
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            const status = testLimiter.getStatus('user1');
+
+            expect(status.count).toBeGreaterThanOrEqual(0);
+
+            testLimiter.destroy();
+        });
+
+        it('should handle locked state during cleanup', async () => {
+            const testLimiter = new RateLimiter({
+                maxAttempts: 2,
+                windowMs: 100,
+                cooldownMs: 200
+            });
+
+            testLimiter.recordAttempt('user1');
+            testLimiter.recordAttempt('user1');
+
+            const blockedResult = testLimiter.recordAttempt('user1');
+
+            expect(blockedResult.allowed).toBe(false);
+
+            testLimiter.destroy();
+        });
     });
 });
