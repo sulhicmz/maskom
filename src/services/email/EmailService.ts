@@ -14,7 +14,7 @@ import {
     executeWithResilience,
     RateLimitExceededError
 } from '@/services/common';
-import { TIMEOUTS } from '@/constants';
+import { TIMEOUTS, CIRCUIT_BREAKER_CONFIG } from '@/constants';
 
 class EmailService implements IEmailService {
     private serviceId: string;
@@ -31,11 +31,7 @@ class EmailService implements IEmailService {
             logServiceWarning('EmailService', 'constructor', 'EmailJS credentials not configured in environment variables');
         }
 
-        this.circuitBreaker = new CircuitBreaker({
-            failureThreshold: 5,
-            resetTimeoutMs: 60000,
-            monitoringPeriodMs: 60000
-        });
+        this.circuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.EMAIL_SERVICE);
     }
 
     async sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>> {

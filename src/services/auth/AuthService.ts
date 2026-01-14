@@ -9,7 +9,7 @@ import {
     RateLimitExceededError,
     createErrorResult
 } from '@/services/common';
-import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS } from '@/constants';
+import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS, CIRCUIT_BREAKER_CONFIG } from '@/constants';
 import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,11 +23,7 @@ class AuthService implements IAuthService {
     constructor() {
         this.loginRateLimiter = new RateLimiter(RATE_LIMITS.LOGIN);
         this.registerRateLimiter = new RateLimiter(RATE_LIMITS.REGISTER);
-        this.circuitBreaker = new CircuitBreaker({
-            failureThreshold: 50,
-            resetTimeoutMs: 60000,
-            monitoringPeriodMs: 60000
-        });
+        this.circuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.AUTH_SERVICE);
     }
 
     private async loginWithTimeout(credentials: LoginCredentials): Promise<AuthResult> {
