@@ -2,12 +2,13 @@ import type { IAuthService, LoginCredentials, RegisterData, User, AuthResult } f
 import { validateEmail, validatePassword } from '@/utils/validation';
 import { RateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
-import { 
-    ServiceErrorCode, 
+import {
+    ServiceErrorCode,
     ServiceValidationError,
     executeWithResilience,
     RateLimitExceededError,
-    createErrorResult
+    createErrorResult,
+    createRateLimitErrorResult
 } from '@/services/common';
 import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS, CIRCUIT_BREAKER_CONFIG } from '@/constants';
 import { logServiceError, logServiceSuccess } from '@/services/common';
@@ -114,15 +115,8 @@ class AuthService implements IAuthService {
 
             return result;
         } catch (error) {
-            if (error instanceof RateLimitExceededError && error.limitCheck) {
-                const secondsRemaining = Math.ceil(((error.limitCheck.resetTime || Date.now()) - Date.now()) / MS_TO_SECONDS);
-                return createErrorResult(
-                    error.limitCheck.error?.includes('Too many attempts')
-                        ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
-                        : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                    ServiceErrorCode.RATE_LIMIT,
-                    { rateLimited: true }
-                );
+            if (error instanceof RateLimitExceededError) {
+                return createRateLimitErrorResult(error, MS_TO_SECONDS);
             }
 
             const standardizedError = error instanceof Error ? error : new Error('Unknown error');
@@ -151,15 +145,8 @@ class AuthService implements IAuthService {
 
             return result;
         } catch (error) {
-            if (error instanceof RateLimitExceededError && error.limitCheck) {
-                const secondsRemaining = Math.ceil(((error.limitCheck.resetTime || Date.now()) - Date.now()) / MS_TO_SECONDS);
-                return createErrorResult(
-                    error.limitCheck.error?.includes('Too many attempts')
-                        ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
-                        : 'Terlalu banyak percobaan. Silakan coba lagi nanti.',
-                    ServiceErrorCode.RATE_LIMIT,
-                    { rateLimited: true }
-                );
+            if (error instanceof RateLimitExceededError) {
+                return createRateLimitErrorResult(error, MS_TO_SECONDS);
             }
 
             const standardizedError = error instanceof Error ? error : new Error('Unknown error');
