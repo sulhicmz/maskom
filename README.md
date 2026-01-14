@@ -2,6 +2,65 @@
 
 Maskom adalah situs pemasaran untuk layanan konektivitas dan managed service Maskom Network yang dibangun di atas Next.js App Router. Seluruh halaman utama ditulis dalam bahasa Indonesia dan memanfaatkan data statis TypeScript sehingga konten dapat diperbarui terpusat tanpa menyentuh komponen presentasi.
 
+## Mulai Cepat (5 Menit)
+
+Berikut panduan cepat untuk menjalankan proyek Maskom di lingkungan lokal:
+
+### 1. Instalasi Dependensi
+
+```bash
+npm install
+```
+
+### 2. Konfigurasi Environment Variables (Opsional)
+
+Untuk fitur email, salin file environment example dan konfigurasi kredensial EmailJS:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` dan masukkan kredensial EmailJS:
+```bash
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+### 3. Jalankan Server Pengembangan
+
+```bash
+npm run dev
+```
+
+Server akan berjalan di `http://localhost:3000`
+
+### 4. Jalankan Tests (Opsional)
+
+Verifikasi semua tests berjalan dengan baik:
+
+```bash
+npm test
+```
+
+### 5. Build Produksi
+
+Untuk build produksi:
+
+```bash
+npm run build
+npm run start
+```
+
+### Langkah Berikutnya
+
+- [**Dokumentasi Arsitektur**](docs/blueprint.md) - Overview lengkap arsitektur dan pola desain
+- [**Panduan Pengembangan**](docs/testing-guide.md) - Panduan testing dan development
+- [**Panduan Komponen**](docs/component-development-guide.md) - Cara membuat dan memelihara komponen
+- [**Panduan Data File**](docs/data-file-creation-guide.md) - Cara membuat dan mengelola data statis
+- [**Dokumentasi API**](docs/api.md) - Dokumentasi layanan (EmailService, AuthService)
+- [**Roadmap**](docs/roadmap.md) - Rencana pengembangan fitur
+
 ## Fitur Utama
 - **Runtime edge** dengan `export const runtime = 'edge'` sehingga build Next.js dapat dijalankan di Cloudflare Workers. Beberapa halaman menggunakan runtime nodejs untuk kompatibilitas dengan OpenNext Cloudflare deployment. 【F:src/app/layout.tsx†L1-L33】
 - **Layout reusable** melalui `Wrapper` yang menambahkan `ScrollToTop`, `ToastContainer`, dan `ErrorBoundary` untuk interaksi global yang konsisten dan penanganan error yang elegan. 【F:src/layouts/Wrapper.tsx†L1-L15】
