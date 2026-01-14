@@ -1,12 +1,13 @@
-import { 
-    ServiceResult, 
-    ServiceErrorCode, 
-    ServiceErrorCodeType 
+import {
+    ServiceResult,
+    ServiceErrorCode,
+    ServiceErrorCodeType
 } from './types';
-import { 
-    ServiceException, 
-    isServiceException 
+import {
+    ServiceException,
+    isServiceException
 } from './ServiceException';
+import { RateLimitExceededError } from './resilience';
 
 export function createSuccessResult<T>(
     message: string,
@@ -67,4 +68,30 @@ export function mapToServiceResult<T>(
         error: errorMessage,
         errorCode: errorCode as ServiceErrorCodeType,
     };
+}
+
+export function createRateLimitErrorResult(
+    error: RateLimitExceededError,
+    msToSeconds: number
+): ServiceResult<void> {
+    if (!error.limitCheck) {
+        return createErrorResult(
+            'Terlalu banyak percobaan. Silakan coba lagi nanti.',
+            ServiceErrorCode.RATE_LIMIT
+        );
+    }
+
+    const secondsRemaining = Math.ceil(
+        ((error.limitCheck.resetTime || Date.now()) - Date.now()) / msToSeconds
+    );
+
+    const errorMessage = error.limitCheck.error?.includes('Too many attempts')
+        ? `Terlalu banyak percobaan. Silakan coba lagi dalam ${secondsRemaining} detik.`
+        : 'Terlalu banyak percobaan. Silakan coba lagi nanti.';
+
+    return createErrorResult(
+        errorMessage,
+        ServiceErrorCode.RATE_LIMIT,
+        { rateLimited: true }
+    );
 }

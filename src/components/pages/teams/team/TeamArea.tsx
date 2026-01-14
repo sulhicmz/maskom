@@ -10,7 +10,7 @@ const ReactPaginate = dynamic(() => import("react-paginate"), {
   loading: () => <div className="ac-pagination text-center mt-30 wow fadeInUp"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
 })
 
-const TeamAreaComponent = () => {
+const TeamAreaComponent = React.memo(() => {
 
    const team = useMemo(() => team_data, []);
    const itemsPerPage = 8;
@@ -69,8 +69,10 @@ const TeamAreaComponent = () => {
                 </div>
              </div>
           </div>
-       </section>
-   )
-}
+        </section>
+    )
+});
+
+TeamAreaComponent.displayName = "TeamAreaComponent"
 
 export default TeamAreaComponent

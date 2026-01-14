@@ -14,7 +14,7 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
 })
 
-const BlogArea = () => {
+const BlogArea = React.memo(() => {
 
    const itemsPerPage = 3;
 
@@ -69,8 +69,10 @@ const BlogArea = () => {
                 <BlogSidebar />
              </div>
           </div>
-       </section>
-   )
-}
+        </section>
+    )
+});
+
+BlogArea.displayName = "BlogArea"
 
 export default BlogArea

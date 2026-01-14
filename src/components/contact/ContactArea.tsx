@@ -3,7 +3,7 @@ import Link from "next/link";
 import contact_data from "@/data/ContactData";
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const ContactArea = () => {
+const ContactArea = React.memo(() => {
    return (
       <section className="contact-info-section pt-40 pb-80">
          <div className="container">
@@ -33,7 +33,9 @@ const ContactArea = () => {
             </div>
          </div>
       </section>
-   )
-}
+    )
+});
+
+ContactArea.displayName = "ContactArea"
 
 export default ContactArea

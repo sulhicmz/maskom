@@ -36,14 +36,14 @@ describe('Tags', () => {
     it('should render nine tags', () => {
       const { container } = render(<Tags />);
 
-      const tagElements = container.querySelectorAll('.tagcloud span');
+      const tagElements = container.querySelectorAll('.tagcloud a');
       expect(tagElements).toHaveLength(9);
     });
 
     it('should render tags in correct order', () => {
       const { container } = render(<Tags />);
 
-      const tagElements = container.querySelectorAll('.tagcloud span');
+      const tagElements = container.querySelectorAll('.tagcloud a');
       expect(tagElements[0]).toHaveTextContent('SD-WAN');
       expect(tagElements[1]).toHaveTextContent('Managed Wi-Fi');
       expect(tagElements[2]).toHaveTextContent('Keamanan');
@@ -55,12 +55,12 @@ describe('Tags', () => {
       expect(tagElements[8]).toHaveTextContent('Wi-Fi');
     });
 
-    it('should render tags as span elements', () => {
+    it('should render tags as link elements', () => {
       const { container } = render(<Tags />);
       
-      const tagElements = container.querySelectorAll('.tagcloud span');
+      const tagElements = container.querySelectorAll('.tagcloud a');
       tagElements.forEach(tag => {
-        expect(tag.tagName.toLowerCase()).toBe('span');
+        expect(tag.tagName.toLowerCase()).toBe('a');
       });
     });
   });
@@ -120,23 +120,30 @@ describe('Tags', () => {
   });
 
   describe('Accessibility', () => {
-    it('should use semantic span elements for tags', () => {
+    it('should use semantic link elements for tags', () => {
       const { container } = render(<Tags />);
-      
-      const tagElements = container.querySelectorAll('.tagcloud span');
+
+      const tagElements = container.querySelectorAll('.tagcloud a');
       tagElements.forEach(tag => {
-        expect(tag.tagName.toLowerCase()).toBe('span');
+        expect(tag.tagName.toLowerCase()).toBe('a');
       });
     });
 
-    it('should not use interactive elements for tags', () => {
+    it('should have aria-label for each tag link', () => {
       const { container } = render(<Tags />);
-      
+
+      const tagLinks = container.querySelectorAll('.tagcloud a');
+      tagLinks.forEach(link => {
+        expect(link).toHaveAttribute('aria-label');
+      });
+    });
+
+    it('should use interactive links for tags', () => {
+      const { container } = render(<Tags />);
+
       const links = container.querySelectorAll('.tagcloud a');
-      const buttons = container.querySelectorAll('.tagcloud button');
-      
-      expect(links).toHaveLength(0);
-      expect(buttons).toHaveLength(0);
+
+      expect(links.length).toBeGreaterThan(0);
     });
   });
 
@@ -188,15 +195,15 @@ describe('Tags', () => {
   describe('Visual Structure', () => {
     it('should render tags in a cloud layout', () => {
       const { container } = render(<Tags />);
-      
+
       const tagcloud = container.querySelector('.tagcloud');
       expect(tagcloud).toBeInTheDocument();
     });
 
     it('should have consistent tag element structure', () => {
       const { container } = render(<Tags />);
-      
-      const tagElements = container.querySelectorAll('.tagcloud span');
+
+      const tagElements = container.querySelectorAll('.tagcloud a');
       tagElements.forEach(tag => {
         expect(tag.textContent).toBeTruthy();
       });
