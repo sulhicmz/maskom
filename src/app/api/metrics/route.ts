@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import metricsCollector from '@/utils/metrics';
+import { createApiResponse } from '@/utils/apiResponse';
 
 export async function GET() {
     const allMetrics = metricsCollector.getAllMetrics();
@@ -26,11 +26,8 @@ export async function GET() {
         })
     };
 
-    return NextResponse.json(response, {
-        status: 200,
-        headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
-        }
+    return createApiResponse({
+        data: response,
+        status: 200
     });
 }

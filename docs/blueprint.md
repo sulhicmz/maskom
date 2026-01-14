@@ -1031,22 +1031,32 @@ External API (EmailJS, etc.)
 
 #### 6. API Standardization
 
-- **Purpose**: Ensure consistent response formats and error handling across all services
-- **Implementation**: Common service types in `src/services/common/`
+- **Purpose**: Ensure consistent response formats and error handling across all services and API routes
+- **Implementation**: Common service types in `src/services/common/` and API utilities in `src/utils/`
 - **Components**:
-  - `ServiceResult<T>` - Unified response interface for all services
-  - `ServiceErrorCode` - Standardized error code constants (VALIDATION_ERROR, RATE_LIMIT_EXCEEDED, TIMEOUT, CIRCUIT_BREAKER_OPEN, CREDENTIALS_MISSING, NETWORK_ERROR, UNKNOWN_ERROR)
-  - Exception Classes - Type-safe error handling (ServiceException, ServiceTimeoutError, ServiceRateLimitError, ServiceValidationError, ServiceCircuitBreakerError, ServiceCredentialsError, ServiceNetworkError)
-  - Helper Functions - createSuccessResult, createErrorResult, mapToServiceResult
-  - Logging Utilities - logServiceError, logServiceSuccess, logServiceWarning
+  - **Service Layer** (`src/services/common/`):
+    - `ServiceResult<T>` - Unified response interface for all services
+    - `ServiceErrorCode` - Standardized error code constants (VALIDATION_ERROR, RATE_LIMIT_EXCEEDED, TIMEOUT, CIRCUIT_BREAKER_OPEN, CREDENTIALS_MISSING, NETWORK_ERROR, UNKNOWN_ERROR)
+    - Exception Classes - Type-safe error handling (ServiceException, ServiceTimeoutError, ServiceRateLimitError, ServiceValidationError, ServiceCircuitBreakerError, ServiceCredentialsError, ServiceNetworkError)
+    - Helper Functions - createSuccessResult, createErrorResult, mapToServiceResult
+    - Logging Utilities - logServiceError, logServiceSuccess, logServiceWarning
+  - **API Response Utility** (`src/utils/apiResponse.ts` - ✅ COMPLETED - Task 169):
+    - `createApiResponse<T>()` - Unified API response formatting function
+    - **ApiResponseConfig<T>` interface**: Type-safe configuration for responses
+    - **Default Headers**: Content-Type, Cache-Control (no-cache, no-store, must-revalidate)
+    - **Custom Headers Support**: Optional headers parameter for API-specific customization
+    - **Type Safety**: Generic type parameter ensures response data type consistency
 - **Benefits**:
-  - **Contract First**: ServiceResult defines contract before implementation
+  - **Contract First**: ServiceResult and ApiResponseConfig define contracts before implementation
   - **Consistency**: All services return same format (success, message, error, errorCode, metadata)
-  - **Type Safety**: Error codes are typed as ServiceErrorCodeType, not strings
+  - **API Response Uniformity**: All API routes use createApiResponse with identical headers
+  - **Type Safety**: Error codes and response data are typed, not strings
   - **Error Classification**: Each error has isRetryable and isTimeout flags
   - **Code Reuse**: Helper functions reduce boilerplate
+  - **Single Source of Truth**: createApiResponse eliminates duplicate response formatting (DRY principle)
+  - **Maintainability**: Update response headers in one place (createApiResponse utility)
   - **Self-Documenting**: Type names and error codes describe behavior
-  - **Future-Proof**: Easy to add new services following same patterns
+  - **Future-Proof**: Easy to add new services and API routes following same patterns
 - **Documentation Alignment** (✅ COMPLETED - Task 131):
   - Service documentation accurately reflects actual type implementations
   - `ServiceResult<T>` structure documented with `data` and `metadata` fields
@@ -1054,7 +1064,12 @@ External API (EmailJS, etc.)
   - Domain-specific types (e.g., `AuthResult`) documented with relationship to `ServiceResult<T>`
   - Service Type System sections added to documentation
   - Response examples updated with correct field names (`data.text`, `errorCode`, `metadata`)
-- **Location**: `src/services/common/` (types.ts, ServiceException.ts, logger.ts, resultHelpers.ts, index.ts)
+- **API Response Standardization** (✅ COMPLETED - Task 169):
+  - Eliminated duplicate NextResponse.json() pattern across 3 API routes
+  - Single createApiResponse utility enforces consistent headers (Content-Type, Cache-Control)
+  - Zero code duplication in API response formatting
+  - Easy to add monitoring, logging, or security headers to all API routes
+- **Location**: `src/services/common/` (types.ts, ServiceException.ts, logger.ts, resultHelpers.ts, index.ts), `src/utils/apiResponse.ts`
 
 #### Error Handling
 

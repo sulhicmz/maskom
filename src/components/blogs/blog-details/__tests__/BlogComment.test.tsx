@@ -209,6 +209,14 @@ describe('BlogComment', () => {
     });
   });
 
+  it('renders reply buttons with correct aria-label', () => {
+    render(<BlogComment comments={mockComments} />);
+
+    const replyButtons = screen.getAllByText('Reply');
+    expect(replyButtons[0]).toHaveAttribute('aria-label', 'Balas komentar dari John Doe');
+    expect(replyButtons[1]).toHaveAttribute('aria-label', 'Balas komentar dari Jane Smith');
+  });
+
   it('handles empty comments array gracefully', () => {
     render(<BlogComment comments={[]} />);
 
