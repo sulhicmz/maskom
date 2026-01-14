@@ -1,16 +1,8 @@
-import { withTimeout, withRetry, CircuitBreaker } from '@/utils/resilience';
+import { withTimeout, withRetry, CircuitBreaker, type RetryOptions } from '@/utils/resilience';
 import metricsCollector from '@/utils/metrics';
 import { RateLimiter } from '@/utils/rateLimiter';
 import { logServiceError, logServiceSuccess } from './logger';
 import { RETRY_CONFIG } from '@/constants';
-
-export interface RetryOptions {
-    maxAttempts: number;
-    baseDelayMs: number;
-    maxDelayMs: number;
-    backoffMultiplier: number;
-    retryableErrors?: RegExp[];
-}
 
 export interface ResilienceContext {
     operationName: string;
