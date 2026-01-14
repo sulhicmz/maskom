@@ -9,6 +9,123 @@
 
 ---
 
+## Task 177: Integration Architecture - OpenAPI Spec Correction (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Integration Engineering (API Documentation)
+
+**Problem**:
+- OpenAPI specification (docs/openapi-spec.yaml v1.1.0) documented non-existent API routes
+- Spec incorrectly defined client-side services as server-side API routes:
+  - `/email/send` - Documented but doesn't exist (EmailService is client-side)
+  - `/auth/login` - Documented but doesn't exist (AuthService is client-side)
+  - `/auth/register` - Documented but doesn't exist (AuthService is client-side)
+  - `/auth/logout` - Documented but doesn't exist (AuthService is client-side)
+  - `/auth/current-user` - Documented but doesn't exist (AuthService is client-side)
+  - `/monitoring/*` - Documented but wrong path (actual: `/api/health`, `/api/metrics`, `/api/services/status`)
+- Violated **Contract First** principle - OpenAPI spec should match actual API implementation
+- Misleading documentation for developers and API consumers
+- Could cause confusion about which endpoints are server-side vs client-side
+
+**Actual API Routes** (not documented in old spec):
+- `/api/health` - Health check endpoint (GET)
+- `/api/metrics` - Metrics aggregation endpoint (GET)
+- `/api/services/status` - Email and auth service status (GET)
+
+**Solution**:
+1. **Rewrote OpenAPI specification** (docs/openapi-spec.yaml v2.0.0):
+    - Removed all non-existent routes (/email/send, /auth/*, /monitoring/*)
+    - Added documentation for actual API routes (/api/health, /api/metrics, /api/services/status)
+    - Updated version from 1.1.0 to 2.0.0 (breaking change - routes completely different)
+    - Added clear architecture description distinguishing client-side services from server-side APIs
+    - Updated tags: Health, Monitoring, Service Status (removed Email, Authentication tags for server APIs)
+
+2. **Created Correct API Documentation**:
+    - **/api/health**: GET endpoint for health checks with configurable threshold parameter
+    - **/api/metrics**: GET endpoint for aggregated metrics across all services
+    - **/api/services/status**: GET endpoint for detailed email and auth service status including circuit breaker state
+    - All endpoints documented with proper schemas, examples, and error responses
+
+3. **Updated Documentation Structure**:
+    - Added "Architecture Overview" section explaining service layer vs API routes
+    - Clarified that EmailService and AuthService are client-side services (not server APIs)
+    - Referenced separate service docs (docs/api/email-service.md, docs/api/auth-service.md)
+    - Updated response format documentation to match createApiResponse utility
+    - Added standard headers documentation (Content-Type, Cache-Control)
+
+**Architecture Benefits**:
+1. **Contract First Compliance**: OpenAPI spec now accurately reflects actual API routes
+2. **Developer Experience**: Clear distinction between client-side services and server-side APIs
+3. **API Documentation**: Accurate documentation for all actual endpoints
+4. **Integration Clarity**: Prevents confusion about which calls are client-side vs server-side
+5. **Breaking Change Transparency**: Version bump (1.1.0 → 2.0.0) signals major API documentation change
+6. **Maintainability**: Single source of truth for API routes (OpenAPI spec matches implementation)
+
+**Code Changes**:
+- Modified: `docs/openapi-spec.yaml`
+  - Removed 6 non-existent route definitions (/email/send, /auth/login, /auth/register, /auth/logout, /auth/current-user, /monitoring/*)
+  - Added 3 actual route definitions (/api/health, /api/metrics, /api/services/status)
+  - Updated version from 1.1.0 to 2.0.0
+  - Rewrote description section with architecture overview
+  - Updated tags (removed Email, Authentication; added Health, Service Status)
+  - Created 8 new schema definitions (HealthCheckResponse, MetricsResponse, ServiceStatusResponse, etc.)
+  - Total: Complete rewrite (lines changed not applicable - new spec structure)
+
+**Success Criteria**:
+- [x] Removed all non-existent API routes from OpenAPI spec
+- [x] Documented all actual API routes (/api/health, /api/metrics, /api/services/status)
+- [x] Clarified architecture (client-side services vs server-side APIs)
+- [x] Updated version from 1.1.0 to 2.0.0 (breaking change)
+- [x] All 2634 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] YAML syntax valid (no nested mapping errors)
+- [x] Updated docs/task.md with Task 177 documentation
+
+**Related Files**:
+- ✅ Modified: `docs/openapi-spec.yaml` - Corrected to document actual API routes
+- ✅ Reference: `src/app/api/health/route.ts` - Actual health check endpoint
+- ✅ Reference: `src/app/api/metrics/route.ts` - Actual metrics endpoint
+- ✅ Reference: `src/app/api/services/status/route.ts` - Actual service status endpoint
+- ✅ Reference: `docs/api/email-service.md` - EmailService client-side service documentation
+- ✅ Reference: `docs/api/auth-service.md` - AuthService client-side service documentation
+- ✅ Reference: `src/utils/apiResponse.ts` - createApiResponse utility used by all API routes
+
+**Testing**:
+- All 2634 tests passing (100% success rate)
+- 108 test suites passing
+- No test failures (API routes tested separately via integration tests)
+- Lint passed: 0 errors, 0 warnings
+- YAML syntax validation passed (no errors)
+
+**Notes**:
+- Follows Integration Engineer principles:
+    - **Contract First**: OpenAPI spec now matches actual API implementation
+    - **Single Source of Truth**: OpenAPI spec accurately documents all server-side API routes
+    - **Clear Architecture**: Distinguishes client-side services from server-side APIs
+- Implementation approach:
+    - Complete spec rewrite (not incremental changes) due to fundamental architecture misunderstanding
+    - Version bump (1.1.0 → 2.0.0) signals breaking change
+    - Preserved service-level documentation (email-service.md, auth-service.md) for client-side services
+- Future considerations:
+    - Consider adding API authentication (BearerAuth scheme already defined in spec)
+    - Add rate limiting endpoints for admin users
+    - Add circuit breaker reset endpoints for operational purposes
+    - Integrate with monitoring tools (Prometheus, Datadog) using metrics endpoint
+
+**Impact**:
+- API Documentation: Now accurate and matches actual implementation
+- Developer Experience: Clear understanding of client-side vs server-side architecture
+- Contract Compliance: OpenAPI spec serves as single source of truth for API routes
+- Breaking Change: Version 2.0.0 signals major documentation change (not API breakage)
+- Zero Regressions: All tests passing, lint clean, YAML syntax valid
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: None
+**Next Integration Review**: January 21, 2026
+
+---
+
 ## Task 173: React Optimization - Unnecessary React.memo in Feedback Component (Jan 14, 2026)
 
 **Status**: ✅ Completed

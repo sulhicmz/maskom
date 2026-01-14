@@ -116,16 +116,18 @@ All integration engineering tasks have been completed successfully. The applicat
 - ✅ `docs/api/services-status-api.md` (3,382 bytes) - Service status API documentation
 
 **Machine-Readable Specs**:
-- ✅ `docs/openapi-spec.yaml` - OpenAPI 3.0.3 specification
+- ✅ `docs/openapi-spec.yaml v2.0.0` - OpenAPI 3.0.3 specification (Task 177)
+  - Corrected to document actual API routes (/api/health, /api/metrics, /api/services/status)
   - All endpoints documented with request/response schemas
   - Error codes and examples included
-  - Resilience patterns documented for each service
   - Server configurations for production and development
-
-- ✅ `docs/postman-collection.json` - Ready-to-use Postman collection
-  - All API endpoints with examples
-  - Integration test cases
-  - Environment variables support
+  - Clear architecture description (client-side services vs server-side APIs)
+ 
+- ✅ `docs/postman-collection.json v2.0.0` - Ready-to-use Postman collection (Task 177)
+  - Corrected to document actual API routes
+  - Health check endpoints with configurable threshold
+  - Metrics and service status endpoints
+  - Environment variables support (baseUrl, threshold)
 
 **Documentation Coverage**:
 - API contracts with TypeScript interfaces
