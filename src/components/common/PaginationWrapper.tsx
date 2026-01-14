@@ -9,6 +9,7 @@ interface PaginationProps {
    marginPagesDisplayed?: number
    containerClassName?: string
    className?: string
+   ariaLabel?: string
 }
 
 const ReactPaginate = dynamic(() => import("react-paginate"), {
@@ -16,18 +17,18 @@ const ReactPaginate = dynamic(() => import("react-paginate"), {
    loading: () => <div className="ac-pagination"><nav><div className="text-muted">Memuat halaman...</div></nav></div>
 })
 
-const PaginationWrapper = React.memo(({ pageCount, onPageChange, pageRangeDisplayed = 3, marginPagesDisplayed, containerClassName, className }: PaginationProps) => {
+const PaginationWrapper = React.memo(({ pageCount, onPageChange, pageRangeDisplayed = 3, marginPagesDisplayed, containerClassName, className, ariaLabel }: PaginationProps) => {
    return (
-      <div className={`ac-pagination ${className || ""}`}>
-         <nav>
+      <div className={`ac-pagination ${className || ""}`} aria-label={ariaLabel}>
+         <nav aria-label="Pagination navigation">
             <ReactPaginate
                breakLabel="..."
-               nextLabel={<i className="far fa-angle-right"></i>}
+               nextLabel={<span aria-label="Halaman selanjutnya"><i className="far fa-angle-right" aria-hidden="true"></i></span>}
                onPageChange={onPageChange}
                pageRangeDisplayed={pageRangeDisplayed}
                marginPagesDisplayed={marginPagesDisplayed}
                pageCount={pageCount}
-               previousLabel={<i className="far fa-angle-left"></i>}
+               previousLabel={<span aria-label="Halaman sebelumnya"><i className="far fa-angle-left" aria-hidden="true"></i></span>}
                renderOnZeroPageCount={null}
                containerClassName={containerClassName}
             />

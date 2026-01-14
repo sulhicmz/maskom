@@ -501,8 +501,8 @@ Services (AuthService)
 - ✅ Centralized constants for magic numbers (src/constants/) - Eliminates magic numbers like rate limits, validation thresholds, timeouts, and retry configuration
 - ✅ **Timeout and Retry Constants** (src/constants/timeouts.ts) - Centralized timeout and retry configuration for all services (Task 123) - TIMEOUTS for service timeouts, RETRY_CONFIG for retry behavior, MS_TO_SECONDS for time conversion
 - ✅ Swiper configuration centralization (SWIPER_CONFIG) - Configuration separated from component logic for reusability and consistency (Task 95)
-- ✅ **OpenAPI specification** (docs/openapi-spec.yaml) - Machine-readable API spec (OpenAPI 3.0.3) for code generation and automated testing
-- ✅ **Postman collection** (docs/postman-collection.json) - Ready-to-use collection with all API endpoints, examples, and integration tests
+- ✅ **OpenAPI specification** (docs/openapi-spec.yaml v2.0.0) - Machine-readable API spec (OpenAPI 3.0.3) for monitoring and health check endpoints, corrected to match actual API routes (Task 177)
+- ✅ **Postman collection** (docs/postman-collection.json v2.0.0) - Ready-to-use collection with monitoring and health check endpoints, corrected to match actual API routes (Task 177)
 - ✅ **API Documentation** (docs/api/auth-service.md, docs/api/email-service.md) - Comprehensive API documentation with usage examples, error handling, and resilience patterns (Task 113)
 - ✅ Webpack code splitting for large dependencies (forms, swiper cache groups)
 - ✅ Lazy-loaded form components with loading states (ContactForm, LoginForm, SignUpForm, BlogForm)
