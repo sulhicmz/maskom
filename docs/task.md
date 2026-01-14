@@ -9,6 +9,130 @@
 
 ---
 
+## Task 186: Architecture - Eliminate Duplicate Email Pattern (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: LOW
+**Type**: Code Refactoring (DRY Principle)
+
+**Problem**:
+- Email validation regex pattern duplicated across two files in validation layer
+- `src/utils/validation/rules.ts` defines EmailRule.pattern (line 22)
+- `src/utils/validation/yupAdapter.ts` defines EmailPattern constant (line 4)
+- Both use identical regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
+- Violates DRY principle - changes require updating two locations
+- Anti-pattern: Duplicate rule definition across validation layers
+
+**Location**:
+- `src/utils/validation/rules.ts` (line 22, line 24)
+- `src/utils/validation/yupAdapter.ts` (line 4, line 9)
+
+**Baseline Metrics** (Before Fix):
+- 2 duplicate email pattern definitions
+- yupAdapter.ts defines local EmailPattern instead of using EmailRule.pattern
+
+**Solution**:
+1. **Removed duplicate EmailPattern from yupAdapter.ts**:
+    - Deleted `const EmailPattern` constant (line 4)
+    - Updated import to include EmailRule: `import { PasswordRule, EmailRule } from './rules'`
+    - Changed `.matches(EmailPattern, ...)` to `.matches(EmailRule.pattern, ...)`
+    - yupAdapter now uses single source of truth for email pattern
+
+2. **Single Source of Truth**:
+    - Email pattern now defined only in EmailRule (rules.ts)
+    - All adapters reference EmailRule.pattern for consistency
+    - Changes to email pattern only need one update
+
+**Implementation**:
+```typescript
+// Before (duplicate pattern)
+const EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function createEmailFieldSchema(label: string = "Email") {
+    return yup.string()
+        .required(`${label} diperlukan`)
+        .matches(EmailPattern, `${label} tidak valid`)
+        .label(label);
+}
+
+// After (single source of truth)
+import { PasswordRule, EmailRule } from './rules';
+
+export function createEmailFieldSchema(label: string = "Email") {
+    return yup.string()
+        .required(`${label} diperlukan`)
+        .matches(EmailRule.pattern, `${label} tidak valid`)
+        .label(label);
+}
+```
+
+**Architecture Benefits**:
+1. **DRY Principle**: Email pattern defined once, used everywhere
+2. **Single Source of Truth**: EmailRule.pattern is the authoritative pattern
+3. **Maintainability**: Changes to email pattern only require updating rules.ts
+4. **Layer Separation**: Adapters consume rules from rules layer (not duplicate them)
+5. **Consistency**: All validation layers use same email pattern
+6. **Type Safety**: EmailRule.pattern is typed as RegExp
+
+**Code Changes**:
+- Modified: `src/utils/validation/yupAdapter.ts`
+  - Removed `const EmailPattern` constant (line 4)
+  - Updated import: Added EmailRule to existing import (line 2)
+  - Changed `.matches(EmailPattern, ...)` to `.matches(EmailRule.pattern, ...)` (line 9)
+  - Total: 1 file modified, -1 line (removed duplicate constant), +1 import item (EmailRule)
+
+**Success Criteria**:
+- [x] Removed duplicate EmailPattern constant from yupAdapter.ts
+- [x] Updated yupAdapter to use EmailRule.pattern instead
+- [x] All 2723 tests passing (100% success rate)
+- [x] Validation tests: 339 passed (yupAdapter tests passing)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (21 pages generated)
+- [x] Email pattern now has single source of truth
+- [x] Updated docs/task.md with Task 186 documentation
+
+**Related Files**:
+- ✅ Modified: `src/utils/validation/yupAdapter.ts` - Removed duplicate EmailPattern
+- ✅ Reference: `src/utils/validation/rules.ts` - EmailRule.pattern (single source of truth)
+
+**Testing**:
+- All 2723 tests passing (100% success rate)
+- 109 test suites passing
+- Validation tests: 339 passed (yupAdapter tests: 13 passed)
+- Lint passed: 0 errors, 0 warnings
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows Code Architect principles:
+  - **DRY Principle**: Email pattern defined once in rules.ts
+  - **Single Source of Truth**: EmailRule.pattern is authoritative pattern
+  - **Layer Separation**: Adapters consume rules from rules layer
+- Implementation approach:
+  - Minimal changes (single file, 2 lines changed)
+  - Zero breaking changes (behavior unchanged)
+  - Pattern now consistent across all validation layers
+- Why this matters:
+  - Email validation is critical security feature (prevents invalid email addresses)
+  - Having duplicate patterns creates risk of inconsistencies
+  - Future changes (e.g., internationalized email support) easier with single pattern
+- Pattern used:
+  - Simple but effective email regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`
+  - Rejects whitespace, requires @ and domain separator
+  - Matches standard email format (user@domain.tld)
+
+**Impact**:
+- Code Quality: -1 line (yupAdapter.ts: 63 → 62), eliminated duplicate pattern
+- Maintainability: Email pattern single source of truth (EmailRule.pattern)
+- DRY Compliance: No duplicate email pattern across validation layers
+- Type Safety: EmailRule.pattern typed as RegExp, consistent usage
+- Zero Regressions: All 2723 tests passing, lint clean, build successful
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: None
+**Next Code Quality Review**: January 21, 2026
+
+---
+
 ## Task 185: Code Refactoring - Reduce Conditional Logic Duplication in CtaWrapper (Jan 14, 2026)
 
 **Status**: ✅ Completed

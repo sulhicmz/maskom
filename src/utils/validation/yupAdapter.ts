@@ -1,12 +1,10 @@
 import * as yup from 'yup';
-import { PasswordRule } from './rules';
-
-const EmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { PasswordRule, EmailRule } from './rules';
 
 export function createEmailFieldSchema(label: string = "Email") {
     return yup.string()
         .required(`${label} diperlukan`)
-        .matches(EmailPattern, `${label} tidak valid`)
+        .matches(EmailRule.pattern, `${label} tidak valid`)
         .label(label);
 }
 
