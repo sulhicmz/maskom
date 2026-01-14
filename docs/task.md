@@ -9,6 +9,186 @@
 
 ---
 
+## Task 166: Critical Path Testing - Offcanvas Component (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: QA Engineering (Critical Path Testing)
+
+**Problem**:
+- Offcanvas component had no test coverage (0% coverage)
+- Critical mobile navigation component used across entire application
+- Missing tests for essential user interactions:
+  - Rendering behavior (menu items, logo, social links, phone, address)
+  - Accessibility features (ARIA labels, semantic HTML, keyboard navigation)
+  - Link validation (hrefs, data-bs-dismiss attributes, target/rel attributes)
+  - Data integration (MenuData, SocialMediaData, ContactData usage)
+  - Edge cases (dropdown menus, empty submenus, special characters)
+- High risk of regressions affecting mobile navigation experience
+- Violates QA principle: "Critical paths must be tested"
+
+**Solution**:
+1. **Created Comprehensive Test Suite** (src/layouts/headers/Menu/__tests__/Offcanvas.test.tsx):
+    - 34 comprehensive tests covering all Offcanvas component behavior
+    - Rendering tests (9 tests) - menu items, logo, close button, address, phone, social links
+    - Accessibility tests (6 tests) - ARIA attributes, semantic HTML, keyboard navigation
+    - Link validation tests (6 tests) - hrefs, data-bs-dismiss, target, rel attributes
+    - Data integration tests (4 tests) - MenuData, SocialMediaData, ContactData integration
+    - Edge case tests (5 tests) - dropdowns, empty submenus, special characters, multiple links
+    - Semantic HTML tests (4 tests) - proper HTML structure
+
+2. **Test Coverage Improvements**:
+    - Statements: 0% → 100% (complete coverage)
+    - Functions: 0% → 100% (all component behavior tested)
+    - Test count: 2553 → 2587 (+34 new tests)
+    - Test suites: 106 → 107 (+1 new test suite)
+
+3. **Test Categories Implemented**:
+    1. **Rendering Tests** (9 tests):
+        - Offcanvas container with correct attributes
+        - Logo with link and accessibility
+        - Close button with proper attributes
+        - All menu items from MenuData
+        - Submenu items for dropdown menus
+        - Contact button ("Hubungi Kami")
+        - Address block with company name and location
+        - Phone number with correct link
+        - Social media links from SocialMediaData
+
+    2. **Accessibility Tests** (6 tests):
+        - Offcanvas has proper ARIA attributes (id, tabIndex, aria-labelledby)
+        - Logo link has descriptive aria-label
+        - Close button has proper aria-label
+        - All menu links are keyboard accessible
+        - Social media links have descriptive aria-labels
+        - External social links have proper rel="noreferrer"
+
+    3. **Link Validation Tests** (6 tests):
+        - All menu links have correct href attributes
+        - All menu links have data-bs-dismiss attribute
+        - Submenu links have correct href attributes
+        - Submenu links have data-bs-dismiss attribute
+        - Contact button has correct link and dismiss attribute
+        - Social media links have correct href and target attributes
+
+    4. **Data Integration Tests** (4 tests):
+        - Integrates with MenuData correctly
+        - Integrates with SocialMediaData correctly
+        - Integrates with ContactData PHONE_DISPLAY correctly
+        - Uses consistent data from single source of truth
+
+    5. **Edge Cases** (5 tests):
+        - Handles menu items without dropdowns
+        - Handles dropdown menus correctly
+        - Handles empty submenu arrays gracefully
+        - Handles special characters in phone number
+        - Handles multiple social media links
+
+    6. **Semantic HTML Tests** (4 tests):
+        - Uses proper HTML structure for offcanvas
+        - Uses proper list structure for menu items
+        - Uses proper heading for address block
+        - Uses proper button element for close button
+
+**Architecture Benefits**:
+1. **Critical Path Coverage**: Essential mobile navigation component now fully tested
+2. **Accessibility**: ARIA attributes and semantic HTML verified for screen readers
+3. **Regression Prevention**: Mobile navigation behavior protected by test safety net
+4. **User Experience**: Offcanvas interactions verified across all scenarios
+5. **Code Quality**: 100% coverage for critical navigation component
+6. **Maintainability**: Test documentation serves as component behavior contract
+
+**Testing Principles Applied**:
+- **Test Behavior, Not Implementation**: Verify WHAT happens when users interact, not HOW component works
+- **AAA Pattern**: All tests follow Arrange, Act, Assert structure
+- **Isolation**: No dependencies on external services or state
+- **Determinism**: No random values, consistent results every run
+- **Fast Feedback**: All tests run in <2 seconds
+- **Meaningful Coverage**: Critical paths tested (mobile navigation, accessibility, data integration)
+
+**Code Quality**:
+- Offcanvas.test.tsx: 347 lines (34 comprehensive tests)
+- Offcanvas.tsx: No changes (100% existing functionality preserved)
+- Test count: 2553 → 2587 tests (+34 new tests)
+- Test suites: 106 → 107 (+1 new test suite)
+- All 2587 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build successful: 18 pages generated
+
+**Success Criteria**:
+- [x] Created 34 comprehensive tests for Offcanvas component
+- [x] Rendering tests (9 tests) - menu items, logo, close button, address, phone, social links
+- [x] Accessibility tests (6 tests) - ARIA attributes, semantic HTML, keyboard navigation
+- [x] Link validation tests (6 tests) - hrefs, data-bs-dismiss, target, rel attributes
+- [x] Data integration tests (4 tests) - MenuData, SocialMediaData, ContactData integration
+- [x] Edge case tests (5 tests) - dropdowns, empty submenus, special characters
+- [x] Semantic HTML tests (4 tests) - proper HTML structure
+- [x] All 2587 tests passing (100% success rate)
+- [x] Offcanvas coverage: 0% → 100% statements, 0% → 100% functions
+- [x] Lint passed (0 errors)
+- [x] Build successful (18 pages generated)
+- [x] Zero breaking changes - component behavior unchanged
+- [x] Updated docs/task.md with Task 166 completion
+
+**Related Files**:
+- ✅ Created: `src/layouts/headers/Menu/__tests__/Offcanvas.test.tsx` - Offcanvas tests (347 lines)
+- ✅ Updated: `docs/task.md` - Added Task 166 documentation
+
+**Testing**:
+- All 2587 tests passing (100% success rate)
+- 107 test suites passing
+- Offcanvas tests: 34 passed (was 0, +34 new tests)
+- Lint passed: 0 errors, 0 warnings
+- Zero regressions in existing functionality
+- Test execution time: <2 seconds for Offcanvas suite
+- Test isolation: All tests independent and deterministic
+
+**Notes**:
+- Follows QA Engineer principles:
+    - **Critical Path Testing**: Essential mobile navigation component fully tested
+    - **Test Behavior, Not Implementation**: Tests verify WHAT happens during user interactions
+    - **Test Pyramid**: Unit tests for critical layout component
+    - **Isolation**: No dependencies on external services or global state
+    - **Determinism**: No random values, consistent results every run
+    - **Fast Feedback**: All tests run quickly (<2 seconds)
+    - **Meaningful Coverage**: Critical paths tested (mobile navigation, accessibility, data)
+- Test organization:
+    - describe blocks for logical grouping (Rendering, Accessibility, Link Validation, Data Integration, Edge Cases, Semantic HTML)
+    - Descriptive test names: "should verify behavior" pattern
+    - AAA pattern in all tests (Arrange, Act, Assert)
+- User interactions tested:
+    - Offcanvas rendering with all navigation elements
+    - Menu items and submenu items displayed correctly
+    - Social media links with proper attributes
+    - Phone number and address information rendered
+    - Close button with proper accessibility
+- Accessibility tested:
+    - ARIA attributes (aria-label, aria-labelledby, aria-hidden) verified
+    - Semantic HTML elements (dialog, button, heading, list) verified
+    - Keyboard accessibility verified through proper element types
+    - Screen reader support verified through ARIA labels
+- Coverage breakdown:
+    - Previously uncovered component now fully tested
+    - All component rendering paths tested
+    - All user-facing functionality tested
+    - All accessibility features tested
+    - All data integration points tested
+
+**Impact**:
+- Test Coverage: Offcanvas 0% → 100% statements (+100%)
+- Test Coverage: Offcanvas 0% → 100% functions (+100%)
+- Total Tests: 2553 → 2587 (+34 new tests)
+- Total Test Suites: 106 → 107 (+1 new test suite)
+- Critical Path: Mobile navigation fully tested
+- Accessibility: ARIA attributes and semantic HTML verified
+- Regression Prevention: Navigation behavior protected
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: Task 160 (Critical Path Testing - HeaderOne), Task 165 (Data-Driven UI - Offcanvas)
+**Next QA Review**: January 21, 2026
+
+---
+
 ## Task 165: Data-Driven UI - Offcanvas Component Hardcodes (Jan 14, 2026)
 
 **Status**: ✅ Completed
