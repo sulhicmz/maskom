@@ -5,7 +5,7 @@ import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 import BackgroundSection from "@/components/common/BackgroundSection"
 
-const Feedback = React.memo(() => {
+const Feedback = () => {
    return (
       <BackgroundSection backgroundImage="/assets/images/bg/testimonial-bg.webp" className="testimonial-section testimonial-shape-section p-r z-1 pt-110 pb-90" id="testimoni">
          <div className="shape shape-one"><span className="circle"></span></div>
@@ -53,7 +53,7 @@ const Feedback = React.memo(() => {
          </div>
       </BackgroundSection>
    )
-})
+}
 
 Feedback.displayName = "Feedback"
 
