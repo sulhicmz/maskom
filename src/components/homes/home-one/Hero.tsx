@@ -6,7 +6,7 @@ import BackgroundSection from "@/components/common/BackgroundSection"
 
 import dashboard_img from "@/assets/images/hero/dashboard.svg"
 
-const Hero = React.memo(() => {
+const Hero = () => {
    return (
       <section className="hero-section" id="beranda">
          <BackgroundSection backgroundImage="/assets/images/hero/hero-bg-1.png" className="hero-wrapper">
@@ -42,7 +42,7 @@ const Hero = React.memo(() => {
          </BackgroundSection>
       </section>
    )
-})
+}
 
 Hero.displayName = "Hero"
 

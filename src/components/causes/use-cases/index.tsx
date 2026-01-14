@@ -9,20 +9,20 @@ import Cta from "@/components/common/Cta"
 
 const UseCases = () => {
    return (
-      <div className="ac-page-wrapper">
-         <HeaderOne style={true} />
-         <div className="smooth-wrapper">
-            <div id="smooth-content">
-               <Breadcrumb title="Use Causes" sub_title="Use Causes" />
-               <Cause />
-               <Feedback />
-               <Faq />
-               <Cta />
-            </div>
-         </div>
-         <FooterTwo />
-      </div>
+       <div className="ac-page-wrapper">
+          <HeaderOne style={true} />
+          <div className="smooth-wrapper">
+             <div id="smooth-content">
+                <Breadcrumb title="Use Causes" sub_title="Use Causes" />
+                <Cause />
+                <Feedback />
+                <Faq />
+                <Cta />
+             </div>
+          </div>
+          <FooterTwo />
+       </div>
    )
 }
 
-export default React.memo(UseCases)
+export default UseCases

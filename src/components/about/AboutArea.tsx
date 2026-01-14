@@ -38,7 +38,7 @@ const AboutArea = () => {
                </div>
                <div className="col-xl-5">
                   <AnimationWrapper animation="fadeInRight" className="section-content-box about-one_content-box">
-                     <SectionTitle 
+                     <SectionTitle
                         subtitle="Tentang Kami"
                         title="Menghubungkan Bisnis Indonesia Sejak 2004"
                         className="mb-50"
@@ -67,4 +67,4 @@ const AboutArea = () => {
    )
 }
 
-export default React.memo(AboutArea)
+export default AboutArea

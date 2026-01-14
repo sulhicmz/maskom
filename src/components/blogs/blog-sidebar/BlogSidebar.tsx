@@ -6,7 +6,7 @@ import LatestNews from "./LatestNews"
 import Tags from "./Tags"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const BlogSidebarComponent = () => {
+const BlogSidebar = () => {
    return (
       <div className="col-xl-4">
          <div className="sidebar-widget-area mb-30">
@@ -20,7 +20,7 @@ const BlogSidebarComponent = () => {
                          </div>
                       </form>
                    </div>
-               </AnimationWrapper>
+                </AnimationWrapper>
             </div>
             <Category />
             <LatestNews />
@@ -30,7 +30,6 @@ const BlogSidebarComponent = () => {
    )
 }
 
-const BlogSidebar = React.memo(BlogSidebarComponent)
 BlogSidebar.displayName = "BlogSidebar"
 
 export default BlogSidebar

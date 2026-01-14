@@ -35,45 +35,42 @@ const TeamAreaComponent = () => {
                               <h4><a href="team-details.html">{item.title}</a></h4>
                               <span className="position">{item.designation}</span>
                            </div>
-                            <div className="share-button">
-                               <div className="icon">
-                                  <i className="flaticon-plus-positive-add-mathematical-symbol" aria-hidden="true"></i>
-                               </div>
-                                <ul className="social-link">
-                                   <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f" aria-hidden="true"></i></button></li>
-                                   <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter" aria-hidden="true"></i></button></li>
-                                   <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in" aria-hidden="true"></i></button></li>
-                                   <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram" aria-hidden="true"></i></button></li>
-                                </ul>
-                            </div>
-                        </div>
-                     </div>
-                  </div>
-               ))}
-            </div>
-            <div className="row">
-               <div className="col-lg-12">
-                  <div className="ac-pagination text-center mt-30 wow fadeInUp">
-                     <nav>
-                        <ReactPaginate
-                           breakLabel="..."
-                           nextLabel={<i className="far fa-angle-right"></i>}
-                           onPageChange={handlePageClick}
-                           pageRangeDisplayed={3}
-                           pageCount={pageCount}
-                           previousLabel={<i className="far fa-angle-left"></i>}
-                           renderOnZeroPageCount={null}
-                        />
-                     </nav>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
+                             <div className="share-button">
+                                <div className="icon">
+                                   <i className="flaticon-plus-positive-add-mathematical-symbol" aria-hidden="true"></i>
+                                </div>
+                                 <ul className="social-link">
+                                    <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f" aria-hidden="true"></i></button></li>
+                                    <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter" aria-hidden="true"></i></button></li>
+                                    <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in" aria-hidden="true"></i></button></li>
+                                    <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram" aria-hidden="true"></i></button></li>
+                                 </ul>
+                             </div>
+                         </div>
+                      </div>
+                   </div>
+                ))}
+             </div>
+             <div className="row">
+                <div className="col-lg-12">
+                   <div className="ac-pagination text-center mt-30 wow fadeInUp">
+                      <nav>
+                         <ReactPaginate
+                            breakLabel="..."
+                            nextLabel={<i className="far fa-angle-right"></i>}
+                            onPageChange={handlePageClick}
+                            pageRangeDisplayed={3}
+                            pageCount={pageCount}
+                            previousLabel={<i className="far fa-angle-left"></i>}
+                            renderOnZeroPageCount={null}
+                         />
+                      </nav>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </section>
    )
 }
 
-const TeamArea = React.memo(TeamAreaComponent)
-TeamArea.displayName = "TeamArea"
-
-export default TeamArea
+export default TeamAreaComponent

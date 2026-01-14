@@ -59,18 +59,18 @@ const BlogArea = () => {
                            </div>
                         </AnimationWrapper>
                      ))}
-                     <PaginationWrapper
-                        pageCount={pageCount}
-                        onPageChange={handlePageClick}
-                        pageRangeDisplayed={3}
-                     />
-                  </div>
-               </div>
-               <BlogSidebar />
-            </div>
-         </div>
-      </section>
+                      <PaginationWrapper
+                         pageCount={pageCount}
+                         onPageChange={handlePageClick}
+                         pageRangeDisplayed={3}
+                      />
+                   </div>
+                </div>
+                <BlogSidebar />
+             </div>
+          </div>
+       </section>
    )
 }
 
-export default React.memo(BlogArea)
+export default BlogArea

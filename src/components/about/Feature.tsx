@@ -3,13 +3,13 @@ import React from "react"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Feature = React.memo(() => {
+const Feature = () => {
    return (
       <section className="features-section pb-70">
          <div className="container">
             <div className="row align-items-center">
                <div className="col-lg-7">
-                  <SectionTitle 
+                  <SectionTitle
                      subtitle="Nilai Utama"
                      title="Fondasi Layanan Maskom"
                      className="mb-50"
@@ -40,7 +40,7 @@ const Feature = React.memo(() => {
          </div>
       </section>
    )
-})
+}
 
 Feature.displayName = "Feature"
 
