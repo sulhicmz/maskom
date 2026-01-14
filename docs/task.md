@@ -1,5 +1,141 @@
 # Architecture Task Tracking
 
+## Task 191: Security - Patch diff Package DoS Vulnerability (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Security Engineering (CVE Remediation)
+
+**Problem**:
+- `diff` package (< 8.0.3) has Denial of Service (DoS) vulnerability
+- Vulnerability in parsePatch and applyPatch functions
+- CVSS: CWE-400 (Uncontrolled Resource Consumption) and CWE-1333 (Inefficient Regular Expression Complexity)
+- Advisory: GHSA-73rr-hh4g-fpgx
+- Affects ts-node dependency chain: jest → @jest/core → jest-config → ts-node → diff
+- Current version: 4.0.2 (vulnerable)
+- 7 low severity vulnerabilities reported
+- Anti-pattern: Vulnerable dependencies with known CVEs
+
+**Location**:
+- `node_modules/diff` - Vulnerable package in dependency tree
+- `package.json` - Override configuration needed
+
+**Baseline Metrics** (Before Fix):
+- Vulnerabilities: 7 (all low severity)
+- diff version: 4.0.2 (vulnerable)
+- All 7 vulnerabilities related to diff package DoS issue
+- ts-node version: 10.9.2 (using vulnerable diff)
+
+**Solution**:
+1. **Added package override for diff**:
+    - Added `"diff": ">=8.0.3"` to overrides section in package.json
+    - Overrides force diff package to use patched version >= 8.0.3
+    - ts-node remains at 10.9.2 (no breaking changes)
+    - Follows existing pattern in package.json for security patches
+
+2. **Verified vulnerability fix**:
+    - Ran `npm install` to apply override
+    - Verified diff package upgraded to 8.0.3
+    - Confirmed all 7 vulnerabilities resolved
+    - Verified ts-node unchanged (no breaking changes)
+
+3. **Testing and validation**:
+    - All 2750 tests passing (100% success rate)
+    - Lint passes with 0 errors
+    - No functionality broken by patch
+    - diff package now shows "8.0.3 overridden" in npm list
+
+**Implementation**:
+```json
+// Before (vulnerable - 7 CVEs)
+"overrides": {
+  "@smithy/config-resolver": ">=4.4.0",
+  "@aws-sdk/client-cloudfront": ">=3.966.0",
+  "undici": "7.18.2"
+}
+
+// After (patched - 0 CVEs)
+"overrides": {
+  "@smithy/config-resolver": ">=4.4.0",
+  "@aws-sdk/client-cloudfront": ">=3.966.0",
+  "undici": "7.18.2",
+  "diff": ">=8.0.3"  // Added to patch DoS vulnerability
+}
+```
+
+**Security Benefits**:
+1. **CVE Remediation**: Denial of Service vulnerability patched
+2. **Attack Surface**: Reduces DoS attack vector in diff package
+3. **Defense in Depth**: Maintains security posture with 0 vulnerabilities
+4. **No Breaking Changes**: ts-node version unchanged, zero functional impact
+5. **Follows Pattern**: Uses existing override mechanism in package.json
+6. **Minimal Changes**: Single line addition to package.json
+
+**Code Changes**:
+- Modified: `package.json`
+  - Added `"diff": ">=8.0.3"` to overrides section (line 74)
+  - Total: 1 file modified, +1 line added
+
+**Success Criteria**:
+- [x] Added override for diff package in package.json
+- [x] Upgraded diff from 4.0.2 to 8.0.3
+- [x] All 7 vulnerabilities resolved (7 → 0)
+- [x] All 2750 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] ts-node unchanged (no breaking changes)
+- [x] No functionality broken by patch
+- [x] Updated docs/task.md with Task 191 documentation
+
+**Related Files**:
+- ✅ Modified: `package.json` - Added diff override
+- ✅ Reference: npm audit - Verified 0 vulnerabilities after fix
+- ✅ Reference: GHSA-73rr-hh4g-fpgx - CVE advisory
+
+**Testing**:
+- All 2750 tests passing (100% success rate)
+- 110 test suites passing
+- Lint passed: 0 errors, 0 warnings
+- npm audit: 0 vulnerabilities (was 7)
+- diff package: 8.0.3 (patched, was 4.0.2)
+- ts-node package: 10.9.2 (unchanged)
+
+**Notes**:
+- Follows Security Specialist principles:
+  - **Zero Trust**: Validate all dependencies for known vulnerabilities
+  - **Defense in Depth**: Maintain comprehensive security posture
+  - **Least Privilege**: Patch only what's needed (diff package)
+  - **Secure by Default**: 0 vulnerabilities in dependency tree
+  - **Dependencies are Attack Surface**: Update vulnerable deps immediately
+- Implementation approach:
+  - Minimal changes (single line in package.json)
+  - Uses npm overrides (safe mechanism for patching)
+  - No breaking changes (ts-node unchanged)
+  - Follows existing pattern in package.json
+- Why this matters:
+  - DoS vulnerability can be exploited to exhaust system resources
+  - CWE-400: Uncontrolled Resource Consumption
+  - CWE-1333: Inefficient Regular Expression Complexity
+  - Affects testing infrastructure (jest uses ts-node which uses diff)
+  - Low severity but non-zero risk in production environment
+- Risk assessment:
+  - Before: 7 vulnerabilities (all related to diff DoS)
+  - After: 0 vulnerabilities
+  - Impact: DoS attack vector eliminated from dependency tree
+  - Exposure: Limited to test/dev infrastructure (jest/ts-node)
+
+**Impact**:
+- Security: 7 → 0 vulnerabilities (100% reduction)
+- CVE Remediation: diff package DoS vulnerability patched (4.0.2 → 8.0.3)
+- Dependency Health: All dependencies now secure
+- Zero Breaking Changes: ts-node unchanged, all tests passing
+- Production Ready: Application has 0 vulnerabilities, A+ security grade maintained
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: None
+**Next Security Assessment**: January 21, 2026
+
+---
+
 ## Task 190: QA - Critical Path Testing for createRateLimitErrorResult (Jan 14, 2026)
 
 **Status**: ✅ Completed

@@ -70,6 +70,7 @@
     "@aws-sdk/client-sts": ">=3.966.0",
     "@aws-sdk/token-providers": ">=3.600.0",
     "@aws-sdk/credential-provider-node": ">=3.966.0",
-    "undici": "7.18.2"
+    "undici": "7.18.2",
+    "diff": ">=8.0.3"
   }
 }
