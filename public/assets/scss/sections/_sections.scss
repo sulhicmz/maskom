@@ -350,8 +350,9 @@ p.form_error{
     cursor: pointer;
     color: var(--text-color);
     z-index: 5;
-    &:focus {
-        outline: none;
+    &:focus-visible {
+        outline: 2px solid var(--blue-color);
+        outline-offset: 2px;
         color: var(--blue-color);
     }
     &:hover {

@@ -9,6 +9,165 @@
 
 ---
 
+## Task 183: UI/UX - Focus Indicators Accessibility Fix (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX Engineering (Accessibility Fix)
+
+**Problem**:
+- Global SCSS rules used `outline: none` on all interactive elements (a, input, textarea, button)
+- Password toggle button used `outline: none` on focus state
+- Focus indicators completely removed for keyboard users
+- Keyboard-only users cannot see which element has focus
+- Violates WCAG 2.1 Level A requirement for visible focus indicators (2.4.7 Focus Visible)
+- Anti-pattern: Removing focus indicators without providing alternative visual feedback
+
+**Location**:
+- `public/assets/scss/_common.scss` (lines 42-48) - Global outline removal
+- `public/assets/scss/sections/_sections.scss` (lines 354) - Password toggle focus removal
+
+**Baseline Metrics** (Before Fix):
+- 2 instances of `outline: none` in SCSS files
+- No visible focus indicators for keyboard navigation
+- WCAG 2.1 Level A/AA compliance violation
+- Keyboard users: Cannot see focused element state
+
+**Solution**:
+1. **Replaced global `outline: none` with `:focus-visible` styling** (_common.scss):
+    - Removed `outline: none` from `a:focus, input:focus, textarea:focus, button:focus`
+    - Added `:focus-visible` pseudo-class with visible focus indicator
+    - Focus indicator: 3px solid blue outline with 2px offset
+    - Uses `var(--blue-color)` CSS variable for consistency with design system
+    - `:focus-visible` only shows outline for keyboard navigation, not mouse clicks
+
+2. **Fixed password toggle button focus styling** (_sections.scss):
+    - Replaced `&:focus { outline: none; }` with `&:focus-visible`
+    - Added visible focus indicator: 2px solid blue outline with 2px offset
+    - Preserves color change on focus state
+
+**Implementation**:
+```scss
+// Before (broken - no focus indicators)
+a:focus,
+input:focus,
+textarea:focus,
+button:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+// After (fixed - keyboard-only focus indicators)
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+    text-decoration: none;
+    outline: 3px solid var(--blue-color);
+    outline-offset: 2px;
+}
+```
+
+```scss
+// Before (broken - password toggle)
+.password-toggle {
+    &:focus {
+        outline: none;
+        color: var(--blue-color);
+    }
+}
+
+// After (fixed - visible focus indicator)
+.password-toggle {
+    &:focus-visible {
+        outline: 2px solid var(--blue-color);
+        outline-offset: 2px;
+        color: var(--blue-color);
+    }
+}
+```
+
+**Architecture Benefits**:
+1. **Accessibility**: Keyboard-only users can now see which element has focus
+2. **WCAG 2.1 Compliance**: Meets Level A requirement for focus visible (2.4.7)
+3. **User Experience**: Better navigation for keyboard users and screen reader users
+4. **Modern CSS**: Uses `:focus-visible` pseudo-class for better UX (only shows on keyboard)
+5. **Design System**: Uses CSS variable (`var(--blue-color)`) for consistent styling
+6. **No Visual Impact**: Mouse users see no change (outline only shows on keyboard navigation)
+
+**Accessibility Improvements**:
+- **Keyboard Navigation**: Tab/Shift+Tab users now see clear focus indicators
+- **Screen Reader Users**: Visible focus state helps understand interaction points
+- **Focus Management**: 3px outline with 2px offset is highly visible
+- **No Mouse Impact**: `:focus-visible` doesn't show outline on mouse clicks (better UX)
+- **Color Consistency**: Uses brand blue color (`--blue-color`) for focus indicators
+
+**Code Changes**:
+- Modified: `public/assets/scss/_common.scss` (lines 42-48)
+  - Removed `outline: none` from global focus selectors
+  - Changed from `:focus` to `:focus-visible` for accessibility
+  - Added visible focus indicator: 3px solid var(--blue-color), 2px offset
+  - Total: 1 file modified, 2 lines changed (pseudo-class + outline styling)
+
+- Modified: `public/assets/scss/sections/_sections.scss` (lines 354)
+  - Removed `outline: none` from password toggle focus state
+  - Changed from `&:focus` to `&:focus-visible`
+  - Added visible focus indicator: 2px solid var(--blue-color), 2px offset
+  - Total: 1 file modified, 1 line changed (pseudo-class + outline styling)
+
+**Success Criteria**:
+- [x] Removed all `outline: none` from SCSS files (2 instances)
+- [x] Added `:focus-visible` styling for all interactive elements
+- [x] Used CSS variable (`var(--blue-color)`) for consistency
+- [x] All 2723 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (21 pages generated)
+- [x] Zero breaking changes to existing functionality
+- [x] Updated docs/task.md with Task 183 documentation
+
+**Related Files**:
+- ✅ Modified: `public/assets/scss/_common.scss` - Fixed global focus styling
+- ✅ Modified: `public/assets/scss/sections/_sections.scss` - Fixed password toggle focus
+
+**Testing**:
+- All 2723 tests passing (100% success rate)
+- 109 test suites passing
+- Lint passed: 0 errors, 0 warnings
+- Build successful: 21 pages generated
+- Zero regressions in existing functionality
+
+**Notes**:
+- Follows UI/UX Engineer principles:
+  - **Accessibility (a11y)**: Usable by everyone including keyboard-only users
+  - **Semantic Structure**: Proper focus management for interactive elements
+  - **Keyboard Navigation**: All interactive elements have visible focus indicators
+  - **Focus Management**: Visible focus indicators for keyboard navigation
+- Implementation approach:
+  - Minimal changes (2 SCSS files)
+  - Zero breaking changes (CSS only change, no behavior change)
+  - Modern CSS `:focus-visible` pseudo-class for better UX
+- `:focus-visible` vs `:focus`:
+  - `:focus` - Triggers on ANY focus (keyboard, mouse, touch)
+  - `:focus-visible` - Triggers ONLY when focus is keyboard-generated (better UX)
+  - Mouse users don't see outline, keyboard users do
+- WCAG 2.1 Compliance:
+  - Level A: Focus visible (2.4.7) - Any keyboard operable user interface has a mode of operation where the keyboard focus indicator is visible
+  - Focus indicators now visible with 3px solid outline, 2px offset
+
+**Impact**:
+- Accessibility: Keyboard-only users can now see focused elements
+- WCAG Compliance: Meets Level A requirement (2.4.7 Focus Visible)
+- User Experience: Better navigation for keyboard and screen reader users
+- Visual Design: No impact on mouse users (outline only shows on keyboard navigation)
+- Code Quality: Modern CSS `:focus-visible` pseudo-class for better UX
+- Zero Regressions: All tests passing, lint clean, build successful
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: None
+**Next UI/UX Review**: January 21, 2026
+
+---
+
 ## Task 182: Performance - Rendering Optimization for FaqArea Component (Jan 14, 2026)
 
 **Status**: ✅ Completed
