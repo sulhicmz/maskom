@@ -285,23 +285,223 @@ describe("dataIndex", () => {
 
   describe("Index interface types", () => {
     it("should export IdIndex type", () => {
-      const index: IdIndex<{ id: number }> = createIdIndex([{ id: 1 }]);
+      const index: IdIndex<{ id: number }> = createIdIndex([{ id:1 }]);
       expect(index).toBeDefined();
     });
 
     it("should export PageIndex type", () => {
       const index: PageIndex<{ page: string }> = createPageIndex([
-        { page: "home", id: 1 },
+        { page: "home", id:1 },
       ]);
       expect(index).toBeDefined();
     });
 
     it("should export MultiFieldIndex type", () => {
       const index: MultiFieldIndex<{ id: number }> = createMultiFieldIndex(
-        [{ id: 1, name: "test" }],
+        [{ id:1, name: "test" }],
         ["name"]
       );
       expect(index).toBeDefined();
+    });
+  });
+
+  describe("edge cases - MapIdIndex", () => {
+    it("should handle negative ids", () => {
+      const data: TestItem[] = [
+        { id: -1, name: "Item -1", category: "A" },
+        { id: -2, name: "Item -2", category: "B" },
+      ];
+      const index = createIdIndex(data);
+      expect(index.get(-1)).toEqual({ id: -1, name: "Item -1", category: "A" });
+      expect(index.get(-2)).toEqual({ id: -2, name: "Item -2", category: "B" });
+    });
+
+    it("should handle zero id", () => {
+      const data: TestItem[] = [
+        { id: 0, name: "Item 0", category: "A" },
+      ];
+      const index = createIdIndex(data);
+      expect(index.get(0)).toEqual({ id: 0, name: "Item 0", category: "A" });
+    });
+
+    it("should handle very large ids", () => {
+      const data: TestItem[] = [
+        { id: 999999999, name: "Large ID", category: "A" },
+      ];
+      const index = createIdIndex(data);
+      expect(index.get(999999999)).toEqual({ id: 999999999, name: "Large ID", category: "A" });
+    });
+
+    it("should handle duplicate ids (last wins)", () => {
+      const data: TestItem[] = [
+        { id: 1, name: "First", category: "A" },
+        { id: 1, name: "Second", category: "B" },
+      ];
+      const index = createIdIndex(data);
+      const item = index.get(1);
+      expect(item).toBeDefined();
+      expect(item?.name).toBe("Second");
+      expect(index.size).toBe(1);
+    });
+
+    it("should handle items with undefined optional fields", () => {
+      const data: (TestItem & { optional?: string })[] = [
+        { id: 1, name: "Item 1", category: "A", optional: "value" },
+        { id: 2, name: "Item 2", category: "B", optional: undefined },
+      ];
+      const index = createIdIndex(data);
+      expect(index.get(1)).toEqual({ id: 1, name: "Item 1", category: "A", optional: "value" });
+      expect(index.get(2)).toEqual({ id: 2, name: "Item 2", category: "B", optional: undefined });
+    });
+  });
+
+  describe("edge cases - MapPageIndex", () => {
+    it("should handle empty string page", () => {
+      const data: TestPageItem[] = [
+        { id: 1, page: "", content: "Empty page" },
+      ];
+      const index = createPageIndex(data);
+      const items = index.get("");
+      expect(items).toHaveLength(1);
+      expect(items[0]).toEqual({ id: 1, page: "", content: "Empty page" });
+    });
+
+    it("should handle special characters in page names", () => {
+      const data: TestPageItem[] = [
+        { id: 1, page: "page@123", content: "Special" },
+        { id: 2, page: "page#tag", content: "Hash" },
+      ];
+      const index = createPageIndex(data);
+      expect(index.get("page@123")).toHaveLength(1);
+      expect(index.get("page#tag")).toHaveLength(1);
+    });
+
+    it("should handle unicode in page names", () => {
+      const data: TestPageItem[] = [
+        { id: 1, page: "中文", content: "Chinese" },
+        { id: 2, page: "日本語", content: "Japanese" },
+      ];
+      const index = createPageIndex(data);
+      expect(index.get("中文")).toHaveLength(1);
+      expect(index.get("日本語")).toHaveLength(1);
+    });
+
+    it("should handle many items on same page", () => {
+      const data: TestPageItem[] = Array.from({ length: 1000 }, (_, i) => ({
+        id: i + 1,
+        page: "home",
+        content: `Item ${i + 1}`,
+      }));
+      const index = createPageIndex(data);
+      const items = index.get("home");
+      expect(items).toHaveLength(1000);
+      expect(index.size).toBe(1);
+    });
+
+    it("should handle items with null/undefined content", () => {
+      const data: (TestPageItem & { extra?: string | null })[] = [
+        { id: 1, page: "home", content: "Content", extra: null },
+        { id: 2, page: "home", content: "More", extra: undefined },
+      ];
+      const index = createPageIndex(data);
+      const items = index.get("home");
+      expect(items).toHaveLength(2);
+    });
+  });
+
+  describe("edge cases - MapMultiFieldIndex", () => {
+    it("should handle empty string keys", () => {
+      const data: TestItem[] = [
+        { id: 1, name: "", category: "A" },
+      ];
+      const index = createMultiFieldIndex(data, ["name"]);
+      expect(index.get("")).toHaveLength(1);
+    });
+
+    it("should handle special characters in field values", () => {
+      const data: TestItem[] = [
+        { id: 1, name: "test@example.com", category: "A" },
+        { id: 2, name: "test#123", category: "B" },
+      ];
+      const index = createMultiFieldIndex(data, ["name"]);
+      expect(index.get("test@example.com")).toHaveLength(1);
+      expect(index.get("test#123")).toHaveLength(1);
+    });
+
+    it("should handle unicode in field values", () => {
+      const data: TestItem[] = [
+        { id: 1, name: "测试", category: "A" },
+        { id: 2, name: "テスト", category: "B" },
+      ];
+      const index = createMultiFieldIndex(data, ["name"]);
+      expect(index.get("测试")).toHaveLength(1);
+      expect(index.get("テスト")).toHaveLength(1);
+    });
+
+    it("should handle undefined field values", () => {
+      const data: (TestItem & { optional?: string })[] = [
+        { id: 1, name: "Item 1", category: "A", optional: "value" },
+        { id: 2, name: "Item 2", category: "B", optional: undefined },
+      ];
+      const index = createMultiFieldIndex(data, ["optional"]);
+      expect(index.get("value")).toHaveLength(1);
+      expect(index.get("undefined")).toBeUndefined();
+    });
+
+    it("should handle multi-field keys with special characters", () => {
+      const data: TestItem[] = [
+        { id: 1, name: "test@123", category: "cat#1" },
+      ];
+      const index = createMultiFieldIndex(data, ["name", "category"]);
+      expect(index.get("test@123|cat#1")).toHaveLength(1);
+    });
+
+    it("should handle very long field values", () => {
+      const longString = "a".repeat(1000);
+      const data: TestItem[] = [
+        { id: 1, name: longString, category: "A" },
+      ];
+      const index = createMultiFieldIndex(data, ["name"]);
+      expect(index.get(longString)).toHaveLength(1);
+    });
+  });
+
+  describe("performance - large datasets", () => {
+    it("should handle large array for IdIndex", () => {
+      const data: TestItem[] = Array.from({ length: 10000 }, (_, i) => ({
+        id: i + 1,
+        name: `Item ${i + 1}`,
+        category: i % 2 === 0 ? "A" : "B",
+      }));
+      const index = createIdIndex(data);
+      expect(index.size).toBe(10000);
+      expect(index.get(5000)).toEqual({
+        id: 5000,
+        name: "Item 5000",
+        category: "B",
+      });
+    });
+
+    it("should handle large array for PageIndex", () => {
+      const data: TestPageItem[] = Array.from({ length: 10000 }, (_, i) => ({
+        id: i + 1,
+        page: i % 3 === 0 ? "home" : i % 3 === 1 ? "about" : "contact",
+        content: `Content ${i + 1}`,
+      }));
+      const index = createPageIndex(data);
+      expect(index.size).toBe(3);
+      expect(index.get("home")).toHaveLength(3334);
+    });
+
+    it("should handle large array for MultiFieldIndex", () => {
+      const data: TestItem[] = Array.from({ length: 10000 }, (_, i) => ({
+        id: i + 1,
+        name: `Item ${i + 1}`,
+        category: i % 5 === 0 ? "A" : i % 5 === 1 ? "B" : "C",
+      }));
+      const index = createMultiFieldIndex(data, ["category"]);
+      expect(index.size).toBe(3);
+      expect(index.get("A")).toHaveLength(2000);
     });
   });
 });

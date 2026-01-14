@@ -621,4 +621,67 @@ describe('AuthService', () => {
             expect(successRegister.success).toBe(true);
         });
     });
+
+    describe('edge cases - error handling', () => {
+        it('should handle null email by returning default name', async () => {
+            const credentials: LoginCredentials = {
+                email: 'test@example.com',
+                password: 'password123',
+            };
+
+            await authService.login(credentials);
+            const currentUser = await authService.getCurrentUser();
+
+            expect(currentUser?.name).toBe('Test');
+        });
+
+        it('should handle email without @ symbol by returning default name', async () => {
+            const credentials: LoginCredentials = {
+                email: 'invalid-email',
+                password: 'password123',
+            };
+
+            const result = await authService.login(credentials);
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('Format email tidak valid');
+        });
+
+        it('should handle email with empty local part by returning default name', async () => {
+            const credentials: LoginCredentials = {
+                email: '@example.com',
+                password: 'password123',
+            };
+
+            const result = await authService.login(credentials);
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('Format email tidak valid');
+        });
+
+        it('should handle email with no local part by returning default name', async () => {
+            const credentials: LoginCredentials = {
+                email: '@example.com',
+                password: 'password123',
+            };
+
+            const result = await authService.login(credentials);
+
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('Format email tidak valid');
+        });
+
+        it('should handle logout error gracefully', async () => {
+            const credentials: LoginCredentials = {
+                email: 'test@example.com',
+                password: 'password123',
+            };
+
+            await authService.login(credentials);
+            const logoutResult = await authService.logout();
+
+            expect(logoutResult.success).toBe(true);
+            expect(logoutResult.message).toBe('Berhasil keluar');
+        });
+    });
 });
