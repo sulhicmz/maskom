@@ -19,7 +19,7 @@ export const socialLinks: SocialLink[] = [
     ariaLabel: 'Email Maskom'
   },
   {
-    url: 'tel:+622129212888',
+    url: 'tel:+628170006625',
     iconClass: 'fas fa-phone-alt',
     ariaLabel: 'Telepon Maskom'
   }
