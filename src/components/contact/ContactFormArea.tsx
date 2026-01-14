@@ -18,12 +18,12 @@ const ContactFormArea = () => {
             <div className="row">
                <div className="col-xl-5">
                    <AnimationWrapper animation="fadeInLeft" className="contact-one_image-box p-r z-1 mb-50">
-                      <Image src={img_1} className="image-one"
-                         alt="Ilustrasi tim dukungan pelanggan Maskom siap membantu" />
-                      <Image src={img_2} className="image-two" alt="Ilustrasi tim teknis bekerja sama" />
-                      <Image src={img_3} className="image-three" alt="Ilustrasi kolaborasi tim profesional" />
-                      <Image src={shape} className="shape-one" alt="Elemen dekoratif visual halaman kontak" />
-                   </AnimationWrapper>
+                       <Image src={img_1} className="image-one" priority
+                          alt="Ilustrasi tim dukungan pelanggan Maskom siap membantu" />
+                       <Image src={img_2} className="image-two" loading="lazy" alt="Ilustrasi tim teknis bekerja sama" />
+                       <Image src={img_3} className="image-three" loading="lazy" alt="Ilustrasi kolaborasi tim profesional" />
+                       <Image src={shape} className="shape-one" loading="lazy" alt="Elemen dekoratif visual halaman kontak" />
+                    </AnimationWrapper>
                </div>
                <div className="col-xl-7">
                   <AnimationWrapper animation="fadeInRight" className="section-content-box mb-50 pl-xl-45">
