@@ -119,27 +119,27 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 
 ### Data Files Inventory
 
-| Data File | Base Type | Has Page | Has ID | Pre-filtered | Purpose |
-|-----------|-----------|----------|--------|--------------|---------|
-| TeamData.ts | TeamMember | No | Yes | No | Team members |
-| InnerBlogData.ts | InnerBlogPost | No | Yes | No | Blog posts |
-| FeedbackData.ts | FeedbackItem | Yes | Yes | Yes | Testimonials |
-| MenuData.ts | MenuItem | No | Yes | No | Navigation menu |
-| FaqData.ts | FaqItem | Yes | Yes | No | FAQ items |
-| FeatureData.ts | FeatureItem | Yes | Yes | No | Feature cards (home_3) |
-| ProcessData.ts | ProcessItem | Yes | Yes | No | Process steps |
-| CauseData.ts | CauseItem | Yes | Yes | No | Cause cards |
-| PriceData.ts | PriceItem | Yes | Yes | No | Pricing tables |
-| BlogCommentData.ts | BlogCommentItem | No | Yes | No | Blog comments |
-| SocialMediaData.ts | SocialLink | No | No | No | Social links |
-| InnerFaqData.ts | InnerFaqItem | No | Yes | No | FAQ categories |
-| DashboardData.ts | WiFiDevice, etc. | No | Yes | No | Dashboard widgets |
-| ContactData.ts | ContactInfoItem | No | Yes | No | Contact information |
-| BrandData.ts | StaticImageData[] | No | No | No | Client logos (home-one) |
-| BrandDataDark.ts | StaticImageData[] | No | No | No | Client logos (home-one-dark) |
-| BlogTagData.ts | BlogTagItem | No | Yes | Yes | Blog keyword tags with relationships |
-| BlogCategoryData.ts | string[] | No | No | No | Blog categories |
-| FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | Feature cards (home-one) |
+| Data File | Base Type | Has Page | Has ID | Auto-ID | Pre-filtered | Purpose |
+|-----------|-----------|----------|--------|---------|--------------|---------|
+| TeamData.ts | TeamMember | No | Yes | No | No | Team members |
+| InnerBlogData.ts | InnerBlogPost | No | Yes | No | No | Blog posts |
+| FeedbackData.ts | FeedbackItem | Yes | Yes | Yes | Yes | Testimonials |
+| MenuData.ts | MenuItem | No | Yes | No | No | Navigation menu |
+| FaqData.ts | FaqItem | Yes | Yes | No | No | FAQ items |
+| FeatureData.ts | FeatureItem | Yes | Yes | Yes | No | Feature cards (home_3) |
+| ProcessData.ts | ProcessItem | Yes | Yes | No | No | Process steps |
+| CauseData.ts | CauseItem | Yes | Yes | No | No | Cause cards |
+| PriceData.ts | PriceItem | Yes | Yes | Yes | No | Pricing tables |
+| BlogCommentData.ts | BlogCommentItem | No | Yes | No | No | Blog comments |
+| SocialMediaData.ts | SocialLink | No | No | No | No | Social links |
+| InnerFaqData.ts | InnerFaqItem | No | Yes | No | No | FAQ categories |
+| DashboardData.ts | WiFiDevice, etc. | No | Yes | No | No | Dashboard widgets |
+| ContactData.ts | ContactInfoItem | No | Yes | No | No | Contact information |
+| BrandData.ts | StaticImageData[] | No | No | N/A | No | Client logos (home-one) |
+| BrandDataDark.ts | StaticImageData[] | No | No | N/A | No | Client logos (home-one-dark) |
+| BlogTagData.ts | BlogTagItem | No | Yes | No | Yes | Blog keyword tags with relationships |
+| BlogCategoryData.ts | string[] | No | No | N/A | No | Blog categories |
+| FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | No | Feature cards (home-one) |
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
 
@@ -348,13 +348,15 @@ export interface DataRelationship {
      - ✅ 35 comprehensive tests covering all relationship utilities
 
  4. **✅ Data Standardization** (COMPLETE - Phase 4):
-     - ✅ Standardize date formats (ISO 8601) - Date formatting utilities created
-     - ✅ Consistent date display formatting - formatBlogDate, formatCommentDate utilities
-      - ✅ Date validation - isValidISODate function for validation
-      - ✅ Date parsing - toISODate function for conversion
-       - Consistent base type usage
-       - ✅ Auto-ID generation (COMPLETE - Task 77)
-       - ✅ Applied to PriceData.ts (COMPLETE - Task 175)
+       - ✅ Standardize date formats (ISO 8601) - Date formatting utilities created
+      - ✅ Consistent date display formatting - formatBlogDate, formatCommentDate utilities
+       - ✅ Date validation - isValidISODate function for validation
+       - ✅ Date parsing - toISODate function for conversion
+        - Consistent base type usage
+        - ✅ Auto-ID generation (COMPLETE - Task 77)
+        - ✅ Applied to PriceData.ts (COMPLETE - Task 175)
+        - ✅ Applied to FeedbackData.ts (COMPLETE - Task 183)
+        - ✅ Applied to FeatureData.ts (COMPLETE - Task 183)
 
  5. **✅ Page Registry & Validation** (COMPLETE - Data Architecture Enhancement):
      - ✅ Centralized page registry (VALID_PAGES in src/data/relationships.ts)

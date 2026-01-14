@@ -39,12 +39,13 @@ a{
         text-decoration: none;
     }
 }
-a:focus,
-input:focus,
-textarea:focus,
-button:focus {
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
     text-decoration: none;
-    outline: none;
+    outline: 3px solid var(--blue-color);
+    outline-offset: 2px;
 }
 
 i,
