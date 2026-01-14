@@ -1,7 +1,7 @@
 "use client";
 
 import { UseFormRegisterReturn, FieldError } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface FormFieldProps {
   id: string;
@@ -69,13 +69,6 @@ const FormField = ({
 
     return <input {...commonProps} type={inputType} />;
   };
-
-  useEffect(() => {
-    const textarea = document.getElementById(id) as HTMLTextAreaElement;
-    if (textarea && type === "textarea") {
-      setCharCount(textarea.value.length);
-    }
-  }, [id, type]);
 
   return (
     <div className="form-group">
