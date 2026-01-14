@@ -45,25 +45,29 @@ const CtaWrapper = React.memo<CtaProps>(({
     extraElements,
     id
 }) => {
-    const contentWrapper = animationType === 'animation-wrapper'
-        ? (
+    const ContentRenderer = animationType === 'animation-wrapper'
+        ? ({ children }: { children: React.ReactNode }) => (
             <AnimationWrapper animation={animation} className={contentClassName} id={id}>
-                <h2>{heading}</h2>
-                <p>{description}</p>
-                <Link href={buttonLink} className="theme-btn gradient-btn">{buttonText}</Link>
+                {children}
             </AnimationWrapper>
         )
-        : (
+        : ({ children }: { children: React.ReactNode }) => (
             <div id={id} className={`${contentClassName} wow ${animation}`}>
-                <h2>{heading}</h2>
-                <p>{description}</p>
-                <Link href={buttonLink} className="theme-btn gradient-btn">{buttonText}</Link>
+                {children}
             </div>
         )
 
-    const imageWrapper = animationType === 'animation-wrapper'
-        ? (
-            <div className={imageBoxClassName}>
+    const contentWrapper = (
+        <ContentRenderer>
+            <h2>{heading}</h2>
+            <p>{description}</p>
+            <Link href={buttonLink} className="theme-btn gradient-btn">{buttonText}</Link>
+        </ContentRenderer>
+    )
+
+    const ImageRenderer = animationType === 'animation-wrapper'
+        ? ({ className }: { className?: string }) => (
+            <div className={className}>
                 {images.map((img, index) => (
                     <Image
                         key={index}
@@ -74,8 +78,8 @@ const CtaWrapper = React.memo<CtaProps>(({
                 ))}
             </div>
         )
-        : (
-            <div className={`${imageBoxClassName} wow fadeInRight`}>
+        : ({ className }: { className?: string }) => (
+            <div className={`${className} wow fadeInRight`}>
                 {images.map((img, index) => (
                     <Image
                         key={index}
@@ -85,6 +89,10 @@ const CtaWrapper = React.memo<CtaProps>(({
                 ))}
             </div>
         )
+
+    const imageWrapper = (
+        <ImageRenderer className={imageBoxClassName} />
+    )
 
     return (
         <section className={`${sectionClassName} ${paddingBottom || ''}`}>
