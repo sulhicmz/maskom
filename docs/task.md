@@ -9,6 +9,102 @@
 
 ---
 
+## Task 168: Dependency Cleanup - Duplicate RetryOptions Interface (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Code Architecture (Dependency Cleanup)
+
+**Problem**:
+- `RetryOptions` interface defined in two locations:
+  - `src/services/common/resilience.ts:7`
+  - `src/utils/resilience/types.ts:12`
+- Duplicate interface definitions violate Single Source of Truth principle
+- Creates confusion about which interface is the canonical definition
+- Potential for divergence if one interface is updated but not the other
+- Violates SOLID principles (Dependency Inversion - services should depend on utils abstraction)
+- Layer separation issue: services layer duplicating utils layer contracts
+
+**Solution**:
+1. **Removed Duplicate Interface** (src/services/common/resilience.ts):
+    - Deleted local `RetryOptions` interface definition (lines 7-13, 7 lines removed)
+    - Imported `RetryOptions` from `@/utils/resilience/types.ts`
+    - Updated import to use `type RetryOptions` for type-only import
+    - Single source of truth now in utils layer
+
+2. **Verified Type Compatibility**:
+    - Both interfaces had identical structure (maxAttempts, baseDelayMs, maxDelayMs, backoffMultiplier, retryableErrors)
+    - No breaking changes - interface structure unchanged
+    - All usages of `RetryOptions` now reference the canonical definition from utils
+
+**Architecture Benefits**:
+1. **Single Source of Truth**: One canonical `RetryOptions` interface in utils layer
+2. **Dependency Direction**: Services layer → utils layer (correct direction)
+3. **SOLID Compliance**:
+   - **Dependency Inversion**: Services depend on abstractions in utils layer
+   - **Interface Segregation**: Single focused interface with clear purpose
+4. **Maintainability**: Update interface in one place (utils/types.ts)
+5. **Type Safety**: TypeScript enforces single definition across codebase
+6. **Layer Separation**: Clear boundaries between services and utils layers
+
+**Code Quality**:
+- src/services/common/resilience.ts: 7 lines removed, 1 line added (net -6 lines)
+- Single file modified with zero breaking changes
+- All 2587 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build successful: 21 pages generated
+
+**Success Criteria**:
+- [x] Removed duplicate RetryOptions interface from src/services/common/resilience.ts
+- [x] Imported RetryOptions from src/utils/resilience/types.ts
+- [x] Used type-only import (type RetryOptions) for TypeScript optimization
+- [x] All 2587 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build successful (21 pages generated)
+- [x] Zero breaking changes to existing functionality
+- [x] Updated docs/task.md with Task 168 completion
+
+**Related Files**:
+- ✅ Modified: `src/services/common/resilience.ts` - Removed duplicate interface, imported from utils
+- ✅ Reference: `src/utils/resilience/types.ts` - Canonical RetryOptions definition
+
+**Testing**:
+- All 2587 tests passing (100% success rate)
+- 107 test suites passing
+- Resilience tests: 0 changes (interface import only)
+- Service tests: 0 changes (interface compatible)
+- Lint passed: 0 errors, 0 warnings
+- Zero regressions in existing functionality
+- Build successful: 21 pages generated
+
+**Notes**:
+- Follows Code Architect principles:
+    - **Dependency Cleanup**: Removed duplicate interface definition
+    - **Interface Definition**: Single canonical contract in utils layer
+    - **Layer Separation**: Services depend on utils abstraction
+    - **SOLID**: Dependency Inversion, Single Responsibility
+- Implementation approach:
+    - Minimal change (single file, net -6 lines)
+    - Zero breaking changes (identical interface structure)
+    - Correct dependency direction (services → utils)
+- Future enhancements:
+    - Audit other potential duplicate interfaces
+    - Consider TypeScript path aliases for type imports
+    - Add linting rule to prevent duplicate interface definitions
+
+**Impact**:
+- Code Quality: Single source of truth, -6 lines, DRY principle applied
+- Architecture: Proper dependency direction, SOLID compliance
+- Maintainability: Update interface in one location
+- Type Safety: TypeScript enforces single definition
+- Zero Regressions: All tests passing, lint clean, build successful
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: Task 122 (Interface Definition - IRateLimiter, IMetricsCollector, ICircuitBreaker)
+**Next Architecture Review**: January 21, 2026
+
+---
+
 ## Task 167: Security Assessment - Comprehensive Audit (Jan 14, 2026)
 
 **Status**: ✅ Completed
