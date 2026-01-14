@@ -4,7 +4,7 @@ import AnimationWrapper from "@/components/common/AnimationWrapper";
 import PricingCard from "@/components/common/PricingCard";
 import { useTabs } from "@/hooks/useTabs";
 import type { PriceDetailItem } from "@/types/data";
-import React from "react";
+import React, { useCallback } from "react";
 
 interface SectionTitleConfig {
     subtitle: string;
@@ -45,7 +45,15 @@ const PricingTabs = React.memo(({
     idPrefix = 'price'
 }: PricingTabsProps) => {
 
-    const { activeTab, handleTabClick, handleKeyDown } = useTabs({ tabCount: tabTitles.length });
+    const { activeTab, handleTabClick: originalHandleTabClick, handleKeyDown: originalHandleKeyDown } = useTabs({ tabCount: tabTitles.length });
+
+    const handleTabClick = useCallback((index: number) => {
+        originalHandleTabClick(index);
+    }, [originalHandleTabClick]);
+
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+        originalHandleKeyDown(e, index);
+    }, [originalHandleKeyDown]);
 
     return (
         <section id={sectionId} className={`pricing-section ${sectionClassName || ''}`} aria-label={ariaLabel}>

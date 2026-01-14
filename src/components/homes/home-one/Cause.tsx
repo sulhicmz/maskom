@@ -4,7 +4,7 @@ import React from "react"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Cause = React.memo(() => {
+const Cause = () => {
    return (
       <section className="use-cases-section pt-105 pb-85" id="solusi">
          <div className="container">
@@ -39,7 +39,7 @@ const Cause = React.memo(() => {
          </div>
       </section>
    )
-})
+}
 
 Cause.displayName = "Cause"
 

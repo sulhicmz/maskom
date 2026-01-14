@@ -4,13 +4,13 @@ import React from "react"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Process = React.memo(() => {
+const Process = () => {
    return (
       <section className="works-process-section pb-75" id="pendekatan">
          <div className="container">
             <div className="row">
                <div className="col-lg-12">
-                  <SectionTitle 
+                  <SectionTitle
                      subtitle="Pendekatan Kami"
                      title="Implementasi Cepat & Terukur"
                      description="Maskom memastikan setiap fase berjalan kolaboratif bersama tim Anda, mulai dari asesmen, desain solusi, hingga pengelolaan harian."
@@ -41,7 +41,7 @@ const Process = React.memo(() => {
          </div>
       </section>
    )
-})
+}
 
 Process.displayName = "Process"
 

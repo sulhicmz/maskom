@@ -8,7 +8,7 @@ import React from "react";
 
 const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
-const FaqArea = React.memo(() => {
+const FaqArea = () => {
   const { activeId, toggle, setActiveId } = useAccordion({ initialId: null });
   const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
 
@@ -79,7 +79,7 @@ const FaqArea = React.memo(() => {
       </div>
     </section>
   );
-});
+};
 
 FaqArea.displayName = "FaqArea"
 

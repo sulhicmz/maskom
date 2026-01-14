@@ -6,14 +6,14 @@ import feature_list from "@/data/FeatureHomeOneData"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Feature = React.memo(() => {
+const Feature = () => {
    return (
       <section className="features-section pt-120 pb-70">
          <div className="container">
             <div className="row">
                <div className="col-xl-5">
                   <div className="section-content-box mb-50">
-                     <SectionTitle 
+                     <SectionTitle
                         subtitle="Mengapa Maskom"
                         title="Keunggulan Layanan Konektivitas Maskom"
                         className="mb-50"
@@ -25,10 +25,10 @@ const Feature = React.memo(() => {
                                <div className="icon">
                                   <i className={item.icon} aria-hidden="true"></i>
                                </div>
-                               <div className="content">
-                                  <h4>{item.title}</h4>
-                                  <p>{item.desc}</p>
-                               </div>
+                              <div className="content">
+                                 <h4>{item.title}</h4>
+                                 <p>{item.desc}</p>
+                              </div>
                             </AnimationWrapper>
                          ))}
                      </div>
@@ -43,7 +43,7 @@ const Feature = React.memo(() => {
          </div>
       </section>
    )
-})
+}
 
 Feature.displayName = "Feature"
 

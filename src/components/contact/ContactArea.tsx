@@ -36,4 +36,4 @@ const ContactArea = () => {
    )
 }
 
-export default React.memo(ContactArea)
+export default ContactArea
