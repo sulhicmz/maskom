@@ -10,7 +10,7 @@ import Image from "next/image"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const AboutArea = () => {
+const AboutArea = React.memo(() => {
    return (
       <section className="about-section pt-120 pb-65">
          <div className="container">
@@ -63,8 +63,10 @@ const AboutArea = () => {
                </div>
             </div>
          </div>
-      </section>
-   )
-}
+       </section>
+    )
+});
+
+AboutArea.displayName = "AboutArea"
 
 export default AboutArea

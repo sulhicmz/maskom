@@ -3,7 +3,7 @@ import { pricing_price } from "@/data/PriceData";
 import PricingTabs from "@/components/common/PricingTabs";
 import React from "react";
 
-const PricingArea = () => {
+const PricingArea = React.memo(() => {
 
     return (
         <PricingTabs
@@ -23,7 +23,7 @@ const PricingArea = () => {
             idPrefix="pricing"
         />
     )
-}
+});
 
 PricingArea.displayName = "PricingArea"
 
