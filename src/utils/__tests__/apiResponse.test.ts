@@ -7,7 +7,7 @@ interface TestData {
 
 jest.mock('next/server', () => ({
     NextResponse: {
-        json: jest.fn((data: any, options: any) => ({
+        json: jest.fn((data: unknown, options?: { status?: number; headers?: Record<string, string> }) => ({
             status: options?.status || 200,
             headers: new Map(Object.entries(options?.headers || {})),
             data
@@ -234,7 +234,7 @@ describe('createApiResponse', () => {
         });
 
         it('should handle empty array', () => {
-            const emptyData: any[] = [];
+            const emptyData: unknown[] = [];
 
             const result = createApiResponse({ data: emptyData });
 
