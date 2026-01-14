@@ -47,7 +47,7 @@ const Brand = React.memo(({ brandData, title }: BrandProps) => {
                 </div>
                 <Swiper {...SWIPER_CONFIG} modules={[]} className="clients-slider wow fadeInUp">
                     {brandData.map((item: StaticImageData, i: number) => (
-                        <SwiperSlide key={i} className="client-item">
+                        <SwiperSlide key={item.src} className="client-item">
                             <div className="client-img">
                                 <Link href="/" aria-label={`Kunjungi website partner ${i + 1}`}><Image src={item} alt={`Logo partner bisnis ${i + 1}`} /></Link>
                             </div>
