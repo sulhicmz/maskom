@@ -4,13 +4,41 @@ import inner_faq_data from "@/data/InnerFaqData";
 import { useEffect } from "react";
 import { useTabs } from "@/hooks/useTabs";
 import { useAccordion } from "@/hooks/useAccordion";
-import React from "react";
+import React, { useCallback } from "react";
 
 const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
 const FaqArea = () => {
   const { activeId, toggle, setActiveId } = useAccordion({ initialId: null });
   const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        handleTabClick((index + 1) % tab_title.length);
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        handleTabClick((index - 1 + tab_title.length) % tab_title.length);
+        break;
+      case 'Home':
+        e.preventDefault();
+        handleTabClick(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        handleTabClick(tab_title.length - 1);
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        handleTabClick(index);
+        break;
+    }
+  }, [handleTabClick]);
 
   useEffect(() => {
     if (inner_faq_data[activeTab]?.faq_details?.length) {
@@ -21,18 +49,24 @@ const FaqArea = () => {
   }, [activeTab, setActiveId]);
 
   return (
-    <section className="faqs-section pt-115 pb-80">
+    <section className="faqs-section pt-115 pb-80" aria-label="Frequently Asked Questions">
       <div className="container">
         <div className="row">
           <div className="col-lg-4">
             <div className="sidebar-nav-widget style-two mb-40">
-              <h6>Categories</h6>
-              <ul className="nav nav-tabs">
+              <h6 id="faq-categories-heading">Categories</h6>
+              <ul className="nav nav-tabs" role="tablist" aria-labelledby="faq-categories-heading">
                 {tab_title.map((tab, index) => (
-                  <li key={index} className="nav-item">
+                  <li key={index} className="nav-item" role="presentation">
                     <button
+                      id={`faq-tab-${index}`}
                       className={`nav-link ${activeTab === index ? "active" : ""}`}
                       onClick={() => handleTabClick(index)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      role="tab"
+                      aria-selected={activeTab === index}
+                      aria-controls={`faq-panel-${index}`}
+                      tabIndex={activeTab === index ? 0 : -1}
                     >
                       {tab}
                     </button>
@@ -44,12 +78,19 @@ const FaqArea = () => {
           <div className="col-lg-8">
             <div className="tab-content mb-40">
               {inner_faq_data[activeTab] && inner_faq_data[activeTab].faq_details ? (
-                <div className="section-content-box">
+                <div
+                  className="section-content-box"
+                  id={`faq-panel-${activeTab}`}
+                  role="tabpanel"
+                  aria-labelledby={`faq-tab-${activeTab}`}
+                  hidden={false}
+                >
                   <div className="accordion" id="accordionTwo">
                      {inner_faq_data[activeTab].faq_details.map((item) => (
                         <div key={item.id} className="accordion-card style-two mb-15">
                           <div className="accordion-header">
                             <button
+                              id={`faq-item-button-${item.id}`}
                               onClick={() => toggle(item.id)}
                               className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
                               aria-expanded={activeId === item.id}
@@ -60,6 +101,8 @@ const FaqArea = () => {
                           </div>
                           <div
                             id={`collapse${item.id}`}
+                            role="region"
+                            aria-labelledby={`faq-item-button-${item.id}`}
                             className={`accordion-collapse collapse ${activeId === item.id ? "show" : ""}`}
                           >
                             <div className="accordion-content">
