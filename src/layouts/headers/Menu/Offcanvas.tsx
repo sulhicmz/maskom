@@ -2,14 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import menu_data from "@/data/MenuData";
+import { socialLinks } from "@/data/SocialMediaData";
+import { PHONE_DISPLAY } from "@/data/ContactData";
 import logo from "@/assets/images/logo/logo_02.svg";
-
-const socialLinks = [
-   { icon: "fab fa-instagram", href: "https://www.instagram.com" },
-   { icon: "fab fa-linkedin-in", href: "https://www.linkedin.com" },
-   { icon: "far fa-envelope", href: "mailto:sales@maskom.co.id" },
-   { icon: "fas fa-phone-alt", href: "tel:+628170006625" },
-];
 
 const Offcanvas = () => {
    return (
@@ -48,20 +43,20 @@ const Offcanvas = () => {
                      </ul>
                   </div>
                   <div><Link href="/contact" className="btn-five w-100 tran3s" data-bs-dismiss="offcanvas">Hubungi Kami</Link></div>
-                  <div className="address-block mt-50">
-                     <h4 className="title pb-15">Maskom Network</h4>
-                     <p>Jakarta Selatan, DKI Jakarta<br />Indonesia</p>
-                     <p>Telepon: <Link href="tel:+628170006625">(+62) 817-000-6625</Link></p>
-                  </div>
+                   <div className="address-block mt-50">
+                      <h4 className="title pb-15">Maskom Network</h4>
+                      <p>Jakarta Selatan, DKI Jakarta<br />Indonesia</p>
+                      <p>Telepon: <Link href={`tel:${PHONE_DISPLAY.replace(/[^0-9+]/g, '')}`}>{PHONE_DISPLAY}</Link></p>
+                   </div>
                   <ul className="style-none d-flex flex-wrap w-100 justify-content-between align-items-center social-icon pt-25 mt-auto">
-                     {socialLinks.map((item) => (
-                        <li key={item.href}>
-                           <Link href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel={item.href.startsWith("http") ? "noreferrer" : undefined}>
-                              <i className={item.icon}></i>
-                           </Link>
-                        </li>
-                     ))}
-                  </ul>
+                      {socialLinks.map((item) => (
+                         <li key={item.url}>
+                            <Link href={item.url} target={item.target} aria-label={item.ariaLabel} rel={item.target === "_blank" ? "noreferrer" : undefined}>
+                               <i className={item.iconClass}></i>
+                            </Link>
+                         </li>
+                      ))}
+                   </ul>
                </div>
             </div>
          </div>

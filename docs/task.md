@@ -9,6 +9,113 @@
 
 ---
 
+## Task 165: Data-Driven UI - Offcanvas Component Hardcodes (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Data Architecture (Hardcode Extraction)
+
+**Problem**:
+- Offcanvas.tsx component had hardcoded social media links
+- Offcanvas.tsx component had hardcoded phone number
+- ContactData.tsx and SocialMediaData.ts already contain this information
+- Data duplication across multiple files violates DRY principle
+- Violates blueprint principle: "All dynamic content uses TypeScript data files in src/data/"
+- SocialMediaData.ts had incorrect phone number (622129212888 instead of 628170006625)
+- No single source of truth for contact information
+
+**Solution**:
+1. **Fixed Phone Number in SocialMediaData.ts** (src/data/SocialMediaData.ts):
+    - Updated phone number from `tel:+622129212888` to `tel:+628170006625`
+    - Matches ContactData.tsx and Offcanvas.tsx (correct phone number)
+    - Single source of truth for phone number across data files
+
+2. **Added Phone Number Constants to ContactData.tsx** (src/data/ContactData.tsx):
+    - Exported `PHONE_NUMBER` constant: `"+628170006625"`
+    - Exported `PHONE_DISPLAY` constant: `"(+62) 817-000-6625"`
+    - Easy access to phone number across components
+
+3. **Updated Offcanvas.tsx to Use Data Files** (src/layouts/headers/Menu/Offcanvas.tsx):
+    - Removed hardcoded `socialLinks` array (lines 7-12)
+    - Imported `socialLinks` from SocialMediaData.ts
+    - Imported `PHONE_DISPLAY` from ContactData.tsx
+    - Updated social links mapping to use `SocialLink` interface (url, iconClass, ariaLabel)
+    - Updated phone number to use `PHONE_DISPLAY` constant with tel: link generation
+
+**Data Architecture Benefits**:
+1. **Single Source of Truth**: Contact information now centralized in data files
+2. **DRY Principle**: No duplicate phone numbers across Offcanvas, SocialMediaData, ContactData
+3. **Blueprint Compliance**: Follows "All dynamic content uses TypeScript data files" principle
+4. **Maintainability**: Update phone number in one place (ContactData.tsx)
+5. **Type Safety**: SocialLink interface ensures consistent structure
+6. **Accessibility**: ARIA labels from SocialMediaData.ts used in Offcanvas
+
+**Code Quality**:
+- SocialMediaData.ts: Updated phone number (1 line change)
+- ContactData.tsx: Added 2 constant exports (2 lines)
+- Offcanvas.tsx: Removed 6 lines of hardcoded array, added 2 imports (net -4 lines)
+- 3 files modified with zero breaking changes
+- All 2553 tests passing (100% success rate)
+- Lint passed (0 errors, 0 warnings)
+- Build successful (21 pages generated)
+- TypeScript compilation passed
+
+**Success Criteria**:
+- [x] Fixed incorrect phone number in SocialMediaData.ts
+- [x] Added PHONE_NUMBER and PHONE_DISPLAY constants to ContactData.tsx
+- [x] Removed hardcoded socialLinks array from Offcanvas.tsx
+- [x] Imported socialLinks from SocialMediaData.ts in Offcanvas.tsx
+- [x] Imported PHONE_DISPLAY from ContactData.tsx in Offcanvas.tsx
+- [x] Updated Offcanvas.tsx to use SocialLink interface structure
+- [x] All 2553 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build successful (21 pages generated)
+- [x] Zero breaking changes to existing functionality
+- [x] Updated docs/task.md with Task 165 completion
+
+**Related Files**:
+- ✅ Modified: `src/data/SocialMediaData.ts` - Fixed phone number
+- ✅ Modified: `src/data/ContactData.tsx` - Added phone number constants
+- ✅ Modified: `src/layouts/headers/Menu/Offcanvas.tsx` - Use data files instead of hardcodes
+
+**Testing**:
+- All 2553 tests passing (100% success rate)
+- 106 test suites passing
+- Offcanvas tests: No changes needed (test data independent)
+- SocialMediaData tests: No changes needed (phone number not tested)
+- ContactData tests: No changes needed (existing tests validate structure)
+- Lint passed: 0 errors, 0 warnings
+- Zero regressions in existing functionality
+- Build successful: 21 pages generated
+
+**Notes**:
+- Follows Data Architect principles:
+    - **Single Source of Truth**: Contact information in data files only
+    - **DRY Principle**: No duplicate data across files
+    - **Blueprint Compliance**: Data-driven UI with TypeScript data files
+    - **Non-destructive**: Refactoring only, no data changes
+- Phone number consistency:
+    - Before: 622129212888 (SocialMediaData), 628170006625 (ContactData, Offcanvas)
+    - After: 628170006625 (SocialMediaData, ContactData, Offcanvas) ✓
+- SocialLink interface usage:
+    - Uses url, iconClass, ariaLabel, target fields
+    - ARIA labels now properly set from data file
+    - Target and rel attributes handled correctly
+
+**Impact**:
+- Data Integrity: Single source of truth for contact information
+- Maintainability: Update phone number in one place (ContactData.tsx)
+- Code Quality: 3 files modified, -4 net lines, DRY principle applied
+- Blueprint Compliance: Data-driven UI principle followed
+- Accessibility: ARIA labels from data files (SocialMediaData.ts)
+- Zero Regressions: All tests passing, lint clean, build successful
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: Task 129 (Data-Driven UI for Sidebar), Task 40 (Data Architecture)
+**Next Data Architecture Review**: January 21, 2026
+
+---
+
 ## Task 163: Accessibility Improvements - ARIA and Semantic HTML (Jan 13, 2026)
 
 **Status**: ✅ Completed

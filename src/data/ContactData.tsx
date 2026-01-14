@@ -35,4 +35,7 @@ const contact_data: ContactInfoItem[] = [
    },
 ];
 
+export const PHONE_NUMBER = "+628170006625";
+export const PHONE_DISPLAY = "(+62) 817-000-6625";
+
 export default contact_data;
