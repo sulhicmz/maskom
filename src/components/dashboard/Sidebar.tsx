@@ -11,17 +11,17 @@ const Sidebar = React.memo(({ onModuleChange }: SidebarProps) => {
       <h5>Dashboard</h5>
       <ul className="nav flex-column">
         <li className="nav-item">
-          <button className="nav-link btn btn-link" onClick={() => onModuleChange("wifi")}>
+          <button className="nav-link btn btn-link" onClick={() => onModuleChange("wifi")} aria-label="Buka WiFi Monitor">
             WiFi Monitor
           </button>
         </li>
         <li className="nav-item">
-          <button className="nav-link btn btn-link" onClick={() => onModuleChange("website")}>
+          <button className="nav-link btn btn-link" onClick={() => onModuleChange("website")} aria-label="Buka Website Builder">
             Website Builder
           </button>
         </li>
         <li className="nav-item">
-          <button className="nav-link btn btn-link" onClick={() => onModuleChange("ai")}>
+          <button className="nav-link btn btn-link" onClick={() => onModuleChange("ai")} aria-label="Buka AI Automation">
             AI Automation
           </button>
         </li>

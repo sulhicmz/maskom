@@ -72,7 +72,7 @@ public/
 - [docs/architecture/ADR-0001-worker-stack.md](docs/architecture/ADR-0001-worker-stack.md) — keputusan arsitektur worker & Next.js
 - [docs/blueprint.md](docs/blueprint.md) — overview arsitektur lengkap & pola desain
 - [docs/api.md](docs/api.md) — dokumentasi API lengkap untuk layanan (EmailService, AuthService)
-- [docs/testing-guide.md](docs/testing-guide.md) — panduan pengujian lengkap (1976 tes)
+ - [docs/testing-guide.md](docs/testing-guide.md) — panduan pengujian lengkap (2553 tes)
 - [docs/task.md](docs/task.md) — tracking tugas dan peningkatan arsitektur
 - [docs/roadmap.md](docs/roadmap.md) — roadmap pengembangan fitur
 - [docs/content_plan.md](docs/content_plan.md) — perencanaan konten
@@ -88,7 +88,7 @@ Perbarui dokumentasi di atas setiap kali ada perubahan arsitektur, dependensi, a
 - Semua data statis di `src/data/` divalidasi menggunakan utilitas di `src/utils/dataValidation.ts`
 - 21 validator mencakup: FeedbackItem, FaqItem, PriceItem, MenuItem, TeamMember, dll
 - Data indexing untuk O(1) lookup dan relationship management untuk integritas referensial
-- Jalankan `npm test` untuk memastikan semua validasi berjalan dengan benar (2434 tes total)
+ - Jalankan `npm test` untuk memastikan semua validasi berjalan dengan benar (2553 tes total)
 - Lihat [docs/blueprint.md](docs/blueprint.md#data-validation--completed---task-40-phase-1) untuk detail lengkap
 
 ## Layanan (Services)

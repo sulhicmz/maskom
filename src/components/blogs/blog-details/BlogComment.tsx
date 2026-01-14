@@ -33,12 +33,12 @@ const BlogComment = ({ comments }: BlogCommentProps) => {
                            <span className="post-meta">{comment.formattedDate}</span>
                         </div>
                      </div>
-                     <div className="ac-postbox__comment-text">
-                        <p>{comment.content}</p>
-                        <div className="ac-postbox__comment-reply">
-                           <button type="button">Reply</button>
-                        </div>
-                     </div>
+                        <div className="ac-postbox__comment-text">
+                         <p>{comment.content}</p>
+                         <div className="ac-postbox__comment-reply">
+                            <button type="button" aria-label="Balas komentar dari {comment.name}">Reply</button>
+                         </div>
+                      </div>
                   </div>
                </li>
             ))}
