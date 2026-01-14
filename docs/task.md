@@ -105,6 +105,125 @@
 
 ---
 
+## Task 169: Pattern Implementation - API Response Utility (Jan 14, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Code Architecture (Pattern Implementation)
+
+**Problem**:
+- API routes had duplicate response formatting code
+- All 3 API routes (health, metrics, services/status) used identical NextResponse.json() pattern
+- Duplicate headers configuration (Content-Type, Cache-Control) in each route
+- Violates DRY principle - changes to response headers require updating multiple files
+- No single source of truth for API response format
+- Makes it difficult to add consistent headers (security, monitoring) across all API routes
+
+**Solution**:
+1. **Created createApiResponse Utility** (src/utils/apiResponse.ts):
+    - Generic function with ApiResponseConfig<T> interface
+    - Default headers: Content-Type, Cache-Control (no-cache, no-store, must-revalidate)
+    - Optional custom headers parameter for API-specific configuration
+    - Type-safe response with NextResponse<T> return type
+    - Single source of truth for API response formatting
+
+2. **Updated API Routes to Use Utility**:
+    - health/route.ts: Replaced NextResponse.json() with createApiResponse()
+    - metrics/route.ts: Replaced NextResponse.json() with createApiResponse()
+    - services/status/route.ts: Replaced NextResponse.json() with createApiResponse()
+    - Removed duplicate headers from all routes
+    - Simplified response creation with single function call
+
+**Code Changes**:
+- Created: src/utils/apiResponse.ts (29 lines)
+- Modified: src/app/api/health/route.ts (35 → 31 lines, -4 lines)
+- Modified: src/app/api/metrics/route.ts (37 → 33 lines, -4 lines)
+- Modified: src/app/api/services/status/route.ts (32 → 28 lines, -4 lines)
+- Total: 1 new file, 3 modified files, net +17 lines
+
+**Architecture Benefits**:
+1. **Single Source of Truth**: createApiResponse defines API response pattern once
+2. **DRY Principle**: Eliminated duplicate response formatting code across 3 routes
+3. **Type Safety**: Generic type parameter ensures response data type consistency
+4. **Maintainability**: Update response headers in one place (createApiResponse utility)
+5. **Flexibility**: Optional headers parameter supports API-specific customization
+6. **Extensibility**: Easy to add logging, monitoring, or security headers to all routes
+7. **Consistency**: All API routes now have identical headers and response format
+8. **SOLID Compliance**:
+   - **Single Responsibility**: createApiResponse handles API response formatting only
+   - **Open/Closed**: Open to extension via headers parameter, closed for modification
+
+**Code Quality**:
+- src/utils/apiResponse.ts: 29 lines (new utility)
+- health/route.ts: -4 lines (reused utility)
+- metrics/route.ts: -4 lines (reused utility)
+- services/status/route.ts: -4 lines (reused utility)
+- All 2587 tests passing (100% success rate)
+- Lint passed: 0 errors, 0 warnings
+- Build successful: 21 pages generated
+- Zero breaking changes to API functionality
+
+**Success Criteria**:
+- [x] Created createApiResponse utility with ApiResponseConfig<T> interface
+- [x] Added default headers (Content-Type, Cache-Control) to utility
+- [x] Updated health/route.ts to use createApiResponse
+- [x] Updated metrics/route.ts to use createApiResponse
+- [x] Updated services/status/route.ts to use createApiResponse
+- [x] All 2587 tests passing (100% success rate)
+- [x] Lint passed (0 errors, 0 warnings)
+- [x] Build successful (21 pages generated)
+- [x] Zero breaking changes to existing API functionality
+- [x] Updated docs/blueprint.md with API Response utility documentation
+- [x] Updated docs/task.md with Task 169 completion
+
+**Related Files**:
+- ✅ Created: `src/utils/apiResponse.ts` - API response utility (29 lines)
+- ✅ Modified: `src/app/api/health/route.ts` - Use createApiResponse (-4 lines)
+- ✅ Modified: `src/app/api/metrics/route.ts` - Use createApiResponse (-4 lines)
+- ✅ Modified: `src/app/api/services/status/route.ts` - Use createApiResponse (-4 lines)
+- ✅ Updated: `docs/blueprint.md` - Added API Response utility to API Standardization section
+- ✅ Updated: `docs/task.md` - Added Task 169 documentation
+
+**Testing**:
+- All 2587 tests passing (100% success rate)
+- 107 test suites passing
+- API route behavior unchanged (same response format)
+- Lint passed: 0 errors, 0 warnings
+- Zero regressions in existing functionality
+- Build successful: 21 pages generated
+
+**Notes**:
+- Follows Code Architect principles:
+    - **Pattern Implementation**: Extracted duplicate response pattern into reusable utility
+    - **DRY Principle**: Single implementation eliminates code duplication
+    - **Single Source of Truth**: createApiResponse defines API response format
+    - **Type Safety**: Generic type parameter ensures type consistency
+    - **Maintainability**: Update response pattern in one location
+- Implementation approach:
+    - Minimal changes (1 new file, 3 modified files)
+    - Zero breaking changes (identical response behavior)
+    - Preserved API contract (same response structure and headers)
+- Future enhancements:
+    - Add request logging to createApiResponse
+    - Add response time tracking headers
+    - Add security headers (CORS, X-Frame-Options) to utility
+    - Add API version header support
+    - Consider response compression middleware
+
+**Impact**:
+- Code Quality: Eliminated 12 lines of duplicate code, DRY principle applied
+- Maintainability: Update response headers in one place (createApiResponse)
+- Consistency: All API routes use identical response formatting
+- Type Safety: Generic type parameter ensures data type consistency
+- Extensibility: Easy to add monitoring/logging headers to all routes
+- Zero Regressions: All tests passing, lint clean, build successful
+
+**Verification Date**: 2026-01-14
+**Related Tasks**: Task 162 (Health Check and Monitoring API), Task 64 (API Standardization)
+**Next Architecture Review**: January 21, 2026
+
+---
+
 ## Task 167: Security Assessment - Comprehensive Audit (Jan 14, 2026)
 
 **Status**: ✅ Completed
