@@ -37,16 +37,51 @@ jest.mock('next/dynamic', () => {
         };
         MockComponent.displayName = 'MockReactPaginate';
         return MockComponent;
-      } else if (importStr.includes('BlogSidebar')) {
-        const MockComponent = function() {
-          return <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
-        };
-        MockComponent.displayName = 'MockBlogSidebar';
-        return MockComponent;
       } else {
         return actualDynamic.default(importFn, options);
       }
     },
+  };
+});
+
+jest.mock('@/components/blogs/blog/BlogSearch', () => {
+  return function MockBlogSearch({ searchQuery, onSearchChange }: { searchQuery: string; onSearchChange: (query: string) => void }) {
+    return (
+      <div data-testid="blog-search">
+        <input data-testid="search-input" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} />
+      </div>
+    );
+  };
+});
+
+jest.mock('@/components/blogs/blog/BlogCategoryFilter', () => {
+  return function MockBlogCategoryFilter({ selectedCategory, onCategoryChange }: { selectedCategory: string; onCategoryChange: (category: string) => void }) {
+    return (
+      <div data-testid="blog-category-filter">
+        <select value={selectedCategory} onChange={(e) => onCategoryChange(e.target.value)}>
+          <option value="">Semua Kategori</option>
+          <option value="Konektivitas Terkelola">Konektivitas Terkelola</option>
+          <option value="Keamanan Jaringan">Keamanan Jaringan</option>
+          <option value="Operasional & Dukungan">Operasional & Dukungan</option>
+          <option value="Transformasi Digital">Transformasi Digital</option>
+          <option value="Infrastruktur Cloud">Infrastruktur Cloud</option>
+          <option value="IoT & Edge">IoT & Edge</option>
+        </select>
+      </div>
+    );
+  };
+});
+
+jest.mock('@/components/blogs/blog-sidebar/Tags', () => {
+  return function MockTags({ onTagClick }: { onTagClick: (tagId: number | null) => void }) {
+    return (
+      <div data-testid="blog-tags">
+        <button data-testid="tag-all" onClick={() => onTagClick(null)}>Semua</button>
+        <button data-testid="tag-1" onClick={() => onTagClick(1)}>SD-WAN</button>
+        <button data-testid="tag-2" onClick={() => onTagClick(2)}>Managed Wi-Fi</button>
+        <button data-testid="tag-3" onClick={() => onTagClick(3)}>Keamanan</button>
+      </div>
+    );
   };
 });
 
@@ -58,10 +93,12 @@ jest.mock('next/image', () => ({
 }));
 
 describe('BlogArea', () => {
-  it('renders blog section with container', () => {
+  it('renders blog section with filter components', () => {
     render(<BlogArea />);
 
-    expect(screen.getByTestId('blog-sidebar')).toBeInTheDocument();
+    expect(screen.getByTestId('blog-search')).toBeInTheDocument();
+    expect(screen.getByTestId('blog-category-filter')).toBeInTheDocument();
+    expect(screen.getByTestId('blog-tags')).toBeInTheDocument();
   });
 
   it('renders initial blog items (3 per page)', () => {
@@ -183,6 +220,129 @@ describe('BlogArea', () => {
     fireEvent.click(prevButton);
     await waitFor(() => {
       expect(screen.getByTestId('prev-page')).toBeInTheDocument();
+    });
+  });
+
+  describe('Search Filtering', () => {
+    it('filters blog posts by search query', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'strategi' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/strategi/i)).toBeInTheDocument();
+      });
+    });
+
+    it('shows all posts when search query is empty', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+      fireEvent.change(searchInput, { target: { value: '' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/strategi maskom/i)).toBeInTheDocument();
+      });
+    });
+
+    it('does not show posts that do not match search query', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
+
+      await waitFor(() => {
+        expect(screen.queryByText(/strategi maskom/i)).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Tag Filtering', () => {
+    it('calls onTagClick when tag is clicked', async () => {
+      render(<BlogArea />);
+
+      const tagButton = screen.getByTestId('tag-1');
+      fireEvent.click(tagButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('tag-1')).toBeInTheDocument();
+      });
+    });
+
+    it('calls onTagClick with null when "Semua" is clicked', async () => {
+      render(<BlogArea />);
+
+      const tagAllButton = screen.getByTestId('tag-all');
+      fireEvent.click(tagAllButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('tag-all')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Filter Status', () => {
+    it('shows filter status when filters are active', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Hasil pencarian/i)).toBeInTheDocument();
+      });
+    });
+
+    it('shows clear all filters button when filters are active', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Hapus Semua Filter/i)).toBeInTheDocument();
+      });
+    });
+
+    it('clears all filters when button is clicked', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input') as HTMLInputElement;
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+
+      const clearButton = screen.getByText(/Hapus Semua Filter/i);
+      fireEvent.click(clearButton);
+
+      await waitFor(() => {
+        expect(searchInput.value).toBe('');
+        expect(screen.queryByText(/Hasil pencarian/i)).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('No Results', () => {
+    it('shows no results message when no posts match filters', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'nonexistentxyz' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Tidak ada hasil ditemukan/i)).toBeInTheDocument();
+      });
+    });
+
+    it('shows helpful message when no results found', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Coba ubah kata kunci pencarian/i)).toBeInTheDocument();
+      });
     });
   });
 });

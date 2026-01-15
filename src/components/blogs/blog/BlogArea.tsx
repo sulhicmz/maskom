@@ -1,27 +1,49 @@
 "use client"
-import React from "react"
+import React, { useState, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import dynamic from "next/dynamic"
 import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 import PaginationWrapper from "@/components/common/PaginationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
-
-const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
-  loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
-})
+import BlogSearch from "./BlogSearch"
+import BlogCategoryFilter from "./BlogCategoryFilter"
+import Tags from "../blog-sidebar/Tags"
 
 const BlogArea = React.memo(() => {
+   const [searchQuery, setSearchQuery] = useState("")
+   const [selectedCategory, setSelectedCategory] = useState("")
+   const [selectedTagId, setSelectedTagId] = useState<number | null>(null)
 
    const itemsPerPage = 3;
 
+   const filteredData = useMemo(() => {
+      return inner_blog_data.filter((post) => {
+         const matchesSearch =
+            searchQuery === "" ||
+            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            post.desc.toLowerCase().includes(searchQuery.toLowerCase())
+
+         const matchesCategory = selectedCategory === ""
+
+         const matchesTag = selectedTagId === null || post.tagId === selectedTagId
+
+         return matchesSearch && matchesCategory && matchesTag
+      })
+   }, [searchQuery, selectedCategory, selectedTagId])
+
    const { currentItems, pageCount, handlePageClick } = usePagination({
-      data: inner_blog_data,
+      data: filteredData,
       itemsPerPage,
    });
+
+   const handleClearAllFilters = () => {
+      setSearchQuery("")
+      setSelectedCategory("")
+      setSelectedTagId(null)
+   }
 
    return (
       <section className="blogs-section pt-120 pb-90">
@@ -29,7 +51,20 @@ const BlogArea = React.memo(() => {
             <div className="row">
                <div className="col-xl-8">
                   <div className="blogs-wrapper mb-30">
-                     {currentItems.map((item) => (
+                     {(searchQuery || selectedCategory || selectedTagId) && (
+                        <div className="filter-status mb-30">
+                           <span>Hasil pencarian: <strong>{filteredData.length} artikel</strong></span>
+                           <button
+                              type="button"
+                              onClick={handleClearAllFilters}
+                              className="clear-all-filters"
+                           >
+                              Hapus Semua Filter
+                           </button>
+                        </div>
+                     )}
+                     {currentItems.length > 0 ? (
+                        currentItems.map((item) => (
                         <AnimationWrapper key={item.id} animation="fadeInUp" className="blog-post-item style-two mb-60">
                             <div className="post-thumbnail">
                                <Link href="/blog-details"><Image src={item.thumb} alt={`Thumbnail gambar artikel: ${item.title}`} /></Link>
@@ -57,19 +92,36 @@ const BlogArea = React.memo(() => {
                                   </div>
                               </div>
                            </div>
-                        </AnimationWrapper>
-                     ))}
-                      <PaginationWrapper
+                         </AnimationWrapper>
+                     ))
+                     ) : (
+                        <div className="no-results">
+                           <h3>Tidak ada hasil ditemukan</h3>
+                           <p>Coba ubah kata kunci pencarian atau filter kategori/tag.</p>
+                        </div>
+                     )}
+                     {currentItems.length > 0 && (
+                        <PaginationWrapper
                          pageCount={pageCount}
                          onPageChange={handlePageClick}
-                         pageRangeDisplayed={3}
-                      />
-                   </div>
-                </div>
-                <BlogSidebar />
-             </div>
-          </div>
-        </section>
+                           pageRangeDisplayed={3}
+                        />
+                     )}
+                  </div>
+               </div>
+               <div className="col-xl-4">
+                  <div className="sidebar-wrapper">
+                     <BlogSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+                     <BlogCategoryFilter
+                        selectedCategory={selectedCategory}
+                        onCategoryChange={setSelectedCategory}
+                     />
+                     <Tags selectedTagId={selectedTagId} onTagClick={setSelectedTagId} />
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
     )
 });
 

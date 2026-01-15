@@ -4,7 +4,60 @@
 
 /*---========================
         16. Blog css
- =======================----*/
+  =======================----*/
+
+/* Filter Status */
+.filter-status{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: #F8F8F8;
+    @include border-radius(8px);
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+    & span{
+        font-size: 15px;
+        color: $text-color;
+        & strong{
+            color: $primary-color;
+        }
+    }
+    & .clear-all-filters{
+        padding: 8px 20px;
+        background: transparent;
+        border: 1px solid $border-color;
+        @include border-radius(5px);
+        cursor: pointer;
+        font-size: 14px;
+        color: $text-color;
+        transition: all 0.3s;
+        &:hover{
+            background: $primary-color;
+            border-color: $primary-color;
+            color: $white-color;
+        }
+    }
+}
+
+/* No Results */
+.no-results{
+    text-align: center;
+    padding: 60px 30px;
+    background-color: #FAFAFA;
+    @include border-radius(10px);
+    & h3{
+        font-size: 28px;
+        margin-bottom: 15px;
+        color: $heading-color;
+    }
+    & p{
+        font-size: 16px;
+        color: #777;
+    }
+}
+
 
 .blog-details-wrapper{
     & .blog-post-item{
