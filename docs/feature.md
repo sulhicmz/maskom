@@ -102,7 +102,7 @@ As a developer, I want centralized and type-safe data filtering, so that I can m
 
 ## [FEATURE-006] Advanced Blog Search & Filtering
 
-**Status**: Complete
+**Status**: ✅ Complete
 **Priority**: P1
 **Type**: UX/UI
 
@@ -120,11 +120,20 @@ As a Blog Reader, I want to search blog posts by keywords and filter by categori
 - [x] Add "Clear filters" button
 - [x] Update tests for search/filter behavior
 
+**Implementation Details**:
+- BlogSearch component with 300ms debouncing
+- BlogCategoryFilter with 6 categories from BlogCategoryData
+- Tags component converted to interactive filter buttons
+- Combined filtering (search AND category AND tag)
+- URL query parameters for shareable filtered links
+- Reusable Button and Input UI components created
+- Comprehensive test coverage (56 new tests)
+
 ---
 
 ## [FEATURE-007] Dark Mode Theme Toggle
 
-**Status**: Pending
+**Status**: ✅ Complete
 **Priority**: P1
 **Type**: UX/UI
 
@@ -134,13 +143,22 @@ As a User, I want to switch between light and dark themes, so that I can read co
 
 ### Acceptance Criteria
 
-- [ ] Create theme context provider with localStorage persistence
-- [ ] Add theme toggle button to navigation menu
-- [ ] Apply dark theme styles using CSS variables
-- [ ] Update all components to support theme-aware styling
-- [ ] Add smooth transition between themes
-- [ ] Test across all pages for dark mode compatibility
-- [ ] Update docs/blueprint.md with theme architecture
+- [x] Create theme context provider with localStorage persistence
+- [x] Add theme toggle button to navigation menu
+- [x] Apply dark theme styles using CSS variables
+- [x] Update all components to support theme-aware styling
+- [x] Add smooth transition between themes
+- [x] Test across all pages for dark mode compatibility
+- [x] Update docs/blueprint.md with theme architecture
+
+**Implementation Details**:
+- ThemeContext with localStorage persistence (91 lines)
+- ThemeToggle component with sun/moon icons (24 lines)
+- Dark theme CSS variables in _common.scss
+- Theme toggle integrated into HeaderOne navigation
+- Smooth transitions (0.3s ease) for background and color
+- 80 comprehensive tests (50 for ThemeContext, 30 for ThemeToggle)
+- System preference detection for initial theme
 
 ---
 

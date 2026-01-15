@@ -25,5 +25,6 @@ export const validateInnerBlogPost = createValidator<InnerBlogPost>({
     { key: "desc", required: true },
     { key: "date", required: true },
     { key: "user", required: true },
+    { key: "category", required: false },
   ],
 });

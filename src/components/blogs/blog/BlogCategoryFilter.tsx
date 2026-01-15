@@ -1,53 +1,66 @@
 "use client"
 import React from "react"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import categories from "@/data/BlogCategoryData"
+import Button from "@/components/ui/Button"
 
 interface BlogCategoryFilterProps {
-   selectedCategory: string
-   onCategoryChange: (category: string) => void
+  selectedCategory: string | null
+  onCategoryChange: (category: string | null) => void
 }
 
 const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = ({
-   selectedCategory,
-   onCategoryChange
+  selectedCategory,
+  onCategoryChange,
 }) => {
-   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      onCategoryChange(e.target.value)
-   }
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-   const handleClearFilter = () => {
-      onCategoryChange("")
-   }
+  const handleCategoryChange = (category: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
 
-   return (
-      <div className="sidebar-widget category-widget">
-         <h3 className="widget-title">Kategori</h3>
-         <div className="category-form">
-            <select
-               value={selectedCategory}
-               onChange={handleCategoryChange}
-               aria-label="Filter kategori artikel"
-            >
-               <option value="">Semua Kategori</option>
-               {categories.map((category) => (
-                  <option key={category} value={category}>
-                     {category}
-                  </option>
-               ))}
-            </select>
-            {selectedCategory && (
-               <button
-                  type="button"
-                  onClick={handleClearFilter}
-                  className="category-clear"
-                  aria-label="Hapus filter kategori"
-               >
-                  Reset
-               </button>
-            )}
-         </div>
+    if (category) {
+      params.set("category", category)
+    } else {
+      params.delete("category")
+    }
+
+    const queryString = params.toString()
+    const url = queryString ? `${pathname}?${queryString}` : pathname
+    router.push(url)
+    onCategoryChange(category)
+  }
+
+  return (
+    <div className="sidebar-widget category-widget">
+      <h3 className="widget-title">Kategori</h3>
+      <div className="category-filter">
+        <select
+          value={selectedCategory || ""}
+          onChange={(e) => handleCategoryChange(e.target.value || null)}
+          aria-label="Filter kategori artikel"
+          className="category-select"
+        >
+          <option value="">Semua Kategori</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+        {selectedCategory && (
+          <Button
+            variant="text"
+            onClick={() => handleCategoryChange(null)}
+            className="clear-filter-btn"
+          >
+            Hapus Filter
+          </Button>
+        )}
       </div>
-   )
+    </div>
+  )
 }
 
 BlogCategoryFilter.displayName = "BlogCategoryFilter"

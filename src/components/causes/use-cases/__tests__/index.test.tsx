@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import UseCases from '../index';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 jest.mock('next/image', () => ({
     __esModule: true,
@@ -17,6 +18,14 @@ jest.mock('next/link', () => ({
     ),
 }));
 
+function renderWithProviders(component: React.ReactElement) {
+    return render(
+        <ThemeProvider>
+            {component}
+        </ThemeProvider>
+    );
+}
+
 describe('Use Cases Page Component', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -24,30 +33,30 @@ describe('Use Cases Page Component', () => {
 
     describe('Rendering', () => {
         it('should render without crashing', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             expect(container).toBeInTheDocument();
         });
 
         it('should render main page wrapper with correct class', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const wrapper = container.querySelector('.ac-page-wrapper');
             expect(wrapper).toBeInTheDocument();
         });
 
         it('should render smooth-wrapper', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const smoothWrapper = container.querySelector('.smooth-wrapper');
             expect(smoothWrapper).toBeInTheDocument();
         });
 
         it('should render smooth-content', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const smoothContent = container.querySelector('#smooth-content');
             expect(smoothContent).toBeInTheDocument();
         });
 
         it('should render all page components', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             expect(container.querySelector('.ac-page-wrapper')).toBeInTheDocument();
             expect(container.querySelector('.smooth-wrapper')).toBeInTheDocument();
             expect(container.querySelector('#smooth-content')).toBeInTheDocument();
@@ -56,13 +65,13 @@ describe('Use Cases Page Component', () => {
 
     describe('Header Component', () => {
         it('should render HeaderOne component', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const header = container.querySelector('header');
             expect(header).toBeInTheDocument();
         });
 
         it('should pass style prop to HeaderOne', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const header = container.querySelector('header');
             expect(header).toBeInTheDocument();
         });
@@ -70,7 +79,7 @@ describe('Use Cases Page Component', () => {
 
     describe('Footer Component', () => {
         it('should render FooterTwo component', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const footer = container.querySelector('footer');
             expect(footer).toBeInTheDocument();
         });
@@ -78,31 +87,31 @@ describe('Use Cases Page Component', () => {
 
     describe('Main Content Sections', () => {
         it('should render Breadcrumb component', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const breadcrumb = container.querySelector('.page-banner');
             expect(breadcrumb).toBeInTheDocument();
         });
 
         it('should render Cause section', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const cause = container.querySelector('.use-cases-section');
             expect(cause).toBeInTheDocument();
         });
 
         it('should render Feedback section', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const feedback = container.querySelector('.testimonial-section');
             expect(feedback).toBeInTheDocument();
         });
 
         it('should render Faq section', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const faq = container.querySelector('.faqs-section');
             expect(faq).toBeInTheDocument();
         });
 
         it('should render Cta section', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const cta = container.querySelector('.cta-section');
             expect(cta).toBeInTheDocument();
         });
@@ -110,7 +119,7 @@ describe('Use Cases Page Component', () => {
 
     describe('Layout Structure', () => {
         it('should have correct DOM hierarchy', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             
             const pageWrapper = container.querySelector('.ac-page-wrapper');
             expect(pageWrapper).toBeInTheDocument();
@@ -129,7 +138,7 @@ describe('Use Cases Page Component', () => {
         });
 
         it('should position Header before smooth-content', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const pageWrapper = container.querySelector('.ac-page-wrapper');
             const header = pageWrapper?.querySelector('header');
             const smoothWrapper = pageWrapper?.querySelector('.smooth-wrapper');
@@ -138,7 +147,7 @@ describe('Use Cases Page Component', () => {
         });
 
         it('should position smooth-content before Footer', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const pageWrapper = container.querySelector('.ac-page-wrapper');
             const smoothWrapper = pageWrapper?.querySelector('.smooth-wrapper');
             const footer = pageWrapper?.querySelector('footer');
@@ -149,11 +158,11 @@ describe('Use Cases Page Component', () => {
 
     describe('Component Integration', () => {
         it('should integrate all child components without errors', () => {
-            expect(() => render(<UseCases />)).not.toThrow();
+            expect(() => renderWithProviders(<UseCases />)).not.toThrow();
         });
 
         it('should render all child components', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             
             const header = container.querySelector('header');
             const breadcrumb = container.querySelector('.page-banner');
@@ -175,7 +184,7 @@ describe('Use Cases Page Component', () => {
 
     describe('Accessibility', () => {
         it('should have semantic HTML structure', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             
             const header = container.querySelector('header');
             const footer = container.querySelector('footer');
@@ -187,7 +196,7 @@ describe('Use Cases Page Component', () => {
         });
 
         it('should have correct ARIA structure', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const mainContent = container.querySelector('#smooth-content');
             expect(mainContent).toBeInTheDocument();
             expect(mainContent).toHaveAttribute('id', 'smooth-content');
@@ -196,7 +205,7 @@ describe('Use Cases Page Component', () => {
 
     describe('Component Features', () => {
         it('should render Use Cases page variant', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             const breadcrumb = container.querySelector('.page-banner');
             expect(breadcrumb).toBeInTheDocument();
         });
@@ -204,11 +213,11 @@ describe('Use Cases Page Component', () => {
 
     describe('Edge Cases', () => {
         it('should render with no props', () => {
-            expect(() => render(<UseCases />)).not.toThrow();
+            expect(() => renderWithProviders(<UseCases />)).not.toThrow();
         });
 
         it('should handle all dependencies correctly', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             
             const header = container.querySelector('header');
             const footer = container.querySelector('footer');
@@ -218,7 +227,7 @@ describe('Use Cases Page Component', () => {
         });
 
         it('should maintain correct DOM structure', () => {
-            const { container } = render(<UseCases />);
+            const { container } = renderWithProviders(<UseCases />);
             
             const pageWrapper = container.querySelector('.ac-page-wrapper');
             

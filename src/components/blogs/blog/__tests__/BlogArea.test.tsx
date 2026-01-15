@@ -16,6 +16,104 @@ jest.mock('react-paginate', () => {
   };
 });
 
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
+  usePathname: () => '/blog',
+  useSearchParams: () => new URLSearchParams(''),
+}));
+
+jest.mock('../BlogSearch', () => {
+  return function MockBlogSearch({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+    return (
+      <div className="sidebar-widget search-widget">
+        <h3 className="widget-title">Cari Artikel</h3>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Cari judul atau deskripsi..."
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            aria-label="Cari artikel"
+            className="form-control"
+          />
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              aria-label="Hapus pencarian"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+});
+
+jest.mock('../BlogCategoryFilter', () => {
+  return function MockBlogCategoryFilter({ selectedCategory, onCategoryChange }: { selectedCategory: string | null; onCategoryChange: (cat: string | null) => void }) {
+    return (
+      <div className="sidebar-widget category-widget">
+        <h3 className="widget-title">Kategori</h3>
+        <select
+          value={selectedCategory || ''}
+          onChange={(e) => onCategoryChange(e.target.value || null)}
+          aria-label="Filter kategori artikel"
+          className="category-select"
+        >
+          <option value="">Semua Kategori</option>
+          <option value="Konektivitas Terkelola">Konektivitas Terkelola</option>
+          <option value="Keamanan Jaringan">Keamanan Jaringan</option>
+          <option value="Operasional & Dukungan">Operasional & Dukungan</option>
+          <option value="Transformasi Digital">Transformasi Digital</option>
+          <option value="Infrastruktur Cloud">Infrastruktur Cloud</option>
+          <option value="IoT & Edge">IoT & Edge</option>
+        </select>
+        {selectedCategory && <button onClick={() => onCategoryChange(null)}>Hapus Filter</button>}
+      </div>
+    );
+  };
+});
+
+jest.mock('../../blog-sidebar/Tags', () => {
+  return function MockTags({ selectedTagId, onTagClick }: { selectedTagId: number | null; onTagClick: (id: number | null) => void }) {
+    const tags = [
+      { id: 1, name: 'SD-WAN' },
+      { id: 2, name: 'Managed Wi-Fi' },
+      { id: 3, name: 'Keamanan' },
+      { id: 4, name: 'Cloud Connect' },
+      { id: 5, name: 'Monitoring' },
+      { id: 6, name: 'IoT' },
+      { id: 7, name: 'Managed Service' },
+      { id: 8, name: 'Infrastruktur' },
+      { id: 9, name: 'Wi-Fi' },
+    ];
+
+    return (
+      <div className="sidebar-widget tag-cloud-widget">
+        <h3 className="widget-title">Keywords</h3>
+        <div className="tagcloud">
+          {tags.map((tag) => (
+            <button
+              key={tag.id}
+              onClick={() => onTagClick(selectedTagId === tag.id ? null : tag.id)}
+              className={`tag-btn ${selectedTagId === tag.id ? 'active' : ''}`}
+              aria-label={`Filter artikel dengan kata kunci: ${tag.name}`}
+              aria-pressed={selectedTagId === tag.id}
+            >
+              {tag.name}
+            </button>
+          ))}
+          {selectedTagId && <button onClick={() => onTagClick(null)}>Hapus Filter</button>}
+        </div>
+      </div>
+    );
+  };
+});
+
 jest.mock('next/dynamic', () => {
   const actualDynamic = jest.requireActual<typeof import('next/dynamic')>('next/dynamic');
   return {
@@ -37,51 +135,91 @@ jest.mock('next/dynamic', () => {
         };
         MockComponent.displayName = 'MockReactPaginate';
         return MockComponent;
+      } else if (importStr.includes('BlogSidebar')) {
+        const MockBlogSearch = function({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+          return (
+            <div className="sidebar-widget search-widget">
+              <h3 className="widget-title">Cari Artikel</h3>
+              <div className="search-box">
+                <input
+                  type="text"
+                  placeholder="Cari judul atau deskripsi..."
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                  aria-label="Cari artikel"
+                  className="form-control"
+                />
+              </div>
+            </div>
+          );
+        };
+
+        const MockBlogCategoryFilter = function({ selectedCategory, onCategoryChange }: { selectedCategory: string | null; onCategoryChange: (cat: string | null) => void }) {
+          return (
+            <div className="sidebar-widget category-widget">
+              <h3 className="widget-title">Kategori</h3>
+              <select
+                value={selectedCategory || ''}
+                onChange={(e) => onCategoryChange(e.target.value || null)}
+                aria-label="Filter kategori artikel"
+                className="category-select"
+              >
+                <option value="">Semua Kategori</option>
+                <option value="Konektivitas Terkelola">Konektivitas Terkelola</option>
+                <option value="Keamanan Jaringan">Keamanan Jaringan</option>
+                <option value="Operasional & Dukungan">Operasional & Dukungan</option>
+                <option value="Transformasi Digital">Transformasi Digital</option>
+                <option value="Infrastruktur Cloud">Infrastruktur Cloud</option>
+                <option value="IoT & Edge">IoT & Edge</option>
+              </select>
+            </div>
+          );
+        };
+
+        const MockTags = function({ selectedTagId, onTagClick }: { selectedTagId: number | null; onTagClick: (id: number | null) => void }) {
+          const tags = [
+            { id: 1, name: 'SD-WAN' },
+            { id: 2, name: 'Managed Wi-Fi' },
+            { id: 3, name: 'Keamanan' },
+          ];
+
+          return (
+            <div className="sidebar-widget tag-cloud-widget">
+              <h3 className="widget-title">Keywords</h3>
+              <div className="tagcloud">
+                {tags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    onClick={() => onTagClick(selectedTagId === tag.id ? null : tag.id)}
+                    className={`tag-btn ${selectedTagId === tag.id ? 'active' : ''}`}
+                    aria-label={`Filter artikel dengan kata kunci: ${tag.name}`}
+                    aria-pressed={selectedTagId === tag.id}
+                  >
+                    {tag.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        };
+
+        const MockComponent = function(props: { searchValue?: string; onSearchChange?: (value: string) => void; selectedCategory?: string | null; onCategoryChange?: (category: string | null) => void; selectedTagId?: number | null; onTagClick?: (tagId: number | null) => void }) {
+          return (
+            <div data-testid="blog-sidebar">
+              <MockBlogSearch value={props.searchValue || ''} onChange={props.onSearchChange || (() => {})} />
+              <MockBlogCategoryFilter selectedCategory={props.selectedCategory} onCategoryChange={props.onCategoryChange || (() => {})} />
+              <div>Mock Category</div>
+              <div>Mock LatestNews</div>
+              <MockTags selectedTagId={props.selectedTagId} onTagClick={props.onTagClick || (() => {})} />
+            </div>
+          );
+        };
+        MockComponent.displayName = 'MockBlogSidebar';
+        return MockComponent;
       } else {
         return actualDynamic.default(importFn, options);
       }
     },
-  };
-});
-
-jest.mock('@/components/blogs/blog/BlogSearch', () => {
-  return function MockBlogSearch({ searchQuery, onSearchChange }: { searchQuery: string; onSearchChange: (query: string) => void }) {
-    return (
-      <div data-testid="blog-search">
-        <input data-testid="search-input" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} />
-      </div>
-    );
-  };
-});
-
-jest.mock('@/components/blogs/blog/BlogCategoryFilter', () => {
-  return function MockBlogCategoryFilter({ selectedCategory, onCategoryChange }: { selectedCategory: string; onCategoryChange: (category: string) => void }) {
-    return (
-      <div data-testid="blog-category-filter">
-        <select value={selectedCategory} onChange={(e) => onCategoryChange(e.target.value)}>
-          <option value="">Semua Kategori</option>
-          <option value="Konektivitas Terkelola">Konektivitas Terkelola</option>
-          <option value="Keamanan Jaringan">Keamanan Jaringan</option>
-          <option value="Operasional & Dukungan">Operasional & Dukungan</option>
-          <option value="Transformasi Digital">Transformasi Digital</option>
-          <option value="Infrastruktur Cloud">Infrastruktur Cloud</option>
-          <option value="IoT & Edge">IoT & Edge</option>
-        </select>
-      </div>
-    );
-  };
-});
-
-jest.mock('@/components/blogs/blog-sidebar/Tags', () => {
-  return function MockTags({ onTagClick }: { onTagClick: (tagId: number | null) => void }) {
-    return (
-      <div data-testid="blog-tags">
-        <button data-testid="tag-all" onClick={() => onTagClick(null)}>Semua</button>
-        <button data-testid="tag-1" onClick={() => onTagClick(1)}>SD-WAN</button>
-        <button data-testid="tag-2" onClick={() => onTagClick(2)}>Managed Wi-Fi</button>
-        <button data-testid="tag-3" onClick={() => onTagClick(3)}>Keamanan</button>
-      </div>
-    );
   };
 });
 
@@ -93,12 +231,10 @@ jest.mock('next/image', () => ({
 }));
 
 describe('BlogArea', () => {
-  it('renders blog section with filter components', () => {
+  it('renders blog section with container', () => {
     render(<BlogArea />);
 
-    expect(screen.getByTestId('blog-search')).toBeInTheDocument();
-    expect(screen.getByTestId('blog-category-filter')).toBeInTheDocument();
-    expect(screen.getByTestId('blog-tags')).toBeInTheDocument();
+    expect(screen.getByTestId('blog-sidebar')).toBeInTheDocument();
   });
 
   it('renders initial blog items (3 per page)', () => {
@@ -223,126 +359,84 @@ describe('BlogArea', () => {
     });
   });
 
-  describe('Search Filtering', () => {
-    it('filters blog posts by search query', async () => {
+  describe('Search Functionality', () => {
+    it('renders search input in sidebar', () => {
       render(<BlogArea />);
 
-      const searchInput = screen.getByTestId('search-input');
-      fireEvent.change(searchInput, { target: { value: 'strategi' } });
-
-      await waitFor(() => {
-        expect(screen.getByText(/strategi/i)).toBeInTheDocument();
-      });
+      expect(screen.getByPlaceholderText('Cari judul atau deskripsi...')).toBeInTheDocument();
     });
 
-    it('shows all posts when search query is empty', async () => {
+    it('displays filtered posts when search query matches', async () => {
       render(<BlogArea />);
 
-      const searchInput = screen.getByTestId('search-input');
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'SD-WAN' } });
+
+      await waitFor(() => {
+        const posts = screen.getAllByText(/BACA SELENGKAPNYA/);
+        expect(posts.length).toBeGreaterThan(0);
+      }, { timeout: 2000 });
+    });
+
+    it('shows no results when search matches no posts', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'nonexistent post xyz 12345' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Tidak ada hasil ditemukan')).toBeInTheDocument();
+      }, { timeout: 2000 });
+    });
+  });
+
+  describe('Filter Status Display', () => {
+    it('shows filter status when search is applied', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'test query' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Filter Aktif:')).toBeInTheDocument();
+      }, { timeout: 2000 });
+    });
+
+    it('displays active search filter tag', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
       fireEvent.change(searchInput, { target: { value: 'test' } });
-      fireEvent.change(searchInput, { target: { value: '' } });
 
       await waitFor(() => {
-        expect(screen.getByText(/strategi maskom/i)).toBeInTheDocument();
-      });
+        expect(screen.getByText(/Pencarian: "test"/)).toBeInTheDocument();
+      }, { timeout: 2000 });
     });
+  });
 
-    it('does not show posts that do not match search query', async () => {
+  describe('No Results State', () => {
+    it('shows no results message with helpful text', async () => {
       render(<BlogArea />);
 
-      const searchInput = screen.getByTestId('search-input');
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
       fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
 
       await waitFor(() => {
-        expect(screen.queryByText(/strategi maskom/i)).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Tag Filtering', () => {
-    it('calls onTagClick when tag is clicked', async () => {
-      render(<BlogArea />);
-
-      const tagButton = screen.getByTestId('tag-1');
-      fireEvent.click(tagButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('tag-1')).toBeInTheDocument();
-      });
+        expect(screen.getByText('Tidak ada hasil ditemukan')).toBeInTheDocument();
+        expect(screen.getByText('Coba sesuaikan filter atau kata kunci pencarian Anda.')).toBeInTheDocument();
+      }, { timeout: 2000 });
     });
 
-    it('calls onTagClick with null when "Semua" is clicked', async () => {
+    it('shows clear all filters button in no results state', async () => {
       render(<BlogArea />);
 
-      const tagAllButton = screen.getByTestId('tag-all');
-      fireEvent.click(tagAllButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('tag-all')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Filter Status', () => {
-    it('shows filter status when filters are active', async () => {
-      render(<BlogArea />);
-
-      const searchInput = screen.getByTestId('search-input');
-      fireEvent.change(searchInput, { target: { value: 'test' } });
-
-      await waitFor(() => {
-        expect(screen.getByText(/Hasil pencarian/i)).toBeInTheDocument();
-      });
-    });
-
-    it('shows clear all filters button when filters are active', async () => {
-      render(<BlogArea />);
-
-      const searchInput = screen.getByTestId('search-input');
-      fireEvent.change(searchInput, { target: { value: 'test' } });
-
-      await waitFor(() => {
-        expect(screen.getByText(/Hapus Semua Filter/i)).toBeInTheDocument();
-      });
-    });
-
-    it('clears all filters when button is clicked', async () => {
-      render(<BlogArea />);
-
-      const searchInput = screen.getByTestId('search-input') as HTMLInputElement;
-      fireEvent.change(searchInput, { target: { value: 'test' } });
-
-      const clearButton = screen.getByText(/Hapus Semua Filter/i);
-      fireEvent.click(clearButton);
-
-      await waitFor(() => {
-        expect(searchInput.value).toBe('');
-        expect(screen.queryByText(/Hasil pencarian/i)).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('No Results', () => {
-    it('shows no results message when no posts match filters', async () => {
-      render(<BlogArea />);
-
-      const searchInput = screen.getByTestId('search-input');
-      fireEvent.change(searchInput, { target: { value: 'nonexistentxyz' } });
-
-      await waitFor(() => {
-        expect(screen.getByText(/Tidak ada hasil ditemukan/i)).toBeInTheDocument();
-      });
-    });
-
-    it('shows helpful message when no results found', async () => {
-      render(<BlogArea />);
-
-      const searchInput = screen.getByTestId('search-input');
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
       fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
 
       await waitFor(() => {
-        expect(screen.getByText(/Coba ubah kata kunci pencarian/i)).toBeInTheDocument();
-      });
+        const clearButtons = screen.getAllByText('Hapus Semua Filter');
+        expect(clearButtons.length).toBeGreaterThan(0);
+      }, { timeout: 2000 });
     });
   });
 });

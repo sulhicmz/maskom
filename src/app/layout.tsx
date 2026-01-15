@@ -1,5 +1,6 @@
 import "../styles/index.scss";
 import { Spline_Sans } from "next/font/google";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export const runtime = 'edge';
 
@@ -34,7 +35,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body className={splineSans.className} suppressHydrationWarning>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

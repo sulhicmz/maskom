@@ -1,66 +1,56 @@
 "use client"
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect } from "react"
+import Input from "@/components/ui/Input"
 
 interface BlogSearchProps {
-   searchQuery: string
-   onSearchChange: (query: string) => void
+  value: string
+  onChange: (value: string) => void
 }
 
-const BlogSearch: React.FC<BlogSearchProps> = ({ searchQuery, onSearchChange }) => {
-   const [localQuery, setLocalQuery] = useState(searchQuery)
+const BlogSearch: React.FC<BlogSearchProps> = ({ value, onChange }) => {
+  const [searchQuery, setSearchQuery] = useState(value)
 
-   useEffect(() => {
-      setLocalQuery(searchQuery)
-   }, [searchQuery])
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onChange(searchQuery)
+    }, 300)
 
-   const debouncedSearch = useMemo(
-      () => {
-         let timeoutId: NodeJS.Timeout
-         return (value: string) => {
-            clearTimeout(timeoutId)
-            timeoutId = setTimeout(() => {
-               onSearchChange(value)
-            }, 300)
-         }
-      },
-      [onSearchChange]
-   )
+    return () => clearTimeout(timer)
+  }, [searchQuery, onChange])
 
-   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value
-      setLocalQuery(value)
-      debouncedSearch(value)
-   }
+  useEffect(() => {
+    setSearchQuery(value)
+  }, [value])
 
-   const handleClearSearch = () => {
-      setLocalQuery("")
-      onSearchChange("")
-   }
+  const handleClear = () => {
+    setSearchQuery("")
+    onChange("")
+  }
 
-   return (
-      <div className="sidebar-widget search-widget">
-         <h3 className="widget-title">Cari Artikel</h3>
-         <div className="search-form">
-            <input
-               type="text"
-               placeholder="Cari artikel..."
-               value={localQuery}
-               onChange={handleInputChange}
-               aria-label="Cari artikel"
-            />
-            {localQuery && (
-               <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="search-clear"
-                  aria-label="Hapus pencarian"
-               >
-                  ✕
-               </button>
-            )}
-         </div>
+  return (
+    <div className="sidebar-widget search-widget">
+      <h3 className="widget-title">Cari Artikel</h3>
+      <div className="search-box">
+        <Input
+          type="text"
+          placeholder="Cari judul atau deskripsi..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          ariaLabel="Cari artikel"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="search-clear"
+            aria-label="Hapus pencarian"
+          >
+            ×
+          </button>
+        )}
       </div>
-   )
+    </div>
+  )
 }
 
 BlogSearch.displayName = "BlogSearch"
