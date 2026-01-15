@@ -205,4 +205,111 @@ As an Administrator, I want to view analytics about form submissions, page views
 
 ---
 
+## [FEATURE-010] Blog Post Scheduling & Drafts
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to schedule blog posts with publish dates and save drafts, so that I can prepare content in advance and automate publication.
+
+### Acceptance Criteria
+
+- [ ] Add `status` field to InnerBlogPost interface ('draft', 'scheduled', 'published')
+- [ ] Add `publishDate` field for scheduled posts
+- [ ] Implement publish status validation in data validation layer
+- [ ] Update blog area to only show published posts
+- [ ] Add admin interface for managing drafts and scheduled posts
+- [ ] Add tests for scheduling and draft management
+- [ ] Update docs/blueprint.md with content scheduling architecture
+
+---
+
+## [FEATURE-011] Real-Time Performance Monitoring
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Performance/Analytics
+
+### User Story
+
+As a Developer, I want to see performance metrics in real-time on the analytics dashboard, so that I can identify bottlenecks proactively.
+
+### Acceptance Criteria
+
+- [ ] Integrate performance monitoring SDK (Web Vitals API)
+- [ ] Track Core Web Vitals (LCP, FID, CLS) in real-time
+- [ ] Add performance metrics to analytics dashboard
+- [ ] Implement alerts for performance thresholds exceeded
+- [ ] Store performance data for historical analysis
+- [ ] Add tests for performance tracking
+- [ ] Update docs/blueprint.md with performance monitoring architecture
+
+---
+
+## [FEATURE-012] Blog Results Export
+
+**Status**: Pending
+**Priority**: P3
+**Type**: UX/UI
+
+### User Story
+
+As a User, I want to export filtered blog results as PDF, so that I can save or share curated content with colleagues.
+
+### Acceptance Criteria
+
+- [ ] Add export button to BlogArea component
+- [ ] Implement PDF generation for filtered results
+- [ ] Include search filters and tags in exported PDF
+- [ ] Add export format options (PDF, CSV)
+- [ ] Add tests for export functionality
+- [ ] Update docs/blueprint.md with export architecture
+
+---
+
+## [FEATURE-013] User Roles & Permissions
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Security/Admin
+
+### User Story
+
+As an Administrator, I want to set up user roles and permissions, so that I can control access to sensitive admin features.
+
+### Acceptance Criteria
+
+- [ ] Define role types (admin, editor, user)
+- [ ] Implement role-based access control (RBAC)
+- [ ] Add role assignment in registration or admin panel
+- [ ] Secure admin routes based on user role
+- [ ] Add tests for role-based permissions
+- [ ] Update docs/blueprint.md with RBAC architecture
+
+---
+
+## [FEATURE-014] Blog Post Bookmarking
+
+**Status**: Pending
+**Priority**: P3
+**Type**: UX/UI
+
+### User Story
+
+As a User, I want to bookmark blog posts for later reading, so that I can track articles I want to revisit.
+
+### Acceptance Criteria
+
+- [ ] Add bookmark functionality to blog post cards
+- [ ] Implement bookmarked posts storage (localStorage)
+- [ ] Create "My Bookmarks" page/section
+- [ ] Add bookmark indicator on bookmarked posts
+- [ ] Add tests for bookmark functionality
+- [ ] Update docs/blueprint.md with bookmarking architecture
+
+---
+
 **Last Updated**: 2026-01-15

@@ -1,5 +1,68 @@
 # Architecture Task Tracking
 
+## Task 208: Feature - Blog Post Scheduling & Drafts Implementation (Jan 15, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Feature Development (Content Management)
+
+**Purpose**:
+Implement blog post scheduling and draft management system to allow content creators to prepare content in advance and automate publication.
+
+**Implementation Requirements**:
+1. **Update InnerBlogPost interface**:
+   - Add `status` field: 'draft' | 'scheduled' | 'published'
+   - Add `publishDate` field (optional ISO date string)
+   - Update validateInnerBlogPost validator
+   - Add validation for status field
+
+2. **Update blog data**:
+   - Update existing posts to include 'published' status
+   - Add sample draft and scheduled posts
+   - Test status filtering logic
+
+3. **Update blog display logic**:
+   - Modify BlogArea to filter by status (only show 'published')
+   - Add admin route for viewing all posts (including drafts)
+   - Implement scheduled post auto-publishing (check on page load)
+
+4. **Admin interface** (optional future enhancement):
+   - Create admin panel for managing post status
+   - Add post editor for creating/editing drafts
+   - Add scheduling interface for setting publish dates
+
+5. **Testing**:
+   - Tests for status field validation
+   - Tests for status-based filtering
+   - Tests for scheduled post logic
+   - Tests for data migration
+
+**Success Criteria**:
+- [ ] InnerBlogPost interface updated with status and publishDate fields
+- [ ] Data validator updated with status validation
+- [ ] BlogArea filters by 'published' status only
+- [ ] Sample draft and scheduled posts added to data
+- [ ] Comprehensive tests for scheduling system
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Update: `src/types/data/index.ts` (InnerBlogPost interface)
+- Update: `src/utils/dataValidation/blogValidation.ts` (validateInnerBlogPost)
+- Update: `src/data/InnerBlogData.ts` (add status and publishDate fields)
+- Update: `src/components/blogs/blog/BlogArea.tsx` (filter by status)
+- Add: `src/utils/contentScheduler.ts` (scheduled post logic)
+- Add: Tests for scheduling system
+
+**Notes**:
+- Follows data-driven architecture pattern
+- Status validation prevents invalid states
+- Scheduled posts can be auto-published via cron job in future backend
+- Admin interface can be implemented in separate task
+
+---
+
 ## Task 207: Performance - Rendering Optimization with React.memo (Jan 15, 2026)
 
 **Status**: ✅ Completed
@@ -797,7 +860,269 @@ Implement real-time validation feedback in forms to show validation errors immed
 
 ---
 
-## Task 204: Admin/Analytics - Analytics Dashboard Implementation
+## Task 213: UX/UI - Blog Post Bookmarking System (Jan 15, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Feature Development (UX/UI Enhancement)
+
+**Purpose**:
+Implement blog post bookmarking functionality to allow users to save posts for later reading and quick access.
+
+**Implementation Requirements**:
+1. **Create bookmark storage utility**:
+   - localStorage-based bookmark storage
+   - BookmarkCRUD operations (add, remove, list, check)
+   - Bookmark persistence across sessions
+   - User-specific bookmarks (via localStorage key prefix)
+
+2. **Add bookmark functionality to blog cards**:
+   - Add bookmark button/toggle to InnerBlogPost card
+   - Visual indicator for bookmarked posts
+   - Bookmark status update on click
+   - Bookmark count display
+
+3. **Create "My Bookmarks" page**:
+   - New route: `/blog/bookmarks`
+   - Display bookmarked posts
+   - Empty state when no bookmarks
+   - Share bookmark list (optional)
+
+4. **Update data structures** (if needed):
+   - No changes to InnerBlogPost data (bookmarks are user-specific)
+   - Bookmarks stored in localStorage
+   - Future: Backend storage for cross-device sync
+
+5. **Testing**:
+   - Tests for bookmark storage operations
+   - Tests for bookmark UI components
+   - Tests for bookmark persistence
+   - Tests for bookmark filtering
+
+**Success Criteria**:
+- [ ] Bookmark storage utility created
+- [ ] Bookmark button added to blog post cards
+- [ ] Bookmark visual indicators working
+- [ ] "My Bookmarks" page created
+- [ ] Bookmarks persist across sessions
+- [ ] Comprehensive tests for bookmarking
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Add: `src/utils/bookmarks.ts` (storage utility)
+- Update: `src/components/blogs/blog/InnerBlogPost.tsx` (add bookmark button)
+- Add: `src/app/blog/bookmarks/page.tsx` (bookmarks page)
+- Add: Tests for bookmarking system
+- Add: CSS for bookmark button and indicators
+
+**Notes**:
+- localStorage ensures bookmarks persist across sessions
+- User-specific bookmarks via localStorage key prefix
+- Future: Backend integration for cross-device sync
+- Optional: Social sharing of bookmark lists
+
+---
+
+## Task 212: Security - User Roles & Permissions (RBAC) Implementation (Jan 15, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Feature Development (Security/Authorization)
+
+**Purpose**:
+Implement role-based access control (RBAC) system to manage user permissions and secure admin features.
+
+**Implementation Requirements**:
+1. **Define role system**:
+   - Role types: 'user' | 'editor' | 'admin'
+   - Role permissions mapping
+   - Role validation utility
+   - Role assignment logic
+
+2. **Update user interface**:
+   - Add `role` field to User interface
+   - Update AuthService to handle roles
+   - Role-based access control checks
+   - Role verification methods
+
+3. **Secure admin routes**:
+   - Add role checks to `/admin/*` routes
+   - Redirect unauthorized users to home/login
+   - Role-based UI elements (show/hide features)
+   - Admin-only features protection
+
+4. **Role management** (optional):
+   - Admin panel for role assignment
+   - User role modification interface
+   - Role change history tracking
+
+5. **Testing**:
+   - Tests for role validation
+   - Tests for role-based access control
+   - Tests for admin route protection
+   - Tests for role assignment
+
+**Success Criteria**:
+- [ ] Role system defined with 3 role types
+- [ ] User interface updated with role field
+- [ ] AuthService enhanced with role management
+- [ ] Admin routes protected by role checks
+- [ ] Comprehensive tests for RBAC
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Update: `src/types/auth/index.ts` (add Role type, User interface)
+- Update: `src/services/auth/AuthService.ts` (role management)
+- Add: `src/utils/authorization.ts` (role-based access control)
+- Update: `src/app/admin/*/page.tsx` (add role checks)
+- Add: Tests for role system and authorization
+
+**Notes**:
+- Default role for new users: 'user'
+- Admin role has full access to all features
+- Editor role can manage content but not system settings
+- User role has read-only access to public features
+- Future: Backend integration for persistent roles
+
+---
+
+## Task 211: UX/UI - Blog Results Export (PDF/CSV) (Jan 15, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: LOW
+**Type**: Feature Development (UX/UI Enhancement)
+
+**Purpose**:
+Implement export functionality for blog search results to allow users to save and share curated content.
+
+**Implementation Requirements**:
+1. **Create export utility**:
+   - PDF export using lightweight library (jspdf, pdfmake)
+   - CSV export for data analysis
+   - Export formatting and styling
+   - Include search filters and metadata in exports
+
+2. **Add export UI**:
+   - Export button in BlogArea
+   - Export format selector (PDF/CSV)
+   - Export confirmation dialog
+   - Export progress indicator
+
+3. **Export content**:
+   - Include filtered post titles, descriptions, dates
+   - Include search query and active filters
+   - Include metadata (export date, filter criteria)
+   - Format styling for readability
+
+4. **Testing**:
+   - Tests for PDF export generation
+   - Tests for CSV export generation
+   - Tests for export with different filters
+   - Tests for export error handling
+
+**Success Criteria**:
+- [ ] Export utility created (PDF/CSV)
+- [ ] Export button added to BlogArea
+- [ ] PDF export working with formatting
+- [ ] CSV export working with proper data
+- [ ] Export includes search filters and metadata
+- [ ] Comprehensive tests for export functionality
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Add: `src/utils/exportUtils.ts` (PDF/CSV export)
+- Update: `src/components/blogs/blog/BlogArea.tsx` (add export button)
+- Add: Export component (button, format selector)
+- Add: Tests for export utilities
+- Install: PDF generation library (jspdf or pdfmake)
+
+**Notes**:
+- Use lightweight PDF library to minimize bundle size
+- CSV export for spreadsheet import and analysis
+- PDF export for sharing formatted content
+- Include filter metadata for context
+- Future: Email export option
+
+---
+
+## Task 210: Performance - Real-Time Performance Monitoring (Jan 15, 2026)
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Feature Development (Performance Monitoring)
+
+**Purpose**:
+Implement real-time performance monitoring using Web Vitals API to track and display Core Web Vitals metrics in analytics dashboard.
+
+**Implementation Requirements**:
+1. **Integrate Web Vitals API**:
+   - Import web-vitals library
+   - Track LCP (Largest Contentful Paint)
+   - Track FID (First Input Delay)
+   - Track CLS (Cumulative Layout Shift)
+   - Track FCP (First Contentful Paint)
+   - Track TTFB (Time to First Byte)
+
+2. **Create performance tracking utility**:
+   - Initialize Web Vitals tracking on app load
+   - Store metrics in localStorage
+   - Send metrics to analytics service
+   - Generate performance scores (0-100)
+
+3. **Add to analytics dashboard**:
+   - Real-time performance metrics display
+   - Performance score cards (LCP, FID, CLS)
+   - Performance trend charts
+   - Performance threshold alerts
+   - Historical performance data
+
+4. **Performance threshold alerts**:
+   - Alert when LCP > 2.5s (poor)
+   - Alert when FID > 100ms (poor)
+   - Alert when CLS > 0.1 (poor)
+   - Visual indicators (green/yellow/red)
+   - Alert notifications (optional)
+
+5. **Testing**:
+   - Tests for Web Vitals tracking
+   - Tests for metric storage
+   - Tests for dashboard display
+   - Tests for threshold alerts
+
+**Success Criteria**:
+- [ ] Web Vitals API integrated
+- [ ] Performance tracking utility created
+- [ ] Core Web Vitals tracked (LCP, FID, CLS)
+- [ ] Performance metrics in analytics dashboard
+- [ ] Threshold alerts implemented
+- [ ] Comprehensive tests for monitoring
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Add: `src/utils/performanceMonitoring.ts` (Web Vitals tracking)
+- Update: `src/components/admin/AnalyticsDashboard.tsx` (performance metrics)
+- Update: `src/app/layout.tsx` (initialize tracking)
+- Install: web-vitals library
+- Add: Tests for performance monitoring
+
+**Notes**:
+- Web Vitals API is lightweight (< 1KB)
+- Real-time tracking on every page load
+- Historical data stored in localStorage
+- Threshold alerts for performance degradation
+- Future: APM integration (New Relic, Datadog)
+
+---
+
+## Task 209: Feature - Analytics Dashboard for Admin (Jan 15, 2026)
 
 **Status**: ⏳ Pending
 **Priority**: MEDIUM
@@ -808,32 +1133,32 @@ Create admin dashboard to view analytics about form submissions, page views, and
 
 **Implementation Requirements**:
 1. **Create admin dashboard route**:
-    - New route: `/admin/analytics`
-    - Secure route with authentication check
-    - Implement analytics data structure
+     - New route: `/admin/analytics`
+     - Secure route with authentication check
+     - Implement analytics data structure
 
 2. **Analytics data tracking**:
-    - Form submissions: Contact, Login, Register counts
-    - Page views: Track visits to each page
-    - User engagement: Time spent on pages, bounce rate
-    - Storage: localStorage or in-memory (future: backend integration)
+     - Form submissions: Contact, Login, Register counts
+     - Page views: Track visits to each page
+     - User engagement: Time spent on pages, bounce rate
+     - Storage: localStorage or in-memory (future: backend integration)
 
 3. **Dashboard components**:
-    - Summary cards: Total submissions, page views, active users
-    - Charts/graphs: Form submissions over time, page view trends
-    - Form breakdown: Contact, Login, Register statistics
-    - Page ranking: Most visited pages
+     - Summary cards: Total submissions, page views, active users
+     - Charts/graphs: Form submissions over time, page view trends
+     - Form breakdown: Contact, Login, Register statistics
+     - Page ranking: Most visited pages
 
 4. **Security**:
-    - Authentication check: Only authenticated users can access
-    - Admin role check (if roles implemented)
-    - Route protection with redirect to login if not authenticated
+     - Authentication check: Only authenticated users can access
+     - Admin role check (if roles implemented)
+     - Route protection with redirect to login if not authenticated
 
 5. **Testing**:
-    - Tests for analytics dashboard components
-    - Tests for route protection
-    - Tests for data visualization
-    - Tests for analytics tracking
+     - Tests for analytics dashboard components
+     - Tests for route protection
+     - Tests for data visualization
+     - Tests for analytics tracking
 
 **Success Criteria**:
 - [ ] Admin dashboard route created (`/admin/analytics`)

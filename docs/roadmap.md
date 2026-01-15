@@ -149,6 +149,40 @@ This document outlines the strategic direction and upcoming initiatives for the 
 
 ---
 
+## New Feature Additions (Jan 15, 2026)
+
+### FEATURE-010: Blog Post Scheduling & Drafts
+- Content scheduling for automated publishing
+- Draft management system for content creators
+- Status-based filtering (draft, scheduled, published)
+- Admin interface for managing post lifecycle
+
+### FEATURE-011: Real-Time Performance Monitoring
+- Web Vitals API integration
+- Core Web Vitals tracking (LCP, FID, CLS)
+- Real-time performance dashboard metrics
+- Performance threshold alerts
+
+### FEATURE-012: Blog Results Export
+- PDF export for filtered blog results
+- CSV export option for data analysis
+- Include filters and metadata in exports
+- Shareable curated content collections
+
+### FEATURE-013: User Roles & Permissions
+- Role-based access control (RBAC)
+- User role types: admin, editor, user
+- Secure admin routes by role
+- Role assignment interface
+
+### FEATURE-014: Blog Post Bookmarking
+- Personal bookmark collection
+- "My Bookmarks" page for saved posts
+- LocalStorage persistence
+- Bookmark indicators on posts
+
+---
+
 ## Task Completion Summary (Jan 15, 2026)
 
 **Task 202: Advanced Blog Search & Filtering** - ✅ COMPLETED
