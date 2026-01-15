@@ -1,7 +1,8 @@
+import React from 'react'
 import Link from 'next/link'
 import use_case_sidebar_data from '@/data/UseCaseSidebarData'
 
-const UseCaseDetailsSidebar = () => {
+const UseCaseDetailsSidebar = React.memo(() => {
    return (
       <div className="col-lg-4">
          <div className="sidebar-nav-widget style-one mb-50 wow fadeInDown">
@@ -17,6 +18,8 @@ const UseCaseDetailsSidebar = () => {
          </div>
       </div>
    )
-}
+})
+
+UseCaseDetailsSidebar.displayName = "UseCaseDetailsSidebar"
 
 export default UseCaseDetailsSidebar

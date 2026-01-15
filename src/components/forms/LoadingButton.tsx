@@ -4,6 +4,7 @@ interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   isLoading?: boolean;
   loadingText?: string;
   children: React.ReactNode;
+  showSpinner?: boolean;
 }
 
 const LoadingButton = ({
@@ -12,6 +13,7 @@ const LoadingButton = ({
   children,
   disabled,
   className,
+  showSpinner = true,
   ...props
 }: LoadingButtonProps) => {
   return (
@@ -23,7 +25,14 @@ const LoadingButton = ({
       aria-busy={isLoading}
       {...props}
     >
-      {isLoading ? (loadingText || "Loading...") : children}
+      {isLoading ? (
+        <span className="loading-button-content">
+          {showSpinner && <span className="loading-spinner" aria-hidden="true"></span>}
+          {loadingText || "Loading..."}
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 };

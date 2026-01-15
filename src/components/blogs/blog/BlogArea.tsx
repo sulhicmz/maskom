@@ -10,9 +10,19 @@ import AnimationWrapper from "@/components/common/AnimationWrapper"
 import PaginationWrapper from "@/components/common/PaginationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
+import Skeleton from "@/components/ui/Skeleton"
+import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
-  loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
+  loading: () => (
+    <div className="col-xl-4">
+      <div className="sidebar-wrapper">
+        <Skeleton variant="text" height={30} className="mb-4" />
+        <Skeleton variant="rectangular" height={200} className="mb-4" />
+        <Skeleton variant="text" count={3} className="mb-2" />
+      </div>
+    </div>
+  )
 })
 
 const BlogArea = React.memo(() => {
@@ -24,34 +34,31 @@ const BlogArea = React.memo(() => {
 
    const itemsPerPage = 3;
 
-   const filteredPosts = useMemo(() => {
-      return inner_blog_data.filter((post) => {
-         const matchesSearch = !searchQuery || 
-            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.desc.toLowerCase().includes(searchQuery.toLowerCase())
+    const filterCriteria: BlogFilterCriteria = useMemo(() => ({
+      searchQuery,
+      category: selectedCategory,
+      tagId: selectedTagId,
+    }), [searchQuery, selectedCategory, selectedTagId])
 
-         const matchesCategory = !selectedCategory || post.category === selectedCategory
-         const matchesTag = !selectedTagId || post.tagId === selectedTagId
+     const { filteredPosts, hasFilters } = useMemo(() => {
+      return filterBlogPosts(inner_blog_data, filterCriteria)
+    }, [filterCriteria])
 
-         return matchesSearch && matchesCategory && matchesTag
-      })
-   }, [searchQuery, selectedCategory, selectedTagId])
+     const { currentItems, pageCount, handlePageClick } = usePagination({
+        data: filteredPosts,
+        itemsPerPage,
+     })
 
-   const { currentItems, pageCount, handlePageClick } = usePagination({
-      data: filteredPosts,
-      itemsPerPage,
-   })
+     const handleClearAllFilters = useCallback(() => {
+        setSearchQuery("")
+        setSelectedCategory(null)
+        setSelectedTagId(null)
+        router.push("/blog")
+     }, [router])
 
-   const handleClearAllFilters = useCallback(() => {
-      setSearchQuery("")
-      setSelectedCategory(null)
-      setSelectedTagId(null)
-      router.push("/blog")
-   }, [router])
-
-   const handleCategoryChange = useCallback((category: string | null) => {
-      setSelectedCategory(category)
-   }, [])
+    const handleCategoryChange = useCallback((category: string | null) => {
+       setSelectedCategory(category)
+    }, [])
 
    const handleTagClick = useCallback((tagId: number | null) => {
       setSelectedTagId(tagId)
@@ -62,9 +69,9 @@ const BlogArea = React.memo(() => {
          <div className="container">
             <div className="row">
                <div className="col-xl-8">
-                  <div className="blogs-wrapper mb-30">
-                     {(searchQuery || selectedCategory || selectedTagId) && (
-                        <div className="filter-status mb-30">
+                   <div className="blogs-wrapper mb-30">
+                      {hasFilters && (
+                         <div className="filter-status mb-30">
                            <h4 className="filter-title">Filter Aktif:</h4>
                            <div className="filter-tags">
                                {searchQuery && (
@@ -96,11 +103,11 @@ const BlogArea = React.memo(() => {
                         <div className="no-results">
                            <h3>Tidak ada hasil ditemukan</h3>
                            <p>Coba sesuaikan filter atau kata kunci pencarian Anda.</p>
-                           {searchQuery || selectedCategory || selectedTagId && (
-                              <button onClick={handleClearAllFilters} className="clear-all-btn">
-                                 Hapus Semua Filter
-                              </button>
-                           )}
+                            {hasFilters && (
+                               <button onClick={handleClearAllFilters} className="clear-all-btn">
+                                  Hapus Semua Filter
+                               </button>
+                            )}
                         </div>
                      ) : (
                         <>

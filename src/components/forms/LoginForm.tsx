@@ -14,7 +14,7 @@ interface FormData {
 }
 
 const LoginForm = () => {
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createEmailPasswordSchema()), });
+   const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<FormData>({ resolver: yupResolver(createEmailPasswordSchema()), });
 
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
       async (data?: FormData) => {
@@ -39,6 +39,9 @@ const LoginForm = () => {
             disabled={isSubmitting}
             required
             description="Masukkan email yang Anda gunakan saat mendaftar"
+            trigger={trigger}
+            debounceMs={300}
+            ariaLive="polite"
          />
          <FormField
             id="login_password"
@@ -50,6 +53,9 @@ const LoginForm = () => {
             disabled={isSubmitting}
             required
             description="Minimal 8 karakter"
+            trigger={trigger}
+            debounceMs={300}
+            ariaLive="polite"
          />
          <div className="form-group">
             <LoadingButton
