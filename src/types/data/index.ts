@@ -118,6 +118,8 @@ export interface TeamMember {
   designation: string;
 }
 
+export type BlogPostStatus = 'draft' | 'scheduled' | 'published';
+
 export interface InnerBlogPost {
   id: number;
   thumb: StaticImageData;
@@ -127,6 +129,8 @@ export interface InnerBlogPost {
   user: string;
   tagId: number;
   category?: string;
+  status?: BlogPostStatus;
+  publishDate?: string;
 }
 
 export interface FaqDetail {
