@@ -1,5 +1,269 @@
 # Architecture Task Tracking
 
+## Task 205: UX/UI - Real-time Form Validation Feedback
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: UX/UI Engineering (Form UX Enhancement)
+
+**Purpose**:
+Implement real-time validation feedback in forms to show validation errors immediately as users type, improving user experience and reducing form submission failures.
+
+**Implementation Requirements**:
+1. **Update FormField component**:
+    - Add real-time validation trigger on input change
+    - Implement debounced validation to avoid excessive error messages
+    - Maintain existing onSubmit validation as fallback
+    - Add ARIA live regions for accessibility
+
+2. **Update all form components**:
+    - ContactForm: Real-time validation for name, email, message fields
+    - LoginForm: Real-time validation for email, password fields
+    - SignUpForm: Real-time validation for name, email, password, confirmPassword fields
+    - BlogForm: Real-time validation for title, description, content fields
+
+3. **UX Improvements**:
+    - Show validation errors with clear error messages
+    - Debounce validation (300ms) to avoid spamming errors
+    - Clear error on successful input
+    - Maintain existing error display on submit
+
+4. **Testing**:
+    - Tests for real-time validation behavior
+    - Tests for debouncing functionality
+    - Tests for ARIA live regions accessibility
+    - Tests for form submission fallback validation
+
+**Success Criteria**:
+- [ ] Real-time validation implemented in FormField component
+- [ ] Debounced validation (300ms) to avoid excessive errors
+- [ ] ARIA live regions added for accessibility
+- [ ] All 4 forms updated with real-time validation
+- [ ] Comprehensive tests for real-time validation
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Modify: `src/components/forms/FormField.tsx`
+- Modify: `src/components/forms/ContactForm.tsx`
+- Modify: `src/components/forms/LoginForm.tsx`
+- Modify: `src/components/forms/SignUpForm.tsx`
+- Modify: `src/components/forms/BlogForm.tsx`
+- Add: Tests for real-time validation behavior
+
+**Notes**:
+- Improves user experience by providing early feedback
+- Reduces form submission failures
+- Maintains accessibility with ARIA live regions
+- Debouncing prevents excessive error messages during typing
+
+---
+
+## Task 204: Admin/Analytics - Analytics Dashboard Implementation
+
+**Status**: ⏳ Pending
+**Priority**: MEDIUM
+**Type**: Admin/Analytics Engineering (Dashboard Development)
+
+**Purpose**:
+Create admin dashboard to view analytics about form submissions, page views, and user engagement, enabling data-driven decisions about content and improvements.
+
+**Implementation Requirements**:
+1. **Create admin dashboard route**:
+    - New route: `/admin/analytics`
+    - Secure route with authentication check
+    - Implement analytics data structure
+
+2. **Analytics data tracking**:
+    - Form submissions: Contact, Login, Register counts
+    - Page views: Track visits to each page
+    - User engagement: Time spent on pages, bounce rate
+    - Storage: localStorage or in-memory (future: backend integration)
+
+3. **Dashboard components**:
+    - Summary cards: Total submissions, page views, active users
+    - Charts/graphs: Form submissions over time, page view trends
+    - Form breakdown: Contact, Login, Register statistics
+    - Page ranking: Most visited pages
+
+4. **Security**:
+    - Authentication check: Only authenticated users can access
+    - Admin role check (if roles implemented)
+    - Route protection with redirect to login if not authenticated
+
+5. **Testing**:
+    - Tests for analytics dashboard components
+    - Tests for route protection
+    - Tests for data visualization
+    - Tests for analytics tracking
+
+**Success Criteria**:
+- [ ] Admin dashboard route created (`/admin/analytics`)
+- [ ] Analytics data structure implemented
+- [ ] Form submission tracking working
+- [ ] Page view tracking working
+- [ ] Dashboard components render correctly (summary cards, charts)
+- [ ] Route secured with authentication check
+- [ ] Comprehensive tests for dashboard and tracking
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Add: `src/app/admin/analytics/page.tsx`
+- Add: `src/components/admin/AnalyticsDashboard.tsx`
+- Add: `src/components/admin/AnalyticsSummary.tsx`
+- Add: `src/components/admin/AnalyticsCharts.tsx`
+- Add: `src/utils/analytics.ts` (tracking utilities)
+- Add: Tests for analytics components and tracking
+- Update: `src/services/auth/AuthService.ts` (admin check)
+
+**Notes**:
+- Currently uses localStorage/in-memory storage
+- Future enhancement: Backend integration for persistent analytics
+- Charts can use lightweight libraries (recharts, chart.js)
+- Follows existing data-driven architecture pattern
+
+---
+
+## Task 203: UX/UI - Dark Mode Theme Toggle
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: UX/UI Engineering (Theme System)
+
+**Purpose**:
+Implement dark mode theme toggle to allow users to switch between light and dark themes, improving user experience and accessibility for different lighting conditions.
+
+**Implementation Requirements**:
+1. **Create theme context provider**:
+    - ThemeContext with localStorage persistence
+    - Theme state management (light/dark)
+    - Theme toggle function
+    - Default to system preference or localStorage
+
+2. **Add theme toggle button**:
+    - Add to navigation menu (Header component)
+    - Icon to indicate current theme (sun/moon)
+    - Toggle functionality with smooth transition
+
+3. **Apply dark theme styles**:
+    - Use CSS variables for theming
+    - Create dark theme variant for SCSS variables
+    - Update all components to support theme-aware styling
+    - Reuse existing `home-one-dark` styles as reference
+
+4. **Theme transition**:
+    - Smooth transition between light/dark themes
+    - Apply transition to background, text, and UI elements
+    - Prevent layout shift during theme switch
+
+5. **Testing**:
+    - Tests for theme context provider
+    - Tests for theme toggle functionality
+    - Tests for localStorage persistence
+    - Tests for theme switching on all pages
+
+**Success Criteria**:
+- [ ] ThemeContext created with localStorage persistence
+- [ ] Theme toggle button added to navigation
+- [ ] CSS variables implemented for theming
+- [ ] All pages support dark theme styling
+- [ ] Smooth transition between themes
+- [ ] Comprehensive tests for theme system
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Add: `src/contexts/ThemeContext.tsx`
+- Modify: `src/layouts/Header.tsx` (add theme toggle)
+- Modify: `public/assets/scss/_variables.scss` (theme variables)
+- Modify: `public/assets/scss/style.scss` (dark theme styles)
+- Add: Tests for theme system
+
+**Notes**:
+- Reuses existing `home-one-dark` branding and styles
+- CSS variables enable easy theme switching
+- localStorage ensures theme persists across sessions
+- System preference detection improves UX
+
+---
+
+## Task 202: UX/UI - Advanced Blog Search & Filtering
+
+**Status**: ⏳ Pending
+**Priority**: HIGH
+**Type**: UX/UI Engineering (Search/Filter Implementation)
+
+**Purpose**:
+Implement advanced blog search and filtering functionality to help users quickly find relevant blog posts by keywords, categories, and tags, improving content discovery.
+
+**Implementation Requirements**:
+1. **Implement blog search component**:
+    - Search input with debounced typing (300ms)
+    - Real-time search filtering
+    - Search across blog post titles and descriptions
+    - Clear search button
+
+2. **Add category filter**:
+    - Dropdown to select blog category
+    - Filter posts by category (from BlogCategoryData)
+    - "All Categories" option to clear filter
+
+3. **Add tag filter**:
+    - Update Tags component to filter by tag ID
+    - Clicking tag now filters posts instead of linking to `/blog`
+    - Active tag highlighting
+    - Clear tag filter button
+
+4. **Update BlogArea component**:
+    - Render filtered results (search + category + tag)
+    - Maintain pagination with filtered results
+    - Show "No results found" message when filters match no posts
+    - Filter combinations (search AND category AND tag)
+
+5. **Filter state management**:
+    - State for search query, selected category, selected tag
+    - URL query parameters for shareable filtered links
+    - Clear all filters functionality
+
+6. **Testing**:
+    - Tests for search component with debouncing
+    - Tests for category filtering
+    - Tests for tag filtering
+    - Tests for combined filters
+    - Tests for pagination with filters
+
+**Success Criteria**:
+- [ ] Blog search component implemented with debouncing
+- [ ] Category filter dropdown added
+- [ ] Tag filter implemented (filter by tag ID)
+- [ ] BlogArea renders filtered results correctly
+- [ ] Pagination works with filtered results
+- [ ] "No results found" message displayed
+- [ ] Clear all filters functionality
+- [ ] Comprehensive tests for search/filter
+- [ ] All existing tests passing (zero regressions)
+- [ ] Lint passes with 0 errors, 0 warnings
+- [ ] Build successful
+
+**Related Files**:
+- Add: `src/components/blogs/blog/BlogSearch.tsx`
+- Add: `src/components/blogs/blog/BlogCategoryFilter.tsx`
+- Modify: `src/components/blogs/blog/BlogArea.tsx` (add filtering logic)
+- Modify: `src/components/blogs/blog-sidebar/Tags.tsx` (filter instead of link)
+- Add: Tests for search/filter components
+
+**Notes**:
+- Addresses Task 188 limitation (tags currently link all to `/blog`)
+- Debouncing improves performance and UX
+- URL query parameters enable shareable filtered links
+- Follows existing data-driven architecture pattern
+
+---
+
 ## Task 201: Code Sanitizer - Full Codebase Audit (Jan 15, 2026)
 
 **Status**: ✅ Completed
