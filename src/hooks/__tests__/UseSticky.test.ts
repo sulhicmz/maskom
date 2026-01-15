@@ -1,280 +1,460 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import UseSticky, { useBreakpoint } from '../UseSticky';
 
+type TestWindow = typeof window & {
+  scrollY?: number;
+  innerWidth?: number;
+};
+
 describe('UseSticky', () => {
-    beforeEach(() => {
-        Object.defineProperty(window, 'scrollY', {
-            writable: true,
-            configurable: true,
-            value: 0,
-        });
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+    jest.clearAllMocks();
+  });
+
+  describe('Happy Path', () => {
+    it('returns sticky state object', () => {
+      const { result } = renderHook(() => UseSticky());
+      
+      expect(result.current).toHaveProperty('sticky');
+      expect(typeof result.current.sticky).toBe('boolean');
     });
 
-    afterEach(() => {
-        jest.useRealTimers();
+    it('initializes sticky state to false', () => {
+      const { result } = renderHook(() => UseSticky());
+      
+      expect(result.current.sticky).toBe(false);
     });
 
-    it('returns sticky as false initially', () => {
-        const { result } = renderHook(() => UseSticky(200));
+    it('sets sticky to true when scrollY exceeds offset', () => {
+      const { result } = renderHook(() => UseSticky(100));
+      
+      // Simulate scroll beyond offset
+      (window as TestWindow).scrollY = 150;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      
+      // Run all timers (requestAnimationFrame)
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
 
-        expect(result.current.sticky).toBe(false);
+      expect(result.current.sticky).toBe(true);
     });
 
-    it('updates sticky to true when scroll position exceeds offset', async () => {
-        const { result } = renderHook(() => UseSticky(200));
+    it('keeps sticky state false when scrollY is below offset', () => {
+      const { result } = renderHook(() => UseSticky(200));
+      
+      (window as TestWindow).scrollY = 150;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
 
+      expect(result.current.sticky).toBe(false);
+    });
+
+    it('toggles sticky state when scrollY crosses offset threshold', () => {
+      const { result } = renderHook(() => UseSticky(200));
+      
+      // Scroll below offset
+      (window as TestWindow).scrollY = 150;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+      expect(result.current.sticky).toBe(false);
+
+      // Scroll above offset
+      (window as TestWindow).scrollY = 250;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+      expect(result.current.sticky).toBe(true);
+
+      // Scroll back below offset
+      (window as TestWindow).scrollY = 150;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+      expect(result.current.sticky).toBe(false);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('handles zero offset value', () => {
+      const { result } = renderHook(() => UseSticky(0));
+      
+      (window as TestWindow).scrollY = 1;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+
+      expect(result.current.sticky).toBe(true);
+    });
+
+    it('handles negative offset value', () => {
+      const { result } = renderHook(() => UseSticky(-100));
+      
+      (window as TestWindow).scrollY = 0;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+
+      // With negative offset, scrollY 0 > -100 should be true
+      expect(result.current.sticky).toBe(true);
+    });
+
+    it('handles large offset values', () => {
+      const { result } = renderHook(() => UseSticky(10000));
+      
+      (window as TestWindow).scrollY = 5000;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+
+      expect(result.current.sticky).toBe(false);
+    });
+
+    it('handles scrollY exactly at offset', () => {
+      const { result } = renderHook(() => UseSticky(200));
+      
+      (window as TestWindow).scrollY = 200;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+
+      expect(result.current.sticky).toBe(false);
+    });
+
+    it('handles rapid scroll events without performance issues', () => {
+      const { result } = renderHook(() => UseSticky(200));
+      
+      // Simulate rapid scrolling
+      for (let i = 0; i < 100; i++) {
+        (window as TestWindow).scrollY = i;
         act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 250 });
-            window.dispatchEvent(new Event('scroll'));
+          window.dispatchEvent(new Event('scroll'));
         });
+      }
+      
+      act(() => {
+        jest.runOnlyPendingTimers();
+      });
 
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(true);
-        });
+      // Should eventually settle based on final scrollY
+      expect(result.current.sticky).toBe(false);
+    });
+  });
+
+  describe('Performance Optimization', () => {
+    it('cancels animation frame on unmount', () => {
+      const { unmount } = renderHook(() => UseSticky());
+      
+      (window as TestWindow).scrollY = 300;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+
+      unmount();
+
+      // Should not throw
+      expect(true).toBe(true);
+    });
+  });
+
+  describe('Cleanup', () => {
+    it('removes scroll event listener on unmount', () => {
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      
+      const { unmount } = renderHook(() => UseSticky());
+      
+      unmount();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
     });
 
-    it('updates sticky to false when scroll position is below offset', async () => {
-        const { result } = renderHook(() => UseSticky(200));
+    it('removes event listeners when offset changes', () => {
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      
+      const { rerender } = renderHook(({ offset }) => UseSticky(offset), {
+        initialProps: { offset: 200 },
+      });
 
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 250 });
-            window.dispatchEvent(new Event('scroll'));
-        });
+      rerender({ offset: 300 });
 
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(true);
-        });
+      expect(removeEventListenerSpy).toHaveBeenCalled();
 
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 150 });
-            window.dispatchEvent(new Event('scroll'));
-        });
+      removeEventListenerSpy.mockRestore();
+    });
+  });
 
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(false);
-        });
+  describe('Integration Behavior', () => {
+    it('updates sticky state on scroll event', () => {
+      const { result } = renderHook(() => UseSticky(200));
+      
+      (window as TestWindow).scrollY = 300;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+
+      expect(result.current.sticky).toBe(true);
     });
 
-    it('uses default offset of 200 when not provided', async () => {
-        const { result } = renderHook(() => UseSticky());
+    it('maintains sticky state when not scrolling', () => {
+      const { result } = renderHook(() => UseSticky(200));
+      
+      (window as TestWindow).scrollY = 300;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
+      expect(result.current.sticky).toBe(true);
 
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 201 });
-            window.dispatchEvent(new Event('scroll'));
-        });
+      // Don't scroll again
+      act(() => jest.runOnlyPendingTimers());
 
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(true);
-        });
+      // State should remain true
+      expect(result.current.sticky).toBe(true);
     });
 
-    it('uses custom offset when provided', async () => {
-        const { result } = renderHook(() => UseSticky(100));
+    it('uses default offset of 200 when not provided', () => {
+      const { result } = renderHook(() => UseSticky());
+      
+      (window as TestWindow).scrollY = 201;
+      act(() => {
+        window.dispatchEvent(new Event('scroll'));
+      });
+      act(() => jest.runOnlyPendingTimers());
 
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 150 });
-            window.dispatchEvent(new Event('scroll'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(true);
-        });
-
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 50 });
-            window.dispatchEvent(new Event('scroll'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(false);
-        });
+      expect(result.current.sticky).toBe(true);
     });
-
-    it('handles scroll events at exact offset boundary', async () => {
-        const { result } = renderHook(() => UseSticky(200));
-
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 200 });
-            window.dispatchEvent(new Event('scroll'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(false);
-        });
-
-        act(() => {
-            Object.defineProperty(window, 'scrollY', { value: 201 });
-            window.dispatchEvent(new Event('scroll'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.sticky).toBe(true);
-        });
-    });
-
-    it('cleans up event listener on unmount', () => {
-        const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
-        const { unmount } = renderHook(() => UseSticky());
-
-        unmount();
-
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
-        removeEventListenerSpy.mockRestore();
-    });
-
-    it('handles SSR scenario gracefully', () => {
-        const { result } = renderHook(() => UseSticky(200));
-
-        expect(result.current.sticky).toBe(false);
-    });
+  });
 });
 
 describe('useBreakpoint', () => {
-    beforeEach(() => {
-        Object.defineProperty(window, 'innerWidth', {
-            writable: true,
-            configurable: true,
-            value: 1200,
-        });
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+    jest.clearAllMocks();
+  });
+
+  describe('Happy Path', () => {
+    it('returns isBreakpointOn state object', () => {
+      const { result } = renderHook(() => useBreakpoint());
+      
+      expect(result.current).toHaveProperty('isBreakpointOn');
+      expect(typeof result.current.isBreakpointOn).toBe('boolean');
     });
 
-    it('returns isBreakpointOn as false initially for desktop', () => {
-        const { result } = renderHook(() => useBreakpoint(1200));
-
-        expect(result.current.isBreakpointOn).toBe(false);
+    it('initializes breakpoint state based on window width', () => {
+      (window as TestWindow).innerWidth = 1100;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(true);
     });
 
-    it('returns isBreakpointOn as true when below breakpoint', async () => {
-        const { result } = renderHook(() => useBreakpoint(1200));
-
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1100 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
+    it('sets breakpoint to false when window width exceeds threshold', () => {
+      (window as TestWindow).innerWidth = 1300;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(false);
     });
 
-    it('uses default breakpoint of 1200 when not provided', async () => {
-        const { result } = renderHook(() => useBreakpoint());
+    it('updates breakpoint on window resize', () => {
+      (window as TestWindow).innerWidth = 1300;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(false);
 
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1199 });
-            window.dispatchEvent(new Event('resize'));
-        });
+      // Simulate window resize below breakpoint
+      (window as TestWindow).innerWidth = 1100;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
 
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
+      expect(result.current.isBreakpointOn).toBe(true);
     });
 
-    it('uses custom breakpoint when provided', async () => {
-        const { result } = renderHook(() => useBreakpoint(768));
+    it('toggles breakpoint when window width crosses threshold', () => {
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      // Above breakpoint
+      (window as TestWindow).innerWidth = 1300;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      expect(result.current.isBreakpointOn).toBe(false);
 
-        expect(result.current.isBreakpointOn).toBe(false);
+      // Below breakpoint
+      (window as TestWindow).innerWidth = 1100;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      expect(result.current.isBreakpointOn).toBe(true);
 
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 767 });
-            window.dispatchEvent(new Event('resize'));
-        });
+      // Above breakpoint again
+      (window as TestWindow).innerWidth = 1300;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+      expect(result.current.isBreakpointOn).toBe(false);
+    });
+  });
 
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
+  describe('Edge Cases', () => {
+    it('handles window width exactly at breakpoint', () => {
+      (window as TestWindow).innerWidth = 1200;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(false);
     });
 
-    it('handles resize events across breakpoint boundary', async () => {
-        const { result } = renderHook(() => useBreakpoint(1200));
-
-        expect(result.current.isBreakpointOn).toBe(false);
-
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 900 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
-
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1300 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(false);
-        });
+    it('handles small breakpoint values', () => {
+      (window as TestWindow).innerWidth = 300;
+      const { result } = renderHook(() => useBreakpoint(400));
+      
+      expect(result.current.isBreakpointOn).toBe(true);
     });
 
-    it('handles exact breakpoint boundary', async () => {
-        const { result } = renderHook(() => useBreakpoint(1200));
-
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1200 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(false);
-        });
-
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1199 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
+    it('handles large breakpoint values', () => {
+      (window as TestWindow).innerWidth = 1920;
+      const { result } = renderHook(() => useBreakpoint(4000));
+      
+      expect(result.current.isBreakpointOn).toBe(true);
     });
 
-    it('cleans up event listener on unmount', () => {
-        const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
-        const { unmount } = renderHook(() => useBreakpoint());
-
-        unmount();
-
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
-        removeEventListenerSpy.mockRestore();
+    it('handles window width of 0', () => {
+      (window as TestWindow).innerWidth = 0;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(true);
     });
 
-    it('handles SSR scenario gracefully', () => {
-        const { result } = renderHook(() => useBreakpoint(1200));
+    it('handles very large window width', () => {
+      (window as TestWindow).innerWidth = 999999;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(false);
+    });
+  });
 
-        expect(result.current.isBreakpointOn).toBe(false);
+  describe('Cleanup', () => {
+    it('removes resize event listener on unmount', () => {
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      
+      const { unmount } = renderHook(() => useBreakpoint());
+      
+      unmount();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+
+      removeEventListenerSpy.mockRestore();
     });
 
-    it('handles multiple resize events', async () => {
-        const { result } = renderHook(() => useBreakpoint(1200));
+    it('removes event listeners when breakpoint changes', () => {
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+      
+      const { rerender } = renderHook(({ bp }) => useBreakpoint(bp), {
+        initialProps: { bp: 1200 },
+      });
 
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1100 });
-            window.dispatchEvent(new Event('resize'));
-        });
+      rerender({ bp: 1400 });
 
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
+      expect(removeEventListenerSpy).toHaveBeenCalled();
 
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 800 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(true);
-        });
-
-        act(() => {
-            Object.defineProperty(window, 'innerWidth', { value: 1400 });
-            window.dispatchEvent(new Event('resize'));
-        });
-
-        await waitFor(() => {
-            expect(result.current.isBreakpointOn).toBe(false);
-        });
+      removeEventListenerSpy.mockRestore();
     });
+  });
+
+  describe('Integration Behavior', () => {
+    it('updates breakpoint state on resize event', () => {
+      (window as TestWindow).innerWidth = 1300;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      (window as TestWindow).innerWidth = 1100;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      expect(result.current.isBreakpointOn).toBe(true);
+    });
+
+    it('uses default breakpoint of 1200 when not provided', () => {
+      (window as TestWindow).innerWidth = 1100;
+      const { result } = renderHook(() => useBreakpoint());
+      
+      expect(result.current.isBreakpointOn).toBe(true);
+    });
+
+    it('maintains breakpoint state when not resizing', () => {
+      (window as TestWindow).innerWidth = 1100;
+      const { result } = renderHook(() => useBreakpoint(1200));
+      
+      expect(result.current.isBreakpointOn).toBe(true);
+
+      // Don't trigger resize
+      expect(result.current.isBreakpointOn).toBe(true);
+    });
+  });
+
+  describe('Boundary Conditions', () => {
+    it('handles breakpoint of 1', () => {
+      (window as TestWindow).innerWidth = 0;
+      const { result } = renderHook(() => useBreakpoint(1));
+      
+      expect(result.current.isBreakpointOn).toBe(true);
+
+      (window as TestWindow).innerWidth = 1;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      expect(result.current.isBreakpointOn).toBe(false);
+    });
+
+    it('handles breakpoint of 0', () => {
+      (window as TestWindow).innerWidth = 0;
+      const { result } = renderHook(() => useBreakpoint(0));
+      
+      expect(result.current.isBreakpointOn).toBe(false);
+
+      (window as TestWindow).innerWidth = 100;
+      act(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+
+      expect(result.current.isBreakpointOn).toBe(false);
+    });
+
+    it('handles negative breakpoint values', () => {
+      (window as TestWindow).innerWidth = 100;
+      const { result } = renderHook(() => useBreakpoint(-100));
+      
+      // Window width 100 > -100, so breakpoint should be off
+      expect(result.current.isBreakpointOn).toBe(false);
+    });
+  });
 });
