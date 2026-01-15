@@ -13,72 +13,81 @@ interface FormData {
 }
 
 const BlogForm = () => {
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createBlogFormSchema()), });
+   const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<FormData>({ resolver: yupResolver(createBlogFormSchema()), });
 
-    const { submit: onSubmit, isSubmitting } = useFormSubmission(
-       async () => {
-          return { success: true, message: 'Komentar berhasil dikirim' };
-       },
-       { successMessage: 'Komentar berhasil dikirim', resetForm: reset }
-    );
+     const { submit: onSubmit, isSubmitting } = useFormSubmission(
+        async () => {
+           return { success: true, message: 'Komentar berhasil dikirim' };
+        },
+        { successMessage: 'Komentar berhasil dikirim', resetForm: reset }
+     );
 
-    return (
-       <form onSubmit={handleSubmit(() => onSubmit())} className="comment-form" noValidate>
-         <div className="row">
-            <div className="col-lg-12">
-               <div className="form_group">
-                  <FormField
-                     id="blog_name"
-                     label="Nama lengkap"
-                     type="text"
-                     placeholder="Nama lengkap"
-                     register={register("name")}
-                     error={errors.name}
-                     disabled={isSubmitting}
-                  />
-               </div>
-            </div>
-            <div className="col-lg-12">
-               <div className="form_group">
-                  <FormField
-                     id="blog_email"
-                     label="Email kantor"
-                     type="email"
-                     placeholder="Email kantor"
-                     register={register("email")}
-                     error={errors.email}
-                     disabled={isSubmitting}
-                  />
-               </div>
-            </div>
-            <div className="col-lg-12">
-               <div className="form_group">
-                  <FormField
-                     id="blog_message"
-                     label="Tulis komentar Anda"
-                     type="textarea"
-                     placeholder="Tulis komentar Anda"
-                     register={register("message")}
-                     error={errors.message}
-                     disabled={isSubmitting}
-                     rows={4}
-                  />
-               </div>
-            </div>
-            <div className="col-lg-12">
-               <div className="form_group">
-                  <LoadingButton
-                     className="theme-btn gradient-btn"
-                     isLoading={isSubmitting}
-                     loadingText="Mengirim..."
-                  >
-                     Kirim Komentar
-                  </LoadingButton>
-               </div>
-            </div>
-         </div>
-      </form>
-   )
+     return (
+        <form onSubmit={handleSubmit(() => onSubmit())} className="comment-form" noValidate>
+          <div className="row">
+             <div className="col-lg-12">
+                <div className="form_group">
+                   <FormField
+                      id="blog_name"
+                      label="Nama lengkap"
+                      type="text"
+                      placeholder="Nama lengkap"
+                      register={register("name")}
+                      error={errors.name}
+                      disabled={isSubmitting}
+                      trigger={trigger}
+                      debounceMs={300}
+                      ariaLive="polite"
+                   />
+                </div>
+             </div>
+             <div className="col-lg-12">
+                <div className="form_group">
+                   <FormField
+                      id="blog_email"
+                      label="Email kantor"
+                      type="email"
+                      placeholder="Email kantor"
+                      register={register("email")}
+                      error={errors.email}
+                      disabled={isSubmitting}
+                      trigger={trigger}
+                      debounceMs={300}
+                      ariaLive="polite"
+                   />
+                </div>
+             </div>
+             <div className="col-lg-12">
+                <div className="form_group">
+                   <FormField
+                      id="blog_message"
+                      label="Tulis komentar Anda"
+                      type="textarea"
+                      placeholder="Tulis komentar Anda"
+                      register={register("message")}
+                      error={errors.message}
+                      disabled={isSubmitting}
+                      rows={4}
+                      trigger={trigger}
+                      debounceMs={300}
+                      ariaLive="polite"
+                   />
+                </div>
+             </div>
+             <div className="col-lg-12">
+                <div className="form_group">
+                   <LoadingButton
+                      className="theme-btn gradient-btn"
+                      isLoading={isSubmitting}
+                      loadingText="Mengirim..."
+                   >
+                      Kirim Komentar
+                   </LoadingButton>
+                </div>
+             </div>
+          </div>
+       </form>
+    )
 }
 
 export default BlogForm

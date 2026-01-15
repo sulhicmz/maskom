@@ -1,9 +1,10 @@
 "use client";
 
-import { UseFormRegisterReturn, FieldError } from "react-hook-form";
-import { useState } from "react";
+import { UseFormRegisterReturn, FieldError, FieldValues, UseFormTrigger } from "react-hook-form";
+import { useState, useCallback, useEffect } from "react";
+import { useDebouncedCallback } from "@/hooks/useDebounce";
 
-interface FormFieldProps {
+interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
   id: string;
   label: string;
   type?: "text" | "email" | "password" | "textarea";
@@ -15,9 +16,12 @@ interface FormFieldProps {
   required?: boolean;
   description?: string;
   maxLength?: number;
+  trigger?: UseFormTrigger<TFieldValues>;
+  debounceMs?: number;
+  ariaLive?: "off" | "polite" | "assertive";
 }
 
-const FormField = ({
+const FormField = <TFieldValues extends FieldValues = FieldValues>({
   id,
   label,
   type = "text",
@@ -29,15 +33,48 @@ const FormField = ({
   required = false,
   description,
   maxLength,
-}: FormFieldProps) => {
+  trigger,
+  debounceMs = 300,
+  ariaLive = "polite",
+}: FormFieldProps<TFieldValues>) => {
   const errorId = `${id}_error`;
   const descriptionId = `${id}_description`;
   const [showPassword, setShowPassword] = useState(false);
   const [charCount, setCharCount] = useState(0);
+  const [localError, setLocalError] = useState<FieldError | undefined>(error);
 
   const isPassword = type === "password";
   const inputType = isPassword && showPassword ? "text" : type;
-  const showError = !!error;
+  const showError = !!(error || localError);
+  const displayError = error || localError;
+
+  const debouncedTrigger = useCallback(
+    useDebouncedCallback(() => {
+      if (trigger) {
+        trigger(id as any); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }
+    }, debounceMs),
+    [trigger, id, debounceMs]
+  );
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setCharCount(e.target.value.length);
+
+      if (register.onChange) {
+        register.onChange(e);
+      }
+
+      if (trigger) {
+        debouncedTrigger();
+      }
+    },
+    [register.onChange, trigger, debouncedTrigger]
+  ); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setLocalError(error);
+  }, [error]);
 
   const commonProps = {
     id,
@@ -57,17 +94,12 @@ const FormField = ({
           {...commonProps}
           rows={rows}
           maxLength={maxLength}
-          onChange={(e) => {
-            setCharCount(e.target.value.length);
-            if (register.onChange) {
-              register.onChange(e);
-            }
-          }}
+          onChange={handleChange}
         />
       );
     }
 
-    return <input {...commonProps} type={inputType} />;
+    return <input {...commonProps} type={inputType} onChange={handleChange} />;
   };
 
   return (
@@ -98,9 +130,9 @@ const FormField = ({
       ) : (
         renderInput()
       )}
-      {showError && (
-        <p id={errorId} className="form_error" role="alert" aria-live="polite">
-          {error.message}
+      {showError && displayError && (
+        <p id={errorId} className="form_error" role="alert" aria-live={ariaLive}>
+          {displayError.message}
         </p>
       )}
       {type === "textarea" && maxLength && (

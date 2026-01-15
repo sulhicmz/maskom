@@ -17,7 +17,7 @@ interface FormData {
 
 const ContactForm = () => {
 
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createContactFormSchema()), });
+   const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<FormData>({ resolver: yupResolver(createContactFormSchema()), });
 
    const form = useRef<HTMLFormElement>(null);
 
@@ -53,6 +53,9 @@ const ContactForm = () => {
                   disabled={isSubmittingEmail}
                   required
                   description="Masukkan nama lengkap Anda"
+                  trigger={trigger}
+                  debounceMs={300}
+                  ariaLive="polite"
                />
             </div>
             <div className="col-lg-6">
@@ -66,6 +69,9 @@ const ContactForm = () => {
                   disabled={isSubmittingEmail}
                   required
                   description="Gunakan email perusahaan Anda (contoh: nama@perusahaan.co.id)"
+                  trigger={trigger}
+                  debounceMs={300}
+                  ariaLive="polite"
                />
             </div>
             <div className="col-lg-12">
@@ -81,6 +87,9 @@ const ContactForm = () => {
                   required
                   description="Jelaskan kebutuhan atau pertanyaan Anda secara detail"
                   maxLength={500}
+                  trigger={trigger}
+                  debounceMs={300}
+                  ariaLive="polite"
                />
             </div>
             <div className="col-lg-12">

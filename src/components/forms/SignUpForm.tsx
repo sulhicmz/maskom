@@ -17,7 +17,7 @@ interface FormData {
    password: string;
 }
 const SignUpForm = () => {
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(createSignUpFormSchema()), });
+   const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<FormData>({ resolver: yupResolver(createSignUpFormSchema()), });
 
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
       async (data?: FormData) => {
@@ -43,6 +43,9 @@ const SignUpForm = () => {
             disabled={isSubmitting}
             required
             description="Masukkan nama lengkap sesuai identitas"
+            trigger={trigger}
+            debounceMs={300}
+            ariaLive="polite"
          />
          <FormField
             id="signup_email"
@@ -54,6 +57,9 @@ const SignUpForm = () => {
             disabled={isSubmitting}
             required
             description="Gunakan email perusahaan Anda"
+            trigger={trigger}
+            debounceMs={300}
+            ariaLive="polite"
          />
          <FormField
             id="signup_password"
@@ -65,6 +71,9 @@ const SignUpForm = () => {
             disabled={isSubmitting}
             required
             description="Minimal 8 karakter, gunakan kombinasi huruf dan angka"
+            trigger={trigger}
+            debounceMs={300}
+            ariaLive="polite"
          />
          <div className="form-group mb-25">
             <LoadingButton
