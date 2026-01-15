@@ -30,10 +30,29 @@ This document outlines the strategic direction and upcoming initiatives for the 
 ### Q2 2025
 
 #### High Priority
+- **Advanced Blog Search & Filtering** (P1)
+  - Blog search component with debounced input
+  - Category and tag filtering
+  - Pagination with filtered results
+  - Clear filters functionality
+
+- **Dark Mode Theme Toggle** (P1)
+  - Theme context provider with localStorage
+  - Navigation theme toggle button
+  - CSS variable-based theming
+  - All pages dark mode compatible
+
 - **Data Filtering Strategy** (P2)
   - Centralized filter utilities
   - Type-safe filter operations
   - Consistent filtering patterns
+
+#### Medium Priority
+- **Real-time Form Validation** (P2)
+  - Immediate validation feedback on typing
+  - Debounced error messages
+  - Accessibility improvements (ARIA live regions)
+  - Update all form components
 
 - **State Management Strategy**
   - Evaluate Context API vs Zustand vs React Query
@@ -45,18 +64,16 @@ This document outlines the strategic direction and upcoming initiatives for the 
   - User-friendly error displays
   - Error logging integration
 
-#### Medium Priority
-- **Component Testing Setup**
-  - Integrate React Testing Library
-  - Component test coverage
-  - Visual regression testing
-
-- **Loading State Management**
-  - Consistent loading patterns
-  - Skeleton screens
-  - Optimistic UI updates
-
 ### Q3 2025
+
+#### High Priority
+- **Analytics Dashboard** (P2)
+  - Admin dashboard route
+  - Form submission tracking
+  - Page view analytics
+  - Visual data representation (charts/graphs)
+
+- **E2E Testing Framework**
 
 #### High Priority
 - **E2E Testing Framework**
