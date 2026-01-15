@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState, memo } from "react";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
+import ThemeToggle from "@/components/common/ThemeToggle";
 
 import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/white-logo.svg";
@@ -49,25 +50,26 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
                                      <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
                                   </div>
                                </div>
-                               <div className="ac-header-one__right-btn style-one d-flex">
-                                  <div className="ac-header-bnt-1">
-                                     <Link href="/login">Portal Pelanggan</Link>
-                                  </div>
-                                  <div className="ac-header-bnt-2 d-none d-md-block">
-                                     <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
-                                  </div>
-                                  <button
-                                    onClick={() => setOffCanvas(!offCanvas)}
-                                    className={`navbar-toggler ${offCanvas ? "active" : ""}`}
-                                    aria-label="Toggle navigation menu"
-                                    aria-expanded={offCanvas}
-                                    aria-controls="primary-nav"
-                                  >
-                                     <span></span>
-                                     <span></span>
-                                     <span></span>
-                                  </button>
-                               </div>
+                                <div className="ac-header-one__right-btn style-one d-flex align-items-center">
+                                   <div className="ac-header-bnt-1">
+                                      <Link href="/login">Portal Pelanggan</Link>
+                                   </div>
+                                   <div className="ac-header-bnt-2 d-none d-md-block">
+                                      <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
+                                   </div>
+                                   <ThemeToggle />
+                                   <button
+                                     onClick={() => setOffCanvas(!offCanvas)}
+                                     className={`navbar-toggler ${offCanvas ? "active" : ""}`}
+                                     aria-label="Toggle navigation menu"
+                                     aria-expanded={offCanvas}
+                                     aria-controls="primary-nav"
+                                   >
+                                      <span></span>
+                                      <span></span>
+                                      <span></span>
+                                   </button>
+                                </div>
                            </div>
                         </div>
                      </div>
