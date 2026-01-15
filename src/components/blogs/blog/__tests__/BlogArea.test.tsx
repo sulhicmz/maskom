@@ -16,6 +16,104 @@ jest.mock('react-paginate', () => {
   };
 });
 
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
+  usePathname: () => '/blog',
+  useSearchParams: () => new URLSearchParams(''),
+}));
+
+jest.mock('../BlogSearch', () => {
+  return function MockBlogSearch({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+    return (
+      <div className="sidebar-widget search-widget">
+        <h3 className="widget-title">Cari Artikel</h3>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Cari judul atau deskripsi..."
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            aria-label="Cari artikel"
+            className="form-control"
+          />
+          {value && (
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              aria-label="Hapus pencarian"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+});
+
+jest.mock('../BlogCategoryFilter', () => {
+  return function MockBlogCategoryFilter({ selectedCategory, onCategoryChange }: { selectedCategory: string | null; onCategoryChange: (cat: string | null) => void }) {
+    return (
+      <div className="sidebar-widget category-widget">
+        <h3 className="widget-title">Kategori</h3>
+        <select
+          value={selectedCategory || ''}
+          onChange={(e) => onCategoryChange(e.target.value || null)}
+          aria-label="Filter kategori artikel"
+          className="category-select"
+        >
+          <option value="">Semua Kategori</option>
+          <option value="Konektivitas Terkelola">Konektivitas Terkelola</option>
+          <option value="Keamanan Jaringan">Keamanan Jaringan</option>
+          <option value="Operasional & Dukungan">Operasional & Dukungan</option>
+          <option value="Transformasi Digital">Transformasi Digital</option>
+          <option value="Infrastruktur Cloud">Infrastruktur Cloud</option>
+          <option value="IoT & Edge">IoT & Edge</option>
+        </select>
+        {selectedCategory && <button onClick={() => onCategoryChange(null)}>Hapus Filter</button>}
+      </div>
+    );
+  };
+});
+
+jest.mock('../../blog-sidebar/Tags', () => {
+  return function MockTags({ selectedTagId, onTagClick }: { selectedTagId: number | null; onTagClick: (id: number | null) => void }) {
+    const tags = [
+      { id: 1, name: 'SD-WAN' },
+      { id: 2, name: 'Managed Wi-Fi' },
+      { id: 3, name: 'Keamanan' },
+      { id: 4, name: 'Cloud Connect' },
+      { id: 5, name: 'Monitoring' },
+      { id: 6, name: 'IoT' },
+      { id: 7, name: 'Managed Service' },
+      { id: 8, name: 'Infrastruktur' },
+      { id: 9, name: 'Wi-Fi' },
+    ];
+
+    return (
+      <div className="sidebar-widget tag-cloud-widget">
+        <h3 className="widget-title">Keywords</h3>
+        <div className="tagcloud">
+          {tags.map((tag) => (
+            <button
+              key={tag.id}
+              onClick={() => onTagClick(selectedTagId === tag.id ? null : tag.id)}
+              className={`tag-btn ${selectedTagId === tag.id ? 'active' : ''}`}
+              aria-label={`Filter artikel dengan kata kunci: ${tag.name}`}
+              aria-pressed={selectedTagId === tag.id}
+            >
+              {tag.name}
+            </button>
+          ))}
+          {selectedTagId && <button onClick={() => onTagClick(null)}>Hapus Filter</button>}
+        </div>
+      </div>
+    );
+  };
+});
+
 jest.mock('next/dynamic', () => {
   const actualDynamic = jest.requireActual<typeof import('next/dynamic')>('next/dynamic');
   return {
@@ -38,8 +136,20 @@ jest.mock('next/dynamic', () => {
         MockComponent.displayName = 'MockReactPaginate';
         return MockComponent;
       } else if (importStr.includes('BlogSidebar')) {
-        const MockComponent = function() {
-          return <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
+        const BlogSearchMock = require('../BlogSearch').default;
+        const BlogCategoryFilterMock = require('../BlogCategoryFilter').default;
+        const TagsMock = require('../../blog-sidebar/Tags').default;
+        
+        const MockComponent = function(props: any) {
+          return (
+            <div data-testid="blog-sidebar">
+              <BlogSearchMock value={props.searchValue || ''} onChange={props.onSearchChange || (() => {})} />
+              <BlogCategoryFilterMock selectedCategory={props.selectedCategory} onCategoryChange={props.onCategoryChange || (() => {})} />
+              <div>Mock Category</div>
+              <div>Mock LatestNews</div>
+              <TagsMock selectedTagId={props.selectedTagId} onTagClick={props.onTagClick || (() => {})} />
+            </div>
+          );
         };
         MockComponent.displayName = 'MockBlogSidebar';
         return MockComponent;
@@ -183,6 +293,87 @@ describe('BlogArea', () => {
     fireEvent.click(prevButton);
     await waitFor(() => {
       expect(screen.getByTestId('prev-page')).toBeInTheDocument();
+    });
+  });
+
+  describe('Search Functionality', () => {
+    it('renders search input in sidebar', () => {
+      render(<BlogArea />);
+
+      expect(screen.getByPlaceholderText('Cari judul atau deskripsi...')).toBeInTheDocument();
+    });
+
+    it('displays filtered posts when search query matches', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+
+      await waitFor(() => {
+        const posts = screen.getAllByText(/BACA SELENGKAPNYA/);
+        expect(posts.length).toBeGreaterThan(0);
+      }, { timeout: 500 });
+    });
+
+    it('shows no results when search matches no posts', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'nonexistent post xyz 12345' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Tidak ada hasil ditemukan')).toBeInTheDocument();
+      }, { timeout: 500 });
+    });
+  });
+
+  describe('Filter Status Display', () => {
+    it('shows filter status when search is applied', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'test query' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Filter Aktif:')).toBeInTheDocument();
+      }, { timeout: 500 });
+    });
+
+    it('displays active search filter tag', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Pencarian: "test"/)).toBeInTheDocument();
+      }, { timeout: 500 });
+    });
+  });
+
+  describe('No Results State', () => {
+    it('shows no results message with helpful text', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Tidak ada hasil ditemukan')).toBeInTheDocument();
+        expect(screen.getByText('Coba sesuaikan filter atau kata kunci pencarian Anda.')).toBeInTheDocument();
+      }, { timeout: 500 });
+    });
+
+    it('shows clear all filters button in no results state', async () => {
+      render(<BlogArea />);
+
+      const searchInput = screen.getByPlaceholderText('Cari judul atau deskripsi...');
+      fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
+
+      await waitFor(() => {
+        const clearButtons = screen.getAllByText('Hapus Semua Filter');
+        expect(clearButtons.length).toBeGreaterThan(0);
+      }, { timeout: 500 });
     });
   });
 });

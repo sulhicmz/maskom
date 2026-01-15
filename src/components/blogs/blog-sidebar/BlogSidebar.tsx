@@ -4,27 +4,34 @@ import React from "react"
 import Category from "./Category"
 import LatestNews from "./LatestNews"
 import Tags from "./Tags"
-import AnimationWrapper from "@/components/common/AnimationWrapper"
+import BlogSearch from "../BlogSearch"
+import BlogCategoryFilter from "../BlogCategoryFilter"
 
-const BlogSidebar = () => {
+interface BlogSidebarProps {
+   selectedCategory?: string | null
+   onCategoryChange?: (category: string | null) => void
+   selectedTagId?: number | null
+   onTagClick?: (tagId: number | null) => void
+   searchValue?: string
+   onSearchChange?: (value: string) => void
+}
+
+const BlogSidebar = ({ 
+   selectedCategory = null, 
+   onCategoryChange, 
+   selectedTagId = null, 
+   onTagClick,
+   searchValue = "",
+   onSearchChange 
+}: BlogSidebarProps) => {
    return (
       <div className="col-xl-4">
          <div className="sidebar-widget-area mb-30">
-            <div className="sidebar-widget sidebar-search-widget mb-20">
-               <AnimationWrapper animation="fadeInUp">
-                   <div className="sidebar-widget-content">
-                      <form onSubmit={(e)=>e.preventDefault()} role="search">
-                         <div className="search-input">
-                            <input type="text" placeholder="Cari artikel..." aria-label="Cari artikel di blog"/>
-                            <button type="submit" aria-label="Tombol pencarian artikel"><i className="far fa-search" aria-hidden="true"></i></button>
-                         </div>
-                      </form>
-                   </div>
-                </AnimationWrapper>
-            </div>
+            <BlogSearch value={searchValue} onChange={onSearchChange || (() => {})} />
+            <BlogCategoryFilter selectedCategory={selectedCategory} onCategoryChange={onCategoryChange || (() => {})} />
             <Category />
             <LatestNews />
-            <Tags />
+            <Tags selectedTagId={selectedTagId} onTagClick={onTagClick || (() => {})} />
          </div>
       </div>
    )
