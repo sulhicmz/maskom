@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useMemo, useCallback } from "react"
+import React, { useState, useMemo, useCallback, Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
@@ -143,18 +143,20 @@ const BlogArea = React.memo(() => {
                      )}
                   </div>
                </div>
-               <BlogSidebar 
-                  selectedCategory={selectedCategory}
-                  onCategoryChange={handleCategoryChange}
-                  selectedTagId={selectedTagId}
-                  onTagClick={handleTagClick}
-                  searchValue={searchQuery}
-                  onSearchChange={setSearchQuery}
-               />
-            </div>
-         </div>
-      </section>
-   )
+                <Suspense fallback={<div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>}>
+                  <BlogSidebar 
+                     selectedCategory={selectedCategory}
+                     onCategoryChange={handleCategoryChange}
+                     selectedTagId={selectedTagId}
+                     onTagClick={handleTagClick}
+                     searchValue={searchQuery}
+                     onSearchChange={setSearchQuery}
+                  />
+                </Suspense>
+             </div>
+          </div>
+       </section>
+    )
 });
 
 BlogArea.displayName = "BlogArea"

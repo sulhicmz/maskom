@@ -2,6 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
+import { Suspense } from "react"
 const BlogForm = dynamic(() => import("@/components/forms/BlogForm"), {
    ssr: false,
    loading: () => <div className="text-center py-5">Memuat formulir komentar...</div>
@@ -91,10 +92,12 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                      </div>
                   </div>
                </div>
-               <BlogSidebar />
-            </div>
-         </div>
-      </section>
+                <Suspense fallback={<div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>}>
+                  <BlogSidebar />
+                </Suspense>
+             </div>
+          </div>
+       </section>
    )
 }
 

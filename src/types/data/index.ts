@@ -126,6 +126,7 @@ export interface InnerBlogPost {
   date: string;
   user: string;
   tagId: number;
+  category?: string;
 }
 
 export interface FaqDetail {
