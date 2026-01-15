@@ -1,5 +1,154 @@
 # Architecture Task Tracking
 
+## Task 214: Module Extraction - Blog Filtering Utility (Jan 15, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Component Architecture (Module Extraction)
+
+**Purpose**:
+Extract filtering logic from BlogArea component into reusable utility module to eliminate duplicate code, improve maintainability, and prepare for future blog scheduling features.
+
+**Problem Identified**:
+- Blog filtering logic embedded in BlogArea component (lines 36-47)
+- Search, category, tag filtering managed inline
+- No reusable filter abstraction
+- Tightly coupled filtering logic that's hard to test in isolation
+
+**Solution**:
+Extract filtering logic into `src/utils/blogFilters.ts` with:
+- `BlogFilterCriteria` interface for type-safe filtering
+- `filterBlogPosts()` function for reusable filtering
+- Support for search, category, tag, and status filters
+- `BlogFilterResult` interface with filteredPosts, filterCount, hasFilters
+
+**Implementation**:
+
+### 1. Created BlogFilterCriteria Interface
+```typescript
+export interface BlogFilterCriteria {
+  searchQuery?: string
+  category?: string | null
+  tagId?: number | null
+  status?: 'draft' | 'scheduled' | 'published'
+}
+```
+
+### 2. Created BlogFilterResult Interface
+```typescript
+export interface BlogFilterResult {
+  filteredPosts: InnerBlogPost[]
+  filterCount: number
+  hasFilters: boolean
+}
+```
+
+### 3. Created filterBlogPosts Utility Function
+```typescript
+export function filterBlogPosts(
+  posts: InnerBlogPost[],
+  criteria: BlogFilterCriteria
+): BlogFilterResult
+```
+
+**Features**:
+- Case-insensitive search across title and description
+- Category filtering by exact match
+- Tag filtering by tag ID
+- Status filtering (supports draft, scheduled, published states)
+- Posts without status field treated as 'published' (backward compatible)
+- Combined filters (AND logic between all criteria)
+
+**Code Changes**:
+- Added: `src/utils/blogFilters.ts` - Filter utility module (45 lines)
+- Added: `src/utils/__tests__/blogFilters.test.ts` - 17 comprehensive tests
+- Modified: `src/components/blogs/blog/BlogArea.tsx` - Uses extracted filter utility
+  - Removed inline filtering logic (12 lines removed)
+  - Added import for filterBlogPosts and BlogFilterCriteria
+  - Uses filterCriteria memo for performance
+  - Uses hasFilters from filter result
+- Total: 2 files added, 1 file modified, ~60 lines added/modified
+
+**Architecture Benefits**:
+1. **Module Extraction**: Filtering logic separated from presentation layer
+2. **Layer Separation**: Business logic (filtering) in utils, presentation in components
+3. **Type Safety**: BlogFilterCriteria interface ensures type-safe filtering
+4. **Single Responsibility**: filterBlogPosts handles filtering only
+5. **Testability**: Isolated filter logic tested independently (17 tests)
+6. **Reusability**: Filter utility can be used across any blog component
+7. **Maintainability**: Filter logic changes in one place
+8. **Extensibility**: Easy to add new filter types (date range, author, etc.)
+9. **Performance**: Memoized filter criteria prevents unnecessary recalculations
+10. **SOLID Compliance**: Open/Closed principle (extend via criteria, not modification)
+
+**Code Reduction**:
+- BlogArea: 174 lines → 168 lines (-6 lines, 3.4% reduction)
+- Filtering logic: 12 inline lines → 1 function call
+- Test coverage: 0 → 17 new tests (comprehensive filter coverage)
+
+**Testing**:
+- **17 comprehensive tests** for filterBlogPosts utility:
+  - Returns all posts when no filters provided
+  - Filters posts by search query in title
+  - Filters posts by search query in description
+  - Filters posts by category
+  - Filters posts by tag ID
+  - Filters posts by status (published)
+  - Filters posts with combined search and category
+  - Filters posts with combined search and tag
+  - Filters posts with combined category and tag
+  - Filters posts with all three filters
+  - Returns empty array when no posts match filters
+  - Case insensitive search
+  - Empty search query returns all posts
+  - Null category returns all posts
+  - Null tag ID returns all posts
+  - Partial search matches
+  - Filters correctly with empty post array
+
+**Success Criteria**:
+- [x] BlogFilterCriteria interface created for type-safe filtering
+- [x] filterBlogPosts utility function implemented
+- [x] BlogArea component updated to use extracted filter
+- [x] Filtering logic removed from BlogArea component
+- [x] Comprehensive tests for filter utility (17 tests)
+- [x] All existing tests passing (2917 total, 100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful
+- [x] Updated docs/blueprint.md with Module Extraction documentation
+- [x] Updated docs/task.md with Task 214 documentation
+
+**Related Files**:
+- ✅ Added: `src/utils/blogFilters.ts` - Filter utility module
+- ✅ Added: `src/utils/__tests__/blogFilters.test.ts` - 17 comprehensive tests
+- ✅ Modified: `src/components/blogs/blog/BlogArea.tsx` - Uses extracted filter utility
+- ✅ Updated: `docs/blueprint.md` - Added Module Extraction documentation
+- ✅ Updated: `docs/task.md` - Added Task 214 documentation
+
+**Notes**:
+- Follows Module Extraction principles:
+  - **Single Responsibility**: filterBlogPosts handles filtering only
+  - **DRY Principle**: No duplicate filtering code across components
+  - **Separation of Concerns**: Business logic separated from presentation
+  - **Testability**: Isolated testing with comprehensive coverage
+- Status filter supports future blog scheduling features (Task 208)
+- Posts without status field treated as 'published' for backward compatibility
+- Filter utility can be reused by any blog component (BlogDetails, BlogSidebar, etc.)
+- Extensible design allows easy addition of new filter types
+
+**Impact**:
+- Code Quality: Blog filtering logic extracted into reusable module, improved maintainability
+- Test Coverage: 17 new tests ensure filter logic correctness (2917 total tests)
+- Type Safety: BlogFilterCriteria interface prevents filter errors at compile time
+- Extensibility: Easy to add new filter types without changing component code
+- Zero Regressions: All 2917 tests passing, lint clean, build successful
+
+**Verification Date**: 2026-01-15
+**Related Tasks**: Task 127 (Module Extraction - CTA Component), Task 153 (Module Extraction - PageLayout), Task 208 (Blog Post Scheduling & Drafts)
+**Next Review**: January 22, 2026
+
+---
+
 ## Task 208: Feature - Blog Post Scheduling & Drafts Implementation (Jan 15, 2026)
 
 **Status**: ⏳ Pending
