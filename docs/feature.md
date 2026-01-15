@@ -100,4 +100,91 @@ As a developer, I want centralized and type-safe data filtering, so that I can m
 
 ---
 
-**Last Updated**: 2025-01-07
+## [FEATURE-006] Advanced Blog Search & Filtering
+
+**Status**: Pending
+**Priority**: P1
+**Type**: UX/UI
+
+### User Story
+
+As a Blog Reader, I want to search blog posts by keywords and filter by categories/tags, so that I can quickly find relevant content without browsing all posts.
+
+### Acceptance Criteria
+
+- [ ] Implement blog search component with debounced input
+- [ ] Add category filter dropdown (from BlogCategoryData)
+- [ ] Add tag filter functionality (filter by tag ID)
+- [ ] Update BlogArea to render filtered results
+- [ ] Maintain pagination with filtered results
+- [ ] Add "Clear filters" button
+- [ ] Update tests for search/filter behavior
+
+---
+
+## [FEATURE-007] Dark Mode Theme Toggle
+
+**Status**: Pending
+**Priority**: P1
+**Type**: UX/UI
+
+### User Story
+
+As a User, I want to switch between light and dark themes, so that I can read comfortably in different lighting conditions.
+
+### Acceptance Criteria
+
+- [ ] Create theme context provider with localStorage persistence
+- [ ] Add theme toggle button to navigation menu
+- [ ] Apply dark theme styles using CSS variables
+- [ ] Update all components to support theme-aware styling
+- [ ] Add smooth transition between themes
+- [ ] Test across all pages for dark mode compatibility
+- [ ] Update docs/blueprint.md with theme architecture
+
+---
+
+## [FEATURE-008] Real-time Form Validation Feedback
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/UI
+
+### User Story
+
+As a User filling out forms, I want to see validation errors immediately as I type, so that I don't submit invalid forms.
+
+### Acceptance Criteria
+
+- [ ] Update FormField component to show real-time validation
+- [ ] Debounce validation to avoid excessive error messages
+- [ ] Maintain accessibility (ARIA live regions for errors)
+- [ ] Update ContactForm, LoginForm, SignUpForm, BlogForm
+- [ ] Add tests for real-time validation behavior
+- [ ] Keep existing onSubmit validation as fallback
+
+---
+
+## [FEATURE-009] Analytics Dashboard for Admin
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Admin/Analytics
+
+### User Story
+
+As an Administrator, I want to view analytics about form submissions, page views, and user engagement, so that I can make data-driven decisions about content and improvements.
+
+### Acceptance Criteria
+
+- [ ] Create admin dashboard route (`/admin/analytics`)
+- [ ] Implement analytics data structure (form submissions, page views)
+- [ ] Add charts/graphs for visual data representation
+- [ ] Secure admin route with authentication check
+- [ ] Implement basic tracking for page views and form submissions
+- [ ] Add tests for analytics components
+- [ ] Update docs/blueprint.md with analytics architecture
+
+---
+
+**Last Updated**: 2026-01-15
