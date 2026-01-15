@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import HeaderOne from "../HeaderOne";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 jest.mock("@/hooks/UseSticky");
 const mockedUseSticky = UseSticky as jest.Mock;
@@ -23,6 +24,14 @@ jest.mock("next/link", () => {
   };
 });
 
+function renderWithProviders(component: React.ReactElement) {
+  return render(
+    <ThemeProvider>
+      {component}
+    </ThemeProvider>
+  );
+}
+
 describe("HeaderOne Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -32,7 +41,7 @@ describe("HeaderOne Component", () => {
 
   describe("Rendering", () => {
     it("renders header with default style", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const header = document.querySelector("header");
       expect(header).toBeInTheDocument();
@@ -41,14 +50,14 @@ describe("HeaderOne Component", () => {
     });
 
     it("renders header with white navigation style", () => {
-      render(<HeaderOne style={true} />);
+      renderWithProviders(<HeaderOne style={true} />);
 
       const header = document.querySelector("header");
       expect(header).toHaveClass("navigation-white");
     });
 
     it("renders logo image", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const logo = document.querySelector("img");
       expect(logo).toBeInTheDocument();
@@ -56,14 +65,14 @@ describe("HeaderOne Component", () => {
     });
 
     it("renders navigation menu", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const navMenu = document.querySelector(".main-menu");
       expect(navMenu).toBeInTheDocument();
     });
 
     it("renders portal pelanggan button", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const portalLinks = screen.getAllByText("Portal Pelanggan");
       expect(portalLinks.length).toBeGreaterThanOrEqual(1);
@@ -71,7 +80,7 @@ describe("HeaderOne Component", () => {
     });
 
     it("renders konsultasi gratis button", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const konsultasiLinks = screen.getAllByText("Konsultasi Gratis");
       expect(konsultasiLinks.length).toBeGreaterThanOrEqual(1);
@@ -83,14 +92,14 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: true });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const nav = document.querySelector(".header-navigation");
       expect(nav).toHaveClass("sticky");
     });
 
     it("does not apply sticky class when sticky state is false", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const nav = document.querySelector(".header-navigation");
       expect(nav).not.toHaveClass("sticky");
@@ -102,7 +111,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: true });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const nav = document.querySelector(".header-navigation");
       expect(nav).toHaveClass("breakpoint-on");
@@ -111,7 +120,7 @@ describe("HeaderOne Component", () => {
     });
 
     it("does not apply breakpoint-on class when isBreakpointOn is false", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const nav = document.querySelector(".header-navigation");
       expect(nav).not.toHaveClass("breakpoint-on");
@@ -123,12 +132,16 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      const { rerender } = render(<HeaderOne style={false} />);
+      const { rerender } = renderWithProviders(<HeaderOne style={false} />);
 
       let toggler = document.querySelector(".navbar-toggler");
       expect(toggler).not.toHaveClass("active");
 
-      rerender(<HeaderOne style={false} />);
+      rerender(
+        <ThemeProvider>
+          <HeaderOne style={false} />
+        </ThemeProvider>
+      );
       toggler = document.querySelector(".navbar-toggler");
     });
 
@@ -136,9 +149,13 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      const { rerender } = render(<HeaderOne style={false} />);
-      
-      rerender(<HeaderOne style={true} />);
+
+      const { rerender } = renderWithProviders(<HeaderOne style={false} />);
+      rerender(
+        <ThemeProvider>
+          <HeaderOne style={true} />
+        </ThemeProvider>
+      );
       
       const navMenu = document.querySelector(".ac-nav-menu");
       expect(navMenu).toBeInTheDocument();
@@ -148,7 +165,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       expect(toggler).not.toHaveClass("active");
@@ -162,7 +179,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
 
@@ -177,7 +194,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navOverlay = document.querySelector(".nav-overlay");
@@ -193,7 +210,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navOverlay = document.querySelector(".nav-overlay");
@@ -209,7 +226,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       expect(toggler).toHaveAttribute("aria-expanded", "false");
@@ -223,7 +240,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
 
@@ -238,7 +255,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navMenu = document.querySelector(".ac-nav-menu");
@@ -254,7 +271,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navMenu = document.querySelector(".ac-nav-menu");
@@ -270,7 +287,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const navOverlay = document.querySelector(".nav-overlay");
 
@@ -282,7 +299,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navOverlay = document.querySelector(".nav-overlay");
@@ -297,7 +314,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navOverlay = document.querySelector(".nav-overlay");
@@ -316,7 +333,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navOverlay = document.querySelector(".nav-overlay");
@@ -333,7 +350,7 @@ describe("HeaderOne Component", () => {
       mockedUseSticky.mockReturnValue({ sticky: false });
       mockedUseBreakpoint.mockReturnValue({ isBreakpointOn: false });
 
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const toggler = document.querySelector(".navbar-toggler");
       const navOverlay = document.querySelector(".nav-overlay");
@@ -350,7 +367,7 @@ describe("HeaderOne Component", () => {
 
   describe("Navigation Links", () => {
     it("renders home link", () => {
-      render(<HeaderOne style={false} />);
+      renderWithProviders(<HeaderOne style={false} />);
 
       const homeLinks = document.querySelectorAll('a[href="/"]');
       expect(homeLinks.length).toBeGreaterThanOrEqual(1);

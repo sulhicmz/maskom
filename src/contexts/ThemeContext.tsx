@@ -46,14 +46,12 @@ function applyThemeToDOM(theme: Theme): void {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const stored = getStoredTheme();
     const system = getSystemTheme();
     const initialTheme = stored || system;
-    
+
     setThemeState(initialTheme);
     applyThemeToDOM(initialTheme);
   }, []);
@@ -67,10 +65,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

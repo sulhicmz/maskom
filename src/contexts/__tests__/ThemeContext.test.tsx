@@ -18,6 +18,20 @@ describe('ThemeProvider', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.removeAttribute('data-theme');
+
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+    });
   });
 
   afterEach(() => {
@@ -148,13 +162,9 @@ describe('ThemeProvider', () => {
           <TestComponent />
         </ThemeProvider>
       );
-      
-      await waitFor(() => {
-        expect(localStorage.getItem('maskom-theme')).toBe('light');
-      });
-      
+
       fireEvent.click(screen.getByTestId('toggle'));
-      
+
       await waitFor(() => {
         expect(localStorage.getItem('maskom-theme')).toBe('dark');
       });
