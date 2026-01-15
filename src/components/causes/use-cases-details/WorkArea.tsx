@@ -8,28 +8,28 @@ import thumb_4 from "@/assets/images/case/case-5.jpg"
 const WorkArea = () => {
    return (
       <div className="row">
-         <div className="col-xl-6">
-            <div className="row">
-               <div className="col-lg-6">
-                  <figure>
-                     <Image src={thumb_1} alt="case image" />
-                  </figure>
-               </div>
-               <div className="col-lg-6">
-                  <figure>
-                     <Image src={thumb_2} alt="case image" />
-                  </figure>
-                  <figure>
-                     <Image src={thumb_3} alt="case image" />
-                  </figure>
-               </div>
-               <div className="col-lg-12">
-                  <figure>
-                     <Image src={thumb_4} alt="case image" />
-                  </figure>
-               </div>
-            </div>
-         </div>
+          <div className="col-xl-6">
+             <div className="row">
+                <div className="col-lg-6">
+                   <figure>
+                      <Image src={thumb_1} alt="case image" loading="lazy" />
+                   </figure>
+                </div>
+                <div className="col-lg-6">
+                   <figure>
+                      <Image src={thumb_2} alt="case image" loading="lazy" />
+                   </figure>
+                   <figure>
+                      <Image src={thumb_3} alt="case image" loading="lazy" />
+                   </figure>
+                </div>
+                <div className="col-lg-12">
+                   <figure>
+                      <Image src={thumb_4} alt="case image" loading="lazy" />
+                   </figure>
+                </div>
+             </div>
+          </div>
          <div className="col-xl-6">
             <div className="content-box">
                <h3 className="mb-30">Langkah implementasi Maskom</h3>

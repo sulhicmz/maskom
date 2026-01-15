@@ -30,15 +30,15 @@ const Feedback = () => {
                         <div className="testimonial-item style-one mb-30">
                            <div className="testimonial-content">
                               <div className="author-info-wrap d-flex justify-content-between">
-                                  <div className="author-thumb-item mb-15">
-                                     <div className="thumb">
-                                        <Image src={item.avatar} alt={`Foto profil ${item.name} - ${item.designation}`} />
-                                     </div>
-                                     <div className="content">
-                                        <h6>{item.name}</h6>
-                                        <span className="position">{item.designation}</span>
-                                     </div>
-                                  </div>
+                                   <div className="author-thumb-item mb-15">
+                                      <div className="thumb">
+                                         <Image src={item.avatar} alt={`Foto profil ${item.name} - ${item.designation}`} loading="lazy" />
+                                      </div>
+                                      <div className="content">
+                                         <h6>{item.name}</h6>
+                                         <span className="position">{item.designation}</span>
+                                      </div>
+                                   </div>
                                   <div className="ratings">
                                      <span><i className="fas fa-star" aria-hidden="true"></i>({item.rating})</span>
                                   </div>
