@@ -1,7 +1,6 @@
 "use client"
-import React, { useState, useEffect, useMemo } from "react"
-import { Input } from "@/components/ui/Input"
-import Button from "@/components/ui/Button"
+import React, { useState, useEffect } from "react"
+import Input from "@/components/ui/Input"
 
 interface BlogSearchProps {
   value: string
@@ -37,7 +36,7 @@ const BlogSearch: React.FC<BlogSearchProps> = ({ value, onChange }) => {
           placeholder="Cari judul atau deskripsi..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          aria-label="Cari artikel"
+          ariaLabel="Cari artikel"
         />
         {searchQuery && (
           <button

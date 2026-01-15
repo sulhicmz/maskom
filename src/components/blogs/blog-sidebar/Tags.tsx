@@ -18,17 +18,17 @@ const Tags: React.FC<TagsProps> = ({ selectedTagId, onTagClick }) => {
           <AnimationWrapper animation="fadeInUp">
              <h3 className="widget-title">Keywords</h3>
              <div className="tagcloud">
-                {tags.map((tag) => (
-                   <button
-                      key={tag.id}
-                      onClick={() => handleTagClick(tag.id)}
-                      className={`tag-btn ${selectedTagId === tag.id ? 'active' : ''}`}
-                      aria-label={`Filter artikel dengan kata kunci: ${tag.name}`}
-                      aria-pressed={selectedTagId === tagId}
-                   >
-                      {tag.name}
-                   </button>
-                ))}
+                 {tags.map((tag) => (
+                    <button
+                       key={tag.id}
+                       onClick={() => handleTagClick(tag.id)}
+                       className={`tag-btn ${selectedTagId === tag.id ? 'active' : ''}`}
+                       aria-label={`Filter artikel dengan kata kunci: ${tag.name}`}
+                       aria-pressed={selectedTagId === tag.id}
+                    >
+                       {tag.name}
+                    </button>
+                 ))}
                 {selectedTagId && (
                   <button
                     onClick={() => onTagClick(null)}

@@ -4,8 +4,8 @@ import React from "react"
 import Category from "./Category"
 import LatestNews from "./LatestNews"
 import Tags from "./Tags"
-import BlogSearch from "../BlogSearch"
-import BlogCategoryFilter from "../BlogCategoryFilter"
+import BlogSearch from "../blog/BlogSearch"
+import BlogCategoryFilter from "../blog/BlogCategoryFilter"
 
 interface BlogSidebarProps {
    selectedCategory?: string | null

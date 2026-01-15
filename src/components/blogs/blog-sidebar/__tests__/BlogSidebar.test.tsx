@@ -10,6 +10,45 @@ jest.mock('@/components/common/AnimationWrapper', () => {
     };
 });
 
+jest.mock('@/components/blogs/blog/BlogSearch', () => {
+    return function MockBlogSearch({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+        return (
+            <div className="sidebar-widget search-widget">
+                <h3 className="widget-title">Cari Artikel</h3>
+                <div className="search-box">
+                    <input
+                        type="text"
+                        placeholder="Cari artikel..."
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        aria-label="Cari artikel"
+                        className="form-control"
+                    />
+                </div>
+            </div>
+        );
+    };
+});
+
+jest.mock('@/components/blogs/blog/BlogCategoryFilter', () => {
+    return function MockBlogCategoryFilter({ selectedCategory, onCategoryChange }: { selectedCategory: string | null; onCategoryChange: (cat: string | null) => void }) {
+        return (
+            <div className="sidebar-widget category-widget">
+                <h3 className="widget-title">Kategori</h3>
+                <select
+                    value={selectedCategory || ''}
+                    onChange={(e) => onCategoryChange(e.target.value || null)}
+                    aria-label="Filter kategori artikel"
+                    className="category-select"
+                >
+                    <option value="">Semua Kategori</option>
+                    <option value="Konektivitas Terkelola">Konektivitas Terkelola</option>
+                </select>
+            </div>
+        );
+    };
+});
+
 jest.mock('../Category', () => {
     return function MockCategory() {
         return <div data-testid="blog-category">Category Component</div>;

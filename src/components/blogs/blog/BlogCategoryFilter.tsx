@@ -19,14 +19,16 @@ const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = ({
 
   const handleCategoryChange = (category: string | null) => {
     const params = new URLSearchParams(searchParams.toString())
-    
+
     if (category) {
       params.set("category", category)
     } else {
       params.delete("category")
     }
-    
-    router.push(`${pathname}?${params.toString()}`)
+
+    const queryString = params.toString()
+    const url = queryString ? `${pathname}?${queryString}` : pathname
+    router.push(url)
     onCategoryChange(category)
   }
 

@@ -3,7 +3,7 @@ import React, { useState, useMemo, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
@@ -17,7 +17,6 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
 
 const BlogArea = React.memo(() => {
    const router = useRouter()
-   const searchParams = useSearchParams()
 
    const [searchQuery, setSearchQuery] = useState("")
    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -68,12 +67,12 @@ const BlogArea = React.memo(() => {
                         <div className="filter-status mb-30">
                            <h4 className="filter-title">Filter Aktif:</h4>
                            <div className="filter-tags">
-                              {searchQuery && (
-                                 <span className="filter-tag">
-                                    Pencarian: "{searchQuery}"
-                                    <button onClick={() => setSearchQuery("")} aria-label="Hapus pencarian">×</button>
-                                 </span>
-                              )}
+                               {searchQuery && (
+                                  <span className="filter-tag">
+                                     Pencarian: &quot;{searchQuery}&quot;
+                                     <button onClick={() => setSearchQuery("")} aria-label="Hapus pencarian">×</button>
+                                  </span>
+                               )}
                               {selectedCategory && (
                                  <span className="filter-tag">
                                     Kategori: {selectedCategory}
