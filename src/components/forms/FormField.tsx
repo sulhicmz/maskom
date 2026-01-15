@@ -1,6 +1,6 @@
 "use client";
 
-import { UseFormRegisterReturn, FieldError, FieldValues, UseFormTrigger } from "react-hook-form";
+import { UseFormRegisterReturn, FieldError, FieldValues, UseFormTrigger, Path } from "react-hook-form";
 import { useState, useCallback, useEffect } from "react";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 
@@ -48,15 +48,12 @@ const FormField = <TFieldValues extends FieldValues = FieldValues>({
   const showError = !!(error || localError);
   const displayError = error || localError;
 
-  const debouncedTrigger = useCallback(
-    useDebouncedCallback(() => {
-      if (trigger) {
-        trigger(id as any); // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }
-    }, debounceMs),
-    [trigger, id, debounceMs]
-  );
-
+  const debouncedTrigger = useDebouncedCallback(() => {
+    if (trigger) {
+      trigger(id as Path<TFieldValues>);
+    }
+  }, debounceMs);
+  
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setCharCount(e.target.value.length);
@@ -68,9 +65,9 @@ const FormField = <TFieldValues extends FieldValues = FieldValues>({
       if (trigger) {
         debouncedTrigger();
       }
-    },
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps -- register.onChange is used, not register
     [register.onChange, trigger, debouncedTrigger]
-  ); // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   useEffect(() => {
     setLocalError(error);
