@@ -134,13 +134,32 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/*====== Extra CSS ======*/
+ /*====== Extra CSS ======*/
 
-.bg_cover{
+/* Skip to main content link for accessibility */
+.skip-to-main-content {
+    position: fixed;
+    top: -100%;
+    left: 0;
+    background: var(--blue-color);
+    color: var(--white-color);
+    padding: 12px 24px;
+    z-index: 99999;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.3s ease;
+
+    &:focus {
+        top: 0;
+        outline: none;
+    }
+}
+
+ .bg_cover{
     background-position: center center;
     background-size: cover;
     background-repeat: no-repeat;
-}
+ }
 .slick-slide {
     outline: 0;
 }
@@ -206,25 +225,105 @@ ul.social-link{
 ::-webkit-scrollbar-thumb {
     background: $black-dark-color; 
 }
-/*===== Preloader =====*/
+ /*===== Preloader =====*/
 
-.ac-preloader {
-    bottom: 0;
-    height: 100vh;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 100vw;
-    z-index: 99999;
-    @extend %flex-center;
-    @extend %white-bg;
-}
-.loader {
-    position: relative;
-    overflow: hidden;
-    animation: ac-translateY 1.2s infinite ;
-}     
+ .ac-preloader {
+     bottom: 0;
+     height: 100vh;
+     left: 0;
+     position: fixed;
+     right: 0;
+     top: 0;
+     width: 100vw;
+     z-index: 99999;
+     @extend %flex-center;
+     @extend %white-bg;
+ }
+ .loader {
+     position: relative;
+     overflow: hidden;
+     animation: ac-translateY 1.2s infinite ;
+ }
+
+ /*===== Skeleton Loading =====*/
+
+ .skeleton {
+     background: linear-gradient(90deg, var(--gray-light-color) 25%, var(--border-color) 50%, var(--gray-light-color) 75%);
+     background-size: 200% 100%;
+     border-radius: 4px;
+     display: inline-block;
+ }
+
+ .skeleton-pulse {
+     animation: skeleton-pulse 1.5s ease-in-out infinite;
+ }
+
+ .skeleton-wave {
+     animation: skeleton-wave 1.6s linear infinite;
+ }
+
+ .skeleton-no-animation {
+     animation: none;
+ }
+
+ .skeleton-text {
+     height: 1em;
+     width: 100%;
+ }
+
+ .skeleton-circular {
+     border-radius: 50%;
+ }
+
+ .skeleton-rectangular {
+     border-radius: 4px;
+ }
+
+ .skeleton-rounded {
+     border-radius: 16px;
+ }
+
+ @keyframes skeleton-pulse {
+     0%, 100% {
+         opacity: 1;
+     }
+     50% {
+         opacity: 0.5;
+     }
+ }
+
+ @keyframes skeleton-wave {
+     0% {
+         background-position: 200% 0;
+     }
+     100% {
+         background-position: -200% 0;
+     }
+ }
+
+ /*===== Loading Spinner =====*/
+
+ .loading-button-content {
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+ }
+
+ .loading-spinner {
+     display: inline-block;
+     width: 16px;
+     height: 16px;
+     border: 2px solid rgba(255, 255, 255, 0.3);
+     border-radius: 50%;
+     border-top-color: currentColor;
+     animation: spin 0.8s linear infinite;
+ }
+
+ @keyframes spin {
+     to {
+         transform: rotate(360deg);
+     }
+ }
 @keyframes ac-translateY {
     0%{
         transform: translateY(0);

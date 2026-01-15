@@ -30,7 +30,9 @@ const Wrapper = ({ children }: WrapperProps) => {
     }, []);
 
     return <ErrorBoundary>
-        {children}
+        <main id="main-content">
+            {children}
+        </main>
         <ScrollToTop />
         <ToastContainer position="top-center" />
     </ErrorBoundary>;

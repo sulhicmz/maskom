@@ -10,9 +10,18 @@ import AnimationWrapper from "@/components/common/AnimationWrapper"
 import PaginationWrapper from "@/components/common/PaginationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
+import Skeleton from "@/components/ui/Skeleton"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
-  loading: () => <div className="col-xl-4"><div className="sidebar-wrapper">Loading sidebar...</div></div>
+  loading: () => (
+    <div className="col-xl-4">
+      <div className="sidebar-wrapper">
+        <Skeleton variant="text" height={30} className="mb-4" />
+        <Skeleton variant="rectangular" height={200} className="mb-4" />
+        <Skeleton variant="text" count={3} className="mb-2" />
+      </div>
+    </div>
+  )
 })
 
 const BlogArea = React.memo(() => {
