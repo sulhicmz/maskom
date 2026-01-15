@@ -31,13 +31,13 @@ const Hero = () => {
                      </div>
                   </div>
                </div>
-                <div className="row">
-                   <div className="col-lg-12">
-                      <AnimationWrapper animation="fadeInUp" className="hero-one_image-box text-center">
-                         <Image src={dashboard_img} alt="Dashboard monitoring infrastruktur jaringan Maskom" />
-                      </AnimationWrapper>
-                   </div>
-                </div>
+                 <div className="row">
+                    <div className="col-lg-12">
+                       <AnimationWrapper animation="fadeInUp" className="hero-one_image-box text-center">
+                          <Image src={dashboard_img} alt="Dashboard monitoring infrastruktur jaringan Maskom" priority />
+                       </AnimationWrapper>
+                    </div>
+                 </div>
             </div>
          </BackgroundSection>
       </section>

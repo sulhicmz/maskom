@@ -27,9 +27,9 @@ const TeamAreaComponent = React.memo(() => {
                {currentItems.map((item) => (
                   <div key={item.id} className="col-xl-3 col-md-6 col-sm-12">
                      <div className="team-item style-one mb-30 wow fadeInUp">
-                         <div className="member-image">
-                            <Image src={item.img} alt={`Foto profil ${item.title} - ${item.designation}`} />
-                         </div>
+                          <div className="member-image">
+                             <Image src={item.img} alt={`Foto profil ${item.title} - ${item.designation}`} loading="lazy" />
+                          </div>
                         <div className="member-info">
                            <div className="content">
                               <h4><a href="team-details.html">{item.title}</a></h4>
