@@ -3,7 +3,7 @@ import React from "react"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Feature = () => {
+const Feature = React.memo(() => {
    return (
       <section className="features-section pb-70">
          <div className="container">
@@ -40,7 +40,7 @@ const Feature = () => {
          </div>
       </section>
    )
-}
+})
 
 Feature.displayName = "Feature"
 
