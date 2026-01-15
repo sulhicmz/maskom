@@ -9,7 +9,7 @@ interface BlogCategoryFilterProps {
   onCategoryChange: (category: string | null) => void
 }
 
-const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = ({
+const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = React.memo(({
   selectedCategory,
   onCategoryChange,
 }) => {
@@ -61,7 +61,7 @@ const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = ({
       </div>
     </div>
   )
-}
+})
 
 BlogCategoryFilter.displayName = "BlogCategoryFilter"
 

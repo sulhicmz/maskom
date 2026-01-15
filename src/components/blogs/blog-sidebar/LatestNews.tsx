@@ -35,7 +35,7 @@ const latest_news: DataType[] = [
    },
 ];
 
-const LatestNews = () => {
+const LatestNews = React.memo(() => {
    return (
       <div className="sidebar-widget sidebar-recent-widget mb-35 wow fadeInUp">
          <h3 className="widget-title">Berita Terbaru</h3>
@@ -54,7 +54,7 @@ const LatestNews = () => {
          </div>
       </div>
    )
-}
+})
 
 LatestNews.displayName = "LatestNews"
 

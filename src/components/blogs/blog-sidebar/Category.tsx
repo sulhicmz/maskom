@@ -3,7 +3,7 @@ import Link from "next/link";
 import categories from "@/data/BlogCategoryData";
 import AnimationWrapper from "@/components/common/AnimationWrapper";
 
-const Category = () => {
+const Category = React.memo(() => {
    return (
       <div className="sidebar-widget sidebar-category-widget mb-35">
          <AnimationWrapper animation="fadeInUp">
@@ -18,7 +18,7 @@ const Category = () => {
          </AnimationWrapper>
       </div>
    )
-}
+})
 
 Category.displayName = "Category"
 
