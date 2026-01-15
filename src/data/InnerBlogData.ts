@@ -15,6 +15,7 @@ const inner_blog_data: InnerBlogPost[] = [
        user: "Tim Editorial Maskom",
        tagId: 7,
        category: "Konektivitas Terkelola",
+       status: "published",
     },
     {
        id: 2,
@@ -25,6 +26,7 @@ const inner_blog_data: InnerBlogPost[] = [
        user: "Tim Network Engineering",
        tagId: 1,
        category: "Konektivitas Terkelola",
+       status: "published",
     },
     {
        id: 3,
@@ -35,6 +37,7 @@ const inner_blog_data: InnerBlogPost[] = [
        user: "Solution Architect Maskom",
        tagId: 8,
        category: "IoT & Edge",
+       status: "published",
     },
     {
        id: 4,
@@ -45,6 +48,7 @@ const inner_blog_data: InnerBlogPost[] = [
        user: "Customer Success Team",
        tagId: 9,
        category: "Operasional & Dukungan",
+       status: "published",
     },
     {
        id: 5,
@@ -55,6 +59,30 @@ const inner_blog_data: InnerBlogPost[] = [
        user: "Cybersecurity Specialist",
        tagId: 3,
        category: "Keamanan Jaringan",
+       status: "published",
+    },
+    {
+       id: 6,
+       thumb: blog_thumb1,
+       title: "Panduan implementasi jaringan serat optik untuk gedung perkantoran",
+       desc: "Artikel ini sedang dalam tahap penulisan dan review oleh tim teknis. Akan membahas standar instalasi, jenis kabel yang digunakan, dan pertimbangan desain untuk jaringan kantor modern.",
+       date: "2024-01-20",
+       user: "Infrastructure Team",
+       tagId: 1,
+       category: "Konektivitas Terkelola",
+       status: "draft",
+    },
+    {
+       id: 7,
+       thumb: blog_thumb2,
+       title: "Roadmap teknologi 5G untuk enterprise Indonesia 2025",
+       desc: "Artikel ini akan membahas proyeksi adopsi 5G di sektor enterprise Indonesia, use case potensial, dan persiapan yang diperlukan perusahaan untuk memanfaatkan teknologi ini.",
+       date: "2024-01-18",
+       user: "Strategic Planning Team",
+       tagId: 7,
+       category: "IoT & Edge",
+       status: "scheduled",
+       publishDate: "2024-02-01",
     },
  ];
 

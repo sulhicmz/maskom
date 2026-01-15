@@ -273,8 +273,11 @@ describe('BlogArea', () => {
     render(<BlogArea />);
 
     const pageCount = screen.getByTestId('page-count');
-    const expectedPages = Math.ceil(inner_blog_data.length / 3);
-    
+    const publishedPosts = inner_blog_data.filter(post =>
+      post.status === 'published' || !('status' in post)
+    );
+    const expectedPages = Math.ceil(publishedPosts.length / 3);
+
     expect(pageCount.textContent).toBe(String(expectedPages));
   });
 

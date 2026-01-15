@@ -34,11 +34,12 @@ const BlogArea = React.memo(() => {
 
    const itemsPerPage = 3;
 
-    const filterCriteria: BlogFilterCriteria = useMemo(() => ({
-      searchQuery,
-      category: selectedCategory,
-      tagId: selectedTagId,
-    }), [searchQuery, selectedCategory, selectedTagId])
+     const filterCriteria: BlogFilterCriteria = useMemo(() => ({
+       searchQuery,
+       category: selectedCategory,
+       tagId: selectedTagId,
+       status: 'published',
+     }), [searchQuery, selectedCategory, selectedTagId])
 
      const { filteredPosts, hasFilters } = useMemo(() => {
       return filterBlogPosts(inner_blog_data, filterCriteria)
