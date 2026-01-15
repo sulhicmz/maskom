@@ -6,7 +6,7 @@ import feature_list from "@/data/FeatureHomeOneData"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Feature = () => {
+const Feature = React.memo(() => {
    return (
       <section className="features-section pt-120 pb-70">
          <div className="container">
@@ -43,7 +43,7 @@ const Feature = () => {
          </div>
       </section>
    )
-}
+});
 
 Feature.displayName = "Feature"
 

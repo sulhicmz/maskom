@@ -4,7 +4,7 @@ import React from "react"
 import SectionTitle from "@/components/common/SectionTitle"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 
-const Process = () => {
+const Process = React.memo(() => {
    return (
       <section className="works-process-section pb-75" id="pendekatan">
          <div className="container">
@@ -41,7 +41,7 @@ const Process = () => {
          </div>
       </section>
    )
-}
+});
 
 Process.displayName = "Process"
 
