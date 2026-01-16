@@ -211,7 +211,7 @@ export function exportToCSV(
     post.date,
     post.category || '',
     post.tagId ? (tagsById.get(post.tagId)?.name || '') : ''
-  ].map(escapeCSV).join(','))
+  ].map(item => escapeCSV(String(item))).join(','))
 
   const csvContent = [
     ...metadataLines,

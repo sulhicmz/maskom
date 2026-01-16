@@ -3,6 +3,7 @@
 import React from 'react'
 import { FormSubmissionMetrics, PageViewMetrics, DateSubmission, DatePageView } from '@/types/analytics'
 import { formatNumber } from '@/utils/analytics'
+import { formatAsPercentage } from '@/utils/formatPercentage'
 
 interface AnalyticsChartProps {
   title: string
@@ -44,7 +45,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data, type }) =>
         <div className="d-flex flex-column">
           {chartData.map((item, index) => {
             const value = isForm ? (item as DateSubmission).count : (item as DatePageView).views
-            const percentage = (value / maxValue) * 100
+            const percentageValue = (value / maxValue) * 100
 
             return (
               <div key={index} className="mb-3">
@@ -56,12 +57,12 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data, type }) =>
                   <div
                     className={`progress-bar ${getBarColor(index)} progress-bar-striped`}
                     role="progressbar"
-                    style={{ width: `${percentage}%` }}
+                    style={{ width: `${percentageValue}%` }}
                     aria-valuenow={value}
                     aria-valuemin={0}
                     aria-valuemax={maxValue}
                   >
-                    {percentage.toFixed(1)}%
+                    {formatAsPercentage(value, maxValue)}
                   </div>
                 </div>
               </div>

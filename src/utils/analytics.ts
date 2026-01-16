@@ -1,4 +1,5 @@
 import { AnalyticsData, FormSubmissionMetrics, AnalyticsSummary } from '@/types/analytics'
+import { formatAsPercentage } from './formatPercentage'
 
 let pageViews: Record<string, { count: number; unique: Set<string> }> = {}
 let formSubmissions: Record<string, { count: number; successful: number; failed: number }> = {}
@@ -92,7 +93,7 @@ export function formatNumber(num: number): string {
 }
 
 export function formatPercentage(value: number): string {
-  return `${value.toFixed(1)}%`
+  return formatAsPercentage(value, 100, 1)
 }
 
 export function formatDuration(seconds: number): string {

@@ -8,6 +8,7 @@ import AnalyticsChart from './AnalyticsChart'
 import PerformanceMetrics from './PerformanceMetrics'
 import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
+import { formatAsPercentage } from '@/utils/formatPercentage'
 import { useRouter } from 'next/navigation'
 
 const AnalyticsDashboard: React.FC = () => {
@@ -104,7 +105,6 @@ const AnalyticsDashboard: React.FC = () => {
                     </thead>
                     <tbody>
                       {analyticsData.formSubmissions.map((form, index) => {
-                        const successRate = (form.successfulSubmissions / form.totalSubmissions) * 100
                         return (
                           <tr key={index}>
                             <td>
@@ -113,7 +113,7 @@ const AnalyticsDashboard: React.FC = () => {
                             <td>{form.totalSubmissions}</td>
                             <td className="text-success">{form.successfulSubmissions}</td>
                             <td className="text-danger">{form.failedSubmissions}</td>
-                            <td>{successRate.toFixed(1)}%</td>
+                            <td>{formatAsPercentage(form.successfulSubmissions, form.totalSubmissions)}</td>
                             <td>{form.avgCompletionTime}s</td>
                           </tr>
                         )
@@ -155,7 +155,7 @@ const AnalyticsDashboard: React.FC = () => {
                           <td>{page.totalViews}</td>
                           <td>{page.uniqueViews}</td>
                           <td>{page.avgTimeOnPage}s</td>
-                          <td>{(page.bounceRate * 100).toFixed(1)}%</td>
+                          <td>{formatAsPercentage(page.bounceRate * 100, 100)}</td>
                         </tr>
                       ))}
                     </tbody>
