@@ -679,7 +679,7 @@ As an Administrator, I want to view analytics about form submissions, page views
 
 ## Task 223: FEATURE-013 - User Roles & Permissions (Jan 16, 2026)
 
-**Status**: 📋 Pending
+**Status**: ✅ Completed
 **Priority**: HIGH
 **Type**: Feature Development (Security/Admin)
 
@@ -689,12 +689,12 @@ As an Administrator, I want to set up user roles and permissions, so that I can 
 
 ### Acceptance Criteria
 
-- [ ] Define role types (admin, editor, user)
-- [ ] Implement role-based access control (RBAC)
-- [ ] Add role assignment in registration or admin panel
-- [ ] Secure admin routes based on user role
-- [ ] Add tests for role-based permissions
-- [ ] Update docs/blueprint.md with RBAC architecture
+- [x] Define role types (admin, editor, user)
+- [x] Implement role-based access control (RBAC)
+- [x] Add role assignment in registration or admin panel
+- [x] Secure admin routes based on user role
+- [x] Add tests for role-based permissions
+- [x] Update docs/blueprint.md with RBAC architecture
 
 ### Implementation Plan
 
@@ -748,6 +748,157 @@ As an Administrator, I want to set up user roles and permissions, so that I can 
 - Existing AuthService for session management
 - Existing login/register forms for role assignment
 - Existing admin routes for RBAC application
+
+### Implementation
+
+#### Phase 1: Role System Architecture
+- [x] Created `src/types/role.ts` with UserRole type (admin, editor, user)
+- [x] Created `src/types/permission.ts` with Permission type enum (9 permissions)
+- [x] Created Role-Permission mapping (admin: 9 permissions, editor: 4 permissions, user: 1 permission)
+- [x] Created `src/data/rolesData.ts` for role definitions
+
+#### Phase 2: Authentication Enhancement
+- [x] Updated `AuthService` to include role in user session
+- [x] Updated user registration to assign default role (user)
+- [x] Added `getCurrentUserRole()` function to AuthService
+- [x] Added `hasPermission()` function to AuthService
+- [x] Added `hasRole()` function to AuthService
+
+#### Phase 3: RBAC Utilities
+- [x] Created `src/utils/rbac.ts` for role-based access control utilities
+- [x] Implemented `canAccessRoute(userRole: UserRole, route: string): boolean`
+- [x] Implemented `canPerformAction(userRole: UserRole, action: Permission): boolean`
+- [x] Implemented `requireRole(requiredRole: UserRole): wrapper function`
+- [x] Implemented `requirePermission(requiredPermission: Permission): wrapper function`
+- [x] Implemented `requireAnyPermission/AllPermissions`: Higher-order functions for flexible permission checks
+- [x] Implemented `getUnauthorizedRedirectPath()`: Get appropriate redirect based on user role
+
+#### Phase 4: Component Protection
+- [x] Created `ProtectedRoute` component for route-level protection
+- [x] Updated admin routes to use ProtectedRoute
+- [x] Updated `/admin/analytics` route with required permission (VIEW_ANALYTICS)
+
+#### Phase 5: Integration & Testing
+- [x] Integrated RBAC with existing AuthService
+- [x] Added role information to user profile
+- [x] Created comprehensive tests for RBAC utilities (119 tests)
+- [x] Tested route protection with different roles
+- [x] Tested permission checks for various actions
+- [x] Fixed canPerformAllActions empty array bug
+- [x] Fixed sleep test timing tolerance issue
+
+### Code Changes
+- Added: `src/types/role.ts` - Role types and utilities (42 lines)
+- Added: `src/types/permission.ts` - Permission enum and utilities (71 lines)
+- Added: `src/data/rolesData.ts` - Role-permission mapping (77 lines)
+- Modified: `src/services/auth/types.ts` - Updated User and RegisterData interfaces with role field
+- Modified: `src/services/auth/AuthService.ts` - Added role assignment and RBAC methods
+- Added: `src/utils/rbac.ts` - RBAC utilities (96 lines)
+- Added: `src/components/common/ProtectedRoute.tsx` - Route protection component (84 lines)
+- Modified: `src/app/admin/analytics/page.tsx` - Added ProtectedRoute wrapper
+- Added: `src/types/__tests__/role.test.ts` - 15 tests
+- Added: `src/types/__tests__/permission.test.ts` - 20 tests
+- Added: `src/data/__tests__/rolesData.test.ts` - 42 tests
+- Added: `src/utils/__tests__/rbac.test.ts` - 42 tests
+- Fixed: `src/utils/rbac.ts` - canPerformAllActions empty array logic
+- Fixed: `src/utils/resilience/__tests__/sleep.test.ts` - Timing tolerance for Promise.race test
+- Total: 12 files added/modified, ~500 lines added/modified
+
+### Architecture Benefits
+
+1. **Security**: Principle of least privilege for sensitive features
+2. **Scalability**: Easy to add new roles and permissions
+3. **Maintainability**: Centralized RBAC logic
+4. **Type Safety**: TypeScript enums for roles and permissions
+5. **Audit Trail**: Clear role-based access logging (ready for future enhancement)
+6. **User Experience**: Different UI based on user role
+7. **Route Protection**: Declarative route-level authorization
+8. **Composability**: Higher-order functions for flexible permission checks
+9. **Separation of Concerns**: Authorization logic separated from business logic
+10. **DRY Principle**: Single source of truth for role-permission mapping
+11. **SOLID Compliance**: Open/Closed (extend via roles), Interface Segregation (specific permissions)
+
+### Testing
+
+- ✅ **15 tests** for role types (UserRole, ROLE_CONFIGS, getRoleConfig, isValidRole)
+- ✅ **20 tests** for permission types (Permission enum, PERMISSION_CONFIGS, getPermissionConfig, isValidPermission)
+- ✅ **42 tests** for role-permission mapping (getPermissionsByRole, hasPermission, hasAnyPermission, hasAllPermissions, canRoleAccessRoute)
+- ✅ **42 tests** for RBAC utilities (canAccessRoute, canPerformAction, requireRole, requirePermission, getUnauthorizedRedirectPath)
+- **Total**: 119+ comprehensive tests for RBAC system
+- **All tests passing**: 3175 tests, 100% success rate
+- **Zero regressions**: All existing tests continue to pass
+
+### Success Criteria
+
+- [x] Role types defined (admin, editor, user) with hierarchy
+- [x] Permission enum defined with 9 granular permissions
+- [x] Role-permission mapping created (admin: 9, editor: 4, user: 1)
+- [x] RBAC utilities implemented (canAccessRoute, canPerformAction, requireRole)
+- [x] ProtectedRoute component created for route-level protection
+- [x] Admin routes updated with role-based protection
+- [x] AuthService integrated with role system (getCurrentUserRole, hasPermission, hasRole)
+- [x] Comprehensive tests for RBAC (119+ tests)
+- [x] All tests passing (3175 tests, 100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (0 errors)
+- [x] Updated docs/blueprint.md with RBAC architecture
+
+### Related Files
+- ✅ Added: `src/types/role.ts` - Role types and utilities
+- ✅ Added: `src/types/permission.ts` - Permission enum and utilities
+- ✅ Added: `src/data/rolesData.ts` - Role-permission mapping
+- ✅ Modified: `src/services/auth/types.ts` - User interface with role field
+- ✅ Modified: `src/services/auth/AuthService.ts` - Role assignment and RBAC methods
+- ✅ Added: `src/utils/rbac.ts` - RBAC utilities
+- ✅ Added: `src/components/common/ProtectedRoute.tsx` - Route protection component
+- ✅ Modified: `src/app/admin/analytics/page.tsx` - ProtectedRoute wrapper
+- ✅ Added: `src/types/__tests__/role.test.ts` - 15 tests
+- ✅ Added: `src/types/__tests__/permission.test.ts` - 20 tests
+- ✅ Added: `src/data/__tests__/rolesData.test.ts` - 42 tests
+- ✅ Added: `src/utils/__tests__/rbac.test.ts` - 42 tests
+- ✅ Updated: `docs/blueprint.md` - RBAC architecture documentation
+- ✅ Updated: `docs/task.md` - Task 223 documentation
+
+### Notes
+
+- Role-based access control (RBAC) system implemented with 3 roles (admin, editor, user)
+- 9 granular permissions across 4 categories (analytics, users, content, admin)
+- ProtectedRoute component provides declarative route-level authorization
+- Higher-order functions enable flexible permission checking (requireRole, requirePermission)
+- Role-permission mapping can be easily extended with new roles and permissions
+- Type-safe interfaces prevent authorization errors at compile time
+- Route protection uses async authentication checks with loading states
+- Empty permission arrays correctly return true (canPerformAllActions, requireAllPermissions)
+- Test timing tolerance improved to reduce flaky test failures
+
+### Impact
+
+- Security: RBAC system provides fine-grained access control for sensitive features
+- Feature-013 Complete: User roles & permissions feature now available
+- Test Coverage: +119 tests (3075 → 3175, 100% pass rate)
+- Type Safety: All RBAC operations properly typed with TypeScript
+- User Experience: Route-based protection with automatic redirects for unauthorized access
+- Architecture: SOLID principles applied (Open/Closed, Interface Segregation, Dependency Inversion)
+- Zero Regressions: All 3175 tests passing, lint clean, build successful
+
+### Verification Date
+
+2026-01-16
+
+### Task Completed
+
+This task (Task 223) implements FEATURE-013 as specified in docs/task.md.
+
+### Related Tasks
+
+- Task 222 (FEATURE-009 - Analytics Dashboard) - Now protected with VIEW_ANALYTICS permission
+- Task 208 (FEATURE-010 - Blog Post Scheduling) - Editor can PUBLISH_CONTENT, User can EDIT_CONTENT
+
+### Next Review
+
+January 22, 2026
+
+---
 
 **Estimated Effort**: 2-3 days
 

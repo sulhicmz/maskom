@@ -467,6 +467,232 @@ Services (AuthService)
 - Zero regressions in existing functionality
 - Error messages verified consistent across all adapters
 
+## RBAC Architecture (✅ COMPLETED - Task 223)
+
+### Purpose
+
+Implement Role-Based Access Control (RBAC) system to enable fine-grained authorization, secure admin routes, and provide principle of least privilege for sensitive features.
+
+### Architecture Components
+
+**Role Types** (src/types/role.ts):
+```typescript
+export type UserRole = 'admin' | 'editor' | 'user'
+
+export interface RoleConfig {
+  id: UserRole
+  name: string
+  description: string
+  level: number
+}
+```
+
+**Permission Types** (src/types/permission.ts):
+```typescript
+export enum Permission {
+  VIEW_ANALYTICS = 'view_analytics',
+  MANAGE_USERS = 'manage_users',
+  MANAGE_ROLES = 'manage_roles',
+  MANAGE_CONTENT = 'manage_content',
+  PUBLISH_CONTENT = 'publish_content',
+  EDIT_CONTENT = 'edit_content',
+  DELETE_CONTENT = 'delete_content',
+  VIEW_ADMIN_DASHBOARD = 'view_admin_dashboard',
+  MANAGE_SETTINGS = 'manage_settings'
+}
+```
+
+**Role-Permission Mapping** (src/data/rolesData.ts):
+- Admin: All 9 permissions (full system access)
+- Editor: Content management permissions (4 permissions)
+- User: Basic permissions (1 permission)
+
+**RBAC Utilities** (src/utils/rbac.ts):
+```typescript
+export function canAccessRoute(userRole: UserRole, route: string): boolean
+export function canPerformAction(userRole: UserRole, action: Permission): boolean
+export function requireRole(requiredRole: UserRole): (userRole: UserRole) => boolean
+export function requirePermission(requiredPermission: Permission): (userRole: UserRole) => boolean
+```
+
+**ProtectedRoute Component** (src/components/common/ProtectedRoute.tsx):
+- Route-level protection with role/permission checks
+- Automatic redirect to login or dashboard on unauthorized access
+- Loading states during authentication checks
+- Support for multiple required permissions
+
+### Implementation
+
+#### Role System
+- **UserRole type**: 'admin' | 'editor' | 'user' with hierarchical levels (admin: 3, editor: 2, user: 1)
+- **RoleConfig interface**: Type-safe role configuration with name, description, and level
+- **Validation utilities**: isValidRole() for type narrowing
+
+#### Permission System
+- **Permission enum**: 9 granular permissions across 4 categories (analytics, users, content, admin)
+- **PermissionConfig interface**: Type-safe permission configuration with name, description, and category
+- **Validation utilities**: isValidPermission() for type narrowing
+
+#### Role-Permission Mapping
+- **getPermissionsByRole()**: Get all permissions for a role
+- **hasPermission()**: Check if role has specific permission
+- **hasAnyPermission()**: Check if role has any of multiple permissions
+- **hasAllPermissions()**: Check if role has all of multiple permissions
+- **canRoleAccessRoute()**: Route-based permission checks
+
+#### RBAC Utilities
+- **canAccessRoute()**: Check if user can access specific route
+- **canPerformAction()**: Check if user can perform specific action
+- **canPerformAnyAction()**: Check if user can perform any of multiple actions
+- **canPerformAllActions()**: Check if user can perform all of multiple actions
+- **requireRole()**: Higher-order function for role requirements
+- **requirePermission()**: Higher-order function for permission requirements
+- **requireAnyPermission()**: Higher-order function for multiple permission requirements (any match)
+- **requireAllPermissions()**: Higher-order function for multiple permission requirements (all match)
+- **getUnauthorizedRedirectPath()**: Get appropriate redirect path based on user role
+
+#### AuthService Integration
+- **User interface**: Added role field to User interface
+- **RegisterData interface**: Added optional role field for registration
+- **IAuthService interface**: Added getCurrentUserRole(), hasPermission(), hasRole() methods
+- **Role assignment**: Default role 'user' on registration, configurable via RegisterData.role
+- **Permission checks**: Integrated with rolesData.ts for role-permission validation
+
+#### ProtectedRoute Component
+- **Props**: children, requiredRole, requiredPermission, requiredPermissions, fallback
+- **Authentication check**: Redirects to /login if not authenticated
+- **Role check**: Redirects to /dashboard if role doesn't match requiredRole
+- **Permission check**: Redirects to /dashboard if missing requiredPermission(s)
+- **Route-based check**: Uses canAccessRoute() if no role/permission specified
+- **Loading state**: Shows spinner during authentication verification
+- **Client-side protection**: Uses 'use client' directive for Next.js App Router
+
+### Route Protection
+
+**Admin Analytics Route** (src/app/admin/analytics/page.tsx):
+```typescript
+<ProtectedRoute requiredPermission={Permission.VIEW_ANALYTICS}>
+  <AnalyticsDashboard />
+</ProtectedRoute>
+```
+
+### Permission Categories
+
+**Analytics** (1 permission):
+- VIEW_ANALYTICS: Access analytics dashboard and reports
+
+**Users** (2 permissions):
+- MANAGE_USERS: Create, edit, and delete users
+- MANAGE_ROLES: Assign and modify user roles
+
+**Content** (4 permissions):
+- MANAGE_CONTENT: Full access to all content management
+- PUBLISH_CONTENT: Publish and schedule content
+- EDIT_CONTENT: Edit existing content
+- DELETE_CONTENT: Delete content
+
+**Admin** (2 permissions):
+- VIEW_ADMIN_DASHBOARD: Access admin dashboard
+- MANAGE_SETTINGS: Modify system settings
+
+### Architecture Benefits
+
+1. **Security**: Principle of least privilege for sensitive features
+2. **Scalability**: Easy to add new roles and permissions
+3. **Maintainability**: Centralized RBAC logic
+4. **Type Safety**: TypeScript enums for roles and permissions
+5. **Audit Trail**: Clear role-based access logging (ready for future enhancement)
+6. **User Experience**: Different UI based on user role
+7. **Route Protection**: Declarative route-level authorization
+8. **Composability**: Higher-order functions for flexible permission checks
+9. **Separation of Concerns**: Authorization logic separated from business logic
+10. **DRY Principle**: Single source of truth for role-permission mapping
+
+### Testing
+
+- ✅ **15 tests** for role types (UserRole, ROLE_CONFIGS, getRoleConfig, isValidRole)
+- ✅ **20 tests** for permission types (Permission enum, PERMISSION_CONFIGS, getPermissionConfig, isValidPermission)
+- ✅ **42 tests** for role-permission mapping (getPermissionsByRole, hasPermission, hasAnyPermission, hasAllPermissions, canRoleAccessRoute)
+- ✅ **42 tests** for RBAC utilities (canAccessRoute, canPerformAction, requireRole, requirePermission, getUnauthorizedRedirectPath)
+- **Total**: 119+ comprehensive tests for RBAC system
+
+### Usage Examples
+
+**Check route access**:
+```typescript
+import { canAccessRoute } from '@/utils/rbac'
+
+if (canAccessRoute('admin', '/admin/analytics')) {
+  // Show admin link
+}
+```
+
+**Check permission**:
+```typescript
+import authService from '@/services/auth/AuthService'
+
+const canEdit = await authService.hasPermission('edit_content')
+```
+
+**Protect route**:
+```typescript
+import ProtectedRoute from '@/components/common/ProtectedRoute'
+import { Permission } from '@/types/permission'
+
+<ProtectedRoute requiredPermission={Permission.VIEW_ANALYTICS}>
+  <AdminDashboard />
+</ProtectedRoute>
+```
+
+**Require multiple permissions**:
+```typescript
+<ProtectedRoute requiredPermissions={[Permission.MANAGE_CONTENT, Permission.PUBLISH_CONTENT]}>
+  <ContentEditor />
+</ProtectedRoute>
+```
+
+### Code Changes
+
+- Added: `src/types/role.ts` - Role types and utilities (42 lines)
+- Added: `src/types/permission.ts` - Permission enum and utilities (71 lines)
+- Added: `src/data/rolesData.ts` - Role-permission mapping (77 lines)
+- Modified: `src/services/auth/types.ts` - Updated User and RegisterData interfaces with role field
+- Modified: `src/services/auth/AuthService.ts` - Added role assignment and RBAC methods
+- Added: `src/utils/rbac.ts` - RBAC utilities (96 lines)
+- Added: `src/components/common/ProtectedRoute.tsx` - Route protection component (84 lines)
+- Modified: `src/app/admin/analytics/page.tsx` - Added ProtectedRoute wrapper
+- Added: `src/types/__tests__/role.test.ts` - 15 tests
+- Added: `src/types/__tests__/permission.test.ts` - 20 tests
+- Added: `src/data/__tests__/rolesData.test.ts` - 42 tests
+- Added: `src/utils/__tests__/rbac.test.ts` - 42 tests
+- Total: 12 files added/modified, ~500 lines added/modified
+
+### Success Criteria
+
+- [x] Role types defined (admin, editor, user) with hierarchy
+- [x] Permission enum defined with 9 granular permissions
+- [x] Role-permission mapping created (admin: 9, editor: 4, user: 1)
+- [x] RBAC utilities implemented (canAccessRoute, canPerformAction, requireRole)
+- [x] ProtectedRoute component created for route-level protection
+- [x] Admin routes updated with role-based protection
+- [x] AuthService integrated with role system (getCurrentUserRole, hasPermission, hasRole)
+- [x] Comprehensive tests for RBAC (119+ tests)
+- [x] All tests passing (zero regressions)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (0 errors)
+
+### Related Tasks
+- Task 222 (Analytics Dashboard) - Now protected with VIEW_ANALYTICS permission
+- Task 208 (Blog Post Scheduling) - Editor can PUBLISH_CONTENT, User can EDIT_CONTENT
+
+### Future Enhancements
+
+1. **Admin Interface** - Role management UI for assigning roles to users
+2. **Audit Logging** - Log role-based access attempts and permission checks
+3. **Permission Scopes** - Add resource-level permissions (e.g., edit own content vs all content)
+4. **Dynamic Roles** - Create custom roles with flexible permission sets
+5. **UI Component Protection** - RoleBasedComponent for UI element-level protection
+
 ## Architectural Patterns
 
 ### Good Patterns (Maintain)

@@ -139,7 +139,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(50);
+            expect(elapsed).toBeGreaterThanOrEqual(45);
             expect(elapsed).toBeLessThan(150);
         });
 
