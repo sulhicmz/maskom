@@ -1,5 +1,279 @@
 # Architecture Task Tracking
 
+## Task 240: Blog Category Data Standardization (Jan 16, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture (Data Integrity)
+
+### Purpose
+
+Standardize blog category data structure from `string[]` to `CategoryItem[]` with auto-generated IDs to ensure referential integrity, single source of truth, and consistency with other data collections.
+
+### Problem Identified
+
+**Blog Category Data Anti-Pattern**:
+- BlogCategoryData was defined as `string[]` (array of category names)
+- InnerBlogPost had `category` field storing category name as string
+- No referential integrity between blog posts and categories
+- No single source of truth for category data
+- Category names duplicated across data files
+- No foreign key validation
+
+**Why This Matters**:
+1. **Referential Integrity**: Blog posts reference categories by string, not ID
+2. **Data Consistency**: Category names can be misspelled without validation
+3. **Single Source of Truth**: Category data duplicated in multiple places
+4. **Type Safety**: String-based references lack compile-time checking
+5. **Maintainability**: Category name changes require updates across multiple files
+6. **Relationship Validation**: No foreign key validation for category references
+7. **Scalability**: Hard to add new categories or track category usage
+
+### Solution
+
+**Data Structure Transformation**:
+
+**Before** (string array):
+```typescript
+const categories: string[] = [
+   "Konektivitas Terkelola",
+   "Keamanan Jaringan",
+   ...
+];
+
+interface InnerBlogPost {
+   category: string;  // String reference, no validation
+}
+```
+
+**After** (objects with IDs):
+```typescript
+export interface CategoryItem {
+   id: number;
+   name: string;
+}
+
+export const DATA_RELATIONSHIPS: DataRelationship[] = [
+   {
+     sourceCollection: "InnerBlogData",
+     targetCollection: "BlogCategoryData",
+     sourceField: "categoryId",
+     targetField: "id",
+     type: "many-to-one",
+     optional: false,
+   },
+];
+```
+
+### Implementation
+
+#### Phase 1: Define CategoryItem Type
+- [x] Added `CategoryItem` interface to `src/types/data/index.ts`
+- [x] Interface includes `id: number` and `name: string` fields
+- [x] Follows same pattern as BlogTagItem
+
+#### Phase 2: Convert BlogCategoryData.ts
+- [x] Converted from `string[]` to `CategoryItem[]`
+- [x] Applied auto-ID generation (IDs 1-6 for 6 categories)
+- [x] Exported `blogCategoryById` IdIndex for O(1) lookups
+- [x] Exported `blogCategoriesByName` Map for O(1) name lookups
+- [x] Maintained backward compatibility with `blog_categories_data` export
+
+#### Phase 3: Update InnerBlogPost Type
+- [x] Added `categoryId: number` field to `InnerBlogPost` interface
+- [x] Made `categoryId` required (not optional)
+- [x] Kept `category: string` field optional for backward compatibility
+
+#### Phase 4: Update InnerBlogData.ts
+- [x] Added `categoryId` field to all 7 blog posts
+- [x] Mapped category names to IDs:
+  - "Konektivitas Terkelola" → 1 (3 posts)
+  - "Keamanan Jaringan" → 2 (1 post)
+  - "Operasional & Dukungan" → 3 (1 post)
+  - "IoT & Edge" → 6 (2 posts)
+- [x] Maintained backward compatibility with `category` field
+
+#### Phase 5: Add Relationship Definition
+- [x] Added InnerBlogData → BlogCategoryData relationship to `src/data/relationships.ts`
+- [x] Defined as `many-to-one` relationship
+- [x] Foreign key: `categoryId` → `id`
+- [x] Required relationship (optional: false)
+
+#### Phase 6: Create Validators
+- [x] Created `validateCategoryItem()` validator in `src/utils/dataValidation/blogValidation.ts`
+- [x] Validates required `id` field (number, min: 1)
+- [x] Validates required `name` field (string)
+- [x] Updated `validateInnerBlogPost()` to validate `categoryId` field
+- [x] Added foreign key validation: checks if categoryId exists in BlogCategoryData
+- [x] Added `categoryId` to numberFields configuration (required: true, min: 1)
+- [x] Exported `validateCategoryItem` from `src/utils/dataValidation/index.ts`
+
+#### Phase 7: Add Tests
+- [x] Created `src/utils/dataValidation/__tests__/categoryValidation.test.ts` (24 tests)
+- [x] Tests for `validateCategoryItem`:
+  - Valid CategoryItem (id, name)
+  - Invalid CategoryItem (missing id, missing name, negative id)
+  - All blog categories validation
+  - Edge cases (empty name, special characters, very long names)
+- [x] Tests for `validateInnerBlogPost` with categoryId:
+  - Valid categoryId
+  - Invalid categoryId (references non-existent category)
+  - categoryId validation (required, min: 1)
+  - All valid categoryIds from BlogCategoryData
+  - Orphaned category references
+  - Edge cases (missing categoryId, wrong type)
+- [x] Updated `src/data/__tests__/BlogCategoryData.test.ts` to work with CategoryItem[]
+- [x] Updated `src/utils/dataValidation/__tests__/blogValidation.status.test.ts` to include categoryId
+
+#### Phase 8: Component Updates & Testing
+- [x] Updated `Category` component to use `cat.name` and `cat.id`
+- [x] Updated `BlogCategoryFilter` component to use category IDs
+- [x] Changed `selectedCategory` prop from `string | null` to `number | null`
+- [x] Updated filter URL to use category IDs (`?category=1` vs `?category=Konektivitas+Terkelola`)
+- [x] Updated `BlogCategoryFilter.test.tsx` tests to work with category IDs
+- [x] Added eslint-disable comments for intentional `any` usage in tests
+- [x] All 3426 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+
+### Code Changes
+
+- Modified: `src/types/data/index.ts` - Added CategoryItem interface (+3 lines)
+- Modified: `src/data/BlogCategoryData.ts` - Converted to CategoryItem[] with indexes (+20 lines)
+- Modified: `src/data/InnerBlogData.ts` - Added categoryId to all posts (+7 lines)
+- Modified: `src/data/relationships.ts` - Added InnerBlogData → BlogCategoryData relationship (+5 lines)
+- Modified: `src/utils/dataValidation/blogValidation.ts` - Added validateCategoryItem, updated validateInnerBlogPost (+24 lines)
+- Modified: `src/utils/dataValidation/index.ts` - Exported validateCategoryItem (+1 line)
+- Added: `src/utils/dataValidation/__tests__/categoryValidation.test.ts` - 24 comprehensive tests (+279 lines)
+- Modified: `src/components/blogs/blog-sidebar/Category.tsx` - Use cat.name and cat.id (+1 line)
+- Modified: `src/components/blogs/blog/BlogCategoryFilter.tsx` - Use category IDs (+10 lines)
+- Modified: `src/components/blogs/blog/__tests__/BlogCategoryFilter.test.tsx` - Updated tests (+6 lines)
+- Modified: `src/data/__tests__/BlogCategoryData.test.ts` - Updated for CategoryItem[] (+38 lines)
+- Modified: `src/utils/__tests__/dataValidation.test.ts` - Added categoryId to validBlogPost (+1 line)
+- Modified: `src/utils/__tests__/blogValidation.status.test.ts` - Updated validBlogPost object (+1 line)
+- Total: 13 files added/modified, ~390 lines added/modified
+
+### Architecture Benefits
+
+1. **Referential Integrity**: Blog posts reference categories by foreign key (categoryId)
+2. **Single Source of Truth**: Category data stored centrally in BlogCategoryData
+3. **Type Safety**: Foreign key validation prevents invalid category references
+4. **Data Consistency**: Category names defined once, no duplication
+5. **Relationship Validation**: DataRelationship enforces referential integrity
+6. **Maintainability**: Category changes only require updating BlogCategoryData
+7. **Scalability**: Easy to track category usage and add new categories
+8. **Index Optimization**: O(1) lookups via blogCategoryById and blogCategoriesByName
+9. **Consistency**: Follows same pattern as BlogTagData (Task 101)
+10. **Test Coverage**: Comprehensive tests for all category operations
+
+### Category Data Structure
+
+**Categories (6 total)**:
+| ID | Name | Blog Posts |
+|----|------|------------|
+| 1 | Konektivitas Terkelola | 3 (posts 1, 2, 6) |
+| 2 | Keamanan Jaringan | 1 (post 5) |
+| 3 | Operasional & Dukungan | 1 (post 4) |
+| 4 | Transformasi Digital | 0 (unused) |
+| 5 | Infrastruktur Cloud | 0 (unused) |
+| 6 | IoT & Edge | 2 (posts 3, 7) |
+
+### Relationship Definition
+
+```typescript
+{
+  sourceCollection: "InnerBlogData",
+  targetCollection: "BlogCategoryData",
+  sourceField: "categoryId",
+  targetField: "id",
+  type: "many-to-one",
+  optional: false,
+}
+```
+
+**Usage**:
+- Blog posts have `categoryId: number` (foreign key)
+- Validates against BlogCategoryData at build time
+- Prevents orphaned category references
+- Enables O(1) lookups via blogCategoryById
+
+### Testing
+
+**24 comprehensive tests** for category validation:
+- Valid CategoryItem validation (6 tests)
+- Invalid CategoryItem scenarios (3 tests)
+- All blog categories validation (1 test)
+- InnerBlogPost with categoryId validation (14 tests)
+
+**Updated existing tests**:
+- BlogCategoryData.test.ts (updated for CategoryItem[])
+- blogValidation.status.test.ts (added categoryId field)
+- BlogCategoryFilter.test.tsx (updated for category IDs)
+
+### Success Criteria
+
+- [x] CategoryItem type defined (id, name)
+- [x] BlogCategoryData converted to CategoryItem[] with auto-ID
+- [x] InnerBlogPost type includes categoryId field
+- [x] InnerBlogData.ts updated with categoryId values
+- [x] InnerBlogData → BlogCategoryData relationship added
+- [x] validateCategoryItem validator created
+- [x] validateInnerBlogPost updated with categoryId validation
+- [x] Category component updated to use cat.name and cat.id
+- [x] BlogCategoryFilter updated to use category IDs
+- [x] 24 new tests for category validation
+- [x] All existing tests updated
+- [x] All 3426 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+
+### Related Files
+
+- ✅ Modified: `src/types/data/index.ts` - Added CategoryItem interface
+- ✅ Modified: `src/data/BlogCategoryData.ts` - Converted to CategoryItem[]
+- ✅ Modified: `src/data/InnerBlogData.ts` - Added categoryId field
+- ✅ Modified: `src/data/relationships.ts` - Added relationship
+- ✅ Modified: `src/utils/dataValidation/blogValidation.ts` - Added validators
+- ✅ Added: `src/utils/dataValidation/__tests__/categoryValidation.test.ts` - 24 tests
+- ✅ Modified: `src/components/blogs/blog-sidebar/Category.tsx` - Updated component
+- ✅ Modified: `src/components/blogs/blog/BlogCategoryFilter.tsx` - Updated component
+- ✅ Modified: Multiple test files - Updated for new structure
+
+### Notes
+
+- Follows Data Architecture principles:
+  - **Referential Integrity**: Foreign key validation prevents invalid references
+  - **Single Source of Truth**: Category data stored once in BlogCategoryData
+  - **Type Safety**: Foreign keys provide compile-time checking
+  - **Relationship Validation**: DataRelationship enforces constraints
+  - **Consistency**: Same pattern as BlogTagData (Task 101)
+- Backward compatibility maintained: `category` field kept in InnerBlogPost
+- Category IDs auto-generated (1-6) to prevent conflicts
+- Index utilities: blogCategoryById (O(1) lookup by ID), blogCategoriesByName (O(1) lookup by name)
+- All blog posts reference valid categories (verified during implementation)
+- Foreign key validation: categoryId must exist in BlogCategoryData
+- Relationship supports future cascade delete operations
+
+### Impact
+
+- Data Integrity: Blog category data now has referential integrity with foreign key validation
+- Single Source of Truth: Category data centralized in BlogCategoryData with proper IDs
+- Test Coverage: +24 new tests (3402 → 3426, 100% pass rate)
+- Type Safety: Foreign key validation prevents invalid category references at compile time
+- Consistency: Follows same pattern as BlogTagData, maintainable architecture
+- Zero Regressions: All 3426 tests passing, lint clean
+- Maintainability: Category changes only require updating BlogCategoryData
+
+### Verification Date
+
+2026-01-16
+
+### Related Tasks
+
+- Task 101 (Blog Tag Relationship) - Similar pattern for BlogTagData
+- Task 228 (Auto-ID Generation) - Auto-ID pattern used for category IDs
+- Task 40 Phase 3 (Data Relationship Management) - Relationship validation system
+
+---
+
 ## Task 239: Performance Optimization - Remove Inline Functions in AnalyticsDashboard (Jan 16, 2026)
 
 **Status**: ✅ Completed

@@ -138,7 +138,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | BrandData.ts | StaticImageData[] | No | No | N/A | No | Client logos (home-one) |
 | BrandDataDark.ts | StaticImageData[] | No | No | N/A | No | Client logos (home-one-dark) |
 | BlogTagData.ts | BlogTagItem | No | Yes | No | Yes | Blog keyword tags with relationships |
-| BlogCategoryData.ts | string[] | No | No | N/A | No | Blog categories |
+| BlogCategoryData.ts | CategoryItem | No | Yes | Yes | No | Blog categories (Task 240) |
 | FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | No | Feature cards (home-one) |
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
@@ -160,7 +160,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - `causeValidation.ts` - CauseItem validator
 - `navigationValidation.ts` - MenuItem, NavigationItem, NavigationSection validators
 - `dashboardValidation.ts` - WiFiDevice, WebsiteTemplate, AIStep validators
-- `blogValidation.ts` - BlogCommentItem, InnerBlogPost validators
+- `blogValidation.ts` - CategoryItem, BlogCommentItem, InnerBlogPost validators (Task 240)
 - `teamValidation.ts` - TeamMember validator
 - `socialValidation.ts` - SocialLink validator
 - `contactValidation.ts` - ContactInfoItem validator
@@ -174,39 +174,41 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
  - ✅ `validateRange()` - Number range validation (via createValidator)
  - ✅ `validateEnum<T>()` - Enum value validation (via createValidator)
  
-**Implemented Validators** (25 total):
- - ✅ `validateFeedbackItem` - Testimonials with rating validation
- - ✅ `validateFaqItem` - FAQ questions and answers
- - ✅ `validatePriceItem` - Pricing packages with nested PriceDetailItem validation
- - ✅ `validatePriceDetailItem` - Individual pricing tiers
- - ✅ `validateFeatureItem` - Feature cards
- - ✅ `validateProcessItem` - Process steps
- - ✅ `validateCauseItem` - Cause cards
- - ✅ `validateMenuItem` - Navigation menu with sub-menu validation
- - ✅ `validateWiFiDevice` - Dashboard WiFi devices
- - ✅ `validateWebsiteTemplate` - Website templates
- - ✅ `validateAIStep` - AI process steps
- - ✅ `validateBlogTagItem` - Blog tag items with id and name (Task 101)
- - ✅ `validateBlogCommentItem` - Blog comments
- - ✅ `validateTeamMember` - Team member profiles
- - ✅ `validateInnerBlogPost` - Inner blog posts
- - ✅ `validateFaqDetail` - FAQ detail sections
- - ✅ `validateInnerFaqItem` - FAQ categories with details
- - ✅ `validateSocialLink` - Social media links with target validation
- - ✅ `validateNavigationItem` - Navigation items
- - ✅ `validateNavigationSection` - Navigation sections
- - ✅ `validateContactInfoItem` - Contact information with lines and links arrays (Task 63)
- - ✅ `validateFeatureHomeOneItem` - Feature cards for home-one page (Task 63)
- - ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
- - ✅ `validateDataArray<T>()` - Validate entire arrays
+**Implemented Validators** (26 total):
+- ✅ `validateFeedbackItem` - Testimonials with rating validation
+- ✅ `validateFaqItem` - FAQ questions and answers
+- ✅ `validatePriceItem` - Pricing packages with nested PriceDetailItem validation
+- ✅ `validatePriceDetailItem` - Individual pricing tiers
+- ✅ `validateFeatureItem` - Feature cards
+- ✅ `validateProcessItem` - Process steps
+- ✅ `validateCauseItem` - Cause cards
+- ✅ `validateMenuItem` - Navigation menu with sub-menu validation
+- ✅ `validateWiFiDevice` - Dashboard WiFi devices
+- ✅ `validateWebsiteTemplate` - Website templates
+- ✅ `validateAIStep` - AI process steps
+- ✅ `validateCategoryItem` - Blog category items with id and name (Task 240)
+- ✅ `validateBlogTagItem` - Blog tag items with id and name (Task 101)
+- ✅ `validateBlogCommentItem` - Blog comments
+- ✅ `validateTeamMember` - Team member profiles
+- ✅ `validateInnerBlogPost` - Inner blog posts
+- ✅ `validateFaqDetail` - FAQ detail sections
+- ✅ `validateInnerFaqItem` - FAQ categories with details
+- ✅ `validateSocialLink` - Social media links with target validation
+- ✅ `validateNavigationItem` - Navigation items
+- ✅ `validateNavigationSection` - Navigation sections
+- ✅ `validateContactInfoItem` - Contact information with lines and links arrays (Task 63)
+- ✅ `validateFeatureHomeOneItem` - Feature cards for home-one page (Task 63)
+- ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
+- ✅ `validateDataArray<T>()` - Validate entire arrays
  - ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
  
 **Testing**:
- - ✅ 107 comprehensive tests for specific validators (100% passing)
- - ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
- - ✅ 7 tests for validateBlogTagItem (100% passing) (Task 102)
- - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
- - ✅ All validators tested with valid and invalid inputs
+- ✅ 107 comprehensive tests for specific validators (100% passing)
+- ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
+- ✅ 7 tests for validateBlogTagItem (100% passing) (Task 102)
+- ✅ 24 tests for validateCategoryItem (100% passing) (Task 240)
+- ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
+- ✅ All validators tested with valid and invalid inputs
 - ✅ Base validation utilities tested directly:
   - `validateBaseDataItem()` - 11 tests
   - `createValidator<T>()` - 15 tests
@@ -271,6 +273,7 @@ export interface DataRelationship {
 - ✅ Central relationship configuration file
 - ✅ BlogCommentData → InnerBlogData (many-to-one via blogId foreign key)
 - ✅ InnerBlogData → BlogTagData (many-to-one via tagId foreign key)
+- ✅ InnerBlogData → BlogCategoryData (many-to-one via categoryId foreign key) (Task 240)
 - ✅ Type-safe relationship definitions with DataRelationship interface
 - ✅ Supports validation of all relationships at build time
 
