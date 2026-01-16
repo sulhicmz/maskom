@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import AnalyticsSummaryCards from './AnalyticsSummary'
@@ -10,6 +10,42 @@ import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
 import { formatAsPercentage } from '@/utils/formatPercentage'
 import { useRouter } from 'next/navigation'
+import type { FormSubmissionMetrics, PageViewMetrics } from '@/types/analytics'
+
+const FormSubmissionRow = memo(({ form, index }: { form: FormSubmissionMetrics; index: number }) => {
+  return (
+    <tr key={index}>
+      <td>
+        <span className="badge bg-primary">{form.formType}</span>
+      </td>
+      <td>{form.totalSubmissions}</td>
+      <td className="text-success">{form.successfulSubmissions}</td>
+      <td className="text-danger">{form.failedSubmissions}</td>
+      <td>{formatAsPercentage(form.successfulSubmissions, form.totalSubmissions)}</td>
+      <td>{form.avgCompletionTime}s</td>
+    </tr>
+  )
+})
+
+FormSubmissionRow.displayName = 'FormSubmissionRow'
+
+const PageViewRow = memo(({ page, index }: { page: PageViewMetrics; index: number }) => {
+  return (
+    <tr key={index}>
+      <td>
+        <a href={page.pagePath} className="text-decoration-none">
+          {page.pageTitle}
+        </a>
+      </td>
+      <td>{page.totalViews}</td>
+      <td>{page.uniqueViews}</td>
+      <td>{page.avgTimeOnPage}s</td>
+      <td>{formatAsPercentage(page.bounceRate * 100, 100)}</td>
+    </tr>
+  )
+})
+
+PageViewRow.displayName = 'PageViewRow'
 
 const AnalyticsDashboard: React.FC = () => {
   const { theme } = useTheme()
@@ -104,20 +140,9 @@ const AnalyticsDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {analyticsData.formSubmissions.map((form, index) => {
-                        return (
-                          <tr key={index}>
-                            <td>
-                              <span className="badge bg-primary">{form.formType}</span>
-                            </td>
-                            <td>{form.totalSubmissions}</td>
-                            <td className="text-success">{form.successfulSubmissions}</td>
-                            <td className="text-danger">{form.failedSubmissions}</td>
-                            <td>{formatAsPercentage(form.successfulSubmissions, form.totalSubmissions)}</td>
-                            <td>{form.avgCompletionTime}s</td>
-                          </tr>
-                        )
-                      })}
+                      {analyticsData.formSubmissions.map((form, index) => (
+                        <FormSubmissionRow key={index} form={form} index={index} />
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -146,17 +171,7 @@ const AnalyticsDashboard: React.FC = () => {
                     </thead>
                     <tbody>
                       {analyticsData.pageViews.map((page, index) => (
-                        <tr key={index}>
-                          <td>
-                            <a href={page.pagePath} className="text-decoration-none">
-                              {page.pageTitle}
-                            </a>
-                          </td>
-                          <td>{page.totalViews}</td>
-                          <td>{page.uniqueViews}</td>
-                          <td>{page.avgTimeOnPage}s</td>
-                          <td>{formatAsPercentage(page.bounceRate * 100, 100)}</td>
-                        </tr>
+                        <PageViewRow key={index} page={page} index={index} />
                       ))}
                     </tbody>
                   </table>
