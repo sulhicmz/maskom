@@ -6,6 +6,7 @@ import { useAuthService } from '@/hooks/useAuthService'
 import AnalyticsSummaryCards from './AnalyticsSummary'
 import AnalyticsChart from './AnalyticsChart'
 import PerformanceMetrics from './PerformanceMetrics'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
 import { formatAsPercentage } from '@/utils/formatPercentage'
@@ -62,13 +63,7 @@ const AnalyticsDashboard: React.FC = () => {
   }, [user, router])
 
   if (!isClient) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner minHeight={400} color="primary" />
   }
 
   if (!user) {
