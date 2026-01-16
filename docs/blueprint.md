@@ -386,7 +386,7 @@ export interface DataRelationship {
      - ✅ All data validators run automatically before deployment
      - ✅ Build fails if data validation errors detected
      - ✅ Prevents invalid data from reaching production
-       - ✅ 3575 tests passing (including 224 validation tests)
+      - ✅ 2634 tests passing (including 224 validation tests)
      - ✅ Single command to validate entire data model (npm test)
 
 ## Validation Layer Architecture (✅ COMPLETED - Task 48)
@@ -860,7 +860,7 @@ apmManager.trackPerformance({
 - [x] Breadcrumbs for user journey tracking
 - [x] Performance metrics tracking
 - [x] 60 comprehensive tests for APM integration
- - [x] All 3575 tests passing (100% success rate)
+- [x] All 3540 tests passing (100% success rate)
 - [x] Lint passes (0 errors, 0 warnings)
 - [x] Build successful (23 pages generated)
 
@@ -2606,15 +2606,6 @@ Comprehensive API specifications for all external service integrations are docum
 **Service Documentation**:
 - **Email Service** (`docs/api/email-service.md`) - EmailJS integration with resilience patterns (Task 112)
 - **Auth Service** (`docs/api/auth-service.md`) - Authentication API with login, register, logout, rate limiting (Task 113)
-
-**API Routes Documentation**:
-- **API Routes** (`docs/api/api-routes.md`) - Comprehensive server-side monitoring, health check, and service status endpoints with best practices and troubleshooting (Task 251)
-  - Health check endpoint (`/api/health`) - Configurable success rate thresholds
-  - Metrics endpoint (`/api/metrics`) - Aggregated service metrics and performance data
-  - Service status endpoint (`/api/services/status`) - Circuit breaker states and service health
-- **Health API** (`docs/api/health-api.md`) - Quick reference for health check endpoint
-- **Metrics API** (`docs/api/metrics-api.md`) - Quick reference for metrics endpoint
-- **Service Status API** (`docs/api/services-status-api.md`) - Quick reference for service status endpoint
 
 **Documentation Contents**:
 - Complete API contracts with TypeScript interfaces
