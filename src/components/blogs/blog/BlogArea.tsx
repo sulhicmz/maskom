@@ -13,6 +13,7 @@ import { tagsById } from "@/data/BlogTagData"
 import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
 import BookmarkButton from "@/components/common/BookmarkButton"
+import ExportButton from "@/components/common/ExportButton"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => (
@@ -73,33 +74,40 @@ const BlogArea = React.memo(() => {
                <div className="col-xl-8">
                    <div className="blogs-wrapper mb-30">
                       {hasFilters && (
-                         <div className="filter-status mb-30">
-                           <h4 className="filter-title">Filter Aktif:</h4>
-                           <div className="filter-tags">
-                               {searchQuery && (
+                          <div className="filter-status mb-30">
+                            <h4 className="filter-title">Filter Aktif:</h4>
+                            <div className="filter-tags">
+                                {searchQuery && (
+                                   <span className="filter-tag">
+                                      Pencarian: &quot;{searchQuery}&quot;
+                                      <button onClick={() => setSearchQuery("")} aria-label="Hapus pencarian">×</button>
+                                   </span>
+                                )}
+                               {selectedCategory && (
                                   <span className="filter-tag">
-                                     Pencarian: &quot;{searchQuery}&quot;
-                                     <button onClick={() => setSearchQuery("")} aria-label="Hapus pencarian">×</button>
+                                     Kategori: {selectedCategory}
+                                     <button onClick={() => setSelectedCategory(null)} aria-label="Hapus filter kategori">×</button>
                                   </span>
                                )}
-                              {selectedCategory && (
-                                 <span className="filter-tag">
-                                    Kategori: {selectedCategory}
-                                    <button onClick={() => setSelectedCategory(null)} aria-label="Hapus filter kategori">×</button>
-                                 </span>
-                              )}
-                              {selectedTagId && (
-                                 <span className="filter-tag">
-                                    Tag: {tagsById.get(selectedTagId)?.name}
-                                    <button onClick={() => setSelectedTagId(null)} aria-label="Hapus filter tag">×</button>
-                                 </span>
-                              )}
-                           </div>
-                           <button onClick={handleClearAllFilters} className="clear-all-btn">
-                              Hapus Semua Filter
-                           </button>
-                        </div>
-                     )}
+                               {selectedTagId && (
+                                  <span className="filter-tag">
+                                     Tag: {tagsById.get(selectedTagId)?.name}
+                                     <button onClick={() => setSelectedTagId(null)} aria-label="Hapus filter tag">×</button>
+                                  </span>
+                               )}
+                            </div>
+                            <div className="filter-actions">
+                               <button onClick={handleClearAllFilters} className="clear-all-btn">
+                                  Hapus Semua Filter
+                               </button>
+                               <ExportButton
+                                 posts={filteredPosts}
+                                 filterCriteria={filterCriteria}
+                                 buttonClassName="export-btn"
+                               />
+                            </div>
+                         </div>
+                      )}
 
                      {filteredPosts.length === 0 ? (
                         <div className="no-results">
