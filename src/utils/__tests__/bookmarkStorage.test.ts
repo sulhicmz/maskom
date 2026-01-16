@@ -62,7 +62,7 @@ describe('bookmarkStorage', () => {
       const bookmark = { postId: 'post-1', postTitle: 'Test Post' };
 
       const bookmark1 = addBookmark(bookmark);
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 10));
       const bookmark2 = addBookmark(bookmark);
 
       expect(bookmark1.id).not.toBe(bookmark2.id);
