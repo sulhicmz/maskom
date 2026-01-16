@@ -2,6 +2,7 @@ export const TIMEOUTS = {
     AUTH_LOGIN: 5000,
     AUTH_REGISTER: 5000,
     EMAIL_SERVICE: 10000,
+    API_ROUTE: 5000,
 } as const;
 
 export const RETRY_CONFIG = {

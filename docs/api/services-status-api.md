@@ -10,59 +10,83 @@ Returns detailed status for all services with metrics and circuit breaker inform
 
 #### Response
 
+All responses follow ServiceResult<T> pattern:
+```typescript
+interface ServiceResult<T> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+    errorCode?: ServiceErrorCodeType;
+    metadata?: Record<string, unknown>;
+}
+```
+
 **200 OK**
 ```json
 {
-  "timestamp": "2026-01-13T22:30:00.000Z",
-  "email": {
-    "metrics": {
-      "serviceName": "EmailService.sendEmail",
-      "totalCalls": 100,
-      "successCalls": 95,
-      "failureCalls": 5,
-      "timeoutCalls": 2,
-      "rateLimitCalls": 1,
-      "circuitBreakerOpenCount": 0,
-      "lastError": "timeout",
-      "lastSuccessTime": 17368068095678,
-      "lastFailureTime": 1736808004567,
-      "averageResponseTime": 150
-    },
-    "circuitBreaker": {
-      "isOpen": false,
-      "failureCount": 2,
-      "lastFailureTime": null,
-      "lastSuccessTime": 17368068095678
-    }
-  },
-  "auth": {
-    "metrics": {
-      "login": {
-        "serviceName": "AuthService.login",
-        "totalCalls": 200,
-        "successCalls": 190,
-        "failureCalls": 10,
-        "timeoutCalls": 3,
-        "rateLimitCalls": 5,
-        "circuitBreakerOpenCount": 1
-      },
-      "register": {
-        "serviceName": "AuthService.register",
-        "totalCalls": 50,
-        "successCalls": 48,
-        "failureCalls": 2,
-        "timeoutCalls": 0,
+  "success": true,
+  "message": "Service status retrieved successfully",
+  "data": {
+    "timestamp": "2026-01-13T22:30:00.000Z",
+    "email": {
+      "metrics": {
+        "serviceName": "EmailService.sendEmail",
+        "totalCalls": 100,
+        "successCalls": 95,
+        "failureCalls": 5,
+        "timeoutCalls": 2,
         "rateLimitCalls": 1,
-        "circuitBreakerOpenCount": 0
+        "circuitBreakerOpenCount": 0,
+        "lastError": "timeout",
+        "lastSuccessTime": 17368068095678,
+        "lastFailureTime": 1736808004567,
+        "averageResponseTime": 150
+      },
+      "circuitBreaker": {
+        "isOpen": false,
+        "failureCount": 2,
+        "lastFailureTime": null,
+        "lastSuccessTime": 17368068095678
       }
     },
-    "circuitBreaker": {
-      "isOpen": false,
-      "failureCount": 1,
-      "lastFailureTime": null,
-      "lastSuccessTime": 17368068095678
+    "auth": {
+      "metrics": {
+        "login": {
+          "serviceName": "AuthService.login",
+          "totalCalls": 200,
+          "successCalls": 190,
+          "failureCalls": 10,
+          "timeoutCalls": 3,
+          "rateLimitCalls": 5,
+          "circuitBreakerOpenCount": 1
+        },
+        "register": {
+          "serviceName": "AuthService.register",
+          "totalCalls": 50,
+          "successCalls": 48,
+          "failureCalls": 2,
+          "timeoutCalls": 0,
+          "rateLimitCalls": 1,
+          "circuitBreakerOpenCount": 0
+        }
+      },
+      "circuitBreaker": {
+        "isOpen": false,
+        "failureCount": 1,
+        "lastFailureTime": null,
+        "lastSuccessTime": 17368068095678
+      }
     }
   }
+}
+```
+
+**500 Internal Server Error** - Service status retrieval timeout or error
+```json
+{
+  "success": false,
+  "error": "Service status retrieval timed out"
 }
 ```
 
