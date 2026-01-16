@@ -31,7 +31,8 @@ export async function generateMetadata({ searchParams }: BlogDetailsPageProps) {
       desc: "Artikel yang Anda cari tidak tersedia.",
       date: new Date().toISOString().split("T")[0],
       user: "Maskom",
-      tagId: 0
+      tagId: 0,
+      categoryId: 0
     }, SITE_URL)
   }
 

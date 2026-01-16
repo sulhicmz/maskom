@@ -265,8 +265,9 @@ describe('createRateLimitErrorResult', () => {
         });
 
         it('handles msToSeconds of 1', () => {
-            const now = Date.now();
-            const resetTime = now + 60000;
+            const mockNow = 1700000000000;
+            jest.spyOn(Date, 'now').mockReturnValue(mockNow);
+            const resetTime = mockNow + 60000;
 
             const rateLimitError = new RateLimitExceededError('Too many attempts');
             rateLimitError.limitCheck = {
@@ -280,6 +281,7 @@ describe('createRateLimitErrorResult', () => {
             expect(result.success).toBe(false);
             expect(result.error).toContain('60000 detik');
             expect(result.errorCode).toBe(ServiceErrorCode.RATE_LIMIT);
+            jest.restoreAllMocks();
         });
     });
 

@@ -45,76 +45,76 @@ describe("BlogCategoryFilter", () => {
 
     it("shows selected category", () => {
        render(
-          <BlogCategoryFilter selectedCategory={1} onCategoryChange={jest.fn()} />
+          <BlogCategoryFilter selectedCategory="Konektivitas Terkelola" onCategoryChange={jest.fn()} />
        )
 
        const select = screen.getByLabelText("Filter kategori artikel") as HTMLSelectElement
-       expect(select.value).toBe("1")
-    })
+        expect(select.value).toBe("Konektivitas Terkelola")
+     })
 
-    it("calls onCategoryChange when category is selected", () => {
-       const handleChange = jest.fn()
-       render(<BlogCategoryFilter selectedCategory={null} onCategoryChange={handleChange} />)
+     it("calls onCategoryChange when category is selected", () => {
+        const handleChange = jest.fn()
+        render(<BlogCategoryFilter selectedCategory={null} onCategoryChange={handleChange} />)
 
-       const select = screen.getByLabelText("Filter kategori artikel")
-       fireEvent.change(select, { target: { value: "1" } })
+        const select = screen.getByLabelText("Filter kategori artikel")
+        fireEvent.change(select, { target: { value: "Konektivitas Terkelola" } })
 
-       expect(handleChange).toHaveBeenCalledWith(1)
-    })
+        expect(handleChange).toHaveBeenCalledWith("Konektivitas Terkelola")
+     })
 
-    it("calls onCategoryChange with null when all categories selected", () => {
-       const handleChange = jest.fn()
-       render(
-          <BlogCategoryFilter selectedCategory={1} onCategoryChange={handleChange} />
-       )
+     it("calls onCategoryChange with null when all categories selected", () => {
+        const handleChange = jest.fn()
+        render(
+           <BlogCategoryFilter selectedCategory="Konektivitas Terkelola" onCategoryChange={handleChange} />
+        )
 
-       const select = screen.getByLabelText("Filter kategori artikel")
-       fireEvent.change(select, { target: { value: "" } })
+        const select = screen.getByLabelText("Filter kategori artikel")
+        fireEvent.change(select, { target: { value: "" } })
 
-       expect(handleChange).toHaveBeenCalledWith(null)
-    })
+        expect(handleChange).toHaveBeenCalledWith(null)
+     })
 
-    it("shows clear filter button when category is selected", () => {
-       render(
-          <BlogCategoryFilter selectedCategory={1} onCategoryChange={jest.fn()} />
-       )
+     it("shows clear filter button when category is selected", () => {
+        render(
+           <BlogCategoryFilter selectedCategory="Konektivitas Terkelola" onCategoryChange={jest.fn()} />
+        )
 
-       const clearButton = screen.getByText("Hapus Filter")
-       expect(clearButton).toBeInTheDocument()
-    })
+        const clearButton = screen.getByText("Hapus Filter")
+        expect(clearButton).toBeInTheDocument()
+     })
 
-    it("hides clear filter button when no category is selected", () => {
-       render(<BlogCategoryFilter selectedCategory={null} onCategoryChange={jest.fn()} />)
+     it("hides clear filter button when no category is selected", () => {
+        render(<BlogCategoryFilter selectedCategory={null} onCategoryChange={jest.fn()} />)
 
-       const clearButton = screen.queryByText("Hapus Filter")
-       expect(clearButton).not.toBeInTheDocument()
-    })
+        const clearButton = screen.queryByText("Hapus Filter")
+        expect(clearButton).not.toBeInTheDocument()
+     })
 
-    it("clears filter when clear button is clicked", () => {
-       const handleChange = jest.fn()
-       render(
-          <BlogCategoryFilter selectedCategory={1} onCategoryChange={handleChange} />
-       )
+     it("clears filter when clear button is clicked", () => {
+        const handleChange = jest.fn()
+        render(
+           <BlogCategoryFilter selectedCategory="Konektivitas Terkelola" onCategoryChange={handleChange} />
+        )
 
-       const clearButton = screen.getByText("Hapus Filter")
-       fireEvent.click(clearButton)
+        const clearButton = screen.getByText("Hapus Filter")
+        fireEvent.click(clearButton)
 
-       expect(handleChange).toHaveBeenCalledWith(null)
-    })
+        expect(handleChange).toHaveBeenCalledWith(null)
+     })
 
-    it("updates URL when category changes", () => {
-       render(<BlogCategoryFilter selectedCategory={null} onCategoryChange={jest.fn()} />)
+     it("updates URL when category changes", () => {
+        render(<BlogCategoryFilter selectedCategory={null} onCategoryChange={jest.fn()} />)
 
-       const select = screen.getByLabelText("Filter kategori artikel")
-       fireEvent.change(select, { target: { value: "1" } })
+        const select = screen.getByLabelText("Filter kategori artikel")
+        fireEvent.change(select, { target: { value: "Konektivitas Terkelola" } })
 
-       expect(mockRouter.push).toHaveBeenCalledWith("/blog?category=1")
-    })
+        expect(mockRouter.push).toHaveBeenCalledWith("/blog?category=Konektivitas+Terkelola")
+     })
 
-    it("removes category from URL when category is cleared", () => {
-       render(
-          <BlogCategoryFilter selectedCategory={1} onCategoryChange={jest.fn()} />
-       )
+     it("removes category from URL when category is cleared", () => {
+        render(
+           <BlogCategoryFilter selectedCategory="Konektivitas Terkelola" onCategoryChange={jest.fn()} />
+        )
 
        const clearButton = screen.getByText("Hapus Filter")
        fireEvent.click(clearButton)
