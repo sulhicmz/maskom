@@ -6,6 +6,7 @@ import { UserRole } from '@/types/role'
 import { Permission } from '@/types/permission'
 import authService from '@/services/auth/AuthService'
 import { canAccessRoute, getUnauthorizedRedirectPath } from '@/utils/rbac'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -88,13 +89,7 @@ export default function ProtectedRoute({
   }, [router, pathname, requiredRole, requiredPermission, requiredPermissions])
 
   if (isLoading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner minHeight={200} />
   }
 
   if (!isAuthenticated) {
