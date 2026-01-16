@@ -5,7 +5,7 @@ import {
   validatePageViewMetrics,
   validateUserEngagementMetrics,
   validateAnalyticsData
-} from '../dataValidation/analyticsValidation'
+} from '../analyticsValidation'
 
 describe('Analytics Data Validation', () => {
   describe('validateDateSubmission', () => {
