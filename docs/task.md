@@ -1,5 +1,115 @@
 # Architecture Task Tracking
 
+## Task 241: Blog Category Type Migration Fix (Jan 16, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Build Fix (Type Safety)
+
+### Purpose
+
+Fix type errors and build failures caused by Task 240 (Blog Category Data Standardization) which changed category filtering from string-based to ID-based.
+
+### Problem Identified
+
+**Build Errors After Task 240**:
+- `blog-details/page.tsx`: Missing `categoryId` field in fallback post object
+- `BlogSidebar.tsx`: Interface still uses `string | null` for `selectedCategory`
+- `BlogArea.tsx`: State and filtering still using `string` for category
+- `blogFilters.ts`: Filter interface still uses `category: string` instead of `categoryId: number`
+- `exportUtils.ts`: Export metadata generation still using `category` field
+- Test files: Mock posts and filter criteria still using string-based categories
+
+### Root Cause
+
+Task 240 introduced `categoryId: number` field to `InnerBlogPost` interface but not all code paths were updated:
+- Component interfaces still used string-based category props
+- Filter utilities still used `category` field
+- Test mocks still used string category names
+- Export utilities still referenced `category` instead of `categoryId`
+
+### Solution
+
+**Updated all references from string-based categories to ID-based**:
+
+1. **blog-details/page.tsx**: Added `categoryId: 0` to fallback post object
+2. **BlogSidebar.tsx**: Changed `selectedCategory` from `string | null` to `number | null`
+3. **BlogArea.tsx**: 
+   - Updated state: `useState<number | null>(null)`
+   - Updated filter criteria: `categoryId: selectedCategory`
+   - Imported `blogCategoryById` for display
+   - Display category name: `{blogCategoryById.get(selectedCategory)?.name}`
+4. **blogFilters.ts**:
+   - Updated interface: `category?: string | null` → `categoryId?: number | null`
+   - Updated filtering logic: `post.category === category` → `post.categoryId === categoryId`
+5. **exportUtils.ts**:
+   - Imported `blogCategoryById` from BlogCategoryData
+   - Updated filter count: `Number(!!filterCriteria.category) → Number(!!filterCriteria.categoryId)`
+   - Updated metadata display: Used `blogCategoryById.get()` to resolve category names
+6. **blogFilters.test.ts**: Updated all mock posts to use `categoryId` instead of `category`
+7. **blogFilters.status.test.ts**: Updated all test cases to use `categoryId` in criteria
+8. **exportUtils.test.ts**: Updated test mocks and criteria to use `categoryId`
+
+### Code Changes
+
+- Modified: `src/app/blog-details/page.tsx` - Added categoryId to fallback post (+1 line)
+- Modified: `src/components/blogs/blog-sidebar/BlogSidebar.tsx` - Changed type to number | null (+2 lines)
+- Modified: `src/components/blogs/blog/BlogArea.tsx` - Updated to use categoryId (+7 lines)
+- Modified: `src/utils/blogFilters.ts` - Changed category to categoryId (+2 lines)
+- Modified: `src/utils/exportUtils.ts` - Import and use categoryId (+11 lines)
+- Modified: `src/utils/__tests__/blogFilters.test.ts` - Updated mock posts and tests (+9 lines)
+- Modified: `src/utils/__tests__/blogFilters.status.test.ts` - Updated test criteria (+9 lines)
+- Modified: `src/utils/__tests__/exportUtils.test.ts` - Updated test mocks (+6 lines)
+- Total: 9 files modified, ~47 lines added/modified
+
+### Success Criteria
+
+- [x] Build passes without type errors
+- [x] All 3426 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] blog-details fallback post includes categoryId
+- [x] BlogSidebar uses number | null for selectedCategory
+- [x] BlogArea uses categoryId for filtering and display
+- [x] blogFilters uses categoryId in interface and filtering
+- [x] exportUtils imports and uses blogCategoryById
+- [x] All test files updated to use categoryId
+
+### Related Files
+
+- ✅ Modified: `src/app/blog-details/page.tsx` - Added categoryId to fallback post
+- ✅ Modified: `src/components/blogs/blog-sidebar/BlogSidebar.tsx` - Type updated to number | null
+- ✅ Modified: `src/components/blogs/blog/BlogArea.tsx` - Updated for categoryId
+- ✅ Modified: `src/utils/blogFilters.ts` - Changed to categoryId
+- ✅ Modified: `src/utils/exportUtils.ts` - Import and use blogCategoryById
+- ✅ Modified: Test files - Updated all mocks and criteria
+
+### Notes
+
+- Follows Task 240 architecture: category IDs are numbers, not strings
+- Category names resolved using blogCategoryById.get(id)?.name
+- Filter logic now compares categoryId fields, not category strings
+- All test mocks updated to use categoryId for consistency
+- Zero breaking changes: Category filtering still works, just uses IDs now
+- Type safety improved: Numbers are safer for category references than strings
+
+### Impact
+
+- Build: Production build now passes without type errors
+- Type Safety: All category filtering uses type-safe number IDs
+- Test Coverage: All 3426 tests passing (100% pass rate)
+- Zero Regressions: No functionality changes, only type migrations
+- Consistency: All code now uses same category ID pattern
+
+### Verification Date
+
+2026-01-16
+
+### Related Tasks
+
+- Task 240 (Blog Category Data Standardization) - Introduced categoryId field that required this fix
+
+---
+
 ## Task 240: Blog Category Data Standardization (Jan 16, 2026)
 
 **Status**: ✅ Completed

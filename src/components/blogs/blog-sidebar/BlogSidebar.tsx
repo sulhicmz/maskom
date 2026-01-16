@@ -8,8 +8,8 @@ import BlogSearch from "../blog/BlogSearch"
 import BlogCategoryFilter from "../blog/BlogCategoryFilter"
 
 interface BlogSidebarProps {
-   selectedCategory?: string | null
-   onCategoryChange?: (category: string | null) => void
+   selectedCategory?: number | null
+   onCategoryChange?: (category: number | null) => void
    selectedTagId?: number | null
    onTagClick?: (tagId: number | null) => void
    searchValue?: string

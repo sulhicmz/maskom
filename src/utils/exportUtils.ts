@@ -1,6 +1,7 @@
 import type { InnerBlogPost } from '@/types/data'
 import type { BlogFilterCriteria } from './blogFilters'
 import { tagsById } from '@/data/BlogTagData'
+import { blogCategoryById } from '@/data/BlogCategoryData'
 
 declare const jsPDF: new (...args: unknown[]) => {
   setFontSize: (...args: unknown[]) => void
@@ -42,7 +43,7 @@ export function generateExportMetadata(
   return {
     exportDate: formatExportDate(new Date()),
     filterCount: Number(!!filterCriteria.searchQuery) + 
-                  Number(!!filterCriteria.category) + 
+                  Number(!!filterCriteria.categoryId) + 
                   Number(!!filterCriteria.tagId) +
                   Number(!!filterCriteria.status),
     filters: filterCriteria,
@@ -82,9 +83,12 @@ export function exportToPDF(
       doc.text(`  - Search: "${metadata.filters.searchQuery}"`, margin, yPosition)
       yPosition += 5
     }
-    if (metadata.filters.category) {
-      doc.text(`  - Category: ${metadata.filters.category}`, margin, yPosition)
-      yPosition += 5
+    if (metadata.filters.categoryId) {
+      const categoryName = blogCategoryById.get(metadata.filters.categoryId)?.name
+      if (categoryName) {
+        doc.text(`  - Category: ${categoryName}`, margin, yPosition)
+        yPosition += 5
+      }
     }
     if (metadata.filters.tagId) {
       const tagName = tagsById.get(metadata.filters.tagId)?.name
@@ -178,8 +182,11 @@ export function exportToCSV(
     if (metadata.filters.searchQuery) {
       metadataLines.push(`#   - Search: "${metadata.filters.searchQuery}"`)
     }
-    if (metadata.filters.category) {
-      metadataLines.push(`#   - Category: ${metadata.filters.category}`)
+    if (metadata.filters.categoryId) {
+      const categoryName = blogCategoryById.get(metadata.filters.categoryId)?.name
+      if (categoryName) {
+        metadataLines.push(`#   - Category: ${categoryName}`)
+      }
     }
     if (metadata.filters.tagId) {
       const tagName = tagsById.get(metadata.filters.tagId)?.name

@@ -17,7 +17,7 @@ describe('exportUtils', () => {
       user: 'John Doe',
       date: '2026-01-16',
       tagId: 1,
-      category: 'Technology',
+      categoryId: 1,
       thumb: { src: '/test1.jpg', height: 200, width: 300 },
       link: '/post1'
     },
@@ -28,7 +28,7 @@ describe('exportUtils', () => {
       user: 'Jane Smith',
       date: '2026-01-17',
       tagId: 2,
-      category: 'Business',
+      categoryId: 2,
       thumb: { src: '/test2.jpg', height: 200, width: 300 },
       link: '/post2'
     }
@@ -36,7 +36,7 @@ describe('exportUtils', () => {
 
   const mockFilterCriteria: BlogFilterCriteria = {
     searchQuery: 'test',
-    category: 'Technology',
+    categoryId: 1,
     tagId: 1,
     status: 'published'
   }
@@ -105,7 +105,7 @@ describe('exportUtils', () => {
     it('should calculate filter count correctly', () => {
       const partialFilters: BlogFilterCriteria = {
         searchQuery: 'test',
-        category: null
+        categoryId: null
       }
       const result = generateExportMetadata(mockPosts, partialFilters)
       expect(result.filterCount).toBe(1)

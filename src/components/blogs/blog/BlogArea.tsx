@@ -10,6 +10,7 @@ import AnimationWrapper from "@/components/common/AnimationWrapper"
 import PaginationWrapper from "@/components/common/PaginationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
+import { blogCategoryById } from "@/data/BlogCategoryData"
 import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
 import BookmarkButton from "@/components/common/BookmarkButton"
@@ -27,18 +28,18 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   )
 })
 
-const BlogArea = React.memo(() => {
+ const BlogArea = React.memo(() => {
    const router = useRouter()
-
+ 
    const [searchQuery, setSearchQuery] = useState("")
-   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
    const [selectedTagId, setSelectedTagId] = useState<number | null>(null)
-
+   
    const itemsPerPage = 3;
-
+ 
      const filterCriteria: BlogFilterCriteria = useMemo(() => ({
        searchQuery,
-       category: selectedCategory,
+       categoryId: selectedCategory,
        tagId: selectedTagId,
        status: 'published',
      }), [searchQuery, selectedCategory, selectedTagId])
@@ -59,9 +60,9 @@ const BlogArea = React.memo(() => {
         router.push("/blog")
      }, [router])
 
-    const handleCategoryChange = useCallback((category: string | null) => {
-       setSelectedCategory(category)
-    }, [])
+     const handleCategoryChange = useCallback((categoryId: number | null) => {
+       setSelectedCategory(categoryId)
+     }, [])
 
    const handleTagClick = useCallback((tagId: number | null) => {
       setSelectedTagId(tagId)
@@ -84,11 +85,11 @@ const BlogArea = React.memo(() => {
                                    </span>
                                 )}
                                {selectedCategory && (
-                                  <span className="filter-tag">
-                                     Kategori: {selectedCategory}
-                                     <button onClick={() => setSelectedCategory(null)} aria-label="Hapus filter kategori">×</button>
-                                  </span>
-                               )}
+                                   <span className="filter-tag">
+                                      Kategori: {blogCategoryById.get(selectedCategory)?.name}
+                                      <button onClick={() => setSelectedCategory(null)} aria-label="Hapus filter kategori">×</button>
+                                   </span>
+                                )}
                                {selectedTagId && (
                                   <span className="filter-tag">
                                      Tag: {tagsById.get(selectedTagId)?.name}
