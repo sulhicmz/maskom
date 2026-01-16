@@ -475,8 +475,9 @@ Services (AuthService)
 - ✅ TypeScript interfaces for data structures
 - ✅ Environment variables for sensitive data
 - ✅ Clean file organization by category
-- ✅ Centralized filter utilities for type-safe data operations
-- ✅ Pre-filtered data exports at build time
+ - ✅ Centralized filter utilities for type-safe data operations
+ - ✅ Device filtering utilities for dashboard components (deviceFilters.ts) - Extracted filtering logic from WiFiMonitor component, type-safe status filtering (Online, Offline, Both), comprehensive device statistics (counts, percentages), 27 comprehensive tests (Task 224)
+ - ✅ Pre-filtered data exports at build time
 - ✅ Centralized type definitions in `src/types/data/`
 - ✅ Runtime data validation with comprehensive test coverage
 - ✅ Validation factory pattern with configuration-based validators (eliminates code duplication)
@@ -543,9 +544,10 @@ Services (AuthService)
     - ✅ **Dependency Cleanup** (Task 168) - Removed duplicate RetryOptions interface definition across services and utils layers - Single source of truth for type definitions, proper dependency direction (services → utils), SOLID compliance (Dependency Inversion, Interface Segregation), eliminates 7 lines of duplicate code
      - ✅ **Validation Pattern Consistency** (Task 186) - Eliminated duplicate email regex pattern across validation layers - Removed local EmailPattern from yupAdapter.ts, now uses EmailRule.pattern from rules.ts as single source of truth, DRY principle compliance, eliminates 2 lines of duplicate code
      - ✅ **Dark Mode Theme System** (Task 203) - ThemeContext with localStorage persistence and system preference detection, ThemeToggle component with sun/moon icons, CSS variables for theming, smooth transitions (0.3s ease), theme toggle integrated into HeaderOne navigation, 80 comprehensive tests (50 for ThemeContext, 30 for ThemeToggle)
-     - ✅ **Blog Filtering Utility** (Task 214) - Extracted filtering logic from BlogArea component into reusable filterBlogPosts utility with BlogFilterCriteria interface, eliminates duplicate filtering code, enables type-safe filtering across search, category, tag, and status fields, supports future blog scheduling features, 17 comprehensive tests, BlogArea component simplified by replacing inline filtering with utility module
-
-    ### Interface Definition Pattern (✅ COMPLETED - Task 122)
+      - ✅ **Blog Filtering Utility** (Task 214) - Extracted filtering logic from BlogArea component into reusable filterBlogPosts utility with BlogFilterCriteria interface, eliminates duplicate filtering code, enables type-safe filtering across search, category, tag, and status fields, supports future blog scheduling features, 17 comprehensive tests, BlogArea component simplified by replacing inline filtering with utility module
+      - ✅ **Device Filtering Utility** (Task 224) - Extracted WiFi device filtering logic from WiFiMonitor component into reusable deviceFilters.ts utility, eliminates inline filtering in presentation layer, enables type-safe device status filtering (Online, Offline, Both), provides comprehensive device statistics (counts, percentages), 27 comprehensive tests, WiFiMonitor component simplified by replacing inline filter calls with utility functions
+ 
+     ### Interface Definition Pattern (✅ COMPLETED - Task 122)
 
    ### SEO Enhancement System (✅ COMPLETED - Task 220)
 
@@ -694,18 +696,166 @@ Services (AuthService)
    - [x] Lint passes (0 errors, 0 warnings)
    - [x] Build successful (23 pages generated)
 
-   ### Module Extraction Pattern (✅ COMPLETED - Task 127, Task 153, Task 214)
- 
- ### Purpose
- 
- Extract duplicate component patterns into reusable abstractions to:
- - Eliminate code duplication across multiple component variants
- - Create single source of truth for common UI patterns
- - Simplify maintenance by centralizing changes
- - Apply DRY principle and SOLID (Single Responsibility)
- - Enable easy creation of new component variants
- 
- ### Component Abstraction
+   ### Module Extraction Pattern (✅ COMPLETED - Task 127, Task 153, Task 214, Task 224)
+
+  ### Purpose
+
+  Extract duplicate component patterns into reusable abstractions to:
+  - Eliminate code duplication across multiple component variants
+  - Create single source of truth for common UI patterns
+  - Simplify maintenance by centralizing changes
+  - Apply DRY principle and SOLID (Single Responsibility)
+  - Enable easy creation of new component variants
+
+  ### Component Abstraction
+
+  **Device Filters** (src/utils/deviceFilters.ts):
+
+  ```typescript
+  export interface DeviceFilterOptions {
+    status?: 'Online' | 'Offline' | 'Both';
+  }
+
+  export interface DeviceFilterResult {
+    devices: WiFiDevice[];
+    onlineCount: number;
+    offlineCount: number;
+    totalCount: number;
+  }
+
+  export function filterDevicesByStatus(
+    devices: WiFiDevice[],
+    options: DeviceFilterOptions = {}
+  ): DeviceFilterResult
+
+  export function getOnlineDevices(devices: WiFiDevice[]): WiFiDevice[]
+  export function getOfflineDevices(devices: WiFiDevice[]): WiFiDevice[]
+  export function getDeviceStats(devices: WiFiDevice[]): {
+    onlineCount: number;
+    offlineCount: number;
+    totalCount: number;
+    onlinePercentage: number;
+    offlinePercentage: number;
+  }
+  ```
+
+  ### Implementation
+
+  All device filtering operations now use extracted utility functions:
+  - **WiFiMonitor**: Uses getOfflineDevices() and getDeviceStats()
+  - Previously had inline filtering: `devices.filter(d => d.status === "Offline")`
+  - Previously had inline counting: `devices.filter(d => d.status === "Online").length`
+  - Now uses reusable utility functions with type-safe interfaces
+
+  ### Architecture Benefits
+
+  1. **Layer Separation**:
+     - Business logic moved from presentation layer (WiFiMonitor) to utils layer
+     - Clear separation of concerns: components focus on rendering, utils handle filtering
+     - Filtering logic can be tested independently from React components
+
+  2. **DRY Principle**:
+     - Single implementation of device filtering logic
+     - Reusable across any component that needs device filtering
+     - No duplicate filter patterns across multiple components
+
+  3. **Code Reduction**:
+     - WiFiMonitor: 58 lines → 59 lines (+1 line for imports)
+     - Filtering logic: 2 inline lines → 1 function call
+     - Test coverage: 0 → 27 new tests (comprehensive filter coverage)
+
+  4. **Testability**:
+     - Filtering logic tested independently from React components
+     - Pure functions with predictable behavior (easy to test)
+     - 27 tests covering all filtering scenarios (happy path, edge cases, empty arrays)
+
+  5. **Type Safety**:
+     - TypeScript interfaces ensure correct filter options (DeviceFilterOptions)
+     - Type-safe return values (DeviceFilterResult)
+     - Compile-time checking of device status values
+
+  6. **Maintainability**:
+     - Changes to filtering logic only need to update deviceFilters.ts
+     - Clear contract definition through interfaces
+     - Single source of truth for device filtering
+
+  7. **Extensibility**:
+     - Easy to add new filter types (status-based, IP range-based)
+     - Device stats function provides comprehensive metrics
+     - Utility functions can be used by any dashboard component
+
+  8. **Reusability**:
+     - getOnlineDevices() can be used by any component needing online devices
+     - getOfflineDevices() can be used by any component needing offline devices
+     - getDeviceStats() provides comprehensive metrics for dashboards
+     - filterDevicesByStatus() offers flexible filtering with options
+
+  ### Usage Example
+
+  ```typescript
+  import { getOfflineDevices, getDeviceStats } from '@/utils/deviceFilters';
+
+  // Get offline devices for alerts
+  const offlineDevices = getOfflineDevices(devices);
+
+  // Get device statistics
+  const { onlineCount, offlineCount, onlinePercentage } = getDeviceStats(devices);
+
+  // Flexible filtering with options
+  const { devices: onlineOnly } = filterDevicesByStatus(devices, { status: 'Online' });
+  const { devices: allDevices, onlineCount, offlineCount } = filterDevicesByStatus(devices);
+  ```
+
+  ### Testing
+
+  - **27 comprehensive tests** for device filtering utilities:
+    - filterDevicesByStatus (8 tests): status filtering, empty arrays, edge cases
+    - getOnlineDevices (4 tests): online filtering, empty arrays, immutability
+    - getOfflineDevices (4 tests): offline filtering, empty arrays, immutability
+    - getDeviceStats (11 tests): counts, percentages, partial percentages, edge cases
+
+  - Test coverage:
+    - Happy Path: Normal filtering operations with mixed device states
+    - Edge Cases: Empty arrays, all online, all offline, partial percentages
+    - Type Safety: TypeScript interfaces tested for correct typing
+    - Integration Behavior: Device stats calculations verified
+    - Immutability: Original arrays not modified by filter operations
+
+  ### Component Abstraction
+
+  **CtaWrapper** (src/components/common/CtaWrapper.tsx):
+
+  ```typescript
+  interface CtaImage {
+      src: string | StaticImageData;
+      alt: string;
+      className?: string;
+  }
+  
+  interface CtaProps {
+      heading: string;
+      description: string;
+      buttonText: string;
+      buttonLink: string;
+      images: CtaImage[];
+      sectionClassName?: string;
+      contentClassName?: string;
+      imageBoxClassName?: string;
+      backgroundImage?: string;
+      animation?: string;
+      animationType?: 'wow' | 'animation-wrapper';
+      shapes?: boolean;
+      paddingBottom?: string;
+      extraElements?: React.ReactNode;
+  }
+  ```
+
+  ### Implementation
+
+  All CTA variants now use `CtaWrapper` with variant-specific props:
+  - **common/Cta.tsx**: Uses AnimationWrapper, two images, no background
+  - **home-one/Cta.tsx**: Uses AnimationWrapper, two images, with id="hubungi"
+  - **faq/Cta.tsx**: Uses wow.js, single image, with background and shapes
  
  **CtaWrapper** (src/components/common/CtaWrapper.tsx):
  
