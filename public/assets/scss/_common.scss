@@ -151,7 +151,9 @@ body {
 
     &:focus {
         top: 0;
-        outline: none;
+    }
+    &:focus-visible {
+        box-shadow: 0 0 0 4px var(--white-color), 0 0 0 8px var(--blue-color);
     }
 }
 
@@ -161,7 +163,11 @@ body {
     background-repeat: no-repeat;
  }
 .slick-slide {
-    outline: 0;
+    outline: none;
+}
+.slick-slide:focus-visible {
+    outline: 2px solid var(--blue-color);
+    outline-offset: 2px;
 }
 .form_group{
     position: relative;

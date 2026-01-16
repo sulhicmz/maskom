@@ -16,22 +16,18 @@ const ScrollToTop = () => {
    };
 
    return (
-      <>
-         <div 
-            onClick={scrollTop}
-            onKeyDown={handleKeyDown}
-            className={`xc-back-to-top-wrapper ${sticky ? "xc-back-to-top-btn-show" : ""}`}
-            role="button"
-            tabIndex={sticky ? 0 : -1}
-            aria-label="Kembali ke atas halaman"
-            aria-hidden={!sticky}
-         >
-            <button id="xc_back-to-top" type="button" className="xc-back-to-top-btn" aria-label="Kembali ke atas halaman">
-               <i className="far fa-angle-down" aria-hidden="true"></i>
-               <span className="xc-back-to-top-progress" aria-hidden="true"></span>
-            </button>
-         </div>
-      </>
+      <button
+         id="xc_back-to-top"
+         onClick={scrollTop}
+         onKeyDown={handleKeyDown}
+         className={`xc-back-to-top-btn ${sticky ? "xc-back-to-top-btn-show" : ""}`}
+         aria-label="Kembali ke atas halaman"
+         aria-hidden={!sticky}
+         type="button"
+      >
+         <i className="far fa-angle-down" aria-hidden="true"></i>
+         <span className="xc-back-to-top-progress" aria-hidden="true"></span>
+      </button>
    )
 }
 
