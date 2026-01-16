@@ -312,4 +312,91 @@ As a User, I want to bookmark blog posts for later reading, so that I can track 
 
 ---
 
-**Last Updated**: 2026-01-15
+## [FEATURE-015] Error Boundary Implementation
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Architecture/Error Handling
+
+### User Story
+
+As a User, I want to see graceful error messages when components fail, so that I can continue using the application without confusion.
+
+### Acceptance Criteria
+
+- [ ] Create ErrorBoundary component with fallback UI
+- [ ] Add error boundaries to all route pages
+- [ ] Display user-friendly error messages with recovery options
+- [ ] Log errors to console (no sensitive data)
+- [ ] Maintain navigation functionality on errors
+- [ ] Add tests for error boundary behavior
+- [ ] Update docs/blueprint.md with error handling architecture
+
+**Implementation Details**:
+- ErrorBoundary wraps page-level components
+- Fallback UI with "Go Home" and "Try Again" buttons
+- Error logging without stack traces or secrets
+- Maintains header/footer for navigation
+
+---
+
+## [FEATURE-016] Real-Time Form Validation Feedback
+
+**Status**: Pending
+**Priority**: P1
+**Type**: UX/UI
+
+### User Story
+
+As a User filling out forms, I want to see validation errors immediately as I type, so that I don't submit invalid forms and waste time.
+
+### Acceptance Criteria
+
+- [ ] Update FormField component to show real-time validation
+- [ ] Debounce validation (300ms) to avoid excessive error messages
+- [ ] Maintain accessibility (ARIA live regions for errors)
+- [ ] Update ContactForm, LoginForm, SignUpForm, BlogForm
+- [ ] Add tests for real-time validation behavior
+- [ ] Keep existing onSubmit validation as fallback
+- [ ] Update docs/blueprint.md with real-time validation architecture
+
+**Implementation Details**:
+- Extends existing validation layer (rules.ts, yupAdapter.ts)
+- Reuses FormField component abstraction (Task 64)
+- Builds on debouncing pattern from BlogSearch (Task 202)
+- Real-time feedback with 300ms debounce
+- ARIA live regions for screen reader support
+
+---
+
+## [FEATURE-017] SEO Enhancements with Structured Data
+
+**Status**: Pending
+**Priority**: P2
+**Type**: SEO/Optimization
+
+### User Story
+
+As a Search Engine Bot, I want structured data in JSON-LD format, so that I can better understand and display the content in search results.
+
+### Acceptance Criteria
+
+- [ ] Create SeoHead component for dynamic meta tags
+- [ ] Implement JSON-LD structured data for blog posts (Article schema)
+- [ ] Add Open Graph and Twitter Card meta tags
+- [ ] Generate canonical URLs dynamically
+- [ ] Add sitemap.xml generation
+- [ ] Add tests for SEO component output
+- [ ] Update docs/blueprint.md with SEO architecture
+
+**Implementation Details**:
+- SeoHead component follows data-driven patterns
+- Uses Next.js metadata API (app directory compatible)
+- Leverages existing BlogPost data for structured data
+- Article schema: headline, author, datePublished, image
+- Open Graph: title, description, image, url
+- Twitter Card: summary_large_image
+
+---
+
+**Last Updated**: 2026-01-16
