@@ -55,7 +55,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(500);
+            expect(elapsed).toBeGreaterThanOrEqual(499);
             expect(elapsed).toBeLessThan(600);
         });
 

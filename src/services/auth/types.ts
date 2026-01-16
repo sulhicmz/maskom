@@ -1,14 +1,15 @@
 import type { ServiceErrorCodeType } from '@/services/common';
 import type { CircuitBreakerState } from '@/utils/resilience';
 import type { UserRole } from '@/types/role';
+import type { Permission } from '@/types/permission';
 
 export interface IAuthService {
     login(credentials: LoginCredentials): Promise<AuthResult>;
     register(userData: RegisterData): Promise<AuthResult>;
     logout(): Promise<AuthResult>;
     getCurrentUser(): Promise<User | null>;
-    getCurrentUserRole(): UserRole | null;
-    hasPermission(permission: string): Promise<boolean>;
+    getCurrentUserRole(): Promise<UserRole | null>;
+    hasPermission(permission: Permission): Promise<boolean>;
     hasRole(role: UserRole): Promise<boolean>;
     getCircuitBreakerState(): CircuitBreakerState;
     resetCircuitBreaker(): void;

@@ -128,6 +128,7 @@ describe('Analytics Data Validation', () => {
         submissionsByDate: []
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = validateFormSubmissionMetrics(metrics as any)
       expect(result.isValid).toBe(false)
       expect(result.errors.some(e => e.includes('Form type must be one of'))).toBe(true)
@@ -340,7 +341,7 @@ describe('Analytics Data Validation', () => {
             avgCompletionTime: 180,
             submissionsByDate: []
           }
-        ] as any,
+        ] as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         pageViews: [],
         userEngagement: {
           totalSessions: 100,
@@ -368,7 +369,7 @@ describe('Analytics Data Validation', () => {
           returnVisitorRate: 0.42,
           engagedSessions: 50
         },
-        lastUpdated: '' as any
+        lastUpdated: '' as any // eslint-disable-line @typescript-eslint/no-explicit-any
       }
 
       const result = validateAnalyticsData(data)

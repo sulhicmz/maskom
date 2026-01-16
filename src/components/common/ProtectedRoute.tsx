@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { UserRole, Permission } from '@/types/role'
+import { UserRole } from '@/types/role'
+import { Permission } from '@/types/permission'
 import authService from '@/services/auth/AuthService'
 import { canAccessRoute, getUnauthorizedRedirectPath } from '@/utils/rbac'
 

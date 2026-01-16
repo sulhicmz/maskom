@@ -15,8 +15,8 @@ import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRole, isValidRole } from '@/types/role';
+import { Permission } from '@/types/permission';
 import { hasPermission as checkPermission } from '@/data/rolesData';
-import { isValidPermission } from '@/types/permission';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -198,14 +198,11 @@ class AuthService implements IAuthService {
         return this.currentUser?.role || null;
     }
 
-    async hasPermission(permission: string): Promise<boolean> {
+    async hasPermission(permission: Permission): Promise<boolean> {
         if (!this.currentUser) {
             return false;
         }
-        if (!isValidPermission(permission)) {
-            return false;
-        }
-        return checkPermission(this.currentUser.role, permission as any);
+        return checkPermission(this.currentUser.role, permission);
     }
 
     async hasRole(role: UserRole): Promise<boolean> {

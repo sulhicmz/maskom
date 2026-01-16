@@ -1,4 +1,4 @@
-import { AnalyticsData, FormSubmissionMetrics, PageViewMetrics, AnalyticsSummary } from '@/types/analytics'
+import { AnalyticsData, FormSubmissionMetrics, AnalyticsSummary } from '@/types/analytics'
 
 let pageViews: Record<string, { count: number; unique: Set<string> }> = {}
 let formSubmissions: Record<string, { count: number; successful: number; failed: number }> = {}

@@ -1,5 +1,4 @@
 import { AnalyticsData, FormSubmissionMetrics, PageViewMetrics, UserEngagementMetrics } from '@/types/analytics'
-import { validateFormSubmissionMetrics, validatePageViewMetrics, validateUserEngagementMetrics, validateAnalyticsData } from '@/utils/dataValidation/analyticsValidation'
 
 const formSubmissions: FormSubmissionMetrics[] = [
   {

@@ -9,7 +9,6 @@ import {
   requireAllPermissions,
   getUnauthorizedRedirectPath
 } from '@/utils/rbac'
-import { UserRole } from '@/types/role'
 import { Permission } from '@/types/permission'
 
 describe('RBAC Utilities', () => {
@@ -40,6 +39,7 @@ describe('RBAC Utilities', () => {
     })
 
     it('should return false for null role', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(canAccessRoute(null as any, '/admin/analytics')).toBe(false)
     })
   })
@@ -73,10 +73,12 @@ describe('RBAC Utilities', () => {
     })
 
     it('should return false for null role', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(canPerformAction(null as any, Permission.EDIT_CONTENT)).toBe(false)
     })
 
     it('should return false for null action', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(canPerformAction('admin', null as any)).toBe(false)
     })
   })
@@ -112,11 +114,13 @@ describe('RBAC Utilities', () => {
     })
 
     it('should return false for null role', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = canPerformAnyAction(null as any, [Permission.EDIT_CONTENT])
       expect(result).toBe(false)
     })
 
     it('should return false for null actions', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = canPerformAnyAction('admin', null as any)
       expect(result).toBe(false)
     })
@@ -154,6 +158,7 @@ describe('RBAC Utilities', () => {
     })
 
     it('should return false for null role', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = canPerformAllActions(null as any, [Permission.EDIT_CONTENT])
       expect(result).toBe(false)
     })
@@ -183,6 +188,7 @@ describe('RBAC Utilities', () => {
 
     it('should return false for null role', () => {
       const checkAdmin = requireRole('admin')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(checkAdmin(null as any)).toBe(false)
     })
   })
@@ -204,6 +210,7 @@ describe('RBAC Utilities', () => {
 
     it('should return false for null role', () => {
       const checkPermission = requirePermission(Permission.EDIT_CONTENT)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(checkPermission(null as any)).toBe(false)
     })
   })
@@ -229,6 +236,7 @@ describe('RBAC Utilities', () => {
 
     it('should return false for null role', () => {
       const checkAny = requireAnyPermission([Permission.EDIT_CONTENT])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(checkAny(null as any)).toBe(false)
     })
 
@@ -251,6 +259,7 @@ describe('RBAC Utilities', () => {
 
     it('should return false for null role', () => {
       const checkAll = requireAllPermissions([Permission.EDIT_CONTENT])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(checkAll(null as any)).toBe(false)
     })
 

@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { FormSubmissionMetrics, PageViewMetrics } from '@/types/analytics'
+import { FormSubmissionMetrics, PageViewMetrics, DateSubmission, DatePageView } from '@/types/analytics'
 import { formatNumber } from '@/utils/analytics'
 
 interface AnalyticsChartProps {
@@ -16,7 +16,13 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data, type }) =>
     ? (data as FormSubmissionMetrics).submissionsByDate
     : (data as PageViewMetrics).viewsByDate
 
-  const maxValue = Math.max(...chartData.map(d => isForm ? d.count : d.views))
+  const maxValue = Math.max(...chartData.map((d): number => {
+    if (isForm) {
+      return (d as DateSubmission).count
+    } else {
+      return (d as DatePageView).views
+    }
+  }))
 
   const getBarColor = (index: number): string => {
     const colors = [
@@ -37,7 +43,7 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data, type }) =>
       <div className="card-body">
         <div className="d-flex flex-column">
           {chartData.map((item, index) => {
-            const value = isForm ? (item as any).count : (item as any).views
+            const value = isForm ? (item as DateSubmission).count : (item as DatePageView).views
             const percentage = (value / maxValue) * 100
 
             return (

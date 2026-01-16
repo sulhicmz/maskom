@@ -13,7 +13,7 @@ export function useAuthService() {
       try {
         const currentUser = await authService.getCurrentUser()
         setUser(currentUser)
-      } catch (error) {
+      } catch {
         setUser(null)
       } finally {
         setLoading(false)

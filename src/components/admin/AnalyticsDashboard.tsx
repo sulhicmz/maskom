@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { useTheme } from '@/context/ThemeContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import AnalyticsSummaryCards from './AnalyticsSummary'
 import AnalyticsChart from './AnalyticsChart'
