@@ -1,5 +1,267 @@
 # Architecture Task Tracking
 
+## Task 244: APM Integration Setup (Jan 16, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: FEATURE-022 (APM Integration)
+
+### Purpose
+
+Implement Application Performance Monitoring (APM) integration architecture for production observability, error tracking, and performance monitoring with provider abstraction and SOLID principles.
+
+### Problem Identified
+
+**Monitoring Infrastructure Gaps**:
+- No external APM provider integration (only in-memory collection)
+- No user session tracking or user journey analytics
+- No distributed tracing for request flows across services
+- No performance dashboard integration with real metrics
+- Limited to console logging for production debugging
+- No centralized error tracking across the application
+
+**Why This Matters**:
+1. **Production Observability**: Need real-time visibility into application performance in production
+2. **Error Tracking**: Centralized error tracking with stack traces and context
+3. **User Experience**: Track user sessions and journeys for UX optimization
+4. **Performance Monitoring**: Monitor API response times, page loads, component renders
+5. **Proactive Issue Detection**: Detect performance issues before they impact users
+6. **Flexible Provider Support**: Need ability to switch APM providers without code changes
+7. **Cost Efficiency**: Lightweight solution with optional provider upgrades
+
+### Solution
+
+**APM Abstraction Layer Architecture**:
+
+```
+APM Manager (Singleton)
+    ↓
+IAPMProvider Interface
+    ↓
+Provider Implementations:
+    - ConsoleAPMProvider (fallback, no external deps)
+    - SentryAPMProvider (optional, requires @sentry/nextjs)
+    - Future: Datadog, New Relic, Posthog
+```
+
+**Core Components**:
+
+1. **IAPMProvider Interface** (`src/utils/apm/types.ts`):
+   - `initialize(config)` - Initialize provider with configuration
+   - `captureError(error)` - Capture custom error objects
+   - `captureException(error)` - Capture JavaScript exceptions
+   - `startTransaction(name, op)` - Start performance transaction
+   - `finishTransaction(transaction)` - Finish transaction with duration
+   - `setUser(user)` - Set user context for tracking
+   - `setTag(key, value)` - Add tags for filtering
+   - `setContext(key, context)` - Add contextual data
+   - `addBreadcrumb(message, category, level)` - Add breadcrumb events
+   - `trackPerformance(metric)` - Track custom performance metrics
+   - `flush()` - Flush pending events
+   - `isEnabled()` - Check if provider is enabled
+
+2. **ConsoleAPMProvider** (`src/utils/apm/consoleProvider.ts`):
+   - Console-based logging (no external dependencies)
+   - Suitable for development and testing
+   - Full implementation of IAPMProvider interface
+   - Tags, contexts, and user support
+   - Transaction tracking with duration calculation
+   - Performance metrics logging
+   - Error and exception capture
+
+3. **APMManager** (`src/utils/apm/apmManager.ts`):
+   - Singleton instance for global APM access
+   - Provider switching with graceful fallback
+   - Configuration management (provider, enabled, environment, sample rate)
+   - Delegates to active provider
+   - Console provider default (no external dependencies)
+   - Sentry provider support (optional, falls back to console)
+
+4. **Type Definitions** (`src/utils/apm/types.ts`):
+   - APMError - Error with level, tags, extra
+   - APMTransaction - Transaction with name, operation, duration
+   - APMUser - User context (id, email, role)
+   - APMSession - Session tracking
+   - APMEvent - Event tracking
+   - APMPerformanceMetrics - Custom metrics
+   - IAPMProvider - Provider interface
+   - APMConfig - Configuration type
+   - APMProviderType - Provider types
+
+### Architecture Benefits
+
+1. **Interface-Based Design**: IAPMProvider enables provider swapping
+2. **SOLID Principles**: 
+   - Single Responsibility: Each provider handles one APM service
+   - Open/Closed: Open for new providers, closed for modification
+   - Interface Segregation: Small, focused interfaces
+   - Dependency Inversion: Depends on abstractions, not concrete implementations
+3. **No Breaking Changes**: Add new providers without modifying existing code
+4. **Testability**: Console provider enables easy testing
+5. **Production Ready**: Upgrade to Sentry when ready without code changes
+6. **Cost Efficient**: Use console logging in development, upgrade to external APM in production
+7. **Type Safety**: Full TypeScript interfaces for all APM operations
+
+### Usage Examples
+
+**Basic Error Tracking**:
+```typescript
+import apmManager from '@/utils/apm';
+
+apmManager.captureError({
+  message: 'Test error',
+  level: 'error',
+  tags: { component: 'TestComponent' },
+  extra: { userId: '123' }
+});
+```
+
+**Exception Tracking**:
+```typescript
+try {
+  await someAsyncOperation();
+} catch (error) {
+  apmManager.captureException(error as Error);
+}
+```
+
+**Transaction Tracking**:
+```typescript
+const transaction = apmManager.startTransaction('API Call', 'http.request');
+try {
+  const response = await fetch('/api/data');
+  return response.json();
+} finally {
+  apmManager.finishTransaction(transaction!);
+}
+```
+
+**User Tracking**:
+```typescript
+apmManager.setUser({
+  id: 'user-123',
+  email: 'user@example.com',
+  role: 'admin'
+});
+```
+
+**Breadcrumbs**:
+```typescript
+apmManager.addBreadcrumb('User clicked submit button', 'ui', 'info');
+```
+
+**Performance Metrics**:
+```typescript
+apmManager.trackPerformance({
+  name: 'page_load_time',
+  value: 1234,
+  unit: 'ms',
+  tags: { route: '/home' }
+});
+```
+
+### Code Changes
+
+- Added: `src/utils/apm/types.ts` - Type definitions (67 lines)
+- Added: `src/utils/apm/consoleProvider.ts` - Console provider (107 lines)
+- Added: `src/utils/apm/apmManager.ts` - APM manager (119 lines)
+- Added: `src/utils/apm/index.ts` - Central exports (7 lines)
+- Added: `src/utils/apm/__tests__/consoleProvider.test.ts` - 32 tests (303 lines)
+- Added: `src/utils/apm/__tests__/apmManager.test.ts` - 28 tests (235 lines)
+- Modified: `eslint.config.mjs` - Added no-require-imports override for APM (4 lines)
+- Total: 7 files added/modified, ~942 lines added
+
+### Testing
+
+**32 tests for ConsoleAPMProvider**:
+- Initialization (3 tests)
+- Error capture (5 tests)
+- Exception capture (2 tests)
+- Transaction tracking (4 tests)
+- User management (3 tests)
+- Tags and contexts (3 tests)
+- Breadcrumbs (5 tests)
+- Performance tracking (3 tests)
+- Flush (1 test)
+
+**28 tests for APMManager**:
+- Initialization (5 tests)
+- Error capture (3 tests)
+- Transaction tracking (3 tests)
+- User management (2 tests)
+- Tags and contexts (2 tests)
+- Breadcrumbs (2 tests)
+- Performance tracking (2 tests)
+- Flush (1 test)
+- Provider type management (3 tests)
+- Config management (3 tests)
+- Error handling (2 tests)
+
+**Total**: 60 comprehensive tests (100% passing)
+
+### Success Criteria
+
+- [x] IAPMProvider interface defined with all required methods
+- [x] ConsoleAPMProvider implementation (fallback, no external deps)
+- [x] APMManager singleton with provider abstraction
+- [x] Type-safe interfaces for all APM operations
+- [x] Error and exception tracking
+- [x] Transaction tracking with duration
+- [x] User context and session tracking
+- [x] Breadcrumbs for user journey tracking
+- [x] Performance metrics tracking
+- [x] 60 comprehensive tests for APM integration
+- [x] All 3540 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (23 pages generated)
+
+### Related Files
+
+- ✅ Added: `src/utils/apm/types.ts` - Type definitions
+- ✅ Added: `src/utils/apm/consoleProvider.ts` - Console provider
+- ✅ Added: `src/utils/apm/apmManager.ts` - APM manager
+- ✅ Added: `src/utils/apm/index.ts` - Central exports
+- ✅ Added: `src/utils/apm/__tests__/consoleProvider.test.ts` - 32 tests
+- ✅ Added: `src/utils/apm/__tests__/apmManager.test.ts` - 28 tests
+- ✅ Modified: `eslint.config.mjs` - ESLint override for require
+
+### Notes
+
+- Follows SOLID principles:
+  - **Interface-Based Design**: IAPMProvider enables provider swapping
+  - **Single Responsibility**: Each provider handles one APM service
+  - **Open/Closed**: Open for new providers, closed for modification
+  - **Interface Segregation**: Small, focused interfaces
+  - **Dependency Inversion**: Depends on abstractions, not concrete implementations
+- Console provider default (no external dependencies)
+- Sentry provider support (optional, falls back to console)
+- Type-safe interfaces for all APM operations
+- Singleton APMManager for global access
+- Configuration-driven provider selection
+- Graceful fallback for missing providers
+- Full test coverage (60 tests, 100% passing)
+
+### Impact
+
+- Architecture: APM integration architecture with provider abstraction
+- Observability: Error tracking, user sessions, performance monitoring
+- Type Safety: Full TypeScript interfaces for all APM operations
+- Test Coverage: +60 new tests (3480 → 3540, 100% pass rate)
+- Zero Regressions: All 3540 tests passing, lint clean, build successful
+- Future-Proof: Easy to add new APM providers (Datadog, New Relic, Posthog)
+
+### Verification Date
+
+2026-01-16
+
+### Related Tasks
+
+- Task 222 (Analytics Dashboard) - Can be enhanced with real APM metrics
+- Task 115 (Security Assessment) - APM can alert on security events
+- Task 240 (Blog Category Data Standardization) - Track category performance with APM
+
+---
+
 ## Task 242: PWA Manifest Configuration (Jan 16, 2026)
 
 **Status**: Pending
