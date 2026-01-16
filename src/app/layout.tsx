@@ -2,6 +2,7 @@ import "../styles/index.scss";
 import { Spline_Sans } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import SkipToMainContent from "@/components/common/SkipToMainContent";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 
 export const runtime = 'edge';
 
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body className={splineSans.className} suppressHydrationWarning>
         <SkipToMainContent />
         <ThemeProvider>
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
