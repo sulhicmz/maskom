@@ -80,10 +80,17 @@ This document outlines the strategic direction and upcoming initiatives for the 
 
 #### High Priority
 - **Analytics Dashboard** (P2)
-  - Admin dashboard route
-  - Form submission tracking
-  - Page view analytics
-  - Visual data representation (charts/graphs)
+   - Admin dashboard route
+   - Form submission tracking
+   - Page view analytics
+   - Visual data representation (charts/graphs)
+   - Business intelligence for form conversion rates
+
+- **User Roles & Permissions** (P2)
+   - Role-based access control (RBAC)
+   - User role types: admin, editor, user
+   - Secure admin routes by role
+   - Role assignment interface
 
 - **E2E Testing Framework**
 
