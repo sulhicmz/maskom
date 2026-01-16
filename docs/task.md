@@ -1,5 +1,136 @@
 # Architecture Task Tracking
 
+## Task 231: Technical Writing - README & Documentation Updates (Jan 16, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Technical Writing (Documentation)
+
+### Purpose
+
+Update README.md and deployment documentation to reflect recent features added in Tasks 220-230, ensuring documentation remains accurate and useful for newcomers.
+
+### Problem Identified
+
+**Outdated Documentation**:
+- README.md missing documentation of major features from Tasks 220-230
+- Test count outdated (2724 → 3199 tests)
+- No mention of Admin Analytics Dashboard
+- No mention of RBAC (Role-Based Access Control)
+- No mention of SEO Enhancement System
+- Deployment documentation status outdated (pending → completed)
+
+**Missing Feature Documentation**:
+- Task 222 (Analytics Dashboard): Not documented in README
+- Task 223 (RBAC): Not documented in README
+- Task 220 (SEO Enhancement): Not documented in README
+- Task 230 (Deployment Automation): Status outdated in deployment.md
+
+### Solution
+
+**1. Updated README.md Features Section**
+- Added Admin Analytics Dashboard feature description
+- Added RBAC (Role-Based Access Control) feature description
+- Added SEO Enhancement System feature description
+- Added Automated Deployment workflow description
+
+**2. Updated Test Counts**
+- Fixed test count from 2724 to 3199 (2 occurrences)
+- Updated both documentation references and validation section
+
+**3. Updated Deployment Documentation**
+- Updated deployment status from "Pending Manual Addition" to "Active"
+- Modified Setup Instructions (workflow file already exists)
+- Updated Next Steps checklist (marked first item as completed)
+
+### Implementation
+
+#### Phase 1: Feature Documentation
+- [x] Added Analytics Dashboard to README features
+- [x] Added RBAC to README features
+- [x] Added SEO Enhancement System to README features
+- [x] Added Automated Deployment to README features
+
+#### Phase 2: Accuracy Updates
+- [x] Updated test count (2724 → 3199) in docs section
+- [x] Updated test count (2724 → 3199) in validation section
+- [x] Updated deployment documentation status
+- [x] Updated deployment setup instructions
+
+#### Phase 3: Verification
+- [x] Ran lint (0 errors, 0 warnings)
+- [x] Ran typecheck (0 errors)
+- [x] All tests passing (3199/3199)
+
+### Code Changes
+- Modified: `README.md` - Added feature documentation (4 new features)
+- Modified: `README.md` - Fixed test counts (2 locations)
+- Modified: `README.md` - Enhanced deployment section
+- Modified: `docs/deployment.md` - Updated status to Active
+- Modified: `docs/deployment.md` - Updated Setup Instructions
+- Modified: `docs/deployment.md` - Updated Next Steps checklist
+- Total: 2 files modified, ~30 lines added/modified
+
+### Architecture Benefits
+
+1. **Documentation Accuracy**: README now accurately reflects current features
+2. **Newcomer Experience**: Easy to understand recent feature additions
+3. **Feature Discovery**: Users can discover admin features, RBAC, SEO enhancements
+4. **Deployment Clarity**: Clear status and setup instructions for automated deployment
+5. **Single Source of Truth**: Documentation matches implementation
+6. **Maintainability**: Easy to keep updated with feature additions
+
+### Success Criteria
+
+- [x] README.md updated with recent features (Tasks 220-230)
+- [x] Test counts updated (2724 → 3199)
+- [x] Admin Analytics Dashboard documented
+- [x] RBAC documented
+- [x] SEO Enhancement System documented
+- [x] Deployment documentation updated (status, setup instructions)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (0 errors)
+- [x] All tests passing (3199/3199)
+
+### Related Files
+
+- ✅ Modified: `README.md` - Main project documentation
+- ✅ Modified: `docs/deployment.md` - Deployment documentation
+- ✅ Updated: `docs/task.md` - Task 231 documentation
+
+### Notes
+
+- Follows Technical Writing principles:
+  - **Single Source of Truth**: Documentation matches code implementation
+  - **Audience Awareness**: Documentation useful for developers and users
+  - **Clarity Over Completeness**: Clear feature descriptions without overwhelming detail
+  - **Actionable Content**: Enables readers to understand and use features
+  - **Progressive Disclosure**: Simple overview with links to detailed docs
+- All new features include file references for easy navigation
+- Test counts accurately reflect current test suite size (3199 tests)
+- Deployment status now accurately reflects workflow file existence
+
+### Impact
+
+- Documentation: README.md now documents all recent features from Tasks 220-230
+- Accuracy: All outdated information corrected (test counts, deployment status)
+- Newcomer Experience: Clear overview of project capabilities
+- Feature Discovery: Users can discover admin dashboard, RBAC, SEO enhancements
+- Zero Errors: Lint clean, type check passing, all tests passing
+
+### Verification Date
+
+2026-01-16
+
+### Related Tasks
+
+- Task 220 (SEO Enhancement System)
+- Task 222 (Analytics Dashboard)
+- Task 223 (RBAC)
+- Task 230 (Deployment Automation)
+
+---
+
 ## Task 230: DevOps - Deployment Automation Documentation (Jan 16, 2026)
 
 **Status**: ✅ Completed
@@ -29412,4 +29543,464 @@ All critical paths are comprehensively tested:
 **Verification Date**: 2026-01-13
 **Related Tasks**: N/A (Standalone cleanup task)
 **Next Dependency Review**: Monthly (February 2026)
+
+---
+
+## Task 232: [REFACTOR] Extract LoadingSpinner Component (Jan 16, 2026)
+
+**Status**: 📋 Pending
+**Priority**: MEDIUM
+**Type**: Component Extraction (Code Duplication)
+**Effort**: Small (1-2 hours)
+
+### Problem Identified
+
+**Duplicate Loading Spinner Pattern**:
+- `AnalyticsDashboard.tsx` (lines 28-32): Uses loading spinner markup
+- `ProtectedRoute.tsx` (lines 92-96): Uses identical loading spinner markup
+- Both components have duplicate code for loading spinner:
+  ```tsx
+  <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 'xxx' }}>
+    <div className="spinner-border..." role="status">
+      <span className="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  ```
+
+**Why This Matters**:
+1. **Code Duplication**: Same pattern repeated in 2 components
+2. **Maintenance**: Changes require updating multiple files
+3. **Inconsistency Risk**: Different components may use different styling
+4. **Accessibility**: Hardcoded "Loading..." text repeated
+
+### Solution
+
+**Create Reusable LoadingSpinner Component** (src/components/ui/LoadingSpinner.tsx):
+
+```typescript
+interface LoadingSpinnerProps {
+  minHeight?: number | string
+  text?: string
+  color?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning'
+}
+
+const LoadingSpinner = ({
+  minHeight = 200,
+  text = 'Loading...',
+  color = 'primary'
+}: LoadingSpinnerProps) => {
+  return (
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: typeof minHeight === 'number' ? `${minHeight}px` : minHeight }}>
+      <div className={`spinner-border text-${color}`} role="status">
+        <span className="visually-hidden">{text}</span>
+      </div>
+    </div>
+  )
+}
+
+export default memo(LoadingSpinner)
+```
+
+**Update Components**:
+- Replace inline loading spinner in `AnalyticsDashboard.tsx` (lines 28-32)
+- Replace inline loading spinner in `ProtectedRoute.tsx` (lines 92-96)
+
+### Implementation
+
+#### Phase 1: Create LoadingSpinner Component
+- [ ] Create `src/components/ui/LoadingSpinner.tsx`
+- [ ] Implement LoadingSpinnerProps interface
+- [ ] Add memo optimization
+- [ ] Support customizable minHeight, text, and color
+- [ ] Export component
+
+#### Phase 2: Update Existing Components
+- [ ] Update `AnalyticsDashboard.tsx` to use LoadingSpinner
+- [ ] Update `ProtectedRoute.tsx` to use LoadingSpinner
+- [ ] Remove duplicate loading spinner code
+- [ ] Test loading states in both components
+
+#### Phase 3: Testing
+- [ ] Create tests for LoadingSpinner component
+- [ ] Test default props (minHeight=200, text='Loading...', color='primary')
+- [ ] Test custom props (different heights, colors, text)
+- [ ] Test memoization prevents unnecessary re-renders
+
+### Success Criteria
+
+- [ ] LoadingSpinner component created in src/components/ui/
+- [ ] AnalyticsDashboard uses LoadingSpinner
+- [ ] ProtectedRoute uses LoadingSpinner
+- [ ] All duplicate loading spinner code removed
+- [ ] Tests created and passing for LoadingSpinner
+- [ ] All existing tests still passing
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+
+### Expected Benefits
+
+1. **DRY Principle**: Single source of truth for loading spinner
+2. **Maintainability**: Update in one place affects all components
+3. **Consistency**: Same loading UI across all components
+4. **Flexibility**: Easy to customize height, text, and color
+5. **Accessibility**: Consistent screen reader support
+6. **Testability**: Isolated testing of loading pattern
+
+### Code Changes
+
+- Added: `src/components/ui/LoadingSpinner.tsx` (~30 lines)
+- Modified: `src/components/admin/AnalyticsDashboard.tsx` (-5 lines, +1 import)
+- Modified: `src/components/common/ProtectedRoute.tsx` (-5 lines, +1 import)
+- Added: `src/components/ui/__tests__/LoadingSpinner.test.tsx` (~50 lines)
+- Total: ~70 lines added/modified
+
+### Related Tasks
+- Task 80 (Component Refactoring) - Similar reusable component pattern
+- Task 119 (Rendering Optimization) - React.memo pattern
+
+---
+
+## Task 233: [REFACTOR] Extract StatusBadge Component (Jan 16, 2026)
+
+**Status**: 📋 Pending
+**Priority**: LOW
+**Type**: Component Extraction (Code Duplication)
+**Effort**: Small (1 hour)
+
+### Problem Identified
+
+**Duplicate Status Color Patterns**:
+- `AnalyticsDashboard.tsx` (lines 107-108): Uses text-success/text-danger for status indicators
+- `ErrorBoundary.tsx` (line 86): Uses text-danger for error display
+- Hardcoded Bootstrap classes for status colors (text-success, text-danger, text-warning)
+- No reusable component for status badges
+
+**Why This Matters**:
+1. **Inconsistent Styling**: Different components may use different patterns
+2. **Hardcoded Colors**: Status colors scattered throughout codebase
+3. **Accessibility**: Status meaning not semantically indicated
+4. **Maintainability**: Changes require updating multiple files
+
+### Solution
+
+**Create Reusable StatusBadge Component** (src/components/ui/StatusBadge.tsx):
+
+```typescript
+type StatusType = 'success' | 'danger' | 'warning' | 'info'
+
+interface StatusBadgeProps {
+  type: StatusType
+  children: React.ReactNode
+  className?: string
+}
+
+const StatusBadge = ({ type, children, className = '' }: StatusBadgeProps) => {
+  const colorMap: Record<StatusType, string> = {
+    success: 'text-success',
+    danger: 'text-danger',
+    warning: 'text-warning',
+    info: 'text-info'
+  }
+
+  return (
+    <span className={`badge status-badge ${colorMap[type]} ${className}`}>
+      {children}
+    </span>
+  )
+}
+
+export default memo(StatusBadge)
+```
+
+**Update Components**:
+- Replace `text-success`/`text-danger` in AnalyticsDashboard
+- Replace `text-danger` in ErrorBoundary
+- Add semantic status badges where appropriate
+
+### Implementation
+
+#### Phase 1: Create StatusBadge Component
+- [ ] Create `src/components/ui/StatusBadge.tsx`
+- [ ] Implement StatusBadgeProps interface with StatusType
+- [ ] Add memo optimization
+- [ ] Map status types to Bootstrap color classes
+- [ ] Export component
+
+#### Phase 2: Update Existing Components
+- [ ] Update `AnalyticsDashboard.tsx` to use StatusBadge
+- [ ] Update `ErrorBoundary.tsx` to use StatusBadge
+- [ ] Identify other locations with status color patterns
+- [ ] Replace hardcoded color classes with StatusBadge
+
+#### Phase 3: Testing
+- [ ] Create tests for StatusBadge component
+- [ ] Test all status types (success, danger, warning, info)
+- [ ] Test custom className prop
+- [ ] Test memoization prevents unnecessary re-renders
+
+### Success Criteria
+
+- [ ] StatusBadge component created in src/components/ui/
+- [ ] AnalyticsDashboard uses StatusBadge for status indicators
+- [ ] ErrorBoundary uses StatusBadge for error display
+- [ ] Hardcoded status color classes removed
+- [ ] Tests created and passing for StatusBadge
+- [ ] All existing tests still passing
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+
+### Expected Benefits
+
+1. **DRY Principle**: Single source of truth for status indicators
+2. **Consistency**: Same visual style across all status displays
+3. **Accessibility**: Semantic status meaning
+4. **Maintainability**: Easy to change status colors or add new types
+5. **Flexibility**: Support for custom className overrides
+6. **Testability**: Isolated testing of status badge pattern
+
+### Code Changes
+
+- Added: `src/components/ui/StatusBadge.tsx` (~25 lines)
+- Modified: `src/components/admin/AnalyticsDashboard.tsx` (-2 lines, +1 import)
+- Modified: `src/components/common/ErrorBoundary.tsx` (-1 line, +1 import)
+- Added: `src/components/ui/__tests__/StatusBadge.test.tsx` (~40 lines)
+- Total: ~60 lines added/modified
+
+### Related Tasks
+- Task 80 (Component Refactoring) - Similar reusable component pattern
+- Task 132 (Accessibility Improvements) - Consistent accessibility patterns
+
+---
+
+## Task 234: [REFACTOR] Extract Percentage Formatting Utility (Jan 16, 2026)
+
+**Status**: 📋 Pending
+**Priority**: LOW
+**Type**: Utility Extraction (Code Duplication)
+**Effort**: Small (30 minutes)
+
+### Problem Identified
+
+**Duplicate Percentage Formatting Pattern**:
+- `AnalyticsChart.tsx` (line 47): `(value / maxValue) * 100` inline calculation
+- `AnalyticsDashboard.tsx` (line 100): `(form.successfulSubmissions / form.totalSubmissions) * 100` inline calculation
+- `AnalyticsDashboard.tsx` (line 151): `(page.bounceRate * 100).toFixed(1)` inline formatting
+- `analytics.ts` (line 75): `(totalSuccessfulSubmissions / totalPageViews) * 100` inline calculation
+- `deviceFilters.ts` (lines 72-73): Duplicate percentage calculation for online/offline counts
+
+**Why This Matters**:
+1. **Code Duplication**: Same calculation repeated in multiple files
+2. **Inconsistency Risk**: Different precision or formatting styles
+3. **Maintenance**: Changes require updating multiple files
+4. **Readability**: Inline calculations less clear than named functions
+
+### Solution
+
+**Create Percentage Formatting Utility** (src/utils/formatPercentage.ts):
+
+```typescript
+export function formatPercentage(value: number, precision: number = 1): string {
+  return `${value.toFixed(precision)}%`
+}
+
+export function calculatePercentage(numerator: number, denominator: number): number {
+  if (denominator === 0) return 0
+  return (numerator / denominator) * 100
+}
+
+export function formatAsPercentage(numerator: number, denominator: number, precision: number = 1): string {
+  return formatPercentage(calculatePercentage(numerator, denominator), precision)
+}
+```
+
+**Update Components**:
+- Replace inline calculations in AnalyticsDashboard.tsx
+- Replace inline calculations in AnalyticsChart.tsx
+- Replace inline calculations in analytics.ts
+- Replace inline calculations in deviceFilters.ts
+
+### Implementation
+
+#### Phase 1: Create Utility Functions
+- [ ] Create `src/utils/formatPercentage.ts`
+- [ ] Implement formatPercentage function
+- [ ] Implement calculatePercentage function
+- [ ] Implement formatAsPercentage function (combines calculation + formatting)
+- [ ] Add edge case handling (division by zero)
+- [ ] Export functions
+
+#### Phase 2: Update Existing Code
+- [ ] Update `AnalyticsDashboard.tsx` to use formatAsPercentage
+- [ ] Update `AnalyticsChart.tsx` to use formatAsPercentage
+- [ ] Update `analytics.ts` to use calculatePercentage/formatPercentage
+- [ ] Update `deviceFilters.ts` to use formatAsPercentage
+- [ ] Remove duplicate inline calculations
+
+#### Phase 3: Testing
+- [ ] Create tests for formatPercentage function
+- [ ] Create tests for calculatePercentage function
+- [ ] Create tests for formatAsPercentage function
+- [ ] Test edge cases (division by zero, negative values, precision)
+- [ ] Verify no regressions in existing tests
+
+### Success Criteria
+
+- [ ] formatPercentage utility created in src/utils/
+- [ ] calculatePercentage utility created in src/utils/
+- [ ] formatAsPercentage utility created in src/utils/
+- [ ] All inline percentage calculations replaced with utility calls
+- [ ] Tests created and passing for all utility functions
+- [ ] All existing tests still passing
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+
+### Expected Benefits
+
+1. **DRY Principle**: Single source of truth for percentage formatting
+2. **Consistency**: Same formatting across all components
+3. **Maintainability**: Update precision or style in one place
+4. **Readability**: Clear function names vs inline calculations
+5. **Testability**: Isolated testing of percentage logic
+6. **Safety**: Consistent edge case handling (division by zero)
+
+### Code Changes
+
+- Added: `src/utils/formatPercentage.ts` (~30 lines)
+- Modified: `src/components/admin/AnalyticsDashboard.tsx` (-2 lines, +1 import)
+- Modified: `src/components/admin/AnalyticsChart.tsx` (-1 line, +1 import)
+- Modified: `src/utils/analytics.ts` (-2 lines, +1 import)
+- Modified: `src/utils/deviceFilters.ts` (-2 lines, +1 import)
+- Added: `src/utils/__tests__/formatPercentage.test.ts` (~60 lines)
+- Total: ~80 lines added/modified
+
+### Related Tasks
+- Task 40 (Data Architecture) - Similar utility pattern for data operations
+- Task 80 (Component Refactoring) - Similar abstraction pattern
+
+---
+
+## Task 235: [REFACTOR] Extract Table Components (Jan 16, 2026)
+
+**Status**: 📋 Pending
+**Priority**: MEDIUM
+**Type**: Component Extraction (Maintainability)
+**Effort**: Medium (2-3 hours)
+
+### Problem Identified
+
+**Duplicate Table Markup Pattern**:
+- `AnalyticsDashboard.tsx` (lines 79-160): Two large tables with 40+ lines each
+- Tables have similar structure: card > card-header > card-body > table-responsive > table > thead > tbody
+- Inline rendering of table rows in component body
+- No reusable table components for common patterns
+
+**Why This Matters**:
+1. **Component Size**: AnalyticsDashboard.tsx is 166 lines, tables occupy 80+ lines
+2. **Readability**: Large JSX blocks reduce code clarity
+3. **Maintainability**: Table structure changes require updating multiple locations
+4. **Reusability**: Other components may need similar tables
+5. **Testability**: Harder to test inline table rendering
+
+### Solution
+
+**Create Reusable Table Components**:
+
+**1. TableCard Component** (src/components/ui/TableCard.tsx):
+- Wraps card structure (card > card-header > card-body > table-responsive)
+- Accepts title, children, className props
+- Provides consistent table container styling
+
+**2. FormSubmissionsTable Component** (src/components/admin/FormSubmissionsTable.tsx):
+- Renders form submissions table with columns: Type, Total, Successful, Failed, Success Rate, Avg Time
+- Accepts data array as prop
+- Calculates success rate inline or via utility
+- Uses TableCard for container
+
+**3. PageViewsTable Component** (src/components/admin/PageViewsTable.tsx):
+- Renders page views table with columns: Page, Total Views, Unique Views, Avg Time, Bounce Rate
+- Accepts data array as prop
+- Formats bounce rate as percentage
+- Uses TableCard for container
+
+### Implementation
+
+#### Phase 1: Create TableCard Component
+- [ ] Create `src/components/ui/TableCard.tsx`
+- [ ] Implement TableCardProps interface (title, children, className)
+- [ ] Wrap Bootstrap card structure
+- [ ] Add memo optimization
+- [ ] Export component
+
+#### Phase 2: Create FormSubmissionsTable Component
+- [ ] Create `src/components/admin/FormSubmissionsTable.tsx`
+- [ ] Implement FormSubmissionsTableProps interface (data array)
+- [ ] Use TableCard for container
+- [ ] Render table with form submission columns
+- [ ] Calculate success rate using utility
+- [ ] Add memo optimization
+
+#### Phase 3: Create PageViewsTable Component
+- [ ] Create `src/components/admin/PageViewsTable.tsx`
+- [ ] Implement PageViewsTableProps interface (data array)
+- [ ] Use TableCard for container
+- [ ] Render table with page view columns
+- [ ] Format bounce rate as percentage using utility
+- [ ] Add memo optimization
+
+#### Phase 4: Update AnalyticsDashboard
+- [ ] Replace inline form submissions table with FormSubmissionsTable component
+- [ ] Replace inline page views table with PageViewsTable component
+- [ ] Remove 80+ lines of table markup
+- [ ] Verify component still renders correctly
+
+#### Phase 5: Testing
+- [ ] Create tests for TableCard component
+- [ ] Create tests for FormSubmissionsTable component
+- [ ] Create tests for PageViewsTable component
+- [ ] Test with empty data arrays
+- [ ] Test with various data values
+- [ ] Verify AnalyticsDashboard integration
+
+### Success Criteria
+
+- [ ] TableCard component created in src/components/ui/
+- [ ] FormSubmissionsTable component created in src/components/admin/
+- [ ] PageViewsTable component created in src/components/admin/
+- [ ] AnalyticsDashboard uses extracted table components
+- [ ] 80+ lines of inline table markup removed
+- [ ] Tests created and passing for all table components
+- [ ] All existing tests still passing
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Build successful
+
+### Expected Benefits
+
+1. **Component Size**: AnalyticsDashboard reduced from 166 to ~80 lines
+2. **Readability**: Clear component separation and structure
+3. **Maintainability**: Table changes isolated in dedicated components
+4. **Reusability**: Other components can use TableCard/FormSubmissionsTable/PageViewsTable
+5. **Testability**: Isolated testing of table rendering logic
+6. **Consistency**: Standardized table structure across admin components
+
+### Code Changes
+
+- Added: `src/components/ui/TableCard.tsx` (~30 lines)
+- Added: `src/components/admin/FormSubmissionsTable.tsx` (~50 lines)
+- Added: `src/components/admin/PageViewsTable.tsx` (~50 lines)
+- Modified: `src/components/admin/AnalyticsDashboard.tsx` (-80 lines, +3 imports)
+- Added: `src/components/ui/__tests__/TableCard.test.tsx` (~30 lines)
+- Added: `src/components/admin/__tests__/FormSubmissionsTable.test.tsx` (~60 lines)
+- Added: `src/components/admin/__tests__/PageViewsTable.test.tsx` (~60 lines)
+- Total: ~300 lines added/modified (but net -70 lines in AnalyticsDashboard)
+
+### Related Tasks
+- Task 80 (Component Refactoring) - Similar extraction pattern
+- Task 232 (LoadingSpinner) - UI component reuse
+- Task 233 (StatusBadge) - UI component reuse
+
+---
+
+**Estimated Effort**: Task 232 (1-2h), Task 233 (1h), Task 234 (30m), Task 235 (2-3h)
+
+---
 
