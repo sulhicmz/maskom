@@ -131,6 +131,184 @@ Update README.md and deployment documentation to reflect recent features added i
 
 ---
 
+## Task 232: FEATURE-018 - Admin Dashboard Performance Metrics (Jan 16, 2026)
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Feature Development (Performance/Analytics)
+
+### Purpose
+
+Implement real-time performance metrics in the admin analytics dashboard to enable proactive identification of bottlenecks and performance optimization.
+
+### User Story
+
+As an Administrator, I want to view real-time performance metrics on the analytics dashboard, so that I can identify and address bottlenecks before they impact users.
+
+### Acceptance Criteria
+
+- [ ] Integrate Web Vitals API for Core Web Vitals tracking (LCP, FID, CLS)
+- [ ] Add performance metrics section to admin dashboard
+- [ ] Implement performance alerts when thresholds exceeded
+- [ ] Store performance data for historical analysis
+- [ ] Add tests for performance tracking utilities
+- [ ] Update docs/blueprint.md with performance monitoring architecture
+
+### Implementation Plan
+
+#### Phase 1: Web Vitals Integration
+- [ ] Create `src/utils/webVitals.ts` with Web Vitals API integration
+- [ ] Implement trackCoreWebVitals() function
+- [ ] Create performance data types (LCP, FID, CLS metrics)
+- [ ] Add performance data to analytics structure
+
+#### Phase 2: Admin Dashboard Enhancement
+- [ ] Create `src/components/admin/PerformanceMetrics.tsx` component
+- [ ] Add performance metrics section to AnalyticsDashboard
+- [ ] Implement performance thresholds and alerts
+- [ ] Add historical data visualization
+
+#### Phase 3: Data Storage & Analysis
+- [ ] Store performance data in analytics collection
+- [ ] Implement performance trend calculations
+- [ ] Add performance degradation alerts
+
+#### Phase 4: Testing & Documentation
+- [ ] Add tests for webVitals utilities (20+ tests)
+- [ ] Add tests for PerformanceMetrics component (15+ tests)
+- [ ] Update docs/blueprint.md with performance monitoring architecture
+
+### Architecture Benefits
+
+1. **Proactive Monitoring**: Identify performance issues before user impact
+2. **Data-Driven Optimization**: Make performance decisions based on metrics
+3. **Real-Time Insights**: Live performance data in admin dashboard
+4. **Historical Analysis**: Track performance trends over time
+5. **Alert System**: Automatic notifications for threshold violations
+6. **Web Vitals Integration**: Leverage industry-standard metrics
+
+---
+
+## Task 233: FEATURE-019 - Blog Post Bookmarking & Saved Collections (Jan 16, 2026)
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Feature Development (UX/User Experience)
+
+### Purpose
+
+Implement blog post bookmarking functionality to allow users to save and manage collections of interesting blog posts for later reading.
+
+### User Story
+
+As a Blog Reader, I want to bookmark blog posts and manage saved collections, so that I can curate and revisit content that interests me.
+
+### Acceptance Criteria
+
+- [ ] Add bookmark functionality to blog post cards with localStorage persistence
+- [ ] Create "My Bookmarks" page displaying saved posts
+- [ ] Add bookmark indicator on bookmarked posts across all views
+- [ ] Implement bookmark removal functionality
+- [ ] Add tests for bookmark storage and UI behavior
+- [ ] Update docs/blueprint.md with bookmarking architecture
+
+### Implementation Plan
+
+#### Phase 1: Bookmark Storage
+- [ ] Create `src/types/bookmark.ts` with bookmark interfaces
+- [ ] Create `src/utils/bookmarkStorage.ts` for localStorage management
+- [ ] Implement addBookmark(), removeBookmark(), getBookmarks() functions
+- [ ] Add bookmark data validation
+
+#### Phase 2: UI Components
+- [ ] Create BookmarkButton component with icon state
+- [ ] Create BookmarksPage component for saved posts display
+- [ ] Add BookmarkButton to BlogPostCard
+- [ ] Add bookmark indicator to BlogArea and BlogDetails
+
+#### Phase 3: Route & Navigation
+- [ ] Create `src/app/bookmarks/page.tsx` route
+- [ ] Add "My Bookmarks" link to navigation menu
+- [ ] Implement bookmark count display in navigation
+
+#### Phase 4: Testing & Documentation
+- [ ] Add tests for bookmarkStorage utilities (25+ tests)
+- [ ] Add tests for BookmarkButton component (15+ tests)
+- [ ] Add tests for BookmarksPage component (10+ tests)
+- [ ] Update docs/blueprint.md with bookmarking architecture
+
+### Architecture Benefits
+
+1. **User Engagement**: Encourages users to return and read more content
+2. **Content Curation**: Users can organize posts by interest
+3. **Persistent Storage**: Bookmarks survive browser sessions
+4. **Cross-View Consistency**: Bookmark indicators visible everywhere
+5. **Simple Management**: Easy add/remove bookmarks
+6. **Personalized Experience**: Tailored content collections per user
+
+---
+
+## Task 234: FEATURE-020 - Blog Content Export & Sharing (Jan 16, 2026)
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Feature Development (UX/User Experience)
+
+### Purpose
+
+Implement export functionality for filtered blog results to enable users to save or share curated content collections for offline use or collaboration.
+
+### User Story
+
+As a Blog Reader, I want to export filtered blog results as PDF or CSV, so that I can save or share curated content with colleagues offline.
+
+### Acceptance Criteria
+
+- [ ] Add export button to BlogArea component
+- [ ] Implement PDF generation for filtered results with styling
+- [ ] Implement CSV export for data analysis
+- [ ] Include search filters and tags in exported files
+- [ ] Add export format selection (PDF, CSV)
+- [ ] Add tests for export functionality
+- [ ] Update docs/blueprint.md with export architecture
+
+### Implementation Plan
+
+#### Phase 1: Export Utilities
+- [ ] Create `src/utils/exportUtils.ts` with export functions
+- [ ] Implement exportToPDF() function with jsPDF
+- [ ] Implement exportToCSV() function
+- [ ] Add export formatting utilities (date, tags, category)
+
+#### Phase 2: UI Components
+- [ ] Create ExportButton component with format selection
+- [ ] Add ExportButton to BlogArea toolbar
+- [ ] Add export loading states and progress indicators
+- [ ] Add export success/error notifications
+
+#### Phase 3: Content Formatting
+- [ ] Format blog posts for PDF export (with styling)
+- [ ] Format blog posts for CSV export (tabular data)
+- [ ] Include search filters and active tags in exports
+- [ ] Add export metadata (date, filters, result count)
+
+#### Phase 4: Testing & Documentation
+- [ ] Add tests for exportUtils (30+ tests)
+- [ ] Add tests for ExportButton component (15+ tests)
+- [ ] Add tests for export format validation (10+ tests)
+- [ ] Update docs/blueprint.md with export architecture
+
+### Architecture Benefits
+
+1. **Offline Access**: Users can read content without internet
+2. **Content Sharing**: Easy distribution of curated collections
+3. **Data Analysis**: CSV format enables further analysis
+4. **Professional Output**: PDF maintains styling and formatting
+5. **Flexible Export**: Multiple format options (PDF, CSV)
+6. **Context Awareness**: Export includes filters and metadata
+
+---
+
 ## Task 230: DevOps - Deployment Automation Documentation (Jan 16, 2026)
 
 **Status**: ✅ Completed
