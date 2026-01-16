@@ -4,7 +4,7 @@ import type { InnerBlogPost } from "@/types/data"
 export function generateBlogPostSchema(
   post: InnerBlogPost,
   canonicalUrl: string,
-  siteUrl: string = "https://maskom.co.id"
+  siteUrl: string = process.env.NEXT_PUBLIC_SITE_URL || "https://maskom.co.id"
 ): BlogPostSchema {
   const imageUrl = post.thumb.src || post.thumb.toString()
   
@@ -33,7 +33,7 @@ export function generateBlogPostSchema(
 }
 
 export function generateWebsiteSchema(
-  siteUrl: string = "https://maskom.co.id"
+  siteUrl: string = process.env.NEXT_PUBLIC_SITE_URL || "https://maskom.co.id"
 ): object {
   return {
     "@context": "https://schema.org",

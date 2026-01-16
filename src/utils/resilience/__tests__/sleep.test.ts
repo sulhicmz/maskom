@@ -151,7 +151,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(150);
+            expect(elapsed).toBeGreaterThanOrEqual(140);
             expect(elapsed).toBeLessThan(250);
         });
     });

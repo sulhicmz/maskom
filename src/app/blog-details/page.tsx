@@ -6,6 +6,8 @@ import JsonLd from "@/components/common/JsonLd"
 
 export const runtime = 'nodejs';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://maskom.co.id"
+
 interface BlogDetailsPageProps {
   searchParams: Promise<{ id?: string }>
 }
@@ -30,10 +32,10 @@ export async function generateMetadata({ searchParams }: BlogDetailsPageProps) {
       date: new Date().toISOString().split("T")[0],
       user: "Maskom",
       tagId: 0
-    }, "https://maskom.co.id")
+    }, SITE_URL)
   }
-  
-  return generateBlogPostMetadata(post, "https://maskom.co.id")
+
+  return generateBlogPostMetadata(post, SITE_URL)
 }
 
 const BlogDetailsPage = async ({ searchParams }: BlogDetailsPageProps) => {
@@ -41,9 +43,9 @@ const BlogDetailsPage = async ({ searchParams }: BlogDetailsPageProps) => {
   const postId = params.id || "1"
   const post = await getBlogPost(postId)
   const BlogDetails = (await import("@/components/blogs/blog-details")).default
-  const canonicalUrl = `https://maskom.co.id/blog-details?id=${postId}`
-  
-  const schema = post ? generateBlogPostSchema(post, canonicalUrl, "https://maskom.co.id") : null
+  const canonicalUrl = `${SITE_URL}/blog-details?id=${postId}`
+
+  const schema = post ? generateBlogPostSchema(post, canonicalUrl, SITE_URL) : null
   
   return (
     <>

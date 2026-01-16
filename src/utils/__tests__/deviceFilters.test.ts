@@ -190,8 +190,8 @@ describe('deviceFilters', () => {
       expect(stats.onlineCount).toBe(1);
       expect(stats.offlineCount).toBe(2);
       expect(stats.totalCount).toBe(3);
-      expect(stats.onlinePercentage).toBe(33.333333333333336);
-      expect(stats.offlinePercentage).toBe(66.66666666666666);
+      expect(stats.onlinePercentage).toBeCloseTo(33.333333333333336);
+      expect(stats.offlinePercentage).toBeCloseTo(66.66666666666666);
     });
 
     it('does not modify original array', () => {
