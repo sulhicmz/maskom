@@ -58,3 +58,9 @@ export function createBlogFormSchema() {
         message: createRequiredFieldSchema("Pesan")
     }).required();
 }
+
+export function createNewsletterFormSchema() {
+    return yup.object().shape({
+        email: createEmailFieldSchema("Email")
+    }).required();
+}

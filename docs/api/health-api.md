@@ -16,37 +16,53 @@ Returns health check results for all monitored services.
 
 #### Response
 
+All responses follow ServiceResult<T> pattern:
+```typescript
+interface ServiceResult<T> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+    errorCode?: ServiceErrorCodeType;
+    metadata?: Record<string, unknown>;
+}
+```
+
 **200 OK** - All services healthy
 ```json
 {
-  "status": "healthy",
-  "timestamp": "2026-01-13T22:30:00.000Z",
-  "services": [
-    {
-      "serviceName": "EmailService.sendEmail",
-      "healthy": true,
-      "message": "Service healthy (success rate: 95.0%)",
-      "metrics": {
+  "success": true,
+  "message": "All services healthy",
+  "data": {
+    "status": "healthy",
+    "timestamp": "2026-01-13T22:30:00.000Z",
+    "services": [
+      {
         "serviceName": "EmailService.sendEmail",
-        "totalCalls": 100,
-        "successCalls": 95,
-        "failureCalls": 5,
-        "timeoutCalls": 2,
-        "rateLimitCalls": 1,
-        "circuitBreakerOpenCount": 0,
-        "lastError": "timeout",
-        "lastSuccessTime": 17368068095678,
-        "lastFailureTime": 1736808004567,
-        "averageResponseTime": 150
-      },
-      "checkedAt": 1736808600000
+        "healthy": true,
+        "message": "Service healthy (success rate: 95.0%)",
+        "metrics": {
+          "serviceName": "EmailService.sendEmail",
+          "totalCalls": 100,
+          "successCalls": 95,
+          "failureCalls": 5,
+          "timeoutCalls": 2,
+          "rateLimitCalls": 1,
+          "circuitBreakerOpenCount": 0,
+          "lastError": "timeout",
+          "lastSuccessTime": 17368068095678,
+          "lastFailureTime": 1736808004567,
+          "averageResponseTime": 150
+        },
+        "checkedAt": 1736808600000
+      }
+    ],
+    "summary": {
+      "totalServices": 1,
+      "healthyServices": 1,
+      "unhealthyServices": 0,
+      "successRateThreshold": 0.9
     }
-  ],
-  "summary": {
-    "totalServices": 1,
-    "healthyServices": 1,
-    "unhealthyServices": 0,
-    "successRateThreshold": 0.9
   }
 }
 ```
@@ -54,15 +70,27 @@ Returns health check results for all monitored services.
 **503 Service Unavailable** - Any service unhealthy
 ```json
 {
-  "status": "degraded",
-  "timestamp": "2026-01-13T22:30:00.000Z",
-  "services": [...],
-  "summary": {
-    "totalServices": 2,
-    "healthyServices": 1,
-    "unhealthyServices": 1,
-    "successRateThreshold": 0.9
+  "success": true,
+  "message": "One or more services degraded",
+  "data": {
+    "status": "degraded",
+    "timestamp": "2026-01-13T22:30:00.000Z",
+    "services": [...],
+    "summary": {
+      "totalServices": 2,
+      "healthyServices": 1,
+      "unhealthyServices": 1,
+      "successRateThreshold": 0.9
+    }
   }
+}
+```
+
+**500 Internal Server Error** - Health check timeout or error
+```json
+{
+  "success": false,
+  "error": "Health check operation timed out"
 }
 ```
 

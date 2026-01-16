@@ -10,47 +10,71 @@ Returns aggregated metrics for all monitored services.
 
 #### Response
 
+All responses follow ServiceResult<T> pattern:
+```typescript
+interface ServiceResult<T> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+    errorCode?: ServiceErrorCodeType;
+    metadata?: Record<string, unknown>;
+}
+```
+
 **200 OK**
 ```json
 {
-  "timestamp": "2026-01-13T22:30:00.000Z",
-  "summary": {
-    "totalServices": 2,
-    "totalCalls": 300,
-    "totalSuccesses": 285,
-    "totalFailures": 15,
-    "totalTimeouts": 5,
-    "totalRateLimits": 6
-  },
-  "services": [
-    {
-      "serviceName": "EmailService.sendEmail",
-      "totalCalls": 100,
-      "successCalls": 95,
-      "failureCalls": 5,
-      "timeoutCalls": 2,
-      "rateLimitCalls": 1,
-      "circuitBreakerOpenCount": 0,
-      "lastError": "timeout",
-      "lastSuccessTime": 17368068095678,
-      "lastFailureTime": 1736808004567,
-      "averageResponseTime": 150,
-      "successRate": 95.0,
-      "health": "healthy"
+  "success": true,
+  "message": "Metrics retrieved successfully",
+  "data": {
+    "timestamp": "2026-01-13T22:30:00.000Z",
+    "summary": {
+      "totalServices": 2,
+      "totalCalls": 300,
+      "totalSuccesses": 285,
+      "totalFailures": 15,
+      "totalTimeouts": 5,
+      "totalRateLimits": 6
     },
-    {
-      "serviceName": "AuthService.login",
-      "totalCalls": 200,
-      "successCalls": 190,
-      "failureCalls": 10,
-      "timeoutCalls": 3,
-      "rateLimitCalls": 5,
-      "circuitBreakerOpenCount": 1,
-      "averageResponseTime": 80,
-      "successRate": 95.0,
-      "health": "healthy"
-    }
-  ]
+    "services": [
+      {
+        "serviceName": "EmailService.sendEmail",
+        "totalCalls": 100,
+        "successCalls": 95,
+        "failureCalls": 5,
+        "timeoutCalls": 2,
+        "rateLimitCalls": 1,
+        "circuitBreakerOpenCount": 0,
+        "lastError": "timeout",
+        "lastSuccessTime": 17368068095678,
+        "lastFailureTime": 1736808004567,
+        "averageResponseTime": 150,
+        "successRate": 95.0,
+        "health": "healthy"
+      },
+      {
+        "serviceName": "AuthService.login",
+        "totalCalls": 200,
+        "successCalls": 190,
+        "failureCalls": 10,
+        "timeoutCalls": 3,
+        "rateLimitCalls": 5,
+        "circuitBreakerOpenCount": 1,
+        "averageResponseTime": 80,
+        "successRate": 95.0,
+        "health": "healthy"
+      }
+    ]
+  }
+}
+```
+
+**500 Internal Server Error** - Metrics retrieval timeout or error
+```json
+{
+  "success": false,
+  "error": "Metrics retrieval timed out"
 }
 ```
 

@@ -11,6 +11,7 @@ describe("validateInnerBlogPost", () => {
     date: "2024-01-15",
     user: "Test User",
     tagId: 1,
+    categoryId: 1,
     category: "Test Category",
     status: "published",
   };

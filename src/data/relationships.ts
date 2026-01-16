@@ -11,22 +11,30 @@ export const VALID_PAGES = [
 export type ValidPage = typeof VALID_PAGES[number];
 
 export const DATA_RELATIONSHIPS: DataRelationship[] = [
-  {
-    sourceCollection: "BlogCommentData",
-    targetCollection: "InnerBlogData",
-    sourceField: "blogId",
-    targetField: "id",
-    type: "many-to-one",
-    optional: false,
-  },
-  {
-    sourceCollection: "InnerBlogData",
-    targetCollection: "BlogTagData",
-    sourceField: "tagId",
-    targetField: "id",
-    type: "many-to-one",
-    optional: false,
-  },
+   {
+     sourceCollection: "BlogCommentData",
+     targetCollection: "InnerBlogData",
+     sourceField: "blogId",
+     targetField: "id",
+     type: "many-to-one",
+     optional: false,
+   },
+   {
+     sourceCollection: "InnerBlogData",
+     targetCollection: "BlogTagData",
+     sourceField: "tagId",
+     targetField: "id",
+     type: "many-to-one",
+     optional: false,
+   },
+   {
+     sourceCollection: "InnerBlogData",
+     targetCollection: "BlogCategoryData",
+     sourceField: "categoryId",
+     targetField: "id",
+     type: "many-to-one",
+     optional: false,
+   },
 ];
 
 export function isValidPage(page: string): page is ValidPage {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { ServiceResult, ServiceErrorCodeType } from '@/services/common';
 
 export interface ApiResponseConfig<T> {
     data: T;
@@ -21,6 +22,77 @@ export function createApiResponse<T>({
         : defaultHeaders;
 
     return NextResponse.json(data, {
+        status,
+        headers: mergedHeaders
+    });
+}
+
+export interface ServiceResponseConfig<T> {
+    data?: T;
+    message?: string;
+    status?: number;
+    headers?: HeadersInit;
+}
+
+export function createServiceResponse<T>({
+    data,
+    message = 'Success',
+    status = 200,
+    headers
+}: ServiceResponseConfig<T>): NextResponse<ServiceResult<T>> {
+    const defaultHeaders: HeadersInit = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+    };
+
+    const mergedHeaders = headers
+        ? { ...defaultHeaders, ...headers }
+        : defaultHeaders;
+
+    const serviceResult: ServiceResult<T> = {
+        success: true,
+        message,
+        data
+    };
+
+    return NextResponse.json(serviceResult, {
+        status,
+        headers: mergedHeaders
+    });
+}
+
+export interface ServiceErrorResponseConfig {
+    error: string;
+    errorCode?: ServiceErrorCodeType;
+    status?: number;
+    headers?: HeadersInit;
+    metadata?: Record<string, unknown>;
+}
+
+export function createServiceErrorResponse({
+    error,
+    errorCode,
+    status = 500,
+    headers,
+    metadata
+}: ServiceErrorResponseConfig): NextResponse<ServiceResult<void>> {
+    const defaultHeaders: HeadersInit = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+    };
+
+    const mergedHeaders = headers
+        ? { ...defaultHeaders, ...headers }
+        : defaultHeaders;
+
+    const serviceResult: ServiceResult<void> = {
+        success: false,
+        error,
+        errorCode,
+        metadata
+    };
+
+    return NextResponse.json(serviceResult, {
         status,
         headers: mergedHeaders
     });

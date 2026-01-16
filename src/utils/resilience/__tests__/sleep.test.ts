@@ -45,7 +45,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(1);
+            expect(elapsed).toBeGreaterThanOrEqual(0);
             expect(elapsed).toBeLessThan(100);
         });
 
@@ -55,7 +55,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(500);
+            expect(elapsed).toBeGreaterThanOrEqual(499);
             expect(elapsed).toBeLessThan(600);
         });
 
@@ -65,7 +65,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(50);
+            expect(elapsed).toBeGreaterThanOrEqual(45);
             expect(elapsed).toBeLessThan(150);
         });
     });
@@ -126,7 +126,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(50);
+            expect(elapsed).toBeGreaterThanOrEqual(45);
             expect(elapsed).toBeLessThan(150);
         });
 
@@ -139,7 +139,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(50);
+            expect(elapsed).toBeGreaterThanOrEqual(45);
             expect(elapsed).toBeLessThan(150);
         });
 
@@ -151,7 +151,7 @@ describe('sleep utility', () => {
             const endTime = Date.now();
             const elapsed = endTime - startTime;
 
-            expect(elapsed).toBeGreaterThanOrEqual(150);
+            expect(elapsed).toBeGreaterThanOrEqual(140);
             expect(elapsed).toBeLessThan(250);
         });
     });

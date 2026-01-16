@@ -2,7 +2,7 @@ import type { InnerBlogPost } from "@/types/data"
 
 export interface BlogFilterCriteria {
   searchQuery?: string
-  category?: string | null
+  categoryId?: number | null
   tagId?: number | null
   status?: 'draft' | 'scheduled' | 'published'
 }
@@ -17,16 +17,16 @@ export function filterBlogPosts(
   posts: InnerBlogPost[],
   criteria: BlogFilterCriteria
 ): BlogFilterResult {
-  const { searchQuery = '', category = null, tagId = null, status } = criteria
-
-  const hasFilters = Boolean(searchQuery || category || tagId || status)
-
+  const { searchQuery = '', categoryId = null, tagId = null, status } = criteria
+  
+  const hasFilters = Boolean(searchQuery || categoryId || tagId || status)
+  
   const filteredPosts = posts.filter((post) => {
     const matchesSearch = !searchQuery || 
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.desc.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesCategory = !category || post.category === category
+    
+    const matchesCategory = !categoryId || post.categoryId === categoryId
     const matchesTag = !tagId || post.tagId === tagId
 
     const matchesStatus = !status || 

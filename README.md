@@ -59,6 +59,7 @@ npm run start
 - [**Panduan Komponen**](docs/component-development-guide.md) - Cara membuat dan memelihara komponen
 - [**Panduan Data File**](docs/data-file-creation-guide.md) - Cara membuat dan mengelola data statis
 - [**Dokumentasi API**](docs/api.md) - Dokumentasi layanan (EmailService, AuthService)
+- [**Panduan Fitur**](docs/features/) - Panduan penggunaan fitur (Dark Mode, Blog, SEO)
 - [**Roadmap**](docs/roadmap.md) - Rencana pengembangan fitur
 
 ## Fitur Utama

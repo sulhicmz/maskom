@@ -51,6 +51,12 @@ const menu_data: MenuItem[] = [
         title: "Kontak",
         link: "/contact",
     },
+    {
+        id: 8,
+        has_dropdown: false,
+        title: "Tandai",
+        link: "/bookmarks",
+    },
 ];
 
 export default menu_data;

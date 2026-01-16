@@ -3,6 +3,33 @@ import Image from "next/image"
 import thumb from "@/assets/images/team/team-single-1.jpg"
 
 const TeamDetailsArea = () => {
+   const handleShare = (platform: string) => {
+      const url = typeof window !== 'undefined' ? window.location.href : 'https://maskom.co.id';
+      const text = 'Check out Robie B Monik, CO-FOUNDER & CEO at Maskom!';
+      const encodedUrl = encodeURIComponent(url);
+      const encodedText = encodeURIComponent(text);
+
+      let shareUrl = '';
+      switch (platform) {
+         case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            break;
+         case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+            break;
+         case 'linkedin':
+            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+            break;
+         case 'instagram':
+            shareUrl = 'https://www.instagram.com/';
+            break;
+      }
+
+      if (shareUrl) {
+         window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=400');
+      }
+   };
+
    return (
       <section className="team-details-section pt-120 pb-70">
          <div className="container">
@@ -31,12 +58,12 @@ const TeamDetailsArea = () => {
                            Pellentesque hendrerit placerat, accumsan libero ut, posuere sapien. Mauris
                            ipsum nulla, aliquet vligula eu, semper semper metus. Pellentesque hendrerit
                            placerat.</p>
-                         <ul className="social-link">
-                            <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                            <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                            <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                            <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                         </ul>
+                          <ul className="social-link">
+                             <li><button type="button" aria-label="Share on Facebook" onClick={() => handleShare('facebook')}><i className="fab fa-facebook-f"></i></button></li>
+                             <li><button type="button" aria-label="Share on Twitter" onClick={() => handleShare('twitter')}><i className="fab fa-twitter"></i></button></li>
+                             <li><button type="button" aria-label="Share on LinkedIn" onClick={() => handleShare('linkedin')}><i className="fab fa-linkedin-in"></i></button></li>
+                             <li><button type="button" aria-label="Share on Instagram" onClick={() => handleShare('instagram')}><i className="fab fa-instagram"></i></button></li>
+                          </ul>
                      </div>
                   </div>
                </div>

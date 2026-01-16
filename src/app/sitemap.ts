@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 import inner_blog_data from "@/data/InnerBlogData"
 
-const SITE_URL = "https://maskom.co.id"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://maskom.co.id"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { WiFiDevice } from "@/types/data";
+import { getOfflineDevices, getDeviceStats } from "@/utils/deviceFilters";
 
 interface WiFiMonitorProps {
   devices: WiFiDevice[];
@@ -7,8 +8,8 @@ interface WiFiMonitorProps {
 }
 
 const WiFiMonitor = ({ devices, ssid = "Maskom WiFi" }: WiFiMonitorProps) => {
-  const offlineDevices = useMemo(() => devices.filter(d => d.status === "Offline"), [devices]);
-  const onlineCount = useMemo(() => devices.filter(d => d.status === "Online").length, [devices]);
+  const offlineDevices = useMemo(() => getOfflineDevices(devices), [devices]);
+  const { onlineCount } = useMemo(() => getDeviceStats(devices), [devices]);
 
    return (
       <section className="wifi-monitor" aria-label="WiFi Network Monitor">

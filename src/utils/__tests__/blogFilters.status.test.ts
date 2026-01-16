@@ -5,14 +5,14 @@ import type { StaticImageData } from "next/image";
 describe("filterBlogPosts with status filtering", () => {
   const mockPosts: InnerBlogPost[] = [
     {
-      id: 1,
+      id:1,
       thumb: {} as StaticImageData,
       title: "Published Post 1",
       desc: "Description 1",
       date: "2024-01-15",
       user: "User 1",
       tagId: 1,
-      category: "Category 1",
+      categoryId: 1,
       status: "published",
     },
     {
@@ -23,7 +23,7 @@ describe("filterBlogPosts with status filtering", () => {
       date: "2024-01-16",
       user: "User 2",
       tagId: 2,
-      category: "Category 1",
+      categoryId: 1,
       status: "draft",
     },
     {
@@ -34,7 +34,7 @@ describe("filterBlogPosts with status filtering", () => {
       date: "2024-01-17",
       user: "User 1",
       tagId: 1,
-      category: "Category 2",
+      categoryId: 2,
       status: "published",
     },
     {
@@ -45,7 +45,7 @@ describe("filterBlogPosts with status filtering", () => {
       date: "2024-01-18",
       user: "User 3",
       tagId: 3,
-      category: "Category 2",
+      categoryId: 2,
       status: "scheduled",
       publishDate: "2024-02-01",
     },
@@ -57,7 +57,7 @@ describe("filterBlogPosts with status filtering", () => {
       date: "2024-01-19",
       user: "User 4",
       tagId: 4,
-      category: "Category 3",
+      categoryId: 3,
     },
   ];
 
@@ -148,18 +148,18 @@ describe("filterBlogPosts with status filtering", () => {
   });
 
   it("should combine status filter with category filter", () => {
-    const criteria: BlogFilterCriteria = {
-      status: "published",
-      category: "Category 1",
-    };
-    const result = filterBlogPosts(mockPosts, criteria);
-
-    expect(result.filteredPosts).toHaveLength(1);
-    expect(result.filteredPosts[0].id).toBe(1);
-    expect(result.filteredPosts[0].status).toBe("published");
-    expect(result.filteredPosts[0].category).toBe("Category 1");
-    expect(result.hasFilters).toBe(true);
-  });
+     const criteria: BlogFilterCriteria = {
+       status: "published",
+       categoryId: 1,
+     };
+     const result = filterBlogPosts(mockPosts, criteria);
+ 
+     expect(result.filteredPosts).toHaveLength(1);
+     expect(result.filteredPosts[0].id).toBe(1);
+     expect(result.filteredPosts[0].status).toBe("published");
+     expect(result.filteredPosts[0].categoryId).toBe(1);
+     expect(result.hasFilters).toBe(true);
+   });
 
   it("should return empty array when no posts match status", () => {
     const criteria: BlogFilterCriteria = { status: "scheduled" };
@@ -187,16 +187,16 @@ describe("filterBlogPosts with status filtering", () => {
   });
 
   it("should combine all filters together", () => {
-    const criteria: BlogFilterCriteria = {
-      status: "published",
-      tagId: 1,
-      category: "Category 1",
-      searchQuery: "Published",
-    };
-    const result = filterBlogPosts(mockPosts, criteria);
-
-    expect(result.filteredPosts).toHaveLength(1);
-    expect(result.filteredPosts[0].id).toBe(1);
-    expect(result.hasFilters).toBe(true);
-  });
+     const criteria: BlogFilterCriteria = {
+       status: "published",
+       tagId: 1,
+       categoryId: 1,
+       searchQuery: "Published",
+     };
+     const result = filterBlogPosts(mockPosts, criteria);
+ 
+     expect(result.filteredPosts).toHaveLength(1);
+     expect(result.filteredPosts[0].id).toBe(1);
+     expect(result.hasFilters).toBe(true);
+   });
 });

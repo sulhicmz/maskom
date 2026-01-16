@@ -10,8 +10,12 @@ import AnimationWrapper from "@/components/common/AnimationWrapper"
 import PaginationWrapper from "@/components/common/PaginationWrapper"
 import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
+import { blogCategoryById } from "@/data/BlogCategoryData"
 import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
+import BookmarkButton from "@/components/common/BookmarkButton"
+import ExportButton from "@/components/common/ExportButton"
+import SocialShareButtons from "@/components/common/SocialShareButtons"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => (
@@ -25,18 +29,18 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   )
 })
 
-const BlogArea = React.memo(() => {
+ const BlogArea = React.memo(() => {
    const router = useRouter()
-
+ 
    const [searchQuery, setSearchQuery] = useState("")
-   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
    const [selectedTagId, setSelectedTagId] = useState<number | null>(null)
-
+   
    const itemsPerPage = 3;
-
+ 
      const filterCriteria: BlogFilterCriteria = useMemo(() => ({
        searchQuery,
-       category: selectedCategory,
+       categoryId: selectedCategory,
        tagId: selectedTagId,
        status: 'published',
      }), [searchQuery, selectedCategory, selectedTagId])
@@ -57,9 +61,9 @@ const BlogArea = React.memo(() => {
         router.push("/blog")
      }, [router])
 
-    const handleCategoryChange = useCallback((category: string | null) => {
-       setSelectedCategory(category)
-    }, [])
+     const handleCategoryChange = useCallback((categoryId: number | null) => {
+       setSelectedCategory(categoryId)
+     }, [])
 
    const handleTagClick = useCallback((tagId: number | null) => {
       setSelectedTagId(tagId)
@@ -72,33 +76,40 @@ const BlogArea = React.memo(() => {
                <div className="col-xl-8">
                    <div className="blogs-wrapper mb-30">
                       {hasFilters && (
-                         <div className="filter-status mb-30">
-                           <h4 className="filter-title">Filter Aktif:</h4>
-                           <div className="filter-tags">
-                               {searchQuery && (
+                          <div className="filter-status mb-30">
+                            <h4 className="filter-title">Filter Aktif:</h4>
+                            <div className="filter-tags">
+                                {searchQuery && (
+                                   <span className="filter-tag">
+                                      Pencarian: &quot;{searchQuery}&quot;
+                                      <button onClick={() => setSearchQuery("")} aria-label="Hapus pencarian">×</button>
+                                   </span>
+                                )}
+                               {selectedCategory && (
+                                   <span className="filter-tag">
+                                      Kategori: {blogCategoryById.get(selectedCategory)?.name}
+                                      <button onClick={() => setSelectedCategory(null)} aria-label="Hapus filter kategori">×</button>
+                                   </span>
+                                )}
+                               {selectedTagId && (
                                   <span className="filter-tag">
-                                     Pencarian: &quot;{searchQuery}&quot;
-                                     <button onClick={() => setSearchQuery("")} aria-label="Hapus pencarian">×</button>
+                                     Tag: {tagsById.get(selectedTagId)?.name}
+                                     <button onClick={() => setSelectedTagId(null)} aria-label="Hapus filter tag">×</button>
                                   </span>
                                )}
-                              {selectedCategory && (
-                                 <span className="filter-tag">
-                                    Kategori: {selectedCategory}
-                                    <button onClick={() => setSelectedCategory(null)} aria-label="Hapus filter kategori">×</button>
-                                 </span>
-                              )}
-                              {selectedTagId && (
-                                 <span className="filter-tag">
-                                    Tag: {tagsById.get(selectedTagId)?.name}
-                                    <button onClick={() => setSelectedTagId(null)} aria-label="Hapus filter tag">×</button>
-                                 </span>
-                              )}
-                           </div>
-                           <button onClick={handleClearAllFilters} className="clear-all-btn">
-                              Hapus Semua Filter
-                           </button>
-                        </div>
-                     )}
+                            </div>
+                            <div className="filter-actions">
+                               <button onClick={handleClearAllFilters} className="clear-all-btn">
+                                  Hapus Semua Filter
+                               </button>
+                               <ExportButton
+                                 posts={filteredPosts}
+                                 filterCriteria={filterCriteria}
+                                 buttonClassName="export-btn"
+                               />
+                            </div>
+                         </div>
+                      )}
 
                      {filteredPosts.length === 0 ? (
                         <div className="no-results">
@@ -123,22 +134,26 @@ const BlogArea = React.memo(() => {
                                        <p>{item.desc}</p>
                                        <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                                     </div>
-                                    <div className="post-meta-wrap">
-                                       <div className="post-meta">
-                                          <span><time><i className="flaticon-clock"></i>{formatBlogDate(item.date)}</time></span>
-                                          <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
-                                          <span><span><i className="flaticon-price-tag"></i>{tagsById.get(item.tagId)?.name ?? ''}</span></span>
-                                       </div>
-                                       <div className="post-share">
-                                          <div className="share-btn"><i className="flaticon-share"></i></div>
-                                          <ul className="social-link">
-                                             <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                             <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                             <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                             <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                                          </ul>
-                                       </div>
-                                    </div>
+<div className="post-meta-wrap">
+                                        <div className="post-meta">
+                                           <span><time><i className="flaticon-clock"></i>{formatBlogDate(item.date)}</time></span>
+                                           <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
+                                           <span><span><i className="flaticon-price-tag"></i>{tagsById.get(item.tagId)?.name ?? ''}</span></span>
+                                        </div>
+                                         <div className="post-share">
+                                            <BookmarkButton
+                                               postId={item.id.toString()}
+                                               postTitle={item.title}
+                                               postTags={item.tagId ? [tagsById.get(item.tagId)?.name ?? ''] : []}
+                                               className="bookmark-btn"
+                                            />
+                                            <div className="share-btn"><i className="flaticon-share"></i></div>
+                                            <SocialShareButtons
+                                               title={item.title}
+                                               url={`/blog-details?id=${item.id}`}
+                                            />
+                                         </div>
+                                     </div>
                                  </div>
                               </AnimationWrapper>
                            ))}

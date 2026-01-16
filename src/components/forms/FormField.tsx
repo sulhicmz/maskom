@@ -1,7 +1,7 @@
 "use client";
 
 import { UseFormRegisterReturn, FieldError, FieldValues, UseFormTrigger, Path } from "react-hook-form";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, memo } from "react";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 
 interface FormFieldProps<TFieldValues extends FieldValues = FieldValues> {
@@ -141,4 +141,4 @@ const FormField = <TFieldValues extends FieldValues = FieldValues>({
   );
 };
 
-export default FormField;
+export default memo(FormField) as <TFieldValues extends FieldValues = FieldValues>(props: FormFieldProps<TFieldValues>) => React.ReactElement;

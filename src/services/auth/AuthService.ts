@@ -14,6 +14,9 @@ import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS, CIRCUIT_BREAKER_CONFIG } from '@/
 import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
 import { v4 as uuidv4 } from 'uuid';
+import { UserRole, isValidRole } from '@/types/role';
+import { Permission } from '@/types/permission';
+import { hasPermission as checkPermission } from '@/data/rolesData';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -68,10 +71,13 @@ class AuthService implements IAuthService {
     private async loginWithoutResilience(credentials: LoginCredentials): Promise<AuthResult> {
         this.validateCredentials(credentials.email, credentials.password, false);
 
+        const role: UserRole = 'user';
+
         this.currentUser = {
             id: this.generateUserId(),
             name: this.extractNameFromEmail(credentials.email),
             email: credentials.email,
+            role,
         };
 
         return {
@@ -85,10 +91,13 @@ class AuthService implements IAuthService {
     private async registerWithoutResilience(userData: RegisterData): Promise<AuthResult> {
         this.validateCredentials(userData.email, userData.password, true, userData.name);
 
+        const role: UserRole = userData.role && isValidRole(userData.role) ? userData.role : 'user';
+
         this.currentUser = {
             id: this.generateUserId(),
             name: userData.name,
             email: userData.email,
+            role,
         };
 
         return {
@@ -183,6 +192,24 @@ class AuthService implements IAuthService {
 
     async getCurrentUser(): Promise<User | null> {
         return this.currentUser;
+    }
+
+    async getCurrentUserRole(): Promise<UserRole | null> {
+        return this.currentUser?.role || null;
+    }
+
+    async hasPermission(permission: Permission): Promise<boolean> {
+        if (!this.currentUser) {
+            return false;
+        }
+        return checkPermission(this.currentUser.role, permission);
+    }
+
+    async hasRole(role: UserRole): Promise<boolean> {
+        if (!this.currentUser) {
+            return false;
+        }
+        return this.currentUser.role === role;
     }
 
     getLoginRateLimitStatus(email: string): { count: number; firstAttempt: number; lockedUntil?: number | null; attemptsRemaining: number } {

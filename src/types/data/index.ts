@@ -98,8 +98,13 @@ export interface AIStep {
 }
 
 export interface BlogTagItem {
-  id: number;
-  name: string;
+   id: number;
+   name: string;
+}
+
+export interface CategoryItem {
+   id: number;
+   name: string;
 }
 
 export interface BlogCommentItem {
@@ -121,16 +126,17 @@ export interface TeamMember {
 export type BlogPostStatus = 'draft' | 'scheduled' | 'published';
 
 export interface InnerBlogPost {
-  id: number;
-  thumb: StaticImageData;
-  title: string;
-  desc: string;
-  date: string;
-  user: string;
-  tagId: number;
-  category?: string;
-  status?: BlogPostStatus;
-  publishDate?: string;
+   id: number;
+   thumb: StaticImageData;
+   title: string;
+   desc: string;
+   date: string;
+   user: string;
+   tagId: number;
+   categoryId: number;
+   category?: string;
+   status?: BlogPostStatus;
+   publishDate?: string;
 }
 
 export interface FaqDetail {

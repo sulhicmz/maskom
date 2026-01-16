@@ -49,7 +49,7 @@ export function generateMetadataFromProps(props: SeoProps): Metadata {
 
 export function generateBlogPostMetadata(
   post: InnerBlogPost,
-  siteUrl: string = "https://maskom.co.id"
+  siteUrl: string = process.env.NEXT_PUBLIC_SITE_URL || "https://maskom.co.id"
 ): Metadata {
   const canonicalUrl = `${siteUrl}/blog-details?id=${post.id}`
   const ogImageUrl = post.thumb.src || post.thumb.toString()

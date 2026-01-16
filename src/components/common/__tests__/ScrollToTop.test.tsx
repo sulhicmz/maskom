@@ -2,8 +2,6 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import ScrollToTop from "../ScrollToTop";
 
-const mockUseSticky = jest.fn(() => ({ sticky: false }));
-
 jest.mock("@/hooks/UseSticky", () => ({
   __esModule: true,
   default: jest.fn(() => ({ sticky: false })),
@@ -11,10 +9,11 @@ jest.mock("@/hooks/UseSticky", () => ({
 
 describe("ScrollToTop Component", () => {
   let mockScrollTo: jest.SpyInstance;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mockUseSticky = jest.mocked(require("@/hooks/UseSticky").default);
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.resetModules();
     mockScrollTo = jest.spyOn(window, "scrollTo").mockImplementation(() => {});
     mockUseSticky.mockReturnValue({ sticky: false });
   });
@@ -29,19 +28,18 @@ describe("ScrollToTop Component", () => {
 
       render(<ScrollToTop />);
 
-      const button = document.getElementById("xc_back-to-top");
+      const button = document.querySelector(".xc-back-to-top-btn");
       expect(button).toBeInTheDocument();
       expect(button).toHaveAttribute("type", "button");
-      expect(button).toHaveClass("xc-back-to-top-btn");
     });
 
-    it("renders back to top wrapper", () => {
+    it("renders back to top button with aria-label", () => {
       mockUseSticky.mockReturnValue({ sticky: false });
 
       render(<ScrollToTop />);
 
-      const wrapper = document.querySelector(".xc-back-to-top-wrapper");
-      expect(wrapper).toBeInTheDocument();
+      const button = document.querySelector(".xc-back-to-top-btn");
+      expect(button).toHaveAttribute("aria-label", "Kembali ke atas halaman");
     });
 
     it("renders back to top progress element", () => {
@@ -61,6 +59,24 @@ describe("ScrollToTop Component", () => {
       const icon = document.querySelector(".fa-angle-down");
       expect(icon).toBeInTheDocument();
     });
+
+    it("hides button when not sticky", () => {
+      mockUseSticky.mockReturnValue({ sticky: false });
+
+      render(<ScrollToTop />);
+
+      const button = document.querySelector(".xc-back-to-top-btn");
+      expect(button).not.toHaveClass("xc-back-to-top-btn-show");
+    });
+
+    it("shows button when sticky", () => {
+      mockUseSticky.mockReturnValue({ sticky: true });
+
+      render(<ScrollToTop />);
+
+      const button = document.querySelector(".xc-back-to-top-btn");
+      expect(button?.className).toContain("xc-back-to-top-btn-show");
+    });
   });
 
   describe("Click Handler", () => {
@@ -69,8 +85,8 @@ describe("ScrollToTop Component", () => {
 
       render(<ScrollToTop />);
 
-      const wrapper = document.querySelector(".xc-back-to-top-wrapper");
-      fireEvent.click(wrapper as Element);
+      const button = document.querySelector(".xc-back-to-top-btn");
+      fireEvent.click(button as Element);
 
       expect(mockScrollTo).toHaveBeenCalledWith({
         top: 0,
@@ -83,8 +99,8 @@ describe("ScrollToTop Component", () => {
 
       render(<ScrollToTop />);
 
-      const wrapper = document.querySelector(".xc-back-to-top-wrapper");
-      fireEvent.click(wrapper as Element);
+      const button = document.querySelector(".xc-back-to-top-btn");
+      fireEvent.click(button as Element);
 
       expect(mockScrollTo).toHaveBeenCalledWith(
         expect.objectContaining({ behavior: "smooth" })
@@ -96,8 +112,8 @@ describe("ScrollToTop Component", () => {
 
       render(<ScrollToTop />);
 
-      const wrapper = document.querySelector(".xc-back-to-top-wrapper");
-      fireEvent.click(wrapper as Element);
+      const button = document.querySelector(".xc-back-to-top-btn");
+      fireEvent.click(button as Element);
 
       expect(mockScrollTo).toHaveBeenCalledWith(
         expect.objectContaining({ top: 0 })

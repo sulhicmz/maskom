@@ -26,9 +26,21 @@ info:
     
     ## Response Format
     
-    All API responses follow standard format using createApiResponse utility:
+    All API responses follow standard ServiceResult<T> format for consistency with client-side services:
     - Success: success=true, message=string, data=T
     - Error: success=false, error=string, errorCode=string, metadata=object
+    
+    All responses include ServiceResult wrapper with the following structure:
+    ```typescript
+    interface ServiceResult<T> {
+        success: boolean;
+        message?: string;
+        data?: T;
+        error?: string;
+        errorCode?: ServiceErrorCodeType;
+        metadata?: Record<string, unknown>;
+    }
+    ```
     
     ## Standard Headers
     
@@ -36,7 +48,7 @@ info:
     - Content-Type: application/json
     - Cache-Control: no-cache, no-store, must-revalidate
   
-  version: 2.0.0
+  version: 3.0.0
   contact:
     name: Maskom Development Team
     url: https://maskom.co.id

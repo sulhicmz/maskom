@@ -22,10 +22,24 @@ src/components/
 │   ├── PageBuilder.tsx
 │   ├── SectionTitle.tsx
 │   ├── AnimationWrapper.tsx
-│   └── BackgroundSection.tsx
+│   ├── BackgroundSection.tsx
+│   ├── FormField.tsx
+│   ├── ExportButton.tsx
+│   ├── ThemeToggle.tsx
+│   ├── ProtectedRoute.tsx
+│   ├── BookmarkButton.tsx
+│   ├── SocialShareButtons.tsx
+│   ├── PricingCard.tsx
+│   ├── PricingTabs.tsx
+│   ├── JsonLd.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── Brand.tsx
+│   ├── Breadcrumb.tsx
+│   ├── ScrollToTop.tsx
+│   └── SkipToMainContent.tsx
 ├── homes/           # Home page variants (home-one, home-two, etc.)
 ├── pages/           # Page-specific components (pricing, faq, teams, etc.)
-├── forms/           # Form components (ContactForm, LoginForm, etc.)
+├── forms/           # Form components (ContactForm, LoginForm, NewsletterForm, etc.)
 ├── blogs/           # Blog-related components
 ├── about/           # About page components
 ├── dashboard/       # Dashboard components
@@ -188,6 +202,286 @@ import FormField from '@/components/common/FormField';
 - Eliminates duplicate form input code across 4 forms
 - Comprehensive accessibility features
 - 100+ tests covering all scenarios
+
+### 7. ExportButton
+
+Use `ExportButton` to export filtered blog content in PDF or CSV format.
+
+```typescript
+import ExportButton from '@/components/common/ExportButton';
+import type { InnerBlogPost } from '@/types/data';
+
+<ExportButton
+    posts={filteredPosts}
+    filterCriteria={filterCriteria}
+    buttonClassName="custom-export-btn"
+/>
+```
+
+**Props**: `ExportButtonProps` (see `src/components/common/ExportButton.tsx`)
+
+**Benefits**:
+- Supports PDF export with jsPDF for professional documents
+- Supports CSV export for data analysis
+- Includes metadata (filters, result count) in exports
+- Toast notifications for user feedback
+- Keyboard navigation and ARIA attributes for accessibility
+- React.memo optimization (Task 237)
+
+### 8. ThemeToggle
+
+Use `ThemeToggle` to switch between light and dark mode.
+
+```typescript
+import ThemeToggle from '@/components/common/ThemeToggle';
+
+<ThemeToggle />
+```
+
+**Features**:
+- System preference detection (automatically matches user's OS theme)
+- Manual theme switching with sun/moon icons
+- localStorage persistence for theme preference
+- Smooth transitions (0.3s ease)
+- Full accessibility support (ARIA labels)
+- ThemeContext integration (Task 203)
+
+**Benefits**:
+- Seamless dark mode experience
+- Respects user system preferences
+- Consistent theme across sessions
+- No flash of unstyled content
+
+### 9. ProtectedRoute
+
+Use `ProtectedRoute` to wrap components requiring authentication or specific roles/permissions.
+
+```typescript
+import ProtectedRoute from '@/components/common/ProtectedRoute';
+import { Permission } from '@/types/permission';
+
+// Route-level protection
+<ProtectedRoute requiredPermission={Permission.VIEW_ANALYTICS}>
+    <AnalyticsDashboard />
+</ProtectedRoute>
+
+// Role-based protection
+<ProtectedRoute requiredRole="admin">
+    <AdminPanel />
+</ProtectedRoute>
+
+// Multiple permissions (all required)
+<ProtectedRoute requiredPermissions={[Permission.MANAGE_CONTENT, Permission.PUBLISH_CONTENT]}>
+    <ContentEditor />
+</ProtectedRoute>
+```
+
+**Props**: `ProtectedRouteProps` (see `src/components/common/ProtectedRoute.tsx`)
+
+**Benefits**:
+- Declarative route protection
+- Automatic redirect to login if unauthenticated
+- Automatic redirect to dashboard if unauthorized
+- Loading states during authentication checks
+- Support for multiple permission requirements
+- RBAC integration (Task 223)
+
+### 10. NewsletterForm
+
+Use `NewsletterForm` for newsletter subscription with form validation.
+
+```typescript
+import NewsletterForm from '@/components/forms/NewsletterForm';
+
+<NewsletterForm
+    className="newsletter-wrapper"
+    buttonClassName="gradient-btn"
+/>
+```
+
+**Features**:
+- Email validation with Yup schema
+- Loading states during submission
+- Success/error feedback with Toast notifications
+- Focus management for screen readers
+- ARIA live regions for accessibility
+- Form reset after successful subscription
+
+**Benefits**:
+- Ready-to-use newsletter form
+- WCAG 2.1 Level AA/AA compliance
+- 23 comprehensive tests (Task 236)
+- Consistent with other form patterns
+
+### 11. BookmarkButton
+
+Use `BookmarkButton` to allow users to bookmark blog posts with localStorage persistence.
+
+```typescript
+import BookmarkButton from '@/components/common/BookmarkButton';
+
+<BookmarkButton
+    postId="1"
+    postTitle="How to Optimize Your Network"
+    postSlug="how-to-optimize-network"
+    postCategory="Konektivitas Terkelola"
+    postTags={["network", "optimization"]}
+    className="bookmark-btn"
+    onBookmarkChange={(isBookmarked) => console.log(isBookmarked)}
+/>
+```
+
+**Props**: `BookmarkButtonProps` (see `src/components/common/BookmarkButton.tsx`)
+
+**Features**:
+- localStorage-based bookmark persistence
+- Visual bookmark state (filled/outline icon)
+- Automatic bookmark detection on mount
+- Full accessibility support (ARIA pressed, labels)
+- Callback for bookmark state changes
+
+**Benefits**:
+- No backend required for bookmarks
+- User bookmarks persist across sessions
+- Easy integration with blog components
+
+### 12. SocialShareButtons
+
+Use `SocialShareButtons` to enable social media sharing of content.
+
+```typescript
+import SocialShareButtons from '@/components/common/SocialShareButtons';
+
+<SocialShareButtons
+    title="My Blog Post"
+    url="https://maskom.co.id/blog-details?id=1"
+    text="Check out this amazing post about network optimization!"
+    className="share-buttons"
+    ariaLabel="Share this article"
+/>
+```
+
+**Props**: `SocialShareButtonsProps` (see `src/components/common/SocialShareButtons.tsx`)
+
+**Features**:
+- Facebook, Twitter, LinkedIn, Instagram sharing
+- Automatic URL encoding
+- Custom share text support
+- Opens share dialog in new window
+- Keyboard navigation support
+- ARIA attributes for accessibility
+- React.memo optimization
+
+**Benefits**:
+- Ready-to-use social sharing
+- Consistent social sharing behavior
+- No external dependencies required
+
+### 13. PricingCard & PricingTabs
+
+Use `PricingCard` for individual pricing plan cards and `PricingTabs` for pricing tab switching.
+
+```typescript
+import { PricingCard } from '@/components/common/PricingCard';
+import { PricingTabs } from '@/components/common/PricingTabs';
+
+<PricingTabs>
+    <PricingCard
+        title="Basic"
+        price="Rp 500.000"
+        period="/month"
+        features={["Feature 1", "Feature 2", "Feature 3"]}
+        buttonText="Choose Basic"
+        buttonLink="/contact"
+        active={false}
+    />
+    <PricingCard
+        title="Pro"
+        price="Rp 1.500.000"
+        period="/month"
+        features={["Feature 1", "Feature 2", "Feature 3", "Feature 4"]}
+        buttonText="Choose Pro"
+        buttonLink="/contact"
+        active={true}
+    />
+</PricingTabs>
+```
+
+**Benefits**:
+- Eliminates duplicate pricing card code (2 components using same pattern)
+- Consistent pricing display across pages
+- Currency formatting support
+- React.memo optimization (Task 85)
+
+### 14. JsonLd
+
+Use `JsonLd` to inject Schema.org structured data for SEO.
+
+```typescript
+import JsonLd from '@/components/common/JsonLd';
+import { generateBlogPostSchema } from '@/utils/seo';
+
+const BlogDetailsPage = ({ post }) => {
+    const schema = generateBlogPostSchema(post, canonicalUrl, "https://maskom.co.id");
+
+    return (
+        <>
+            <JsonLd data={schema} />
+            <BlogDetails post={post} />
+        </>
+    );
+};
+```
+
+**Props**: `JsonLdProps` (see `src/components/common/JsonLd.tsx`)
+
+**Features**:
+- Type-safe JSON-LD script injection
+- Handles nested objects and arrays
+- Supports Schema.org Article, Organization, and other schemas
+- Essential for Google Rich Snippets (Task 220)
+
+**Benefits**:
+- Improves search engine visibility
+- Enables Google Rich Snippets
+- Better social media link previews
+- No manual JSON-LD syntax required
+
+### 15. ErrorBoundary
+
+Use `ErrorBoundary` to wrap components and handle errors gracefully.
+
+```typescript
+import ErrorBoundary from '@/components/common/ErrorBoundary';
+
+<ErrorBoundary
+    fallback={
+        <div className="error-container">
+            <h2>Something went wrong</h2>
+            <p>We're sorry, but an error occurred while rendering this page.</p>
+            <button onClick={() => window.location.reload()}>Reload Page</button>
+            <button onClick={() => window.history.back()}>Go Back</button>
+        </div>
+    }
+>
+    <ComponentThatMayError />
+</ErrorBoundary>
+```
+
+**Props**: `ErrorBoundaryProps` (see `src/components/common/ErrorBoundary.tsx`)
+
+**Features**:
+- Catches component errors and displays fallback
+- Error logging with unique error IDs
+- Recovery options (reload, go back)
+- Custom fallback UI support
+- Integrates with Toast notifications
+
+**Benefits**:
+- Graceful error handling
+- Prevents entire app crash
+- Better user experience
+- Easier debugging with error IDs
 
 ## Data-Driven Components
 
@@ -605,6 +899,14 @@ Before creating a new component, check if existing abstractions can be used:
 - [ ] Can I use `SectionTitle` for this section header?
 - [ ] Can I use `AnimationWrapper` for this animation?
 - [ ] Can I use `FormField` for this form input?
+- [ ] Can I use `ExportButton` for exporting data (PDF/CSV)?
+- [ ] Can I use `ThemeToggle` for dark mode?
+- [ ] Can I use `ProtectedRoute` for route protection?
+- [ ] Can I use `BookmarkButton` for bookmarking content?
+- [ ] Can I use `SocialShareButtons` for social sharing?
+- [ ] Can I use `PricingCard` for pricing plans?
+- [ ] Can I use `JsonLd` for SEO structured data?
+- [ ] Can I use `ErrorBoundary` for error handling?
 - [ ] Can I use data from `src/data/*.ts` instead of hardcoding?
 
 ## Additional Resources

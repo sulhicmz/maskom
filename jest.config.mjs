@@ -10,11 +10,12 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@/assets/(.*)$": "<rootDir>/public/assets/$1",
+    "^jspdf$": "<rootDir>/__mocks__/jspdf.mock.ts",
   },
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
   testPathIgnorePatterns: ["<rootDir>/.next/"],
   transformIgnorePatterns: [
-    "node_modules/(?!swiper)",
+    "node_modules/(?!swiper)/",
   ],
 };
 

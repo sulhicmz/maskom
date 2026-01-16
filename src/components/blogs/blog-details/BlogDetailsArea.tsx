@@ -10,6 +10,8 @@ const BlogForm = dynamic(() => import("@/components/forms/BlogForm"), {
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
 import { InnerBlogPost } from "@/types/data"
 import { tagsById } from "@/data/BlogTagData"
+import BookmarkButton from "@/components/common/BookmarkButton"
+import SocialShareButtons from "@/components/common/SocialShareButtons"
 
 import blog_thumb from "@/assets/images/blog/blog-single-1.jpg"
 import quote from "@/assets/images/icon/right-quote.png"
@@ -28,13 +30,23 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                             {single_blog?.thumb ? <Image src={single_blog.thumb} alt={`Thumbnail gambar artikel: ${single_blog.title}`} /> : <Image src={blog_thumb} alt="Thumbnail gambar placeholder: Artikel Maskom" />}
                          </div>
                         <div className="post-content wow fadeInUp">
-                           <h3 className="title">{single_blog?.title ? single_blog.title : "Strategi Maskom menjaga pengalaman pelanggan omni-channel"}</h3>
-                             <div className="post-meta mb-35">
-                                <time><i className="far fa-calendar-alt"></i>15
-                                   Mar 2024</time>
-                                <span><i className="far fa-user-circle"></i>{single_blog?.user ?? "Tim Editorial Maskom"}</span>
-                                <span><i className="far fa-tag"></i>{tag ?? "Managed Service"}</span>
-                             </div>
+                           <div className="bookmark-header d-flex align-items-center justify-content-between mb-3">
+                              <h3 className="title mb-0">{single_blog?.title ? single_blog.title : "Strategi Maskom menjaga pengalaman pelanggan omni-channel"}</h3>
+                              {single_blog?.id && (
+                                 <BookmarkButton
+                                    postId={single_blog.id.toString()}
+                                    postTitle={single_blog.title}
+                                    postTags={tag ? [tag] : []}
+                                    className="bookmark-btn-detail"
+                                 />
+                              )}
+                           </div>
+                              <div className="post-meta mb-35">
+                                 <time><i className="far fa-calendar-alt"></i>15
+                                    Mar 2024</time>
+                                 <span><i className="far fa-user-circle"></i>{single_blog?.user ?? "Tim Editorial Maskom"}</span>
+                                 <span><i className="far fa-tag"></i>{tag ?? "Managed Service"}</span>
+                              </div>
                            <p>Maskom mendampingi jaringan retail nasional dalam menjaga konsistensi pengalaman pelanggan antara toko fisik dan kanal digital. Seluruh kasir, aplikasi loyalty, layanan click & collect, hingga dashboard manajemen dihubungkan melalui jaringan managed service yang dipantau 24/7.</p>
                            <p>Dengan pendekatan tersebut, tim IT pelanggan tidak lagi mengelola perangkat secara manual per gerai. Maskom menghadirkan otomatisasi konfigurasi, segmentasi VLAN, serta laporan kesehatan jaringan yang dapat diakses kapan saja melalui portal pelanggan.</p>
                             <blockquote className="mb-35">
@@ -62,15 +74,13 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                                   <span>Managed Service,</span>
                                   <span> Konektivitas</span>
                                </div>
-                               <div className="ac-postbox-tags">
-                                  <div className="share-btn"><i className="flaticon-share"></i></div>
-                                  <ul className="social-link">
-                                     <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                     <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                     <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                     <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                                  </ul>
-                               </div>
+                                <div className="ac-postbox-tags">
+                                   <div className="share-btn"><i className="flaticon-share"></i></div>
+                                   <SocialShareButtons
+                                      title={single_blog?.title}
+                                      url={`/blog-details?id=${single_blog?.id}`}
+                                   />
+                                </div>
                             </div>
                         </div>
                      </article>

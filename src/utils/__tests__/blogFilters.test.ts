@@ -9,14 +9,14 @@ interface InnerBlogPostWithStatus extends InnerBlogPost {
 
 const mockPosts: InnerBlogPost[] = [
   {
-    id: 1,
+    id:1,
     thumb: "/test1.jpg" as unknown as StaticImageData,
     title: "Test Post 1",
     desc: "This is test description 1",
     date: "2024-01-01",
     user: "Author 1",
     tagId: 1,
-    category: "Category A",
+    categoryId: 1,
   },
   {
     id: 2,
@@ -26,7 +26,7 @@ const mockPosts: InnerBlogPost[] = [
     date: "2024-01-02",
     user: "Author 2",
     tagId: 2,
-    category: "Category B",
+    categoryId: 2,
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ const mockPosts: InnerBlogPost[] = [
     date: "2024-01-03",
     user: "Author 3",
     tagId: 1,
-    category: "Category A",
+    categoryId: 1,
   },
 ]
 
@@ -71,15 +71,15 @@ describe("filterBlogPosts", () => {
     expect(result.hasFilters).toBe(true)
   })
 
-  test("filters posts by category", () => {
-    const criteria: BlogFilterCriteria = { category: "Category A" }
-    const result = filterBlogPosts(mockPosts, criteria)
-
-    expect(result.filteredPosts).toHaveLength(2)
-    expect(result.filteredPosts.every(post => post.category === "Category A")).toBe(true)
-    expect(result.filterCount).toBe(2)
-    expect(result.hasFilters).toBe(true)
-  })
+  test("filters posts by categoryId", () => {
+     const criteria: BlogFilterCriteria = { categoryId: 1 }
+     const result = filterBlogPosts(mockPosts, criteria)
+ 
+     expect(result.filteredPosts).toHaveLength(2)
+     expect(result.filteredPosts.every(post => post.categoryId === 1)).toBe(true)
+     expect(result.filterCount).toBe(2)
+     expect(result.hasFilters).toBe(true)
+   })
 
   test("filters posts by tag ID", () => {
     const criteria: BlogFilterCriteria = { tagId: 1 }
@@ -102,7 +102,7 @@ describe("filterBlogPosts", () => {
         date: "2024-01-04",
         user: "Author 4",
         tagId: 1,
-        category: "Category A",
+        categoryId: 1,
         status: 'draft',
       },
       {
@@ -113,7 +113,7 @@ describe("filterBlogPosts", () => {
         date: "2024-01-05",
         user: "Author 5",
         tagId: 2,
-        category: "Category B",
+        categoryId: 2,
         status: 'published',
       },
     ]
@@ -129,15 +129,15 @@ describe("filterBlogPosts", () => {
     expect(result.hasFilters).toBe(true)
   })
 
-  test("filters posts with combined search and category", () => {
-    const criteria: BlogFilterCriteria = { searchQuery: "Test", category: "Category A" }
-    const result = filterBlogPosts(mockPosts, criteria)
-
-    expect(result.filteredPosts).toHaveLength(1)
-    expect(result.filteredPosts[0].id).toBe(1)
-    expect(result.filterCount).toBe(1)
-    expect(result.hasFilters).toBe(true)
-  })
+  test("filters posts with combined search and categoryId", () => {
+     const criteria: BlogFilterCriteria = { searchQuery: "Test", categoryId: 1 }
+     const result = filterBlogPosts(mockPosts, criteria)
+ 
+     expect(result.filteredPosts).toHaveLength(1)
+     expect(result.filteredPosts[0].id).toBe(1)
+     expect(result.filterCount).toBe(1)
+     expect(result.hasFilters).toBe(true)
+   })
 
   test("filters posts with combined search and tag", () => {
     const criteria: BlogFilterCriteria = { searchQuery: "Test", tagId: 1 }
@@ -149,44 +149,44 @@ describe("filterBlogPosts", () => {
     expect(result.hasFilters).toBe(true)
   })
 
-  test("filters posts with combined category and tag", () => {
-    const criteria: BlogFilterCriteria = { category: "Category A", tagId: 1 }
-    const result = filterBlogPosts(mockPosts, criteria)
-
-    expect(result.filteredPosts).toHaveLength(2)
-    expect(result.filteredPosts.every(post => 
-      post.category === "Category A" && post.tagId === 1
-    )).toBe(true)
-    expect(result.filterCount).toBe(2)
-    expect(result.hasFilters).toBe(true)
-  })
+  test("filters posts with combined categoryId and tag", () => {
+     const criteria: BlogFilterCriteria = { categoryId: 1, tagId: 1 }
+     const result = filterBlogPosts(mockPosts, criteria)
+ 
+     expect(result.filteredPosts).toHaveLength(2)
+     expect(result.filteredPosts.every(post => 
+       post.categoryId === 1 && post.tagId === 1
+     )).toBe(true)
+     expect(result.filterCount).toBe(2)
+     expect(result.hasFilters).toBe(true)
+   })
 
   test("filters posts with all three filters", () => {
-    const criteria: BlogFilterCriteria = { 
-      searchQuery: "Post", 
-      category: "Category A", 
-      tagId: 1 
-    }
-    const result = filterBlogPosts(mockPosts, criteria)
-
-    expect(result.filteredPosts).toHaveLength(1)
-    expect(result.filteredPosts[0].id).toBe(1)
-    expect(result.filterCount).toBe(1)
-    expect(result.hasFilters).toBe(true)
-  })
+     const criteria: BlogFilterCriteria = { 
+       searchQuery: "Post", 
+       categoryId: 1, 
+       tagId: 1 
+     }
+     const result = filterBlogPosts(mockPosts, criteria)
+ 
+     expect(result.filteredPosts).toHaveLength(1)
+     expect(result.filteredPosts[0].id).toBe(1)
+     expect(result.filterCount).toBe(1)
+     expect(result.hasFilters).toBe(true)
+   })
 
   test("returns empty array when no posts match filters", () => {
-    const criteria: BlogFilterCriteria = { 
-      searchQuery: "NonExistent", 
-      category: "Category Z", 
-      tagId: 999 
-    }
-    const result = filterBlogPosts(mockPosts, criteria)
-
-    expect(result.filteredPosts).toHaveLength(0)
-    expect(result.filterCount).toBe(0)
-    expect(result.hasFilters).toBe(true)
-  })
+     const criteria: BlogFilterCriteria = { 
+       searchQuery: "NonExistent", 
+       categoryId: 999, 
+       tagId: 999 
+     }
+     const result = filterBlogPosts(mockPosts, criteria)
+ 
+     expect(result.filteredPosts).toHaveLength(0)
+     expect(result.filterCount).toBe(0)
+     expect(result.hasFilters).toBe(true)
+   })
 
   test("case insensitive search", () => {
     const criteria: BlogFilterCriteria = { searchQuery: "test post 1" }
@@ -205,14 +205,14 @@ describe("filterBlogPosts", () => {
     expect(result.hasFilters).toBe(false)
   })
 
-  test("null category returns all posts", () => {
-    const criteria: BlogFilterCriteria = { category: null }
-    const result = filterBlogPosts(mockPosts, criteria)
-
-    expect(result.filteredPosts).toHaveLength(3)
-    expect(result.filterCount).toBe(3)
-    expect(result.hasFilters).toBe(false)
-  })
+  test("null categoryId returns all posts", () => {
+     const criteria: BlogFilterCriteria = { categoryId: null }
+     const result = filterBlogPosts(mockPosts, criteria)
+ 
+     expect(result.filteredPosts).toHaveLength(3)
+     expect(result.filterCount).toBe(3)
+     expect(result.hasFilters).toBe(false)
+   })
 
   test("null tag ID returns all posts", () => {
     const criteria: BlogFilterCriteria = { tagId: null }
