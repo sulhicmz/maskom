@@ -2740,3 +2740,121 @@ Comprehensive security audit completed with **zero critical issues**:
 **Full Documentation**: See `docs/task.md` - Task 130: Security Assessment for complete details
 **Assessment Frequency**: Monthly (Tasks 125, 130) and Quarterly comprehensive
 **Next Assessment**: February 13, 2026
+
+### Bookmarking System (✅ COMPLETED - Task 233)
+
+### Purpose
+
+Implement blog post bookmarking functionality to allow users to save and manage collections of interesting blog posts for later reading.
+
+### Architecture Components
+
+**Bookmark Types** (src/types/bookmark.ts):
+```typescript
+export interface Bookmark {
+  id: string;
+  postId: string;
+  postTitle: string;
+  postSlug?: string;
+  postCategory?: string;
+  postTags?: string[];
+  createdAt: string;
+}
+
+export interface BookmarkStorage {
+  bookmarks: Bookmark[];
+  lastUpdated: string;
+}
+```
+
+**Bookmark Storage Utilities** (src/utils/bookmarkStorage.ts):
+- `addBookmark(bookmark)` - Add a new bookmark with auto-generated ID and timestamp
+- `removeBookmark(postId)` - Remove bookmark by postId
+- `getBookmarks()` - Get all bookmarks sorted by creation date (newest first)
+- `bookmarkExists(postId)` - Check if post is bookmarked
+- `clearBookmarks()` - Clear all bookmarks
+- `getBookmarkCount()` - Get total bookmark count
+- Error handling for localStorage errors (QuotaExceededError, SecurityError, corrupted data)
+- SSR-safe: Returns empty bookmarks when window is undefined
+
+**Bookmark Validation** (src/utils/bookmarkValidation.ts):
+- `validateBookmark(bookmark)` - Validate bookmark structure (id, postId, postTitle, createdAt)
+- `validatePostId(postId)` - Validate postId format
+- ISO date validation for createdAt field
+- Type checking for all fields (string, array)
+
+**BookmarkButton Component** (src/components/common/BookmarkButton.tsx):
+- Client-side component using useState and useEffect
+- Auto-detects bookmark status on mount via bookmarkExists()
+- Toggle functionality: add or remove bookmark
+- Icon state: solid (fas) for bookmarked, outline (far) for not bookmarked
+- Props: postId, postTitle, postSlug, postCategory, postTags, className, onBookmarkChange
+- SSR-safe: Shows disabled placeholder until mounted
+- Accessibility: aria-label, aria-pressed attributes
+
+**BookmarksPage Component** (src/components/bookmarks/BookmarksPage.tsx):
+- Displays all saved bookmarks in grid layout
+- Shows post title, tags, and creation date
+- Remove button for each bookmark
+- Empty state message when no bookmarks exist
+- Responsive design with Bootstrap grid
+
+### Integration
+
+**BlogArea** (src/components/blogs/blog/BlogArea.tsx):
+- BookmarkButton integrated into each blog post card
+- Located in post-share section alongside social buttons
+- Passes postId, postTitle, and postTags to BookmarkButton
+
+**BlogDetailsArea** (src/components/blogs/blog-details/BlogDetailsArea.tsx):
+- BookmarkButton integrated into individual blog post view
+- Located in header section next to title
+- Conditionally renders only when single_blog.id exists
+- Passes postId, postTitle, and tag to BookmarkButton
+
+**Navigation** (src/data/MenuData.ts):
+- Menu item id 8: "Tandai" (Bookmarks)
+- Link: /bookmarks
+- No dropdown, direct navigation to BookmarksPage
+
+**Route** (src/app/bookmarks/page.tsx):
+- Next.js App Router page for bookmarked posts
+- Renders BookmarksPage component
+- Protected from SSR issues (client-side rendering)
+
+### Architecture Benefits
+
+1. **User Engagement**: Encourages users to return and read more content
+2. **Content Curation**: Users can organize posts by interest
+3. **Persistent Storage**: Bookmarks survive browser sessions (localStorage)
+4. **Cross-View Consistency**: Bookmark indicators visible everywhere (BlogArea, BlogDetailsArea)
+5. **Simple Management**: Easy add/remove bookmarks with one click
+6. **Personalized Experience**: Tailored content collections per user
+7. **Type Safety**: TypeScript interfaces ensure correct bookmark structure
+8. **Validation**: Runtime validation prevents corrupted bookmark data
+9. **Error Handling**: Graceful degradation on localStorage errors
+10. **Accessibility**: ARIA labels and keyboard navigation support
+
+### Testing
+
+- ✅ 71 bookmark tests passing (100% success rate)
+- ✅ 62 tests for BookmarkButton component (happy path, state changes, accessibility)
+- ✅ 9 tests for bookmarkStorage utilities (localStorage operations, error handling)
+- ✅ All 3321 tests passing (100% success rate)
+- ✅ Zero regressions in existing functionality
+
+### Success Criteria
+
+- [x] Bookmark types defined (Bookmark, BookmarkStorage)
+- [x] Bookmark storage utilities implemented (add, remove, get, exists, clear, count)
+- [x] Bookmark validation implemented (validateBookmark, validatePostId)
+- [x] BookmarkButton component created with icon state
+- [x] BookmarksPage component created for saved posts display
+- [x] BookmarkButton integrated into BlogArea
+- [x] BookmarkButton integrated into BlogDetailsArea
+- [x] Navigation menu link to /bookmarks added
+- [x] Bookmarks route created (src/app/bookmarks/page.tsx)
+- [x] Comprehensive tests (71 bookmark tests)
+- [x] All 3321 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (24 pages generated)

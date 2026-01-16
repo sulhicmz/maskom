@@ -12,6 +12,7 @@ import { formatBlogDate } from "@/utils/dateFormat"
 import { tagsById } from "@/data/BlogTagData"
 import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
+import BookmarkButton from "@/components/common/BookmarkButton"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => (
@@ -123,22 +124,28 @@ const BlogArea = React.memo(() => {
                                        <p>{item.desc}</p>
                                        <Link href="/blog-details" className="read-more style-one"><span>BACA SELENGKAPNYA</span></Link>
                                     </div>
-                                    <div className="post-meta-wrap">
-                                       <div className="post-meta">
-                                          <span><time><i className="flaticon-clock"></i>{formatBlogDate(item.date)}</time></span>
-                                          <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
-                                          <span><span><i className="flaticon-price-tag"></i>{tagsById.get(item.tagId)?.name ?? ''}</span></span>
-                                       </div>
-                                       <div className="post-share">
-                                          <div className="share-btn"><i className="flaticon-share"></i></div>
-                                          <ul className="social-link">
-                                             <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                             <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                             <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                             <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                                          </ul>
-                                       </div>
-                                    </div>
+<div className="post-meta-wrap">
+                                        <div className="post-meta">
+                                           <span><time><i className="flaticon-clock"></i>{formatBlogDate(item.date)}</time></span>
+                                           <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
+                                           <span><span><i className="flaticon-price-tag"></i>{tagsById.get(item.tagId)?.name ?? ''}</span></span>
+                                        </div>
+                                        <div className="post-share">
+                                           <BookmarkButton
+                                              postId={item.id.toString()}
+                                              postTitle={item.title}
+                                              postTags={item.tagId ? [tagsById.get(item.tagId)?.name ?? ''] : []}
+                                              className="bookmark-btn"
+                                           />
+                                           <div className="share-btn"><i className="flaticon-share"></i></div>
+                                           <ul className="social-link">
+                                              <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
+                                              <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
+                                              <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
+                                              <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
+                                           </ul>
+                                        </div>
+                                     </div>
                                  </div>
                               </AnimationWrapper>
                            ))}
