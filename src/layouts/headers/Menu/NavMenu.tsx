@@ -2,9 +2,9 @@
 import menu_data from "@/data/MenuData";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, memo } from "react";
 
-const NavMenu = () => {
+const NavMenu = memo(() => {
     const currentRoute = usePathname();
     const [openSubmenus, setOpenSubmenus] = useState<{ [key: number]: boolean }>({});
 
@@ -68,6 +68,8 @@ const NavMenu = () => {
             ))}
         </ul>
     );
-};
+});
+
+NavMenu.displayName = "NavMenu";
 
 export default NavMenu;
