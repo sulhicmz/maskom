@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import AnalyticsSummaryCards from './AnalyticsSummary'
 import AnalyticsChart from './AnalyticsChart'
+import PerformanceMetrics from './PerformanceMetrics'
 import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
 import { useRouter } from 'next/navigation'
@@ -54,6 +55,12 @@ const AnalyticsDashboard: React.FC = () => {
         </div>
 
         <AnalyticsSummaryCards summary={summary} />
+
+        <div className="row mt-4">
+          <div className="col-12">
+            <PerformanceMetrics />
+          </div>
+        </div>
 
         <div className="row mt-4">
           <div className="col-xl-6 col-lg-12 mb-4">

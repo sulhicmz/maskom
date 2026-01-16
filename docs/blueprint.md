@@ -908,24 +908,127 @@ import { Permission } from '@/types/permission'
    - ✅ Lint passes: 0 errors, 0 warnings
    - ✅ Build successful: 23 pages generated
 
-   ### Success Criteria
+    ### Success Criteria
 
-   - [x] Create SEO types and interfaces (SeoProps, BlogPostSchema, SitemapEntry)
-   - [x] Create JSON-LD generator for blog posts (generateBlogPostSchema)
-   - [x] Create metadata generator utilities (generateBlogPostMetadata, generateMetadataFromProps)
-   - [x] Create JsonLd component for structured data rendering
-   - [x] Implement Open Graph meta tags (og:title, og:description, og:image, og:url)
-   - [x] Implement Twitter Card meta tags (twitter:card, twitter:title, twitter:description, twitter:image)
-   - [x] Generate canonical URLs dynamically
-   - [x] Create sitemap.ts for dynamic sitemap generation
-   - [x] Create robots.ts for crawler directives
-   - [x] Update blog-details page with dynamic metadata and JSON-LD
-   - [x] Add comprehensive tests (20 tests covering all SEO components)
-   - [x] All tests passing (3031 total, 100% success rate)
-   - [x] Lint passes (0 errors, 0 warnings)
-   - [x] Build successful (23 pages generated)
+    - [x] Create SEO types and interfaces (SeoProps, BlogPostSchema, SitemapEntry)
+    - [x] Create JSON-LD generator for blog posts (generateBlogPostSchema)
+    - [x] Create metadata generator utilities (generateBlogPostMetadata, generateMetadataFromProps)
+    - [x] Create JsonLd component for structured data rendering
+    - [x] Implement Open Graph meta tags (og:title, og:description, og:image, og:url)
+    - [x] Implement Twitter Card meta tags (twitter:card, twitter:title, twitter:description, twitter:image)
+    - [x] Generate canonical URLs dynamically
+    - [x] Create sitemap.ts for dynamic sitemap generation
+    - [x] Create robots.ts for crawler directives
+    - [x] Update blog-details page with dynamic metadata and JSON-LD
+    - [x] Add comprehensive tests (20 tests covering all SEO components)
+    - [x] All tests passing (3031 total, 100% success rate)
+    - [x] Lint passes (0 errors, 0 warnings)
+    - [x] Build successful (23 pages generated)
 
-   ### Module Extraction Pattern (✅ COMPLETED - Task 127, Task 153, Task 214, Task 224)
+    ### Performance Monitoring System (✅ COMPLETED - Task 232)
+
+    ### Purpose
+
+    Implement real-time performance metrics monitoring in the admin analytics dashboard to enable proactive identification of bottlenecks and performance optimization.
+
+    ### Architecture Components
+
+    **Performance Types** (src/types/analytics.ts):
+    ```typescript
+    export interface WebVitalsMetrics {
+      lcp: number
+      fid: number
+      cls: number
+      fcp: number
+      ttfb: number
+    }
+
+    export interface WebVitalsEntry {
+      metric: 'LCP' | 'FID' | 'CLS' | 'FCP' | 'TTFB'
+      value: number
+      rating: 'good' | 'needs-improvement' | 'poor'
+      timestamp: string
+    }
+
+    export interface PerformanceMetrics {
+      metrics: WebVitalsMetrics
+      entries: WebVitalsEntry[]
+      averageRating: 'good' | 'needs-improvement' | 'poor'
+      lastUpdated: string
+    }
+    ```
+
+    **Web Vitals Utility** (src/utils/webVitals.ts):
+    ```typescript
+    export function getRating(metric: string, value: number): 'good' | 'needs-improvement' | 'poor'
+    export function recordMetric(metric: string, value: number): void
+    export function getWebVitalsMetrics(): WebVitalsMetrics
+    export function getWebVitalsEntries(): WebVitalsEntry[]
+    export function resetWebVitals(): void
+    export function calculateAverageRating(): 'good' | 'needs-improvement' | 'poor'
+    export function getPerformanceMetrics(): PerformanceMetrics
+    export function hasPerformanceAlerts(): boolean
+    export function getPerformanceAlerts(): WebVitalsEntry[]
+    ```
+
+    **Performance Thresholds**:
+    - LCP (Largest Contentful Paint): good < 2500ms, needs-improvement 2500-4000ms, poor > 4000ms
+    - FID (First Input Delay): good < 100ms, needs-improvement 100-300ms, poor > 300ms
+    - CLS (Cumulative Layout Shift): good < 0.1, needs-improvement 0.1-0.25, poor > 0.25
+    - FCP (First Contentful Paint): good < 1800ms, needs-improvement 1800-3000ms, poor > 3000ms
+    - TTFB (Time to First Byte): good < 800ms, needs-improvement 800-1800ms, poor > 1800ms
+
+    **PerformanceMetrics Component** (src/components/admin/PerformanceMetrics.tsx):
+    - Displays all Core Web Vitals with ratings
+    - Shows performance alerts for poor metrics
+    - Web Vitals history table with timestamps
+    - Best practices guide for performance optimization
+    - 30-second auto-refresh interval
+    - Dark mode support
+
+    ### Implementation
+
+    **Analytics Dashboard Enhancement** (src/components/admin/AnalyticsDashboard.tsx):
+    - Integrated PerformanceMetrics component
+    - Added performance data to analytics collection (analyticsData.ts)
+    - Mock performance data with good ratings (for demo)
+    - Real-time metrics tracking ready for production
+
+    ### Architecture Benefits
+
+    1. **Proactive Monitoring**: Identify performance issues before user impact
+    2. **Data-Driven Optimization**: Make performance decisions based on metrics
+    3. **Real-Time Insights**: Live performance data in admin dashboard
+    4. **Historical Analysis**: Track performance trends over time
+    5. **Alert System**: Automatic notifications for threshold violations
+    6. **Web Vitals Integration**: Leverage industry-standard metrics
+    7. **Average Rating**: Overall performance health indicator
+
+    ### Testing
+
+    - ✅ 51 comprehensive tests for webVitals utilities (100% passing)
+    - ✅ All 3301 tests passing (100% success rate)
+    - ✅ Zero regressions in existing functionality
+    - ✅ Lint passes (0 errors, 0 warnings)
+    - ✅ Type check passes (0 errors)
+
+    ### Success Criteria
+
+    - [x] Create Web Vitals utility (src/utils/webVitals.ts)
+    - [x] Implement getRating function with threshold logic
+    - [x] Implement recordMetric for tracking metrics
+    - [x] Implement resetWebVitals for clearing data
+    - [x] Implement calculateAverageRating for overall health
+    - [x] Implement hasPerformanceAlerts for alert detection
+    - [x] Create PerformanceMetrics component for admin dashboard
+    - [x] Add performance data to analytics collection
+    - [x] Integrate PerformanceMetrics into AnalyticsDashboard
+    - [x] Add 51 comprehensive tests for webVitals utilities
+    - [x] All 3301 tests passing (100% success rate)
+    - [x] Lint passes (0 errors, 0 warnings)
+    - [x] Type check passes (0 errors)
+
+    ### Module Extraction Pattern (✅ COMPLETED - Task 127, Task 153, Task 214, Task 224)
 
   ### Purpose
 

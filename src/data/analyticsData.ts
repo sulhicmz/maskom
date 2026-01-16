@@ -1,4 +1,4 @@
-import { AnalyticsData, FormSubmissionMetrics, PageViewMetrics, UserEngagementMetrics } from '@/types/analytics'
+import { AnalyticsData, FormSubmissionMetrics, PageViewMetrics, UserEngagementMetrics, PerformanceMetrics } from '@/types/analytics'
 
 const formSubmissions: FormSubmissionMetrics[] = [
   {
@@ -226,10 +226,30 @@ const userEngagement: UserEngagementMetrics = {
   engagedSessions: 1850
 }
 
+const performanceData: PerformanceMetrics = {
+  metrics: {
+    lcp: 1850,
+    fid: 75,
+    cls: 0.08,
+    fcp: 1200,
+    ttfb: 450
+  },
+  entries: [
+    { metric: 'LCP', value: 1850, rating: 'good', timestamp: '2026-01-14T10:30:00.000Z' },
+    { metric: 'FID', value: 75, rating: 'good', timestamp: '2026-01-14T10:30:05.000Z' },
+    { metric: 'CLS', value: 0.08, rating: 'good', timestamp: '2026-01-14T10:30:10.000Z' },
+    { metric: 'FCP', value: 1200, rating: 'good', timestamp: '2026-01-14T10:30:15.000Z' },
+    { metric: 'TTFB', value: 450, rating: 'good', timestamp: '2026-01-14T10:30:20.000Z' }
+  ],
+  averageRating: 'good',
+  lastUpdated: new Date().toISOString()
+}
+
 const analyticsData: AnalyticsData = {
   formSubmissions,
   pageViews,
   userEngagement,
+  performance: performanceData,
   lastUpdated: new Date().toISOString()
 }
 

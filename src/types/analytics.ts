@@ -45,6 +45,28 @@ export interface AnalyticsData {
   lastUpdated: string
 }
 
+export interface WebVitalsMetrics {
+  lcp: number
+  fid: number
+  cls: number
+  fcp: number
+  ttfb: number
+}
+
+export interface WebVitalsEntry {
+  metric: 'LCP' | 'FID' | 'CLS' | 'FCP' | 'TTFB'
+  value: number
+  rating: 'good' | 'needs-improvement' | 'poor'
+  timestamp: string
+}
+
+export interface PerformanceMetrics {
+  metrics: WebVitalsMetrics
+  entries: WebVitalsEntry[]
+  averageRating: 'good' | 'needs-improvement' | 'poor'
+  lastUpdated: string
+}
+
 export interface AnalyticsSummary {
   totalFormSubmissions: number
   formSuccessRate: number
@@ -52,4 +74,12 @@ export interface AnalyticsSummary {
   avgSessionDuration: number
   conversionRate: number
   engagementScore: number
+}
+
+export interface AnalyticsData {
+  formSubmissions: FormSubmissionMetrics[]
+  pageViews: PageViewMetrics[]
+  userEngagement: UserEngagementMetrics
+  performance?: PerformanceMetrics
+  lastUpdated: string
 }
