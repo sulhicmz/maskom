@@ -6,5 +6,6 @@ export {
     createEmailPasswordSchema,
     createContactFormSchema,
     createSignUpFormSchema,
-    createBlogFormSchema
+    createBlogFormSchema,
+    createNewsletterFormSchema
 } from '@/utils/validation/yupAdapter';

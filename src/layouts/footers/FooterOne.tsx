@@ -2,6 +2,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import SocialLinks from "@/components/common/SocialLinks"
+import NewsletterForm from "@/components/forms/NewsletterForm"
 import { navigationSections, socialLinks } from "@/data/SocialMediaData"
 import { memo } from "react"
 
@@ -52,32 +53,15 @@ const FooterOne = memo(({ style, style_2 }: FooterOneProps) => {
                         </div>
                      </div>
                   </div>
-                   <div className="col-lg-3">
-                       <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
-                          <h4 className="footer-title">News & Update</h4>
-                          <div className="newsletter-content">
-                             <form className="form-group mb-30" onSubmit={(e) => e.preventDefault()}>
-                                <label htmlFor="footer_email" className="sr-only">Email address</label>
-                                <input
-                                   type="email"
-                                   id="footer_email"
-                                   placeholder="Masukkan email Anda"
-                                   name="email"
-                                   required
-                                   aria-label="Email untuk newsletter"
-                                />
-                                <button
-                                   type="submit"
-                                   className={`theme-btn ${style ? "style-one" : "gradient-btn"}`}
-                                   aria-label="Subscribe ke newsletter"
-                                >
-                                   Subscribe
-                                </button>
-                             </form>
-                             <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
-                          </div>
+                    <div className="col-lg-3">
+                        <div className="footer-widget footer-newsletter-widget mb-30 wow fadeInUp">
+                           <h4 className="footer-title">News & Update</h4>
+                           <div className="newsletter-content">
+                              <NewsletterForm buttonClassName={style ? "style-one" : "gradient-btn"} />
+                              <p>Dapatkan kabar terbaru seputar layanan Maskom dan tren infrastruktur digital langsung ke email Anda.</p>
+                           </div>
+                        </div>
                        </div>
-                      </div>
                </div>
             </div>
          </div>

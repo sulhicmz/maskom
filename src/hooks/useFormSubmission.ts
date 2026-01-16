@@ -20,6 +20,7 @@ export function useFormSubmission<TData = void, TResult extends BaseResult = Bas
     options: FormSubmissionOptions<TResult> = {}
 ) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const { onSuccess, onError, resetForm, successMessage } = options;
 
     const submit = async (data?: TData): Promise<TResult> => {
@@ -28,6 +29,7 @@ export function useFormSubmission<TData = void, TResult extends BaseResult = Bas
             const result = await serviceCall(data);
 
             if (result.success) {
+                setIsSuccess(true);
                 if (successMessage) {
                     toast.success(successMessage, { position: 'top-center' });
                 } else if (result.message) {
@@ -38,9 +40,11 @@ export function useFormSubmission<TData = void, TResult extends BaseResult = Bas
                     resetForm();
                 }
             } else if (result.metadata?.rateLimited) {
+                setIsSuccess(false);
                 toast.error(result.error || 'Terlalu banyak percobaan. Silakan coba lagi nanti.', { position: 'top-center' });
                 onError?.(result.error || 'Rate limited');
             } else {
+                setIsSuccess(false);
                 toast.error(result.error || 'Gagal. Silakan coba lagi.', { position: 'top-center' });
                 onError?.(result.error || 'Unknown error');
             }
@@ -51,5 +55,5 @@ export function useFormSubmission<TData = void, TResult extends BaseResult = Bas
         }
     };
 
-    return { submit, isSubmitting };
+    return { submit, isSubmitting, isSuccess };
 }
