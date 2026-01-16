@@ -1,5 +1,203 @@
 # Architecture Task Tracking
 
+## Task 228: Data Architecture - Auto-ID Generation for Remaining BaseDataItem Files (Jan 16, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture (Data Integrity)
+
+### Purpose
+Apply auto-ID generation to remaining BaseDataItem data files (FaqData, ProcessData, CauseData) to ensure unique IDs across collections, prevent duplicate IDs, and maintain consistency with existing auto-ID pattern.
+
+### Problem Identified
+
+**Duplicate ID Issue**:
+- FaqData.ts has IDs restarting for each page (home_1: 1,2,3; home_2: 1,2,3,4; home_3: 1,2,3,4)
+- ProcessData.ts has manual IDs (1,2,3)
+- CauseData.ts has manual IDs (1,2,3,4,5,6)
+
+**Why This Matters**:
+1. **Data Integrity**: Duplicate IDs break unique ID constraint principle
+2. **Relationship Integrity**: Future relationships may require truly unique IDs
+3. **Consistency**: FeedbackData, PriceData, FeatureData already use auto-ID (Tasks 175, 183)
+4. **Maintenance**: Manual ID tracking is error-prone
+5. **Single Source of Truth**: Auto-ID provides centralized ID management
+
+### Data Files Inventory (Auto-ID Status)
+
+| Data File | Extends BaseDataItem | Auto-ID Applied | ID Uniqueness |
+|-----------|-------------------|----------------|--------------|
+| FeedbackData.ts | Yes | ✅ (Task 183) | Unique |
+| PriceData.ts | Yes | ✅ (Task 175) | Unique |
+| FeatureData.ts | Yes | ✅ (Task 183) | Unique |
+| FaqData.ts | Yes | ✅ (Task 228) | Unique |
+| ProcessData.ts | Yes | ✅ (Task 228) | Unique |
+| CauseData.ts | Yes | ✅ (Task 228) | Unique |
+
+### Implementation
+
+#### Phase 1: FaqData.ts Auto-ID
+- [x] Removed manual `id` fields from all FaqItem objects
+- [x] Imported and applied `autoIdArray<FaqItem>` utility
+- [x] Kept page field and all other data intact
+- [x] Exported as `faq_data`
+
+**Code Changes**:
+```typescript
+// Before
+const faq_data: FaqItem[] = [
+  { id: 1, page: "home_1", ... },
+  { id: 1, page: "home_2", ... },  // Duplicate ID!
+  { id: 1, page: "home_3", ... }   // Duplicate ID!
+];
+
+// After
+const { data: faq_data } = autoIdArray<FaqItem>([
+  { page: "home_1", ... },
+  { page: "home_2", ... },
+  { page: "home_3", ... }
+], { startFrom: 1 });
+// Result: IDs 1-11 (unique across all pages)
+```
+
+#### Phase 2: ProcessData.ts Auto-ID
+- [x] Removed manual `id` fields from all ProcessItem objects
+- [x] Imported and applied `autoIdArray<ProcessItem>` utility
+- [x] Kept page field and all other data intact
+- [x] Exported as `process_data`
+
+**Code Changes**:
+```typescript
+// Before
+const process_data: ProcessItem[] = [
+  { id: 1, page: "home_1", ... },
+  { id: 2, page: "home_1", ... },
+  { id: 3, page: "home_1", ... }
+];
+
+// After
+const { data: process_data } = autoIdArray<ProcessItem>([
+  { page: "home_1", ... },
+  { page: "home_1", ... },
+  { page: "home_1", ... }
+], { startFrom: 1 });
+// Result: IDs 1-3 (unique)
+```
+
+#### Phase 3: CauseData.ts Auto-ID
+- [x] Removed manual `id` fields from all CauseItem objects
+- [x] Imported and applied `autoIdArray<CauseItem>` utility
+- [x] Kept page field and all other data intact
+- [x] Exported as `cause_data`
+
+**Code Changes**:
+```typescript
+// Before
+const cause_data: CauseItem[] = [
+  { id: 1, page: "home_1", ... },
+  { id: 2, page: "home_1", ... },
+  { id: 3, page: "home_1", ... },
+  { id: 4, page: "home_1", ... },
+  { id: 5, page: "home_1", ... },
+  { id: 6, page: "home_1", ... }
+];
+
+// After
+const { data: cause_data } = autoIdArray<CauseItem>([
+  { page: "home_1", ... },
+  { page: "home_1", ... },
+  { page: "home_1", ... },
+  { page: "home_1", ... },
+  { page: "home_1", ... },
+  { page: "home_1", ... }
+], { startFrom: 1 });
+// Result: IDs 1-6 (unique)
+```
+
+#### Phase 4: Validation & Testing
+- [x] Verified all IDs are unique across collections
+- [x] Verified validators still pass (validateFaqItem, validateProcessItem, validateCauseItem)
+- [x] Verified page filtering still works correctly
+- [x] Verified pre-filtered exports work correctly
+
+### Code Changes
+- Modified: `src/data/FaqData.ts` - Applied autoIdArray (11 items, IDs 1-11)
+- Modified: `src/data/ProcessData.ts` - Applied autoIdArray (3 items, IDs 1-3)
+- Modified: `src/data/CauseData.ts` - Applied autoIdArray (6 items, IDs 1-6)
+- Total: 3 files modified, ~10 lines changed per file
+
+### Architecture Benefits
+
+1. **Data Integrity**: Unique IDs prevent relationship conflicts
+2. **Consistency**: All BaseDataItem files now use auto-ID pattern
+3. **Maintainability**: No manual ID tracking required
+4. **Scalability**: Easy to add new items without ID conflicts
+5. **Single Source of Truth**: Centralized ID management via dataAutoId.ts
+6. **Type Safety**: AutoIdArrayResult provides generator for testing/debugging
+
+### Before vs After
+
+**Before (Duplicate IDs in FaqData)**:
+- home_1: IDs 1, 2, 3
+- home_2: IDs 1, 2, 3, 4 (duplicates with home_1!)
+- home_3: IDs 1, 2, 3, 4 (duplicates with home_1 and home_2!)
+- Total: 11 items, but only IDs 1-4 used (multiple duplicates)
+
+**After (Unique IDs)**:
+- All items: IDs 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+- Total: 11 items, all IDs unique (1-11)
+- No duplicates across pages
+
+### Success Criteria
+
+- [x] FaqData.ts converted to use autoIdArray
+- [x] ProcessData.ts converted to use autoIdArray
+- [x] CauseData.ts converted to use autoIdArray
+- [x] All IDs unique across collections
+- [x] All existing validators pass
+- [x] Page filtering still works correctly
+- [x] Pre-filtered exports work correctly
+- [x] All 3197 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (0 errors)
+- [x] Build successful (23 pages generated)
+
+### Related Files
+- ✅ Modified: `src/data/FaqData.ts` - Applied autoIdArray
+- ✅ Modified: `src/data/ProcessData.ts` - Applied autoIdArray
+- ✅ Modified: `src/data/CauseData.ts` - Applied autoIdArray
+- ✅ Updated: `docs/blueprint.md` - Data Files Inventory updated
+- ✅ Updated: `docs/task.md` - Task 228 documentation
+
+### Notes
+- Follows Data Architecture Principle: Single Source of Truth for ID management
+- Consistent with FeedbackData, PriceData, FeatureData auto-ID pattern (Tasks 175, 183)
+- No breaking changes: Page filtering and pre-filtered exports work identically
+- ID uniqueness verified: FaqData (1-11), ProcessData (1-3), CauseData (1-6)
+- All validators pass: validateFaqItem, validateProcessItem, validateCauseItem
+- Zero regressions: All 3197 tests passing, lint clean, build successful
+
+### Impact
+- Data Integrity: All BaseDataItem files now use auto-ID pattern, preventing duplicate IDs
+- ID Uniqueness: FaqData no longer has duplicate IDs across pages (1-11 unique)
+- Consistency: All 6 BaseDataItem files (Feedback, Price, Feature, Faq, Process, Cause) use same pattern
+- Maintainability: No manual ID tracking required for any BaseDataItem file
+- Scalability: Easy to add new FAQ items without managing ID conflicts
+- Zero Regressions: All 3197 tests passing, lint clean, build successful
+
+### Verification Date
+2026-01-16
+
+### Related Tasks
+- Task 175 (Auto-ID for PriceData.ts)
+- Task 183 (Auto-ID for FeedbackData.ts and FeatureData.ts)
+- Task 77 (Auto-ID Generation Framework)
+
+### Next Review
+January 22, 2026
+
+---
+
 ## Task 227: Performance Optimization - NavMenu Memoization (Jan 16, 2026)
 
 **Status**: ✅ Completed
