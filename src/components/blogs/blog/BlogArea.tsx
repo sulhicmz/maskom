@@ -15,6 +15,7 @@ import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
 import BookmarkButton from "@/components/common/BookmarkButton"
 import ExportButton from "@/components/common/ExportButton"
+import SocialShareButtons from "@/components/common/SocialShareButtons"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => (
@@ -139,21 +140,19 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
                                            <span><span><i className="flaticon-user-2"></i>{item.user}</span></span>
                                            <span><span><i className="flaticon-price-tag"></i>{tagsById.get(item.tagId)?.name ?? ''}</span></span>
                                         </div>
-                                        <div className="post-share">
-                                           <BookmarkButton
-                                              postId={item.id.toString()}
-                                              postTitle={item.title}
-                                              postTags={item.tagId ? [tagsById.get(item.tagId)?.name ?? ''] : []}
-                                              className="bookmark-btn"
-                                           />
-                                           <div className="share-btn"><i className="flaticon-share"></i></div>
-                                           <ul className="social-link">
-                                              <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                              <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                              <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                              <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                                           </ul>
-                                        </div>
+                                         <div className="post-share">
+                                            <BookmarkButton
+                                               postId={item.id.toString()}
+                                               postTitle={item.title}
+                                               postTags={item.tagId ? [tagsById.get(item.tagId)?.name ?? ''] : []}
+                                               className="bookmark-btn"
+                                            />
+                                            <div className="share-btn"><i className="flaticon-share"></i></div>
+                                            <SocialShareButtons
+                                               title={item.title}
+                                               url={`/blog-details?id=${item.id}`}
+                                            />
+                                         </div>
                                      </div>
                                  </div>
                               </AnimationWrapper>

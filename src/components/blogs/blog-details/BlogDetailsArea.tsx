@@ -11,6 +11,7 @@ import BlogSidebar from "../blog-sidebar/BlogSidebar"
 import { InnerBlogPost } from "@/types/data"
 import { tagsById } from "@/data/BlogTagData"
 import BookmarkButton from "@/components/common/BookmarkButton"
+import SocialShareButtons from "@/components/common/SocialShareButtons"
 
 import blog_thumb from "@/assets/images/blog/blog-single-1.jpg"
 import quote from "@/assets/images/icon/right-quote.png"
@@ -73,15 +74,13 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                                   <span>Managed Service,</span>
                                   <span> Konektivitas</span>
                                </div>
-                               <div className="ac-postbox-tags">
-                                  <div className="share-btn"><i className="flaticon-share"></i></div>
-                                  <ul className="social-link">
-                                     <li><button type="button" aria-label="Share on Facebook"><i className="fab fa-facebook-f"></i></button></li>
-                                     <li><button type="button" aria-label="Share on Twitter"><i className="fab fa-twitter"></i></button></li>
-                                     <li><button type="button" aria-label="Share on LinkedIn"><i className="fab fa-linkedin-in"></i></button></li>
-                                     <li><button type="button" aria-label="Share on Instagram"><i className="fab fa-instagram"></i></button></li>
-                                  </ul>
-                               </div>
+                                <div className="ac-postbox-tags">
+                                   <div className="share-btn"><i className="flaticon-share"></i></div>
+                                   <SocialShareButtons
+                                      title={single_blog?.title}
+                                      url={`/blog-details?id=${single_blog?.id}`}
+                                   />
+                                </div>
                             </div>
                         </div>
                      </article>
