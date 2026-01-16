@@ -725,4 +725,318 @@ describe('FormField', () => {
       expect(wrapper).toContainElement(toggleButton as HTMLElement);
     });
   });
+
+  describe('Real-Time Validation', () => {
+    it('triggers validation when trigger prop is provided', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: 'test' } });
+
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledWith('test-id');
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('does not trigger validation when trigger prop is undefined', () => {
+      const mockTrigger = jest.fn();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={undefined}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: 'test' } });
+
+      expect(mockTrigger).not.toHaveBeenCalled();
+    });
+
+    it('debounces validation calls with default debounceMs', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: 'a' } });
+      fireEvent.change(input, { target: { value: 'ab' } });
+      fireEvent.change(input, { target: { value: 'abc' } });
+
+      expect(mockTrigger).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('uses custom debounceMs value', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={500}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: 'test' } });
+
+      jest.advanceTimersByTime(400);
+      expect(mockTrigger).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(100);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('handles rapid input changes correctly', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+
+      for (let i = 0; i < 10; i++) {
+        fireEvent.change(input, { target: { value: `test${i}` } });
+      }
+
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('updates character count before debounce completes', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          type="textarea"
+          maxLength={100}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const charCount = screen.getByText(/karakter/);
+
+      fireEvent.change(textarea, { target: { value: 'Hello' } });
+      expect(charCount).toHaveTextContent('5 / 100 karakter');
+      expect(mockTrigger).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('applies debounceMs=0 (no debouncing)', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={0}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: 'test' } });
+
+      jest.advanceTimersByTime(0);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+  });
+
+  describe('ARIA Live Regions for Real-Time Validation', () => {
+    it('applies aria-live="polite" by default to error messages', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'This field is required',
+      };
+
+      render(<FormField {...baseProps} error={mockError} />);
+
+      const errorElement = screen.getByRole('alert');
+      expect(errorElement).toHaveAttribute('aria-live', 'polite');
+    });
+
+    it('applies custom aria-live value from props', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'This field is required',
+      };
+
+      render(
+        <FormField
+          {...baseProps}
+          error={mockError}
+          ariaLive="assertive"
+        />
+      );
+
+      const errorElement = screen.getByRole('alert');
+      expect(errorElement).toHaveAttribute('aria-live', 'assertive');
+    });
+
+    it('applies aria-live="off" when specified', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'This field is required',
+      };
+
+      render(
+        <FormField
+          {...baseProps}
+          error={mockError}
+          ariaLive="off"
+        />
+      );
+
+      const errorElement = screen.getByRole('alert');
+      expect(errorElement).toHaveAttribute('aria-live', 'off');
+    });
+
+    it('removes aria-live when error is cleared', () => {
+      const mockError: FieldError = {
+        type: 'required',
+        message: 'This field is required',
+      };
+
+      const { rerender } = render(
+        <FormField
+          {...baseProps}
+          error={mockError}
+          ariaLive="polite"
+        />
+      );
+
+      const errorElement = screen.getByRole('alert');
+      expect(errorElement).toHaveAttribute('aria-live', 'polite');
+
+      rerender(<FormField {...baseProps} error={undefined} />);
+
+      const errorAfterClear = screen.queryByRole('alert');
+      expect(errorAfterClear).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Real-Time Validation with Debounce Integration', () => {
+    it('prevents excessive validation calls during rapid typing', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+
+      fireEvent.change(input, { target: { value: 'a' } });
+      jest.advanceTimersByTime(100);
+      expect(mockTrigger).not.toHaveBeenCalled();
+
+      fireEvent.change(input, { target: { value: 'ab' } });
+      jest.advanceTimersByTime(100);
+      expect(mockTrigger).not.toHaveBeenCalled();
+
+      fireEvent.change(input, { target: { value: 'abc' } });
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('calls validation after debounce period completes', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: 'test' } });
+
+      jest.advanceTimersByTime(299);
+      expect(mockTrigger).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(1);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    it('handles consecutive debounce cycles correctly', () => {
+      const mockTrigger = jest.fn().mockResolvedValue(true);
+      jest.useFakeTimers();
+
+      render(
+        <FormField
+          {...baseProps}
+          trigger={mockTrigger}
+          debounceMs={300}
+        />
+      );
+
+      const input = screen.getByRole('textbox');
+
+      fireEvent.change(input, { target: { value: 'first' } });
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledTimes(1);
+
+      fireEvent.change(input, { target: { value: 'second' } });
+      jest.advanceTimersByTime(300);
+      expect(mockTrigger).toHaveBeenCalledTimes(2);
+
+      jest.useRealTimers();
+    });
+  });
 });

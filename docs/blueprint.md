@@ -486,6 +486,8 @@ Services (AuthService)
 - ✅ CDN-based CSS loading (Bootstrap, FontAwesome) with global edge delivery
 - ✅ Lazy loading CSS on-demand (Toastify CSS loaded only when needed)
 - ✅ Form validation utilities with shared schema factories (formValidation.ts)
+- ✅ Real-time form validation with debouncing (FormField component, useDebouncedCallback hook)
+- ✅ ARIA live regions for accessibility (aria-live="polite" on error messages)
 - ✅ Form submission hook with consistent error handling (useFormSubmission)
 - ✅ Service layer abstraction for external API calls (EmailService, AuthService)
 - ✅ DRY principle applied to form validation and submission patterns
