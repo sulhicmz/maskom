@@ -670,20 +670,21 @@ describe("dataValidation", () => {
   });
 
   describe("validateInnerBlogPost", () => {
-    it("should validate a valid inner blog post", () => {
-      const item: InnerBlogPost = {
-        id: 1,
-        thumb: mockStaticImageData,
-        title: "Blog Title",
-        desc: "Blog description",
-        date: "15 Mar 2024",
-         user: "Author",
-         tagId: 1,
-      };
-      const result = validateInnerBlogPost(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
+     it("should validate a valid inner blog post", () => {
+       const item: InnerBlogPost = {
+         id: 1,
+         thumb: mockStaticImageData,
+         title: "Blog Title",
+         desc: "Blog description",
+         date: "15 Mar 2024",
+          user: "Author",
+          tagId: 1,
+          categoryId: 1,
+       };
+       const result = validateInnerBlogPost(item);
+       expect(result.isValid).toBe(true);
+       expect(result.errors).toHaveLength(0);
+     });
 
     it("should reject blog post with empty user", () => {
       const item: InnerBlogPost = {

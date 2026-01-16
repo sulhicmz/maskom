@@ -5,8 +5,8 @@ import categories from "@/data/BlogCategoryData"
 import Button from "@/components/ui/Button"
 
 interface BlogCategoryFilterProps {
-  selectedCategory: string | null
-  onCategoryChange: (category: string | null) => void
+   selectedCategory: number | null
+   onCategoryChange: (categoryId: number | null) => void
 }
 
 const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = React.memo(({
@@ -17,35 +17,35 @@ const BlogCategoryFilter: React.FC<BlogCategoryFilterProps> = React.memo(({
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const handleCategoryChange = (category: string | null) => {
-    const params = new URLSearchParams(searchParams.toString())
+  const handleCategoryChange = (categoryId: number | null) => {
+     const params = new URLSearchParams(searchParams.toString())
 
-    if (category) {
-      params.set("category", category)
-    } else {
-      params.delete("category")
-    }
+     if (categoryId) {
+       params.set("category", categoryId.toString())
+     } else {
+       params.delete("category")
+     }
 
-    const queryString = params.toString()
-    const url = queryString ? `${pathname}?${queryString}` : pathname
-    router.push(url)
-    onCategoryChange(category)
-  }
+     const queryString = params.toString()
+     const url = queryString ? `${pathname}?${queryString}` : pathname
+     router.push(url)
+     onCategoryChange(categoryId)
+   }
 
   return (
     <div className="sidebar-widget category-widget">
       <h3 className="widget-title">Kategori</h3>
       <div className="category-filter">
         <select
-          value={selectedCategory || ""}
-          onChange={(e) => handleCategoryChange(e.target.value || null)}
+          value={selectedCategory?.toString() || ""}
+          onChange={(e) => handleCategoryChange(e.target.value ? parseInt(e.target.value, 10) : null)}
           aria-label="Filter kategori artikel"
           className="category-select"
         >
           <option value="">Semua Kategori</option>
           {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
+            <option key={category.id} value={category.id.toString()}>
+              {category.name}
             </option>
           ))}
         </select>
