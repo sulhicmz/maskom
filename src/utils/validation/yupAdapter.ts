@@ -64,3 +64,15 @@ export function createNewsletterFormSchema() {
         email: createEmailFieldSchema("Email")
     }).required();
 }
+
+export function createCommentFormSchema() {
+    return yup.object().shape({
+        name: createNameFieldSchema("Nama"),
+        email: createEmailFieldSchema("Email"),
+        content: yup.string()
+            .required("Komentar diperlukan")
+            .min(10, "Komentar minimal 10 karakter")
+            .max(1000, "Komentar maksimal 1000 karakter")
+            .label("Komentar")
+    }).required();
+}

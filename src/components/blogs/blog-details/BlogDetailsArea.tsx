@@ -1,17 +1,15 @@
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import dynamic from "next/dynamic"
-import { Suspense } from "react"
-const BlogForm = dynamic(() => import("@/components/forms/BlogForm"), {
-   ssr: false,
-   loading: () => <div className="text-center py-5">Memuat formulir komentar...</div>
-})
+import { Suspense, useMemo } from "react"
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
-import { InnerBlogPost } from "@/types/data"
+import { InnerBlogPost, BlogCommentItem } from "@/types/data"
 import { tagsById } from "@/data/BlogTagData"
 import BookmarkButton from "@/components/common/BookmarkButton"
 import SocialShareButtons from "@/components/common/SocialShareButtons"
+import CommentList from "../comments/CommentList"
+import CommentForm from "../comments/CommentForm"
+import blogCommentData from "@/data/BlogCommentData"
 
 import blog_thumb from "@/assets/images/blog/blog-single-1.jpg"
 import quote from "@/assets/images/icon/right-quote.png"
@@ -19,6 +17,12 @@ import thumb_2 from "@/assets/images/blog/blog-single-2.jpg"
 
 const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
    const tag = single_blog?.tagId ? tagsById.get(single_blog.tagId)?.name : null;
+
+   const filteredComments = useMemo(() => {
+      if (!single_blog?.id) return [];
+      return blogCommentData.filter((comment: BlogCommentItem) => comment.blogId === single_blog.id);
+   }, [single_blog?.id]);
+
    return (
       <section className="blog-details-section pt-120 pb-80">
          <div className="container">
@@ -85,8 +89,8 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                         </div>
                      </article>
 
-                     <div
-                        className="ac-post-navigation d-flex align-items-center justify-content-between wow fadeInUp mb-30">
+                      <div
+                         className="ac-post-navigation d-flex align-items-center justify-content-between wow fadeInUp mb-30">
                         <div className="prev-post post-nav mb-20">
                            <Link href="/blog-details" className="theme-btn gradient-btn">Previous Post</Link>
                         </div>
@@ -95,10 +99,13 @@ const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
                         </div>
                      </div>
 
+                     {single_blog?.id && filteredComments.length > 0 && (
+                        <CommentList comments={filteredComments} blogId={single_blog.id} />
+                     )}
 
                      <div className="ac-comments_respond wow fadeInUp">
-                        <h3 className="comments-heading">Leave a Reply</h3>
-                        <BlogForm />
+                        <h3 className="comments-heading">Tinggalkan Balasan</h3>
+                        {single_blog?.id && <CommentForm blogId={single_blog.id} />}
                      </div>
                   </div>
                </div>
