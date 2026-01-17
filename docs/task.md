@@ -1,5 +1,271 @@
 # Architecture Task Tracking
 
+## Task 269: [FEATURE] Multi-Language Support (i18n) Setup (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: HIGH
+**Type**: Feature Development - i18n
+
+### Purpose
+
+Implement internationalization (i18n) architecture to support multiple languages (English/Indonesian) and enable language switching for website visitors.
+
+### Implementation Plan
+
+**Phase 1: i18n Infrastructure**
+- Create src/locales/ directory structure
+- Create translation JSON files (en.json, id.json)
+- Install i18n library (next-intl or similar)
+- Create I18nContext provider
+- Create useTranslation hook
+
+**Phase 2: Language Switcher**
+- Add language selector component to navigation
+- Implement language preference persistence (localStorage)
+- Add language switch animation
+- Update SEO meta tags based on language
+
+**Phase 3: Content Translation**
+- Translate static UI text (buttons, labels, messages)
+- Translate error messages and validation
+- Translate accessibility labels
+- Translate navigation menu items
+
+**Phase 4: Testing**
+- Add tests for i18n context provider
+- Add tests for language switcher component
+- Add tests for translation fallbacks
+- Verify accessibility across languages
+
+### Success Criteria
+
+- [ ] i18n infrastructure created
+- [ ] Language selector added to navigation
+- [ ] English and Indonesian translations provided
+- [ ] Language preference persisted in localStorage
+- [ ] SEO meta tags updated based on language
+- [ ] All tests passing
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Add: `src/locales/en.json` - English translations
+- [ ] Add: `src/locales/id.json` - Indonesian translations
+- [ ] Add: `src/contexts/I18nContext.tsx` - i18n context provider
+- [ ] Add: `src/hooks/useTranslation.ts` - Translation hook
+- [ ] Add: `src/components/common/LanguageSwitcher.tsx` - Language switcher component
+- [ ] Modify: `src/layouts/headers/HeaderOne.tsx` - Add language switcher
+
+### Notes
+
+- Follows i18n best practices (message format, pluralization, interpolation)
+- Maintains existing Indonesian content as default
+- Future-proof for additional languages (RTL support)
+- Accessibility compliant across all languages
+
+---
+
+## Task 270: [FEATURE] Advanced Blog Comment System - Core (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Development - Comments
+
+### Purpose
+
+Implement core blog comment system with threading, validation, and moderation to enable reader engagement and community discussions.
+
+### Implementation Plan
+
+**Phase 1: Comment Data Model**
+- Extend BlogCommentItem interface (parentId for threading)
+- Add moderation status field (pending, approved, rejected)
+- Add upvote/downvote fields
+- Update BlogCommentData with sample threaded comments
+
+**Phase 2: Comment Form Component**
+- Create CommentForm component with real-time validation
+- Apply existing FormField component abstraction
+- Add ARIA attributes for accessibility
+- Integrate with AuthService for user authentication
+
+**Phase 3: Comment List Component**
+- Create CommentList component with thread rendering
+- Implement nested reply rendering
+- Add comment count display
+- Apply real-time validation feedback
+
+**Phase 4: Integration**
+- Integrate CommentForm into blog post detail pages
+- Integrate CommentList into blog post detail pages
+- Update BlogDetails component to display comments
+- Add comment metadata (date, author, upvotes)
+
+### Success Criteria
+
+- [ ] Comment data model extended (threading, moderation, votes)
+- [ ] CommentForm component created with validation
+- [ ] CommentList component created with threading
+- [ ] Comments integrated into blog post detail pages
+- [ ] All tests passing (comment system tests)
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Modify: `src/types/data/index.ts` - Extend BlogCommentItem interface
+- [ ] Modify: `src/data/BlogCommentData.ts` - Add threaded comments
+- [ ] Add: `src/components/blogs/comments/CommentForm.tsx` - Comment form
+- [ ] Add: `src/components/blogs/comments/CommentList.tsx` - Comment list with threading
+- [ ] Add: `src/components/blogs/comments/__tests__/CommentForm.test.tsx` - Comment form tests
+- [ ] Add: `src/components/blogs/comments/__tests__/CommentList.test.tsx` - Comment list tests
+- [ ] Modify: `src/components/blogs/blog-details/BlogDetails.tsx` - Integrate comments
+
+### Notes
+
+- Leverages existing BlogCommentData (src/data/BlogCommentData.ts)
+- Uses real-time validation (FEATURE-016)
+- Follows DRY principle with FormField component
+- Extends FEATURE-010 (Blog Post Scheduling & Drafts)
+- Integrated with ThemeContext for dark mode support
+
+---
+
+## Task 271: [FEATURE] Content Version Control System (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Development - Version Control
+
+### Purpose
+
+Implement content version control for blog posts to enable creators to view and restore previous versions, recover from accidental changes, and maintain content history.
+
+### Implementation Plan
+
+**Phase 1: Version Data Model**
+- Create BlogPostVersion interface (id, postId, content, timestamp, notes)
+- Create version storage utility (localStorage)
+- Implement version creation on save
+- Implement version comparison utility
+
+**Phase 2: Version History Panel**
+- Create VersionHistoryPanel component
+- Display version list with timestamps
+- Add version annotations (notes for each save)
+- Add restore functionality
+- Add compare versions view (diff highlighting)
+
+**Phase 3: Integration**
+- Integrate VersionHistoryPanel into BlogForm
+- Implement automatic version creation on publish
+- Add version count display in admin dashboard
+- Add rollback functionality
+
+**Phase 4: Testing**
+- Add tests for version storage
+- Add tests for version history panel
+- Add tests for restore functionality
+- Add tests for diff comparison
+
+### Success Criteria
+
+- [ ] BlogPostVersion interface created
+- [ ] Version storage utility implemented
+- [ ] VersionHistoryPanel component created
+- [ ] Versions integrated into BlogForm
+- [ ] Restore functionality working
+- [ ] Diff comparison implemented
+- [ ] All tests passing
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Add: `src/types/blog.ts` - BlogPostVersion interface
+- [ ] Add: `src/utils/versionStorage.ts` - Version storage utility
+- [ ] Add: `src/components/blogs/form/VersionHistoryPanel.tsx` - Version history panel
+- [ ] Add: `src/components/blogs/form/__tests__/VersionHistoryPanel.test.tsx` - Version history tests
+- [ ] Modify: `src/components/blogs/form/BlogForm.tsx` - Integrate version history
+- [ ] Modify: `src/app/admin/analytics/page.tsx` - Display version count
+
+### Notes
+
+- Extends FEATURE-025 (Blog Post Draft Auto-Save)
+- Uses localStorage for version storage
+- Follows DRY principle for version management
+- Integrated with existing data validation layer
+- APM integration for version tracking metrics
+
+---
+
+## Task 272: [FEATURE] Advanced Global Search (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Development - Search
+
+### Purpose
+
+Implement global search across all content types (blog, services, team, FAQ) to enable users to find relevant information without navigating multiple pages.
+
+### Implementation Plan
+
+**Phase 1: Search Index**
+- Create search index utility (blog + services + FAQ + team)
+- Implement federated search across multiple data sources
+- Create search result type (BlogResult, ServiceResult, TeamResult, FAQResult)
+- Implement search ranking algorithm
+
+**Phase 2: Global Search Component**
+- Create GlobalSearch component with fixed header position
+- Implement search suggestions/autocomplete
+- Add keyboard shortcut (Cmd+K / Ctrl+K)
+- Add recent searches display
+- Add trending searches display
+
+**Phase 3: Search Results**
+- Create SearchResultsPage with faceted search
+- Implement search result highlighting (matched text)
+- Add result type filters (blog, services, team, FAQ)
+- Add keyboard navigation for results
+
+**Phase 4: Testing**
+- Add tests for search index utility
+- Add tests for global search component
+- Add tests for search results page
+- Verify accessibility (keyboard navigation)
+
+### Success Criteria
+
+- [ ] Search index created (multiple data sources)
+- [ ] GlobalSearch component created with suggestions
+- [ ] SearchResultsPage created with faceted search
+- [ ] Keyboard shortcut implemented (Cmd+K / Ctrl+K)
+- [ ] All tests passing
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Add: `src/utils/searchIndex.ts` - Search index utility
+- [ ] Add: `src/components/common/GlobalSearch.tsx` - Global search component
+- [ ] Add: `src/components/common/__tests__/GlobalSearch.test.tsx` - Global search tests
+- [ ] Add: `src/app/search/page.tsx` - Search results page
+- [ ] Add: `src/app/search/__tests__/search.test.tsx` - Search results tests
+- [ ] Modify: `src/layouts/headers/HeaderOne.tsx` - Add global search trigger
+
+### Notes
+
+- Extends FEATURE-006 (Advanced Blog Search & Filtering)
+- Applies debouncing pattern (300ms delay)
+- Uses real-time validation for search input
+- Integrated with ThemeContext for dark mode
+- Applies PageBuilder for search results page
+
+---
+
 ## Task 268: [UI/UX] Add Select Element Focus Styles for Keyboard Accessibility (Jan 17, 2026)
 
 **Status**: ✅ Completed
@@ -34754,4 +35020,215 @@ export function formatAsPercentage(numerator: number, denominator: number, preci
 **Estimated Effort**: Task 232 (1-2h), Task 233 (1h), Task 234 (30m), Task 235 (2-3h)
 
 ---
+
+
+---
+
+## Task 273: [FEATURE] Content Scheduling & Publishing Workflow (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Development - Content Scheduling
+
+### Purpose
+
+Implement advanced content scheduling and publishing workflow for blog posts with publish date, expiration, target audience, and preview capabilities.
+
+### Implementation Plan
+
+**Phase 1: Data Model Extension**
+- Extend InnerBlogPost interface (publishAt, expiresAt, targetAudience)
+- Add content templates for cloning
+- Update blog data validation (validateSchedulingFields)
+
+**Phase 2: Publishing Form Enhancements**
+- Add publishAt date-time picker to BlogForm
+- Add expiresAt date-time picker to BlogForm
+- Add target audience selector (beginner, intermediate, advanced)
+- Implement content preview modal (FEATURE-029)
+- Add post duplication/cloning functionality
+
+**Phase 3: Publishing Queue**
+- Create PublishingQueueDashboard component for admins
+- Implement automated post expiration
+- Add bulk publishing actions
+- Display scheduled posts in admin view
+
+**Phase 4: Testing**
+- Add tests for scheduling form enhancements
+- Add tests for publishing queue
+- Add tests for automated expiration
+- Verify timezone handling
+
+### Success Criteria
+
+- [ ] InnerBlogPost interface extended (publishAt, expiresAt, targetAudience)
+- [ ] Publishing form enhanced with date-time pickers
+- [ ] Content preview modal working
+- [ ] PublishingQueueDashboard created
+- [ ] Automated expiration working
+- [ ] All tests passing
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Modify: `src/types/data/index.ts` - Extend InnerBlogPost interface
+- [ ] Add: `src/components/blogs/form/PublishingOptions.tsx` - Publishing form enhancements
+- [ ] Add: `src/components/blogs/form/ContentPreviewModal.tsx` - Content preview modal
+- [ ] Add: `src/components/admin/PublishingQueueDashboard.tsx` - Publishing queue dashboard
+- [ ] Add: `src/utils/blogScheduler.ts` - Automated expiration utility
+- [ ] Add: `src/components/blogs/form/__tests__/PublishingOptions.test.tsx` - Publishing options tests
+- [ ] Add: `src/components/admin/__tests__/PublishingQueueDashboard.test.tsx` - Publishing queue tests
+- [ ] Modify: `src/data/validation/blogValidation.ts` - Add scheduling validation
+
+### Notes
+
+- Extends FEATURE-010 (Blog Post Scheduling & Drafts)
+- Uses existing InnerBlogPost data model
+- Integrated with ThemeContext for dark mode support
+- Applies PageBuilder for consistent admin UI
+- APM integration for publishing metrics
+
+---
+
+## Task 274: [FEATURE] Advanced Analytics & User Behavior Tracking (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Development - Analytics
+
+### Purpose
+
+Implement advanced analytics and user behavior tracking to enable administrators to optimize content strategy and improve user experience based on data.
+
+### Implementation Plan
+
+**Phase 1: Event Tracking**
+- Create event tracking utility (trackEvent)
+- Implement user journey mapping (trackPageTransition)
+- Track form abandonment events
+- Track search query analytics
+
+**Phase 2: Analytics Dashboard Enhancements**
+- Add user journey visualization
+- Add conversion funnel display
+- Add form abandonment rate metrics
+- Add search query analytics dashboard
+
+**Phase 3: A/B Testing Framework**
+- Create A/B testing utility (trackVariant)
+- Implement variant assignment logic
+- Add A/B test management UI
+- Add statistical significance calculation
+
+**Phase 4: Testing**
+- Add tests for event tracking utilities
+- Add tests for analytics enhancements
+- Add tests for A/B testing framework
+- Verify privacy compliance (GDPR)
+
+### Success Criteria
+
+- [ ] Event tracking utility created
+- [ ] User journey mapping working
+- [ ] Analytics dashboard enhanced with new metrics
+- [ ] A/B testing framework implemented
+- [ ] All tests passing
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Add: `src/utils/eventTracker.ts` - Event tracking utility
+- [ ] Add: `src/utils/userJourney.ts` - User journey mapping
+- [ ] Add: `src/components/admin/UserJourneyChart.tsx` - User journey visualization
+- [ ] Add: `src/components/admin/ConversionFunnel.tsx` - Conversion funnel display
+- [ ] Add: `src/components/admin/SearchAnalytics.tsx` - Search query analytics
+- [ ] Add: `src/components/admin/ABTestManager.tsx` - A/B testing management UI
+- [ ] Add: `src/utils/abTesting.ts` - A/B testing utility
+- [ ] Modify: `src/app/admin/analytics/page.tsx` - Integrate new analytics features
+- [ ] Add: `src/utils/__tests__/eventTracker.test.ts` - Event tracking tests
+- [ ] Add: `src/components/admin/__tests__/ABTestManager.test.tsx` - A/B testing tests
+
+### Notes
+
+- Extends FEATURE-009 (Analytics Dashboard)
+- Leverages existing APM integration (FEATURE-022)
+- Uses Web Analytics API for privacy-friendly tracking
+- Applies privacy-first approach (GDPR compliant)
+- Integrated with RBAC for admin-only access
+
+---
+
+## Task 275: [FEATURE] Notification System (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Development - Notifications
+
+### Purpose
+
+Implement notification system to enable website visitors to receive relevant updates (new blog posts, comment replies, system announcements) and manage notification preferences.
+
+### Implementation Plan
+
+**Phase 1: Notification Data Model**
+- Create Notification interface (id, type, message, status, timestamp)
+- Create NotificationPreferences interface (blog, comments, system, email)
+- Create notification storage utility (localStorage)
+
+**Phase 2: Notification Center**
+- Create NotificationCenter component
+- Implement notification list with read/unread status
+- Add notification action buttons (view, dismiss)
+- Add notification grouping (daily digest option)
+- Add notification history display
+
+**Phase 3: Notification Preferences**
+- Create NotificationPreferencesPanel component
+- Add notification type toggles (blog, comments, system)
+- Add email notification settings
+- Persist preferences in localStorage
+
+**Phase 4: Push Notifications**
+- Implement browser push notifications (extends FEATURE-027)
+- Add notification permission request
+- Add push notification subscription
+- Add notification content (title, body, icon)
+
+**Phase 5: Testing**
+- Add tests for notification storage
+- Add tests for notification center
+- Add tests for notification preferences
+- Add tests for push notifications
+
+### Success Criteria
+
+- [ ] Notification interface created
+- [ ] NotificationCenter component created
+- [ ] NotificationPreferencesPanel created
+- [ ] Push notifications working
+- [ ] All tests passing
+- [ ] Lint passes with 0 errors
+- [ ] Build successful
+
+### Related Files
+
+- [ ] Add: `src/types/notification.ts` - Notification interfaces
+- [ ] Add: `src/utils/notificationStorage.ts` - Notification storage utility
+- [ ] Add: `src/components/notifications/NotificationCenter.tsx` - Notification center
+- [ ] Add: `src/components/notifications/NotificationPreferencesPanel.tsx` - Preferences panel
+- [ ] Add: `src/hooks/useNotifications.ts` - Notifications hook
+- [ ] Add: `src/components/notifications/__tests__/NotificationCenter.test.tsx` - Notification center tests
+- [ ] Add: `src/components/notifications/__tests__/NotificationPreferencesPanel.test.tsx` - Preferences panel tests
+- [ ] Modify: `src/hooks/useServiceWorker.ts` - Push notification support
+
+### Notes
+
+- Extends FEATURE-027 (Push Notifications for Blog Updates)
+- Uses localStorage for notification preferences
+- Applies real-time validation for settings
+- Integrated with PWA service worker (FEATURE-021)
+- APM integration for notification engagement metrics
 

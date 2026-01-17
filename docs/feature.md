@@ -732,4 +732,234 @@ As a Content Creator, I want to preview blog posts before publishing, so that I 
 
 ---
 
+---
+
+## [FEATURE-030] Advanced Blog Comment System
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/User Engagement
+
+### User Story
+
+As a Blog Reader, I want to comment on blog posts and engage in discussions with other readers and authors, so that I can share my thoughts, ask questions, and participate in the community.
+
+### Acceptance Criteria
+
+- [ ] Add comment form to blog post detail pages
+- [ ] Implement comment threading (nested replies)
+- [ ] Add comment validation (length, spam detection)
+- [ ] Implement comment moderation system for authors/admins
+- [ ] Add email notifications for comment replies
+- [ ] Display comment count on blog cards
+- [ ] Add rich text editor for comments
+- [ ] Implement comment editing and deletion (for comment authors)
+- [ ] Add comment upvote/downvote system
+- [ ] Add tests for comment system
+- [ ] Update docs/blueprint.md with comment system architecture
+
+**Implementation Notes**:
+- Leverage existing BlogCommentData (src/data/BlogCommentData.ts)
+- Integrate with AuthService for user authentication
+- Use real-time validation feedback (FEATURE-016)
+- Apply DRY principle for comment rendering components
+- Integrate with APM for comment performance tracking
+
+---
+
+## [FEATURE-031] Content Scheduling & Publishing Workflow
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to schedule blog posts with advanced publishing options (publish date, expiration, target audience), so that I can plan content releases and manage publication timing strategically.
+
+### Acceptance Criteria
+
+- [ ] Add publishAt date-time picker to BlogForm
+- [ ] Add optional expiresAt field for time-limited content
+- [ ] Implement target audience selection (beginner, intermediate, advanced)
+- [ ] Add content preview modal (FEATURE-029)
+- [ ] Implement publishing queue dashboard for admins
+- [ ] Add automated expiration of expired posts
+- [ ] Add post duplication/cloning for templates
+- [ ] Implement bulk publishing actions
+- [ ] Add tests for scheduling workflow
+- [ ] Update docs/blueprint.md with scheduling architecture
+
+**Implementation Notes**:
+- Extends FEATURE-010 (Blog Post Scheduling & Drafts)
+- Use existing InnerBlogPost data model
+- Integrate with ThemeContext for dark mode support
+- Apply PageBuilder for consistent admin UI
+- Use APM to track publishing metrics
+
+---
+
+## [FEATURE-032] Multi-Language Support (i18n)
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Internationalization
+
+### User Story
+
+As a Website Visitor, I want to view the website in my preferred language (Indonesian/English), so that I can understand content and navigate the site comfortably in my native language.
+
+### Acceptance Criteria
+
+- [ ] Implement i18n context provider (English/Indonesian)
+- [ ] Add language selector in navigation menu
+- [ ] Translate all static UI text (buttons, labels, messages)
+- [ ] Translate blog content with language variants
+- [ ] Persist language preference in localStorage
+- [ ] Update SEO meta tags based on selected language
+- [ ] Add language switcher animation
+- [ ] Implement RTL support for future languages
+- [ ] Add tests for i18n functionality
+- [ ] Update docs/blueprint.md with i18n architecture
+
+**Implementation Notes**:
+- Create src/locales/ directory with JSON translation files
+- Use next-intl or similar i18n library
+- Apply DRY principle for translation keys
+- Maintain existing Indonesian content as default
+- Ensure accessibility compliance across languages
+
+---
+
+## [FEATURE-033] Advanced Analytics & User Behavior Tracking
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Analytics/Admin
+
+### User Story
+
+As an Administrator, I want to track user behavior patterns and engagement metrics, so that I can optimize content strategy and improve user experience based on data.
+
+### Acceptance Criteria
+
+- [ ] Implement event tracking (clicks, scrolls, time on page)
+- [ ] Add user journey mapping (flow between pages)
+- [ ] Track form abandonment rates
+- [ ] Implement A/B testing framework for UI variations
+- [ ] Add conversion funnel visualization
+- [ ] Track search query analytics (what users search for)
+- [ ] Implement heatmap integration (click density)
+- [ ] Add custom event tracking API
+- [ ] Export analytics data (FEATURE-028)
+- [ ] Add tests for analytics tracking
+- [ ] Update docs/blueprint.md with analytics architecture
+
+**Implementation Notes**:
+- Extends FEATURE-009 (Analytics Dashboard)
+- Leverage existing APM integration (FEATURE-022)
+- Use Web Analytics API for privacy-friendly tracking
+- Apply privacy-first approach (GDPR compliant)
+- Integrate with RBAC for admin-only access
+
+---
+
+## [FEATURE-034] Content Version Control & History
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to view and restore previous versions of blog posts, so that I can recover from accidental changes and maintain content history.
+
+### Acceptance Criteria
+
+- [ ] Implement version tracking for all blog post changes
+- [ ] Add version history panel in BlogForm
+- [ ] Add restore from previous version functionality
+- [ ] Implement compare versions view (diff highlighting)
+- [ ] Add version annotations (notes for each save)
+- [ ] Implement automatic version creation on publish
+- [ ] Add rollback to specific version
+- [ ] Display version count in admin dashboard
+- [ ] Add tests for version control
+- [ ] Update docs/blueprint.md with version control architecture
+
+**Implementation Notes**:
+- Extends FEATURE-025 (Blog Post Draft Auto-Save)
+- Use localStorage or in-memory version storage
+- Apply real-time validation feedback
+- Integrate with existing data validation layer
+- Add version metadata to InnerBlogPost interface
+
+---
+
+## [FEATURE-035] Advanced Search & Discovery
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/Search
+
+### User Story
+
+As a Website Visitor, I want to search across all content types (blog, services, team, FAQ), so that I can find relevant information without navigating multiple pages.
+
+### Acceptance Criteria
+
+- [ ] Implement global search bar (fixed header or keyboard shortcut)
+- [ ] Add federated search (blog + services + FAQ + team)
+- [ ] Implement search suggestions/autocomplete
+- [ ] Add search result highlighting (matched text)
+- [ ] Implement faceted search (filters by type, date, category)
+- [ ] Add recent searches display
+- [ ] Implement popular/trending searches
+- [ ] Add keyboard navigation for search results
+- [ ] Implement search analytics (what users search for)
+- [ ] Add tests for search functionality
+- [ ] Update docs/blueprint.md with search architecture
+
+**Implementation Notes**:
+- Extends FEATURE-006 (Advanced Blog Search & Filtering)
+- Apply debouncing pattern (300ms delay)
+- Use real-time validation for search input
+- Integrate with ThemeContext for dark mode
+- Apply PageBuilder for search results page
+
+---
+
+## [FEATURE-036] Notification System
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/Engagement
+
+### User Story
+
+As a Website Visitor, I want to receive notifications for relevant updates (new blog posts, comment replies, system announcements), so that I stay informed without actively checking the site.
+
+### Acceptance Criteria
+
+- [ ] Implement notification preferences panel (user settings)
+- [ ] Add notification types (blog, comments, system)
+- [ ] Implement in-app notification center
+- [ ] Add browser push notifications (FEATURE-027)
+- [ ] Add email notification settings
+- [ ] Implement notification read/unread status
+- [ ] Add notification history
+- [ ] Implement notification grouping (daily digest option)
+- [ ] Add notification action buttons (view, dismiss)
+- [ ] Add tests for notification system
+- [ ] Update docs/blueprint.md with notification architecture
+
+**Implementation Notes**:
+- Extends FEATURE-027 (Push Notifications for Blog Updates)
+- Use localStorage for notification preferences
+- Apply real-time validation for settings
+- Integrate with PWA service worker (FEATURE-021)
+- Use APM to track notification engagement metrics
+
+---
+
 **Last Updated**: 2026-01-17
