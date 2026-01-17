@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import { ReactNode, useEffect } from "react";
+import { I18nProvider } from "@/contexts/I18nContext";
 
 const ToastContainer = dynamic(
     () => import("react-toastify").then((mod) => mod.ToastContainer),
@@ -29,13 +30,15 @@ const Wrapper = ({ children }: WrapperProps) => {
         };
     }, []);
 
-    return <ErrorBoundary>
-        <main id="main-content">
-            {children}
-        </main>
-        <ScrollToTop />
-        <ToastContainer position="top-center" />
-    </ErrorBoundary>;
+    return <I18nProvider>
+        <ErrorBoundary>
+            <main id="main-content">
+                {children}
+            </main>
+            <ScrollToTop />
+            <ToastContainer position="top-center" />
+        </ErrorBoundary>
+    </I18nProvider>;
 }
 
 export default Wrapper
