@@ -1,5 +1,217 @@
 # Architecture Task Tracking
 
+## Task 251: API Documentation - API Routes Documentation (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: API Documentation
+
+### Purpose
+
+Create comprehensive API documentation for server-side monitoring, health check, and service status endpoints to enable external integrations, monitoring tools, and production observability.
+
+### Problem Identified
+
+**Missing API Route Documentation**:
+- API routes (`/api/health`, `/api/metrics`, `/api/services/status`) have no standalone documentation
+- OpenAPI spec and Postman collection exist, but no developer-friendly markdown documentation
+- Developers need detailed usage examples and troubleshooting guides
+- External monitoring tools require clear API contract documentation
+
+**Why This Matters**:
+1. **Integration Enablement**: External monitoring tools need clear API documentation
+2. **Developer Experience**: New developers need comprehensive guides for monitoring APIs
+3. **Production Monitoring**: Production teams need reference for health checks and metrics
+4. **Debugging Support**: Troubleshooting guides help diagnose service issues
+5. **API Contract**: Clear documentation serves as source of truth for API behavior
+6. **Maintainability**: Documented APIs are easier to maintain and extend
+
+### Solution
+
+**Created Comprehensive API Documentation** (`docs/api/api-routes.md`):
+
+#### 1. Overview Section
+- Architecture overview explaining service layer vs API routes
+- Response format standardization (ServiceResult<T>)
+- Standard headers documentation
+
+#### 2. Endpoint Documentation
+
+**Health Check Endpoint** (`GET /api/health`):
+- Purpose and use cases
+- Query parameters (threshold)
+- Request examples (bash/curl)
+- Response examples (200 healthy, 503 degraded, 500 error)
+- Status codes table
+- Response fields description
+- Troubleshooting common issues
+
+**Metrics Endpoint** (`GET /api/metrics`):
+- Purpose and use cases
+- Request examples
+- Response examples (200 success, 500 error)
+- Status codes table
+- Response fields description
+- Summary and services array breakdown
+
+**Service Status Endpoint** (`GET /api/services/status`):
+- Purpose and use cases
+- Request examples
+- Response examples (200 success, 500 error)
+- Status codes table
+- Response fields description
+- Circuit breaker state documentation
+
+#### 3. Supporting Sections
+
+**Circuit Breaker States**:
+- State descriptions (Closed, Open, Half-Open)
+- State transitions diagram
+- Configuration parameters (threshold, timeout)
+
+**Service Health Classification**:
+- Success rate thresholds (Healthy ≥90%, Degraded 70-90%, Unhealthy <70%)
+- Health calculation methodology
+
+**Rate Limiting Configuration**:
+- EmailService rate limits (5 attempts/min, 5min cooldown)
+- AuthService rate limits (login: 5/15min/30min, register: 5/1hr/2hr)
+
+**Timeout Configuration**:
+- Service timeouts (EmailService: 10s, AuthService: 5s)
+- API route timeouts (30s for all routes)
+
+**Error Handling**:
+- Standard error response format
+- Error codes table with actions
+- Error recovery strategies
+
+#### 4. Best Practices
+
+Code examples for:
+1. Health monitoring with threshold configuration
+2. Metrics analysis with success rate calculation
+3. Circuit breaker monitoring for alerting
+
+#### 5. Security Considerations
+
+- No authentication (consider adding for production)
+- Rate limiting recommendations
+- CORS configuration
+- HTTPS enforcement
+
+#### 6. Monitoring & Observability
+
+- Metrics collected (total calls, successes, failures, timeouts, rate limits)
+- Recommended monitoring tools (APM, logging, alerting, dashboards)
+- Alert threshold recommendations
+
+#### 7. Testing
+
+- Manual testing examples (curl commands)
+- Automated testing references
+
+#### 8. Troubleshooting
+
+Common issues and resolutions:
+1. "One or more services degraded" (503)
+2. "Internal server error" (500)
+3. Slow response times
+4. Circuit breaker open
+
+### Documentation Structure
+
+```markdown
+docs/api/api-routes.md (780 lines)
+├── Overview
+│   ├── Architecture
+│   ├── Response Format
+│   └── Standard Headers
+├── Endpoints
+│   ├── 1. Health Check (/api/health)
+│   ├── 2. Metrics (/api/metrics)
+│   └── 3. Service Status (/api/services/status)
+├── Circuit Breaker States
+├── Service Health Classification
+├── Rate Limiting Configuration
+├── Timeout Configuration
+├── Error Handling
+├── Best Practices
+├── Security Considerations
+├── Monitoring & Observability
+├── Testing
+├── Troubleshooting
+└── Related Documentation
+```
+
+### Code Changes
+
+- Added: `docs/api/api-routes.md` - Comprehensive API documentation (780 lines)
+- Total: 1 file added
+
+### Architecture Benefits
+
+1. **Developer Experience**: Comprehensive documentation reduces integration time
+2. **API Contract**: Clear documentation serves as source of truth
+3. **Production Support**: Troubleshooting guides help diagnose production issues
+4. **Monitoring Enablement**: External tools can integrate with documented APIs
+5. **Maintainability**: Documented APIs are easier to maintain and extend
+6. **Integration Standardization**: Consistent with existing service documentation patterns
+7. **Self-Documenting**: API routes now have comprehensive markdown documentation
+8. **Zero Breaking Changes**: Documentation only, no code modifications
+
+### Success Criteria
+
+- [x] API routes documentation created (docs/api/api-routes.md)
+- [x] All three endpoints documented (health, metrics, services/status)
+- [x] Request/response examples provided
+- [x] Best practices included
+- [x] Troubleshooting guide included
+- [x] Security considerations documented
+- [x] Monitoring & observability section included
+- [x] Related documentation linked
+- [x] Version history included
+
+### Related Files
+
+- ✅ Added: `docs/api/api-routes.md` - 780 lines of comprehensive API documentation
+
+### Notes
+
+- Follows Integration Engineer principles:
+  - **Contract First**: Clear API contracts documented for all endpoints
+  - **Self-Documenting**: Intuitive, well-documented APIs
+  - **Consistency**: Follows same patterns as auth-service.md and email-service.md
+  - **Backward Compatibility**: No breaking changes (documentation only)
+  - **Zero Breaking Changes**: Documentation only, no code modifications
+- OpenAPI spec already exists (docs/openapi-spec.yaml v3.0.0)
+- Postman collection already exists (docs/postman-collection.json v3.0.0)
+- API routes follow ServiceResult<T> pattern (documented)
+- All response examples include ServiceResult wrapper
+- Standard headers documented (Content-Type, Cache-Control)
+- Error codes aligned with ServiceErrorCode enum
+
+### Impact
+
+- Documentation: +780 lines of comprehensive API documentation
+- Developer Experience: External monitoring tools can integrate with documented APIs
+- Production Support: Troubleshooting guides help diagnose service issues
+- Integration Standardization: Consistent with existing service documentation patterns
+- Zero Regressions: No code changes, only documentation added
+- Maintenance: API routes now have comprehensive markdown documentation
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 244 (APM Integration) - API routes provide metrics for APM tools
+- Task 223 (RBAC Architecture) - Service status monitoring supports RBAC observability
+- Task 177 (API Standardization) - OpenAPI spec and Postman collection created
+
+---
+
 ## Task 250: QA - Critical Path Testing - ProtectedRoute Component (Jan 17, 2026)
 
 **Status**: ✅ Completed
