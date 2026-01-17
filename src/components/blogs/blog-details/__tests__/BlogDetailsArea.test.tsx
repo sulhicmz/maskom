@@ -9,11 +9,29 @@ jest.mock('next/image', () => ({
   default: ({ alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => <img alt={alt} {...props} />,
 }));
 
-jest.mock('next/dynamic', () => () => {
+jest.mock('next/dynamic', () => {
   const MockComponent = () => <div data-testid="blog-form">Mock BlogForm</div>;
   MockComponent.displayName = 'MockComponent';
   return MockComponent;
 });
+
+jest.mock('../../blog-sidebar/BlogSidebar', () => {
+  const MockSidebar = () => <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
+  MockSidebar.displayName = 'MockBlogSidebar';
+  return MockSidebar;
+});
+
+jest.mock('../../blog-sidebar/BlogSidebar', () => {
+  const MockSidebar = () => <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
+  MockSidebar.displayName = 'MockBlogSidebar';
+  return MockSidebar;
+});
+
+ jest.mock('../../blog-sidebar/BlogSidebar', () => {
+   const MockSidebar = () => <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
+   MockSidebar.displayName = 'MockBlogSidebar';
+   return MockSidebar;
+ });
 
 jest.mock('../../blog-sidebar/BlogSidebar', () => {
   const MockSidebar = () => <div data-testid="blog-sidebar">Mock BlogSidebar</div>;
@@ -156,20 +174,20 @@ describe('BlogDetailsArea', () => {
     });
   });
 
-  it('renders comments section heading', () => {
-    render(<BlogDetailsArea />);
-    
-    const heading = screen.getByText('Leave a Reply');
-    expect(heading).toBeInTheDocument();
-    expect(heading.tagName).toBe('H3');
-  });
+   it('renders comments section heading', () => {
+     render(<BlogDetailsArea />);
+     
+     const heading = screen.getByText('Tinggalkan Balasan');
+     expect(heading).toBeInTheDocument();
+     expect(heading.tagName).toBe('H3');
+   });
 
-  it('renders BlogForm component', () => {
-    render(<BlogDetailsArea />);
-    
-    const form = screen.getByTestId('blog-form');
-    expect(form).toBeInTheDocument();
-  });
+    it('renders BlogForm component', () => {
+      render(<BlogDetailsArea single_blog={mockBlogPost} />);
+
+      const form = screen.getByText('Nama');
+      expect(form).toBeInTheDocument();
+    });
 
   it('renders BlogSidebar component', () => {
     render(<BlogDetailsArea />);
@@ -333,11 +351,11 @@ describe('BlogDetailsArea', () => {
     expect(thumbnail).toBeInTheDocument();
   });
 
-  it('renders Indonesian content correctly', () => {
-    render(<BlogDetailsArea />);
-    
-    expect(screen.getByText('Leave a Reply')).toBeInTheDocument();
-    expect(screen.getByText('Previous Post')).toBeInTheDocument();
-    expect(screen.getByText('Next Post')).toBeInTheDocument();
-  });
+   it('renders Indonesian content correctly', () => {
+     render(<BlogDetailsArea />);
+     
+     expect(screen.getByText('Tinggalkan Balasan')).toBeInTheDocument();
+     expect(screen.getByText('Previous Post')).toBeInTheDocument();
+     expect(screen.getByText('Next Post')).toBeInTheDocument();
+   });
 });
