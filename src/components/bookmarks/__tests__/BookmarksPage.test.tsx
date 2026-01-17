@@ -4,12 +4,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BookmarksPage from '../index';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { I18nProvider } from '@/contexts/I18nContext';
 import { Bookmark } from '@/types/bookmark';
 
 function renderWithProviders(component: React.ReactElement) {
   return render(
     <ThemeProvider>
-      {component}
+      <I18nProvider>
+        {component}
+      </I18nProvider>
     </ThemeProvider>
   );
 }

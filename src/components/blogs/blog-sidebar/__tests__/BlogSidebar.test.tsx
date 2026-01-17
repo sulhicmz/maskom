@@ -3,11 +3,47 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BlogSidebar from '../BlogSidebar';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { I18nProvider } from '@/contexts/I18nContext';
 
 // Mock dependencies
 jest.mock('@/components/common/AnimationWrapper', () => {
     return function MockAnimationWrapper({ children, className }: { children: React.ReactNode; className?: string }) {
         return <div className={className} data-testid="animation-wrapper">{children}</div>;
+    };
+});
+
+jest.mock('@/components/blogs/blog/BlogSearch', () => {
+    return function MockBlogSearch({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+        return (
+            <div className="sidebar-widget search-widget">
+                <h3 className="widget-title">Cari Artikel</h3>
+                <div className="search-box">
+                    <input
+                        type="text"
+                        placeholder="Cari artikel..."
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        aria-label="Cari artikel"
+                        className="form-control"
+                    />
+                </div>
+            </div>
+        );
+    };
+});
+
+jest.mock('@/components/blogs/blog-tags/BlogTags', () => {
+    return function MockBlogTags({ tags }: { tags: number[] }) {
+        return (
+            <div className="sidebar-widget">
+                <h3 className="widget-title">Tags</h3>
+                <div className="tag-cloud">
+                    {tags.map(tag => (
+                        <span key={tag} className="tag">{tag}</span>
+                    ))}
+                </div>
+            </div>
+        );
     };
 });
 
@@ -71,7 +107,9 @@ jest.mock('../Tags', () => {
 function renderWithProviders(component: React.ReactElement) {
     return render(
         <ThemeProvider>
-            {component}
+            <I18nProvider>
+                {component}
+            </I18nProvider>
         </ThemeProvider>
     );
 }
