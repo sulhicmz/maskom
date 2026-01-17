@@ -6,8 +6,6 @@ import SkipToMainContent from "@/components/common/SkipToMainContent";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import ServiceWorkerUpdate from "@/components/common/ServiceWorkerUpdate";
 
-export const runtime = 'edge';
-
 const splineSans = Spline_Sans({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
