@@ -56,8 +56,8 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
 
       setLocalComments(prev => prev.map(comment => {
         if (comment.id === commentId) {
-          const upvoteChange = voteType === 'up' ? 1 : 0;
-          const downvoteChange = voteType === 'down' ? 1 : 0;
+          const upvoteChange = voteType === 'up' ? 1 : (previousVote === 'up' ? -1 : 0);
+          const downvoteChange = voteType === 'down' ? 1 : (previousVote === 'down' ? -1 : 0);
           return {
             ...comment,
             upvotes: comment.upvotes + upvoteChange,

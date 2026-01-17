@@ -182,12 +182,12 @@ describe('BlogDetailsArea', () => {
      expect(heading.tagName).toBe('H3');
    });
 
-   it('renders BlogForm component', () => {
-     render(<BlogDetailsArea />);
+    it('renders BlogForm component', () => {
+      render(<BlogDetailsArea single_blog={mockBlogPost} />);
 
-     const form = screen.getByText('Nama');
-     expect(form).toBeInTheDocument();
-   });
+      const form = screen.getByText('Nama');
+      expect(form).toBeInTheDocument();
+    });
 
   it('renders BlogSidebar component', () => {
     render(<BlogDetailsArea />);

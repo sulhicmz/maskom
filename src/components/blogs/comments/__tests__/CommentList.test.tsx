@@ -187,22 +187,20 @@ describe("CommentList", () => {
          expect(upvoteCount).toHaveTextContent("5");
       });
 
-       test("should switch from upvote to downvote", () => {
-           const { container } = render(<CommentList {...defaultProps} />);
+        test("should switch from upvote to downvote", () => {
+            const { container } = render(<CommentList {...defaultProps} />);
 
-           const upvoteButton = container.querySelector('.ac-postbox_comment')?.querySelectorAll('button[aria-label*="Setuju dengan komentar dari Test User 1"]')[0] as HTMLElement;
-           const downvoteButton = container.querySelector('.ac-postbox_comment')?.querySelectorAll('button[aria-label*="Tidak setuju dengan komentar dari Test User 1"]')[0] as HTMLElement;
-           if (upvoteButton) {
-              fireEvent.click(upvoteButton);
-           }
-           if (downvoteButton) {
-              fireEvent.click(downvoteButton);
-           }
+            const upvoteButton = container.querySelector('.ac-postbox_comment')?.querySelectorAll('button[aria-label*="Setuju dengan komentar dari Test User 1"]')[0] as HTMLElement;
+            if (upvoteButton) {
+               fireEvent.click(upvoteButton);
+            }
 
-           const updatedDownvoteButton = container.querySelector('.ac-postbox_comment')?.querySelectorAll('button[aria-label*="Tidak setuju dengan komentar dari Test User 1"]')[0] as HTMLElement;
-           const downvoteCount = updatedDownvoteButton?.querySelector("span");
-           expect(downvoteCount).toHaveTextContent("1");
-        });
+            const downvoteButton = screen.getAllByRole("button", { name: /tidak setuju dengan komentar dari test user 1/i })[0];
+            fireEvent.click(downvoteButton);
+
+            const updatedDownvoteCount = screen.getAllByRole("button", { name: /tidak setuju dengan komentar dari test user 1/i })[0].querySelector("span");
+            expect(updatedDownvoteCount).toHaveTextContent("1");
+         });
    });
 
    describe("Replying", () => {
