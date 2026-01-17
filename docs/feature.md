@@ -586,7 +586,7 @@ As a Customer, I want to submit and track support tickets, so that I can get hel
 
 ### User Story
 
-As a Website Visitor, I want to view detailed team member profiles, so that I can learn about the expertise and background of the team.
+As a Website Visitor, I want to view detailed team member profiles, so that I can learn about expertise and background of team.
 
 ### Acceptance Criteria
 
@@ -600,4 +600,120 @@ As a Website Visitor, I want to view detailed team member profiles, so that I ca
 
 ---
 
-**Last Updated**: 2026-01-16
+## [FEATURE-025] Blog Post Draft Auto-Save
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to manage blog post drafts with auto-save, so that I don't lose my work during browser crashes or accidental closures.
+
+### Acceptance Criteria
+
+- [ ] Implement auto-save for blog post drafts (localStorage)
+- [ ] Add auto-save interval configuration (default: 30s)
+- [ ] Display "Last saved" indicator with timestamp
+- [ ] Recover unsaved drafts on page load
+- [ ] Add manual save button for immediate save
+- [ ] Add clear draft functionality
+- [ ] Add tests for auto-save behavior
+- [ ] Update docs/blueprint.md with auto-save architecture
+
+---
+
+## [FEATURE-026] Service Worker Cache Configuration
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Infrastructure/Admin
+
+### User Story
+
+As a Site Administrator, I want to configure service worker cache strategies via admin panel, so that I can optimize caching policies without code changes.
+
+### Acceptance Criteria
+
+- [ ] Create cache configuration interface in admin panel
+- [ ] Configure cache-first asset patterns (file extensions)
+- [ ] Configure network-first API endpoints
+- [ ] Configure cache TTL (time-to-live) settings
+- [ ] Add cache size limits and cleanup policies
+- [ ] Implement cache statistics dashboard
+- [ ] Add manual cache clear button
+- [ ] Add tests for cache configuration
+- [ ] Update docs/blueprint.md with cache management architecture
+
+---
+
+## [FEATURE-027] Push Notifications for Blog Updates
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Engagement/Mobile
+
+### User Story
+
+As a Mobile User, I want to receive push notifications for blog updates, so that I stay informed about new content without actively checking.
+
+### Acceptance Criteria
+
+- [ ] Request push notification permission on first visit
+- [ ] Subscribe users to push notifications service
+- [ ] Send push notifications for new blog posts
+- [ ] Add notification preference settings in user profile
+- [ ] Implement notification unsubscribe functionality
+- [ ] Add notification history in user dashboard
+- [ ] Add tests for push notification behavior
+- [ ] Update docs/blueprint.md with push notification architecture
+
+---
+
+## [FEATURE-028] Analytics Data Export
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Analytics/Admin
+
+### User Story
+
+As an Analytics User, I want to export analytics data as CSV, so that I can perform custom analysis in external tools.
+
+### Acceptance Criteria
+
+- [ ] Add export button to analytics dashboard
+- [ ] Implement CSV export for form submission metrics
+- [ ] Implement CSV export for page view metrics
+- [ ] Add date range selector for exports
+- [ ] Include metadata in exported files (export date, filters applied)
+- [ ] Add export format options (CSV, JSON)
+- [ ] Add tests for export functionality
+- [ ] Update docs/blueprint.md with analytics export architecture
+
+---
+
+## [FEATURE-029] Blog Post Preview Mode
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to preview blog posts before publishing, so that I can ensure formatting and appearance are correct.
+
+### Acceptance Criteria
+
+- [ ] Add preview button to blog form (BlogForm)
+- [ ] Create preview mode that renders post as published
+- [ ] Show preview in modal or separate route
+- [ ] Include all post content (title, description, tags, category, image)
+- [ ] Maintain preview data in memory (not saved)
+- [ ] Add edit button in preview to return to form
+- [ ] Add tests for preview functionality
+- [ ] Update docs/blueprint.md with preview mode architecture
+
+---
+
+**Last Updated**: 2026-01-17
