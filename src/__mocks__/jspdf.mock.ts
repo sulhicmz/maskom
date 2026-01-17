@@ -1,4 +1,4 @@
-export const createJsPdfMock = function() {
+const jsPDFMock = function() {
   return {
     setFontSize: jest.fn(),
     setFont: jest.fn(),
@@ -16,4 +16,5 @@ export const createJsPdfMock = function() {
   }
 }
 
-export default createJsPdfMock
+export default jsPDFMock
+module.exports = jsPDFMock
