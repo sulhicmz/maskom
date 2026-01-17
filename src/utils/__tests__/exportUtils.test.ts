@@ -167,20 +167,20 @@ describe('exportUtils', () => {
   })
 
   describe('exportBlogPosts', () => {
-    it('should export posts in CSV format', () => {
-      exportBlogPosts(mockPosts, mockFilterCriteria, { format: 'csv' })
+    it('should export posts in CSV format', async () => {
+      await exportBlogPosts(mockPosts, mockFilterCriteria, { format: 'csv' })
 
       expect(document.createElement).toHaveBeenCalledWith('a')
     })
 
-    it('should throw error for unsupported format', () => {
-      expect(() => {
-        exportBlogPosts(mockPosts, mockFilterCriteria, { format: 'invalid' as unknown })
-      }).toThrow('Unsupported export format: invalid')
+    it('should throw error for unsupported format', async () => {
+      await expect(
+        exportBlogPosts(mockPosts, mockFilterCriteria, { format: 'invalid' as 'csv' | 'pdf' })
+      ).rejects.toThrow('Unsupported export format: invalid')
     })
 
-    it('should generate metadata for export', () => {
-      exportBlogPosts(mockPosts, mockFilterCriteria, { format: 'csv' })
+    it('should generate metadata for export', async () => {
+      await exportBlogPosts(mockPosts, mockFilterCriteria, { format: 'csv' })
 
       expect(document.createElement).toHaveBeenCalled()
     })

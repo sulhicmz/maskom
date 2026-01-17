@@ -52,8 +52,8 @@ const ExportButton = React.memo<ExportButtonProps>(({
       }
 
       await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          exportBlogPosts(posts, filterCriteria, config)
+        setTimeout(async () => {
+          await exportBlogPosts(posts, filterCriteria, config)
           resolve()
         }, 100)
       })

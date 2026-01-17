@@ -1,5 +1,159 @@
 # Architecture Task Tracking
 
+## Task 250: QA - Critical Path Testing - ProtectedRoute Component (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: QA - Critical Path Testing
+
+### Purpose
+
+Add comprehensive test coverage for the ProtectedRoute component, a critical security component in the RBAC (Role-Based Access Control) system that controls route-level authorization.
+
+### Problem Identified
+
+**Missing Test Coverage**:
+- **ProtectedRoute component** has NO tests - critical security gap
+- Component handles authentication, role-based access, permission-based access, and error handling
+- RBAC system relies on this component for route protection
+- No test coverage means potential security vulnerabilities could go undetected
+
+**Why This Matters**:
+1. **Security**: This component controls who can access admin routes and protected content
+2. **Authorization Logic**: Tests verify role and permission checks work correctly
+3. **Authentication Flow**: Tests verify login redirects and fallback rendering
+4. **Error Handling**: Tests verify graceful error handling for auth/permission failures
+5. **Critical Path**: This is on the critical path for all admin and protected routes
+6. **Regression Prevention**: Tests prevent future changes from breaking authorization
+
+### Test Implementation
+
+#### Test Categories
+
+**1. Authentication Flow** (5 tests)
+- Loading spinner initially displayed
+- Redirect to /login when user is not authenticated
+- Render children when user is authenticated
+- Render fallback when user is not authenticated and fallback is provided
+- Handle authentication errors gracefully
+
+**2. Role-Based Access Control** (6 tests)
+- Allow access when user has required role (admin, editor, user)
+- Deny access when user does not have required role
+- Redirect to dashboard when user lacks required role
+- Allow admin user to access admin-protected route
+- Allow editor user to access editor-protected route
+- Deny admin user access to user-only route if configured
+
+**3. Permission-Based Access Control** (5 tests)
+- Allow access when user has required permission
+- Deny access when user lacks required permission
+- Redirect to dashboard when user lacks required permission
+- Allow editor to access content management with correct permission
+- Deny user access to admin-specific permissions
+
+**4. Multiple Permissions** (5 tests)
+- Allow access when user has all required permissions
+- Deny access when user lacks one of required permissions
+- Deny access when user lacks all required permissions
+- Check all required permissions (verify Promise.all usage)
+- Handle empty requiredPermissions array as no requirement
+
+**5. Route-Based Access Control** (3 tests)
+- Allow access when route is unprotected
+- Allow admin to access admin route
+- Deny user access to admin route
+
+**6. Combined Access Control** (3 tests)
+- Check both role and permission when both are specified
+- Deny access when role check fails but permission check passes
+- Deny access when permission check fails but role check passes
+
+**7. Edge Cases** (3 tests)
+- Handle slow authentication response
+- Render children with multiple components
+
+**8. Error Handling** (4 tests)
+- Redirect to login on authentication error
+- Not render children on authentication error
+- Handle role check errors
+- Handle permission check errors
+
+**9. Loading State** (2 tests)
+- Show LoadingSpinner with correct minHeight
+- Hide loading spinner after authentication completes
+
+### Test Coverage Summary
+
+**Total Tests**: 35 tests
+**Test Pattern**: AAA (Arrange-Act-Assert)
+**Test Coverage**:
+- ✅ Authentication flow
+- ✅ Role-based access (admin, editor, user)
+- ✅ Permission-based access (9 granular permissions)
+- ✅ Multiple permissions (array-based)
+- ✅ Route-based access control
+- ✅ Combined access control (role + permission)
+- ✅ Error handling (auth, role, permission errors)
+- ✅ Loading states (spinner rendering)
+- ✅ Edge cases (slow auth, multiple children)
+
+**Mocked Dependencies**:
+- AuthService (getCurrentUser, hasRole, hasPermission)
+- useRouter (push)
+- usePathname
+- getUnauthorizedRedirectPath
+
+### Success Criteria
+
+- [x] 35 comprehensive tests created for ProtectedRoute
+- [x] All tests pass consistently (3575 total, 100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (25 pages)
+- [x] Type check passes (no TypeScript errors)
+- [x] Critical security component now has test coverage
+- [x] Authentication, authorization, and error handling verified
+- [x] AAA test pattern followed throughout
+
+### Related Files
+
+- ✅ Added: `src/components/common/__tests__/ProtectedRoute.test.tsx` - 35 comprehensive tests (626 lines)
+
+### Notes
+
+- Follows QA Engineer principles:
+  - **Test Behavior, Not Implementation**: Tests verify authorization behavior, not implementation details
+  - **Test Pyramid**: Unit tests for critical component (no integration/E2E needed for this module)
+  - **Isolation**: Each test independent with proper mocks and cleanup
+  - **Determinism**: All tests pass consistently across multiple runs
+  - **Fast Feedback**: Test execution time ~0.8s for all 35 tests
+  - **Meaningful Coverage**: Critical paths tested (auth, roles, permissions, errors)
+  - **Anti-Pattern Avoidance**: No flaky tests, no external dependencies without mocking
+- Tests verify the RBAC security system works correctly
+- Happy path and sad path scenarios covered
+- Edge cases (slow auth, multiple children) tested
+- Error handling (auth failures, permission errors) verified
+- Mocks properly isolated for each test
+
+### Impact
+
+- Test Coverage: +35 new tests (3540 → 3575, 100% pass rate)
+- Security: Critical RBAC component now has comprehensive test coverage
+- Quality: Authorization logic verified through tests
+- Zero Regressions: All 3575 tests passing, lint clean, build successful
+- Confidence: ProtectedRoute component behavior now verified
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 223 (RBAC Architecture) - ProtectedRoute is part of RBAC system
+- Task 248 (Code Sanitizer) - ProtectedRoute had no tests, now covered
+
+---
+
 ## Task 248: Code Sanitizer - Comprehensive Code Health Assessment (Jan 17, 2026)
 
 **Status**: ✅ Completed

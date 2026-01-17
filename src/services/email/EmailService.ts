@@ -1,4 +1,3 @@
-import emailjs from '@emailjs/browser';
 import type { IEmailService, EmailSendParams, EmailSendOptions, ServiceMetrics } from './types';
 import type { ServiceResult } from '@/services/common';
 import { withTimeout, CircuitBreaker } from '@/utils/resilience';
@@ -21,6 +20,7 @@ class EmailService implements IEmailService {
     private templateId: string;
     private publicKey: string;
     private circuitBreaker: CircuitBreaker;
+    private emailjsModule: typeof import('@emailjs/browser') | null = null;
 
     constructor() {
         this.serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
@@ -71,6 +71,11 @@ class EmailService implements IEmailService {
     }
 
     private async sendEmailWithTimeout(params: EmailSendParams): Promise<{ text: string }> {
+        if (!this.emailjsModule) {
+            this.emailjsModule = await import('@emailjs/browser');
+        }
+
+        const emailjs = this.emailjsModule;
         const result = await withTimeout(
             emailjs.send(
                 this.serviceId,

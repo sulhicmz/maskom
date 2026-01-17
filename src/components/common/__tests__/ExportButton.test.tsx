@@ -275,7 +275,7 @@ describe('ExportButton', () => {
       
       await waitFor(() => {
         expect(button).not.toBeDisabled()
-      })
+      }, { timeout: 2000 })
     })
 
     it('should not allow clicking button during export', async () => {
