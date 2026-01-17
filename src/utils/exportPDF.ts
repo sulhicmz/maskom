@@ -1,18 +1,47 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-require-imports */
+import type { InnerBlogPost } from '@/types/data'
+import type { ExportConfig, ExportMetadata } from './exportUtils'
+import type { BlogFilterCriteria } from './blogFilters'
+import { tagsById } from '@/data/BlogTagData'
+import { blogCategoryById } from '@/data/BlogCategoryData'
+
+function getFilterMetadataText(filters: Partial<BlogFilterCriteria>): string[] {
+  const metadataLines: string[] = []
+
+  if (filters.searchQuery) {
+    metadataLines.push(`Search: "${filters.searchQuery}"`)
+  }
+  if (filters.categoryId) {
+    const categoryName = blogCategoryById.get(filters.categoryId)?.name
+    if (categoryName) {
+      metadataLines.push(`Category: ${categoryName}`)
+    }
+  }
+  if (filters.tagId) {
+    const tagName = tagsById.get(filters.tagId)?.name
+    if (tagName) {
+      metadataLines.push(`Tag: ${tagName}`)
+    }
+  }
+  if (filters.status) {
+    metadataLines.push(`Status: ${filters.status}`)
+  }
+
+  return metadataLines
+}
 
 export async function exportToPDF(
-  posts: any,
-  config: any,
-  metadata: any
+  posts: InnerBlogPost[],
+  config: ExportConfig,
+  metadata: ExportMetadata
 ): Promise<void> {
-  const jsPDF = (await import('jspdf')).default as any
+  const jsPDF = (await import('jspdf')).default
   const doc = new jsPDF()
-  const pageWidth = (doc.internal.pageSize as any).getWidth()
+  const pageWidth = (doc.internal.pageSize as unknown as { getWidth: () => number }).getWidth()
 
   const { yPosition: startY, margin, contentWidth } = setupPDFDocument(doc, metadata, pageWidth)
   let yPosition = renderPDFMetadata(doc, metadata, margin, startY)
 
-  posts.forEach((post: any, index: number) => {
+  posts.forEach((post, index) => {
     if (yPosition > 270) {
       doc.addPage()
       yPosition = 20
@@ -25,113 +54,119 @@ export async function exportToPDF(
   doc.save(filename)
 }
 
-function setupPDFDocument(doc: any, metadata: any, pageWidth: number) {
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
+function setupPDFDocument(
+  doc: unknown,
+  metadata: ExportMetadata,
+  pageWidth: number
+): { yPosition: number; margin: number; contentWidth: number } {
+  const typedDoc = doc as { setFontSize: (size: number) => void; setFont: (font: string, style: string) => void; text: (text: string, x: number, y: number, options?: { align?: string }) => void }
   const margin = 20
   const contentWidth = pageWidth - (margin * 2)
   let yPosition = 30
 
-  doc.text('Blog Posts Export', pageWidth / 2, yPosition, { align: 'center' })
+  typedDoc.setFontSize(16)
+  typedDoc.setFont('helvetica', 'bold')
+  typedDoc.text('Blog Posts Export', pageWidth / 2, yPosition, { align: 'center' })
   yPosition += 10
 
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Export Date: ${metadata.exportDate}`, margin, yPosition)
+  typedDoc.setFontSize(10)
+  typedDoc.setFont('helvetica', 'normal')
+  typedDoc.text(`Export Date: ${metadata.exportDate}`, margin, yPosition)
   yPosition += 7
 
-  doc.text(`Total Posts: ${metadata.resultCount}`, margin, yPosition)
+  typedDoc.text(`Total Posts: ${metadata.resultCount}`, margin, yPosition)
   yPosition += 7
 
   return { yPosition, margin, contentWidth }
 }
 
-function renderPDFMetadata(doc: any, metadata: any, margin: number, yPosition: number) {
+function renderPDFMetadata(
+  doc: unknown,
+  metadata: ExportMetadata,
+  margin: number,
+  yPosition: number
+): number {
+  const typedDoc = doc as {
+    setFontSize: (size: number) => void
+    setFont: (font: string, style: string) => void
+    text: (text: string, x: number, y: number) => void
+    line: (x1: number, y1: number, x2: number, y2: number) => void
+    internal: { pageSize: { getWidth: () => number } }
+  }
+
   if (metadata.filterCount > 0) {
-    doc.text('Active Filters:', margin, yPosition)
+    typedDoc.text('Active Filters:', margin, yPosition)
     yPosition += 5
-    doc.setFontSize(9)
+    typedDoc.setFontSize(9)
 
     const filterText = getFilterMetadataText(metadata.filters)
     filterText.forEach((text: string) => {
-      doc.text(`  - ${text}`, margin, yPosition)
+      typedDoc.text(`  - ${text}`, margin, yPosition)
       yPosition += 5
     })
 
-    doc.setFontSize(10)
+    typedDoc.setFontSize(10)
     yPosition += 5
   }
 
-  doc.line(margin, yPosition, (doc.internal.pageSize as any).getWidth() - margin, yPosition)
+  typedDoc.line(margin, yPosition, typedDoc.internal.pageSize.getWidth() - margin, yPosition)
   yPosition += 10
 
   return yPosition
 }
 
-function renderPDFPost(doc: any, post: any, index: number, margin: number, contentWidth: number, yPosition: number) {
-  doc.setFontSize(12)
-  doc.setFont('helvetica', 'bold')
-  doc.text(`${index + 1}. ${post.title}`, margin, yPosition)
+function renderPDFPost(
+  doc: unknown,
+  post: InnerBlogPost,
+  index: number,
+  margin: number,
+  contentWidth: number,
+  yPosition: number
+): number {
+  const typedDoc = doc as {
+    setFontSize: (size: number) => void
+    setFont: (font: string, style: string) => void
+    setTextColor: (r: number, g: number, b: number) => void
+    text: (text: string, x: number, y: number) => void
+    splitTextToSize: (text: string, width: number) => string[]
+    addPage: () => void
+  }
+
+  typedDoc.setFontSize(12)
+  typedDoc.setFont('helvetica', 'bold')
+  typedDoc.text(`${index + 1}. ${post.title}`, margin, yPosition)
   yPosition += 8
 
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  typedDoc.setFontSize(10)
+  typedDoc.setFont('helvetica', 'normal')
 
-  const lines = doc.splitTextToSize(post.desc, contentWidth)
+  const lines = typedDoc.splitTextToSize(post.desc, contentWidth)
   lines.forEach((line: string) => {
-    doc.text(line, margin, yPosition)
+    typedDoc.text(line, margin, yPosition)
     yPosition += 5
   })
 
   yPosition += 5
-  doc.setFontSize(9)
-  doc.setTextColor(100, 100, 100)
-  doc.text(`Author: ${post.user} | Date: ${post.date}`, margin, yPosition)
+  typedDoc.setFontSize(9)
+  typedDoc.setTextColor(100, 100, 100)
+  typedDoc.text(`Author: ${post.user} | Date: ${post.date}`, margin, yPosition)
   yPosition += 5
 
   if (post.tagId) {
-    const tagsById = require('@/data/BlogTagData').tagsById
     const tagName = tagsById.get(post.tagId)?.name
     if (tagName) {
-      doc.text(`Tag: ${tagName}`, margin, yPosition)
+      typedDoc.text(`Tag: ${tagName}`, margin, yPosition)
       yPosition += 5
     }
   }
 
   if (post.category) {
-    doc.text(`Category: ${post.category}`, margin, yPosition)
+    typedDoc.text(`Category: ${post.category}`, margin, yPosition)
     yPosition += 5
   }
 
-  doc.setTextColor(0, 0, 0)
+  typedDoc.setTextColor(0, 0, 0)
   yPosition += 8
 
   return yPosition
-}
-
-function getFilterMetadataText(filters: any): string[] {
-  const metadataLines: string[] = []
-
-  if (filters.searchQuery) {
-    metadataLines.push(`Search: "${filters.searchQuery}"`)
-  }
-  if (filters.categoryId) {
-    const blogCategoryById = require('@/data/BlogCategoryData').blogCategoryById
-    const categoryName = blogCategoryById.get(filters.categoryId)?.name
-    if (categoryName) {
-      metadataLines.push(`Category: ${categoryName}`)
-    }
-  }
-  if (filters.tagId) {
-    const tagsById = require('@/data/BlogTagData').tagsById
-    const tagName = tagsById.get(filters.tagId)?.name
-    if (tagName) {
-      metadataLines.push(`Tag: ${tagName}`)
-    }
-  }
-  if (filters.status) {
-    metadataLines.push(`Status: ${filters.status}`)
-  }
-
-  return metadataLines
 }

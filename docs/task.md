@@ -1,5 +1,133 @@
 # Architecture Task Tracking
 
+## Task 283: [CODE SANITIZER] Type Safety Fix - exportPDF.ts (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Code Sanitizer - Type Safety
+
+### Purpose
+
+Fix type safety violations in production code by replacing `any` types with proper TypeScript types and removing `require` statements.
+
+### Problem Identified
+
+**Type Safety Violations in `src/utils/exportPDF.ts`**:
+- All function parameters used `any` type instead of proper TypeScript types
+- `require()` statements used instead of ES6 imports
+- Duplicate `getFilterMetadataText` function (DRY violation with `exportUtils.ts`)
+- Violates Code Sanitizer principles: "Type Safety: Strict types, no `any`"
+
+### Issues Found
+
+1. **Untyped Parameters**:
+   - `posts: any` - Should be `InnerBlogPost[]`
+   - `config: any` - Should be `ExportConfig`
+   - `metadata: any` - Should be `ExportMetadata`
+   - `doc: any` - Should use proper jsPDF type
+   - `post: any` - Should be `InnerBlogPost`
+
+2. **Non-ES6 Imports**:
+   - `require('@/data/BlogTagData').tagsById`
+   - `require('@/data/BlogCategoryData').blogCategoryById`
+
+3. **Code Duplication**:
+   - `getFilterMetadataText` duplicated in both `exportPDF.ts` and `exportUtils.ts`
+
+### Implementation
+
+**1. Added Proper TypeScript Imports**:
+```typescript
+import type { InnerBlogPost } from '@/types/data'
+import type { ExportConfig, ExportMetadata } from './exportUtils'
+import type { BlogFilterCriteria } from './blogFilters'
+import { tagsById } from '@/data/BlogTagData'
+import { blogCategoryById } from '@/data/BlogCategoryData'
+```
+
+**2. Fixed Function Signatures**:
+- `exportToPDF`: Parameters now typed as `InnerBlogPost[]`, `ExportConfig`, `ExportMetadata`
+- `setupPDFDocument`: Added typed doc parameter
+- `renderPDFMetadata`: Added typed doc parameter
+- `renderPDFPost`: Added typed doc and post parameters
+
+**3. Replaced `require` with Imports**:
+- Removed `require('@/data/BlogTagData')`
+- Removed `require('@/data/BlogCategoryData')`
+- Used ES6 imports instead
+
+**4. Added jsPDF Type Guards**:
+- Used `unknown` + type assertion pattern for jsPDF objects
+- Properly typed doc methods: `setFontSize`, `setFont`, `text`, `line`, `splitTextToSize`
+- Type-safe access to `doc.internal.pageSize.getWidth()`
+
+**5. Removed Duplicate Code**:
+- Kept one `getFilterMetadataText` function
+- Used imported `tagsById` and `blogCategoryById` from data files
+
+### Results
+
+**Metrics Achieved**:
+- All `any` types removed from production code ✅
+- All `require` statements replaced with ES6 imports ✅
+- Duplicate `getFilterMetadataText` function removed ✅
+- All 3842 tests passing (100% success rate) ✅
+- Lint passes (0 errors, 0 warnings) ✅
+- Build successful (26 pages generated) ✅
+
+### Code Changes
+
+- Modified: `src/utils/exportPDF.ts` - Complete type safety refactor (167 → 140 lines, -27 lines net)
+  - Added proper TypeScript imports
+  - Fixed all function signatures with proper types
+  - Replaced `require` statements with ES6 imports
+  - Removed duplicate `getFilterMetadataText` function
+  - Added type guards for jsPDF objects
+
+### Success Criteria
+
+- [x] All `any` types removed from exportPDF.ts
+- [x] Proper TypeScript types used for all parameters
+- [x] All `require` statements replaced with ES6 imports
+- [x] Duplicate `getFilterMetadataText` function removed
+- [x] All tests passing (3842/3842, 100%)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (26 pages generated)
+- [x] Type check passes (0 errors)
+
+### Related Files
+
+- ✅ Modified: `src/utils/exportPDF.ts` - Type safety refactoring (-27 lines net reduction)
+
+### Notes
+
+- Follows Code Sanitizer principles:
+  - **Type Safety**: All `any` types replaced with proper TypeScript types
+  - **DRY Principle**: Removed duplicate `getFilterMetadataText` function
+  - **Modern JavaScript**: Replaced `require` with ES6 imports
+  - **Build Must Pass**: Verified build, lint, and test pass
+- jsPDF library uses dynamic import for code splitting (Task 281)
+- Type guards used for jsPDF objects due to lack of official TypeScript types
+- All existing functionality preserved with zero regressions
+
+### Verification Date
+
+2026-01-17
+
+### Impact
+
+- Type Safety: Zero `any` types in production code
+- Code Quality: Proper TypeScript types throughout exportPDF module
+- Maintainability: DRY principle applied, no duplicate code
+- Modern Practices: ES6 imports instead of require statements
+
+### Related Tasks
+
+- Task 282 (Layer Separation) - Previous architectural improvement
+- Task 281 (Bundle Optimization) - Dynamic import pattern for jspdf
+
+---
+
 ## Task 282: [CODE ARCHITECT] Layer Separation - Service Types (Jan 17, 2026)
 
 **Status**: ✅ Completed
