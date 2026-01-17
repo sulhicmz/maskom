@@ -94,7 +94,7 @@ export interface FaqItem extends BaseDataItem {
 
 **Pattern 2: Standalone Items** (Global data):
 ```typescript
-// TeamMember, MenuItem, InnerBlogPost
+// TeamMember, MenuItem, InnerBlogPost, MediaAsset
 export interface TeamMember {
     id: number;
     img: StaticImageData;
@@ -140,6 +140,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | BlogTagData.ts | BlogTagItem | No | Yes | No | Yes | Blog keyword tags with relationships |
 | BlogCategoryData.ts | CategoryItem | No | Yes | Yes | No | Blog categories (Task 240) |
 | FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | No | Feature cards (home-one) |
+| MediaAssetData.ts | MediaAsset | No | Yes | No | No | Media assets for content library (Task 285) |
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
 
@@ -164,6 +165,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - `teamValidation.ts` - TeamMember validator
 - `socialValidation.ts` - SocialLink validator
 - `contactValidation.ts` - ContactInfoItem validator
+- `mediaValidation.ts` - MediaAsset validator with URL and ISO date validation (Task 285)
 - `index.ts` - Central export point (backward compatible with dataValidation.ts)
 - ✅ `createValidator<T>()` - Factory pattern for creating validators
 - ✅ `validateBaseDataItem()` - Validate BaseDataItem structure
@@ -191,6 +193,8 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateBlogCommentItem` - Blog comments with threading, moderation status, and voting (Task 270)
 - ✅ `validateTeamMember` - Team member profiles
 - ✅ `validateInnerBlogPost` - Inner blog posts
+- ✅ `validateMediaAsset` - Media assets with URL, media type, and tag validation (Task 285)
+- ✅ `validateMediaAssets` - Array validation for media assets (Task 285)
 - ✅ `validateFaqDetail` - FAQ detail sections
 - ✅ `validateInnerFaqItem` - FAQ categories with details
 - ✅ `validateSocialLink` - Social media links with target validation
@@ -209,6 +213,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ 24 tests for validateCategoryItem (100% passing) (Task 240)
 - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
 - ✅ 32 tests for validateBlogCommentItem (100% passing) (Task 270)
+- ✅ 20 tests for validateMediaItem (100% passing) (Task 285)
 - ✅ All validators tested with valid and invalid inputs
 - ✅ Base validation utilities tested directly:
   - `validateBaseDataItem()` - 11 tests
