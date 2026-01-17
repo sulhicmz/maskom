@@ -2607,6 +2607,15 @@ Comprehensive API specifications for all external service integrations are docum
 - **Email Service** (`docs/api/email-service.md`) - EmailJS integration with resilience patterns (Task 112)
 - **Auth Service** (`docs/api/auth-service.md`) - Authentication API with login, register, logout, rate limiting (Task 113)
 
+**API Routes Documentation**:
+- **API Routes** (`docs/api/api-routes.md`) - Comprehensive server-side monitoring, health check, and service status endpoints with best practices and troubleshooting (Task 251)
+  - Health check endpoint (`/api/health`) - Configurable success rate thresholds
+  - Metrics endpoint (`/api/metrics`) - Aggregated service metrics and performance data
+  - Service status endpoint (`/api/services/status`) - Circuit breaker states and service health
+- **Health API** (`docs/api/health-api.md`) - Quick reference for health check endpoint
+- **Metrics API** (`docs/api/metrics-api.md`) - Quick reference for metrics endpoint
+- **Service Status API** (`docs/api/services-status-api.md`) - Quick reference for service status endpoint
+
 **Documentation Contents**:
 - Complete API contracts with TypeScript interfaces
 - Request/response formats and examples
