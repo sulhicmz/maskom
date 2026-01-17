@@ -51,12 +51,7 @@ const ExportButton = React.memo<ExportButtonProps>(({
         includeFilters: true
       }
 
-      await new Promise<void>((resolve) => {
-        setTimeout(async () => {
-          await exportBlogPosts(posts, filterCriteria, config)
-          resolve()
-        }, 100)
-      })
+      await exportBlogPosts(posts, filterCriteria, config)
 
       toast.success(`Berhasil mengekspor ${posts.length} postingan sebagai ${format.toUpperCase()}`)
     } catch (error) {

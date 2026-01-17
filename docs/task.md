@@ -1,5 +1,100 @@
 # Architecture Task Tracking
 
+## Task 252: DevOps - CI Build Failure Fix - ExportButton Test (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: DevOps - CI Build Fix
+
+### Purpose
+
+Fix failing CI build (1 failed test out of 3575 total) caused by artificial setTimeout delay in ExportButton component that prevented test from completing within timeout.
+
+### Problem Identified
+
+**Failing Test** (src/components/common/__tests__/ExportButton.test.tsx:277):
+- Test "should disable export options during export" failing
+- Test expects button to be re-enabled within 2000ms after export completes
+- ExportButton component had artificial 100ms setTimeout wrapper around exportBlogPosts call
+- Test resolved mock promise but button remained disabled because setTimeout hadn't completed
+- Test failure blocked green CI build (3574/3575 passing)
+
+**Root Cause**:
+```typescript
+// ExportButton.tsx (before fix)
+await new Promise<void>((resolve) => {
+  setTimeout(async () => {
+    await exportBlogPosts(posts, filterCriteria, config)
+    resolve()
+  }, 100)
+})
+```
+- Artificial 100ms delay prevented immediate export completion
+- Test called `resolveExport()` but waited for setTimeout before finally block executed
+- `setIsExporting(false)` in finally block never ran within test timeout
+
+### Solution
+
+Removed artificial setTimeout delay from ExportButton.tsx:
+
+```typescript
+// ExportButton.tsx (after fix)
+await exportBlogPosts(posts, filterCriteria, config)
+```
+
+### Code Changes
+
+- Modified: `src/components/common/ExportButton.tsx` - Removed setTimeout wrapper (-6 lines)
+- Total: 1 file modified, ~6 lines removed
+
+### Architecture Benefits
+
+1. **Simpler Code**: Removed unnecessary artificial delay
+2. **Test Reliability**: Test completes immediately after export
+3. **Performance**: Export completes faster without artificial delay
+4. **Maintainability**: Less code to maintain
+
+### Success Criteria
+
+- [x] ExportButton test passes (18/18)
+- [x] Full test suite passes (3575/3575, 100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (no TypeScript errors)
+- [x] Build successful (25 pages generated)
+- [x] CI build is green again
+
+### Related Files
+
+- ✅ Modified: `src/components/common/ExportButton.tsx` - Removed setTimeout wrapper
+
+### Notes
+
+- Follows DevOps Engineer principles:
+  - **Green Builds Always**: Fixed failing test immediately (CRITICAL priority)
+  - **Anti-Pattern Avoidance**: No artificial delays in production code
+  - **Fast Feedback**: Tests complete quickly without unnecessary waits
+  - **Zero Regressions**: All 3575 tests passing
+- Artificial delays should not be used in production code unless explicitly required
+- If UI feedback delay is needed, use CSS transitions or component-level state management
+
+### Impact
+
+- Build: CI build is green (3575/3575 passing)
+- Performance: Export completes faster without 100ms delay
+- Code Quality: Removed unnecessary code
+- Zero Regressions: All tests passing, lint clean, build successful
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 251 (API Documentation) - Latest completed task
+- Task 248 (Code Sanitizer) - CI health verified
+
+---
+
 ## Task 251: API Documentation - API Routes Documentation (Jan 17, 2026)
 
 **Status**: ✅ Completed
