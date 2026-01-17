@@ -4,14 +4,13 @@ This document provides comprehensive guidance for testing in the Maskom codebase
 
 ## Overview
 
- The Maskom project uses **Jest** and **React Testing Library** for testing with over **3575 tests** across **149 test suites**. Test coverage includes components, hooks, utilities, services, and data validation.
-
-### Test Statistics
-
-   - **Total Test Suites**: 149
-   - **Total Tests**: 3575
-- **Success Rate**: 100% (all tests passing)
-- **Test Framework**: Jest 29.x with React Testing Library
+ The Maskom project uses **Jest** and **React Testing Library** for testing with over **3842 tests** across **163 test suites**. Test coverage includes components, hooks, utilities, services, and data validation.
+ ### Test Statistics
+ 
+    - **Total Test Suites**: 163
+    - **Total Tests**: 3842
+ - **Success Rate**: 100% (all tests passing)
+ - **Test Framework**: Jest 29.x with React Testing Library
 - **Code Coverage**: See coverage reports after running `npm test -- --coverage`
 
 ## Quick Start
@@ -672,14 +671,14 @@ If tests are flaky (intermittently fail):
 4. Mock time-dependent operations
 5. Verify test isolation (no shared state)
 
- ## Summary
+## Summary
 
  The Maskom project has a robust testing foundation with:
-
-    - **2724 tests** across **109 test suites**
- - **100% test success rate**
- - Comprehensive coverage for components, utilities, services, and hooks
- - Clear testing patterns and standards
- - Well-documented testing approach
-
+ 
+     - **3842 tests** across **163 test suites**
+  - **100% test success rate**
+  - Comprehensive coverage for components, utilities, services, and hooks
+  - Clear testing patterns and standards
+  - Well-documented testing approach
+ 
  When adding new features, always include tests to maintain code quality and prevent regressions.
