@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import UseCases from '../index';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { I18nProvider } from '@/contexts/I18nContext';
 
 jest.mock('next/image', () => ({
     __esModule: true,
@@ -21,7 +22,9 @@ jest.mock('next/link', () => ({
 function renderWithProviders(component: React.ReactElement) {
     return render(
         <ThemeProvider>
-            {component}
+            <I18nProvider>
+                {component}
+            </I18nProvider>
         </ThemeProvider>
     );
 }

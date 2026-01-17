@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import HeaderOne from "../HeaderOne";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { I18nProvider } from "@/contexts/I18nContext";
 
 jest.mock("@/hooks/UseSticky");
 const mockedUseSticky = UseSticky as jest.Mock;
@@ -27,7 +28,9 @@ jest.mock("next/link", () => {
 function renderWithProviders(component: React.ReactElement) {
   return render(
     <ThemeProvider>
-      {component}
+      <I18nProvider>
+        {component}
+      </I18nProvider>
     </ThemeProvider>
   );
 }
@@ -139,7 +142,9 @@ describe("HeaderOne Component", () => {
 
       rerender(
         <ThemeProvider>
-          <HeaderOne style={false} />
+          <I18nProvider>
+            <HeaderOne style={false} />
+          </I18nProvider>
         </ThemeProvider>
       );
       toggler = document.querySelector(".navbar-toggler");
@@ -153,7 +158,9 @@ describe("HeaderOne Component", () => {
       const { rerender } = renderWithProviders(<HeaderOne style={false} />);
       rerender(
         <ThemeProvider>
-          <HeaderOne style={true} />
+          <I18nProvider>
+            <HeaderOne style={true} />
+          </I18nProvider>
         </ThemeProvider>
       );
       
