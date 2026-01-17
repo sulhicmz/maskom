@@ -88,6 +88,21 @@ class AuthService implements IAuthService {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    private handleAuthError(error: unknown, _operation: string): AuthResult {
+        if (error instanceof RateLimitExceededError) {
+            return createRateLimitErrorResult(error, MS_TO_SECONDS);
+        }
+
+        const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+
+        if (standardizedError instanceof ServiceValidationError) {
+            return createErrorResult(standardizedError.message, ServiceErrorCode.VALIDATION);
+        }
+
+        return createErrorResult(standardizedError.message);
+    }
+
     private async registerWithoutResilience(userData: RegisterData): Promise<AuthResult> {
         this.validateCredentials(userData.email, userData.password, true, userData.name);
 
@@ -124,17 +139,7 @@ class AuthService implements IAuthService {
 
             return result;
         } catch (error) {
-            if (error instanceof RateLimitExceededError) {
-                return createRateLimitErrorResult(error, MS_TO_SECONDS);
-            }
-
-            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
-
-            if (standardizedError instanceof ServiceValidationError) {
-                return createErrorResult(standardizedError.message, ServiceErrorCode.VALIDATION);
-            }
-
-            return createErrorResult(standardizedError.message);
+            return this.handleAuthError(error, 'login');
         }
     }
 
@@ -154,17 +159,7 @@ class AuthService implements IAuthService {
 
             return result;
         } catch (error) {
-            if (error instanceof RateLimitExceededError) {
-                return createRateLimitErrorResult(error, MS_TO_SECONDS);
-            }
-
-            const standardizedError = error instanceof Error ? error : new Error('Unknown error');
-
-            if (standardizedError instanceof ServiceValidationError) {
-                return createErrorResult(standardizedError.message, ServiceErrorCode.VALIDATION);
-            }
-
-            return createErrorResult(standardizedError.message);
+            return this.handleAuthError(error, 'register');
         }
     }
 

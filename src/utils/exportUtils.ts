@@ -42,8 +42,8 @@ export function generateExportMetadata(
 ): ExportMetadata {
   return {
     exportDate: formatExportDate(new Date()),
-    filterCount: Number(!!filterCriteria.searchQuery) + 
-                  Number(!!filterCriteria.categoryId) + 
+    filterCount: Number(!!filterCriteria.searchQuery) +
+                  Number(!!filterCriteria.categoryId) +
                   Number(!!filterCriteria.tagId) +
                   Number(!!filterCriteria.status),
     filters: filterCriteria,
@@ -51,20 +51,38 @@ export function generateExportMetadata(
   }
 }
 
-export async function exportToPDF(
-  posts: InnerBlogPost[],
-  config: ExportConfig,
-  metadata: ExportMetadata
-): Promise<void> {
-  const jsPDF = (await import('jspdf')).default as unknown as new (...args: unknown[]) => JsPDFType
-  const doc = new jsPDF()
-  const pageWidth = doc.internal.pageSize.getWidth()
+export function getFilterMetadataText(filters: BlogFilterCriteria): string[] {
+  const metadataLines: string[] = []
+
+  if (filters.searchQuery) {
+    metadataLines.push(`Search: "${filters.searchQuery}"`)
+  }
+  if (filters.categoryId) {
+    const categoryName = blogCategoryById.get(filters.categoryId)?.name
+    if (categoryName) {
+      metadataLines.push(`Category: ${categoryName}`)
+    }
+  }
+  if (filters.tagId) {
+    const tagName = tagsById.get(filters.tagId)?.name
+    if (tagName) {
+      metadataLines.push(`Tag: ${tagName}`)
+    }
+  }
+  if (filters.status) {
+    metadataLines.push(`Status: ${filters.status}`)
+  }
+
+  return metadataLines
+}
+
+function setupPDFDocument(doc: JsPDFType, metadata: ExportMetadata, pageWidth: number): { yPosition: number; margin: number; contentWidth: number } {
+  doc.setFontSize(16)
+  doc.setFont('helvetica', 'bold')
   const margin = 20
   const contentWidth = pageWidth - (margin * 2)
   let yPosition = 30
 
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
   doc.text('Blog Posts Export', pageWidth / 2, yPosition, { align: 'center' })
   yPosition += 10
 
@@ -76,38 +94,82 @@ export async function exportToPDF(
   doc.text(`Total Posts: ${metadata.resultCount}`, margin, yPosition)
   yPosition += 7
 
+  return { yPosition, margin, contentWidth }
+}
+
+function renderPDFMetadata(doc: JsPDFType, metadata: ExportMetadata, margin: number, yPosition: number): number {
   if (metadata.filterCount > 0) {
     doc.text('Active Filters:', margin, yPosition)
     yPosition += 5
     doc.setFontSize(9)
-    if (metadata.filters.searchQuery) {
-      doc.text(`  - Search: "${metadata.filters.searchQuery}"`, margin, yPosition)
+
+    const filterText = getFilterMetadataText(metadata.filters)
+    filterText.forEach((text: string) => {
+      doc.text(`  - ${text}`, margin, yPosition)
       yPosition += 5
-    }
-    if (metadata.filters.categoryId) {
-      const categoryName = blogCategoryById.get(metadata.filters.categoryId)?.name
-      if (categoryName) {
-        doc.text(`  - Category: ${categoryName}`, margin, yPosition)
-        yPosition += 5
-      }
-    }
-    if (metadata.filters.tagId) {
-      const tagName = tagsById.get(metadata.filters.tagId)?.name
-      if (tagName) {
-        doc.text(`  - Tag: ${tagName}`, margin, yPosition)
-        yPosition += 5
-      }
-    }
-    if (metadata.filters.status) {
-      doc.text(`  - Status: ${metadata.filters.status}`, margin, yPosition)
-      yPosition += 5
-    }
+    })
+
     doc.setFontSize(10)
     yPosition += 5
   }
 
-  doc.line(margin, yPosition, pageWidth - margin, yPosition)
+  doc.line(margin, yPosition, doc.internal.pageSize.getWidth() - margin, yPosition)
   yPosition += 10
+
+  return yPosition
+}
+
+function renderPDFPost(doc: JsPDFType, post: InnerBlogPost, index: number, margin: number, contentWidth: number, yPosition: number): number {
+  doc.setFontSize(12)
+  doc.setFont('helvetica', 'bold')
+  doc.text(`${index + 1}. ${post.title}`, margin, yPosition)
+  yPosition += 8
+
+  doc.setFontSize(10)
+  doc.setFont('helvetica', 'normal')
+
+  const lines = doc.splitTextToSize(post.desc, contentWidth)
+  lines.forEach((line: string) => {
+    doc.text(line, margin, yPosition)
+    yPosition += 5
+  })
+
+  yPosition += 5
+  doc.setFontSize(9)
+  doc.setTextColor(100, 100, 100)
+  doc.text(`Author: ${post.user} | Date: ${post.date}`, margin, yPosition)
+  yPosition += 5
+
+  if (post.tagId) {
+    const tagName = tagsById.get(post.tagId)?.name
+    if (tagName) {
+      doc.text(`Tag: ${tagName}`, margin, yPosition)
+      yPosition += 5
+    }
+  }
+
+  if (post.category) {
+    doc.text(`Category: ${post.category}`, margin, yPosition)
+    yPosition += 5
+  }
+
+  doc.setTextColor(0, 0, 0)
+  yPosition += 8
+
+  return yPosition
+}
+
+export async function exportToPDF(
+  posts: InnerBlogPost[],
+  config: ExportConfig,
+  metadata: ExportMetadata
+): Promise<void> {
+  const jsPDF = (await import('jspdf')).default as unknown as new (...args: unknown[]) => JsPDFType
+  const doc = new jsPDF()
+  const pageWidth = doc.internal.pageSize.getWidth()
+
+  const { yPosition: startY, margin, contentWidth } = setupPDFDocument(doc, metadata, pageWidth)
+  let yPosition = renderPDFMetadata(doc, metadata, margin, startY)
 
   posts.forEach((post, index) => {
     if (yPosition > 270) {
@@ -115,41 +177,7 @@ export async function exportToPDF(
       yPosition = 20
     }
 
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'bold')
-    doc.text(`${index + 1}. ${post.title}`, margin, yPosition)
-    yPosition += 8
-
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
-
-    const lines = doc.splitTextToSize(post.desc, contentWidth)
-    lines.forEach((line: string) => {
-      doc.text(line, margin, yPosition)
-      yPosition += 5
-    })
-
-    yPosition += 5
-    doc.setFontSize(9)
-    doc.setTextColor(100, 100, 100)
-    doc.text(`Author: ${post.user} | Date: ${post.date}`, margin, yPosition)
-    yPosition += 5
-
-    if (post.tagId) {
-      const tagName = tagsById.get(post.tagId)?.name
-      if (tagName) {
-        doc.text(`Tag: ${tagName}`, margin, yPosition)
-        yPosition += 5
-      }
-    }
-
-    if (post.category) {
-      doc.text(`Category: ${post.category}`, margin, yPosition)
-      yPosition += 5
-    }
-
-    doc.setTextColor(0, 0, 0)
-    yPosition += 8
+    yPosition = renderPDFPost(doc, post, index, margin, contentWidth, yPosition)
   })
 
   const filename = config.filename || `blog-export-${metadata.exportDate}.pdf`
@@ -180,24 +208,11 @@ export function exportToCSV(
 
   if (metadata.filterCount > 0) {
     metadataLines.push('# Filters Applied:')
-    if (metadata.filters.searchQuery) {
-      metadataLines.push(`#   - Search: "${metadata.filters.searchQuery}"`)
-    }
-    if (metadata.filters.categoryId) {
-      const categoryName = blogCategoryById.get(metadata.filters.categoryId)?.name
-      if (categoryName) {
-        metadataLines.push(`#   - Category: ${categoryName}`)
-      }
-    }
-    if (metadata.filters.tagId) {
-      const tagName = tagsById.get(metadata.filters.tagId)?.name
-      if (tagName) {
-        metadataLines.push(`#   - Tag: ${tagName}`)
-      }
-    }
-    if (metadata.filters.status) {
-      metadataLines.push(`#   - Status: ${metadata.filters.status}`)
-    }
+
+    const filterText = getFilterMetadataText(metadata.filters)
+    filterText.forEach((text: string) => {
+      metadataLines.push(`#   - ${text}`)
+    })
   }
 
   metadataLines.push('')
