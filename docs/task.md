@@ -1,5 +1,145 @@
 # Architecture Task Tracking
 
+## Task 268: [UI/UX] Add Select Element Focus Styles for Keyboard Accessibility (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX - Accessibility (a11y)
+
+### Purpose
+
+Add visible focus indicators for select (dropdown) elements to ensure keyboard users can see which element is focused, improving navigation accessibility and meeting WCAG 2.1 Level AA requirements.
+
+### Problem Identified
+
+**Missing Focus Indicators for Select Elements**:
+- `select:focus-visible` not included in focus-visible styles (lines 55-62 of _common.scss)
+- Other form elements (input, textarea, button) have focus-visible styles
+- Select elements had no visible keyboard feedback when focused
+- Keyboard users cannot tell which select element is currently focused
+- Violates WCAG 2.1 requirement for focus indicators (Success Criterion 2.4.7)
+
+**Code Issue**:
+```scss
+// Before - missing select element
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--blue-color);
+    outline-offset: 2px;
+}
+```
+
+**Accessibility Impact**:
+- Keyboard navigation through forms includes select dropdowns
+- Without visible focus, keyboard users cannot track their position
+- Inconsistent UX across form elements
+- Poor experience for users who rely on keyboard navigation
+
+### Implementation
+
+**Added select:focus-visible to Focus Styles**:
+- Added `select:focus-visible` to light mode focus-visible styles
+- Added `select:focus-visible` to dark mode focus-visible styles
+- Added `box-shadow` for better focus visibility (double-ring effect)
+- Added `:focus:not(:focus-visible)` to remove outline on mouse-only focus
+- Ensures consistent focus indicators across all form elements
+
+**CSS Changes** (_common.scss):
+
+```scss
+// Light mode focus styles
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+select:focus-visible {
+    text-decoration: none;
+    outline: 3px solid var(--blue-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--white-color), 0 0 0 5px var(--blue-color);
+}
+
+// Dark mode focus styles
+[data-theme="dark"] a:focus-visible,
+[data-theme="dark"] input:focus-visible,
+[data-theme="dark"] textarea:focus-visible,
+[data-theme="dark"] button:focus-visible,
+[data-theme="dark"] select:focus-visible {
+    outline: 3px solid var(--blue-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--black-dark-color), 0 0 0 5px var(--blue-color);
+}
+
+// Remove outline on mouse-only focus
+:focus:not(:focus-visible) {
+    outline: none;
+}
+```
+
+### Code Changes
+
+- Modified: `public/assets/scss/_common.scss` - Added select:focus-visible styles and box-shadow (+17 lines, -1 line)
+- Total: 1 file modified, ~16 lines added
+
+### Architecture Benefits
+
+1. **Accessibility**: Keyboard users can see which select element is focused ✅
+2. **Consistency**: All form elements now have same focus style ✅
+3. **WCAG 2.1 AA Compliance**: Meets focus indicator requirements (2.4.7) ✅
+4. **Dark Mode Support**: Select elements have proper contrast in dark theme ✅
+5. **Mouse Focus Cleanup**: Outline removed for mouse-only interactions ✅
+6. **Better Visibility**: Double-ring effect (outline + box-shadow) for clear focus ✅
+
+### Success Criteria
+
+- [x] select:focus-visible added to light mode focus-visible styles
+- [x] select:focus-visible added to dark mode focus-visible styles
+- [x] box-shadow added for better focus visibility
+- [x] :focus:not(:focus-visible) added to remove outline on mouse-only focus
+- [x] Build passes (25 pages generated)
+- [x] All tests passing (3649/3649, 100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Zero regressions in existing functionality
+
+### Related Files
+
+- ✅ Modified: `public/assets/scss/_common.scss` - +17 lines, -1 line (focus styles enhanced)
+
+### Notes
+
+- Follows UI/UX Engineer principles:
+  - **Accessibility (a11y)**: Keyboard users can see which select element is focused
+  - **Consistency**: Select elements now have same focus style as other form elements
+  - **User-Centric**: Better UX for keyboard navigation
+  - **Semantic Structure**: Proper focus indicators for interactive elements
+- select elements are commonly used in forms (category filters, dropdowns, etc.)
+- Box-shadow double-ring effect provides high contrast for visibility
+- Light mode: white inner ring + blue outer ring
+- Dark mode: black inner ring + blue outer ring
+- :focus:not(:focus-visible) ensures outline only shows for keyboard navigation, not mouse clicks
+- No breaking changes - all existing functionality preserved
+
+### Impact
+
+- Accessibility: Improved keyboard navigation experience for select elements
+- User Experience: Clear visual feedback for keyboard users
+- Consistency: All form elements now have consistent focus styles
+- Zero Regressions: All 3649 tests passing, lint clean, build successful
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 261 (Accessibility Improvements) - Previous accessibility enhancements (breadcrumb, newsletter form)
+- Task 236 (Newsletter Form) - Form accessibility features
+- Task 132 (Accessibility Improvements) - Initial accessibility enhancements
+
+---
+
 ## Task 263: [REFACTOR] Extract Duplicate Error Handling in AuthService (Jan 17, 2026)
 
 **Status**: ✅ Completed

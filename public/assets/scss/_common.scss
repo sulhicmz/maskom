@@ -55,10 +55,26 @@ a{
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-button:focus-visible {
+button:focus-visible,
+select:focus-visible {
     text-decoration: none;
     outline: 3px solid var(--blue-color);
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--white-color), 0 0 0 5px var(--blue-color);
+}
+
+[data-theme="dark"] a:focus-visible,
+[data-theme="dark"] input:focus-visible,
+[data-theme="dark"] textarea:focus-visible,
+[data-theme="dark"] button:focus-visible,
+[data-theme="dark"] select:focus-visible {
+    outline: 3px solid var(--blue-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--black-dark-color), 0 0 0 5px var(--blue-color);
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
 }
 
 i,
