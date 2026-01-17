@@ -7,6 +7,7 @@ import AnalyticsSummaryCards from './AnalyticsSummary'
 import AnalyticsChart from './AnalyticsChart'
 import PerformanceMetrics from './PerformanceMetrics'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import StatusBadge from '@/components/ui/StatusBadge'
 import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
 import { formatAsPercentage } from '@/utils/formatPercentage'
@@ -20,8 +21,8 @@ const FormSubmissionRow = memo(({ form, index }: { form: FormSubmissionMetrics; 
         <span className="badge bg-primary">{form.formType}</span>
       </td>
       <td>{form.totalSubmissions}</td>
-      <td className="text-success">{form.successfulSubmissions}</td>
-      <td className="text-danger">{form.failedSubmissions}</td>
+      <td><StatusBadge type="success">{form.successfulSubmissions}</StatusBadge></td>
+      <td><StatusBadge type="danger">{form.failedSubmissions}</StatusBadge></td>
       <td>{formatAsPercentage(form.successfulSubmissions, form.totalSubmissions)}</td>
       <td>{form.avgCompletionTime}s</td>
     </tr>

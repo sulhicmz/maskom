@@ -2,6 +2,7 @@
 
 import { Component, ReactNode, ErrorInfo } from "react";
 import Link from "next/link";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 interface ErrorBoundaryProps {
     children: ReactNode;
@@ -83,7 +84,7 @@ function ErrorFallback({ errorId, onReset, onReload }: { errorId: string; onRese
                         <circle cx="40" cy="52" r="2" fill="#dc3545" />
                     </svg>
                 </div>
-                <h1 className="display-4 fw-bold text-danger mb-3">Terjadi Kesalahan</h1>
+                <h1 className="display-4 fw-bold mb-3"><StatusBadge type="danger">Terjadi Kesalahan</StatusBadge></h1>
                 <p className="lead mb-4">
                     Maaf, terjadi kesalahan tak terduga. Tim kami telah diberitahu.
                 </p>
