@@ -3070,3 +3070,193 @@ export interface BookmarkStorage {
 - [x] All 3321 tests passing (100% success rate)
 - [x] Lint passes (0 errors, 0 warnings)
 - [x] Build successful (24 pages generated)
+
+---
+
+## Blog Post Draft Auto-Save (✅ COMPLETED - Task 253)
+
+### Purpose
+
+Implement auto-save functionality for blog post drafts to prevent data loss during browser crashes or accidental closures, with configurable intervals and debounced saving.
+
+### Architecture Components
+
+**AutoSaveConfig Interface** (src/types/data/index.ts):
+```typescript
+export interface AutoSaveConfig<T = object> {
+   formId: string;
+   data: T;
+   onSave?: (data: T) => Promise<void> | void;
+   onRestore?: (data: T) => void;
+   autoSaveInterval?: number;
+   debounceMs?: number;
+   enabled?: boolean;
+}
+```
+
+**DraftData Interface** (src/types/data/index.ts):
+```typescript
+export interface DraftData<T = object> {
+   data: T;
+   savedAt: string;
+   formId: string;
+}
+```
+
+**useAutoSave Hook** (src/hooks/useAutoSave.ts):
+```typescript
+export interface UseAutoSaveReturn<T = object> {
+   isAutoSaving: boolean;
+   lastSavedAt: Date | null;
+   saveDraft: () => void;
+   clearDraft: () => void;
+   restoreDraft: () => T | null;
+   hasDraft: boolean;
+}
+
+export function useAutoSave<T extends object>(config: AutoSaveConfig<T>): UseAutoSaveReturn<T>
+```
+
+**AutoSaveIndicator Component** (src/components/common/AutoSaveIndicator.tsx):
+- Displays "Last saved" status with relative timestamp
+- Shows "Menyimpan..." during save operations
+- Indonesian localization (baru saja, X menit/jam/hari yang lalu)
+- ARIA live region for screen readers
+
+**ClearDraftButton Component** (src/components/common/ClearDraftButton.tsx):
+- Button to clear saved draft with confirmation dialog
+- Disabled when no draft exists
+- Indonesian localization (🗑️ Hapus Draft)
+
+### Implementation
+
+**Storage Strategy**:
+- localStorage key format: \`draft_\${formId}\`
+- ISO 8601 timestamp format for savedAt field
+- Automatic cleanup on component unmount
+
+**Auto-Save Behavior**:
+- **Interval-based**: Saves draft at configured interval (default: 30s)
+- **Debounced**: Manual saves debounced to avoid excessive writes (default: 1s)
+- **Enabled/disabled**: Toggle auto-save with \`enabled\` config option
+- **Draft Recovery**: Auto-restore draft on component mount if \`onRestore\` callback provided
+
+**Manual Operations**:
+- \`saveDraft()\`: Immediate save without debounce
+- \`clearDraft()\`: Remove draft from localStorage
+- \`restoreDraft()\`: Load draft from localStorage
+- \`hasDraft\`: Boolean indicating draft exists
+
+### Architecture Benefits
+
+1. **Layer Separation**:
+   - Storage layer (localStorage) isolated from presentation layer
+   - Hook manages state and persistence independently
+   - Components only use provided interface methods
+
+2. **DRY Principle**:
+   - Reusable hook works with any form data type
+   - Single implementation for auto-save across all forms
+   - No duplicate localStorage access patterns
+
+3. **Type Safety**:
+   - Generic type parameter \`T\` ensures type-safe data handling
+   - DraftData<T> interface provides type-safe storage format
+   - Compile-time checking prevents type errors
+
+4. **User Experience**:
+   - "Last saved" indicator with relative timestamps
+   - Draft recovery prevents data loss
+   - Confirmation dialog prevents accidental deletion
+   - Debouncing avoids excessive localStorage writes
+
+5. **Configurability**:
+   - Auto-save interval configurable per form
+   - Debounce time configurable per form
+   - Enable/disable flag for conditional auto-save
+   - Callbacks for custom save/restore behavior
+
+6. **SOLID Compliance**:
+   - **Single Responsibility**: useAutoSave only manages draft state
+   - **Open/Closed**: Easy to extend with new features (e.g., cloud sync)
+   - **Dependency Inversion**: Components depend on hook interface, not localStorage directly
+
+### Testing
+
+**22 comprehensive tests for useAutoSave hook** (src/hooks/__tests__/useAutoSave.test.ts):
+- Initialization (5 tests): Default config, draft restoration, invalid data handling, hasDraft status
+- saveDraft (5 tests): localStorage persistence, timestamp updates, onSave callback, error handling
+- clearDraft (3 tests): localStorage removal, timestamp reset, hasDraft reset
+- restoreDraft (3 tests): Draft loading, null handling, invalid JSON handling
+- auto-save interval (2 tests): Default interval, enable/disable flag
+- cleanup (1 test): Timer cleanup on unmount
+- type safety (1 test): Generic type parameter acceptance
+- edge cases (2 tests): Undefined data, empty formId handling
+
+### Integration
+
+**BlogForm Integration** (src/components/forms/BlogForm.tsx):
+- AutoSaveIndicator displays last saved timestamp
+- "Pulihkan Draft" button to restore saved draft
+- ClearDraftButton for manual draft deletion
+- Draft cleared after successful form submission
+
+### Success Criteria
+
+- [x] AutoSaveConfig interface defined with all configuration options
+- [x] DraftData interface defined with type-safe storage format
+- [x] useAutoSave hook implemented with localStorage persistence
+- [x] Auto-save interval configurable (default 30s)
+- [x] Debounce for manual saves (default 1s)
+- [x] "Last saved" indicator component created
+- [x] Draft recovery on component mount
+- [x] Manual save and clear draft functionality
+- [x] ClearDraftButton with confirmation dialog
+- [x] BlogForm integrated with auto-save UI
+- [x] 22 comprehensive tests for useAutoSave (100% passing)
+- [x] All 3631 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (0 errors)
+- [x] Build successful (25 pages generated)
+
+### Related Files
+
+- ✅ Added: \`src/types/data/index.ts\` - DraftData, AutoSaveConfig interfaces (+9 lines)
+- ✅ Added: \`src/hooks/useAutoSave.ts\` - Auto-save hook implementation (111 lines)
+- ✅ Added: \`src/hooks/__tests__/useAutoSave.test.ts\` - 22 comprehensive tests (498 lines)
+- ✅ Added: \`src/components/common/AutoSaveIndicator.tsx\` - Last saved indicator (48 lines)
+- ✅ Added: \`src/components/common/ClearDraftButton.tsx\` - Clear draft button (28 lines)
+- ✅ Modified: \`src/components/forms/BlogForm.tsx\` - Auto-save integration (+47 lines)
+
+### Notes
+
+- Follows Code Architect principles:
+  - **Layer Separation**: Storage isolated from presentation layer
+  - **Interface Definition**: Clear contracts between modules
+  - **DRY Principle**: Reusable hook for all forms
+  - **SOLID Compliance**: Single Responsibility, Open/Closed, Dependency Inversion
+- Hook is generic and works with any form data type
+- Debouncing prevents excessive localStorage writes
+- Draft recovery happens automatically on component mount
+- Confirmation dialog prevents accidental draft deletion
+- Indonesian localization throughout UI components
+- All existing tests continue to pass (zero regressions)
+
+### Impact
+
+- Architecture: Auto-save system with reusable hook pattern
+- Type Safety: Generic type parameter ensures type-safe data handling
+- Test Coverage: +22 new tests (3609 → 3631, 100% pass rate)
+- Zero Regressions: All 3631 tests passing, lint clean, build successful
+- User Experience: Draft recovery and "last saved" indicators prevent data loss
+- Maintainability: Single implementation for auto-save across all forms
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 236 (UI/UX Improvement - Newsletter Form) - Can use useAutoSave hook for newsletter drafts
+- Task 50 (AuthService Validation Consolidation) - Similar pattern for validation reusability
+- Task 235 (FormField Component Memoization) - FormField can be enhanced with draft indicators
