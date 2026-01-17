@@ -54,6 +54,7 @@ npm run start
 
 ### Langkah Berikutnya
 
+- [**Panduan Pengguna**](docs/user-guide.md) - Cara menggunakan situs web Maskom (untuk pengunjung dan pelanggan)
 - [**Dokumentasi Arsitektur**](docs/blueprint.md) - Overview lengkap arsitektur dan pola desain
 - [**Panduan Pengembangan**](docs/testing-guide.md) - Panduan testing dan development
 - [**Panduan Komponen**](docs/component-development-guide.md) - Cara membuat dan memelihara komponen
