@@ -112,6 +112,14 @@ const nextConfig: NextConfig = {
               priority: 10,
               reuseExistingChunk: true,
             },
+            jspdf: {
+              test: /[\\/]node_modules[\\/]jspdf[\\/]/,
+              name: 'jspdf',
+              chunks: 'async',
+              priority: 15,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
           },
         },
       };
