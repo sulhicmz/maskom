@@ -3,6 +3,7 @@ import { Spline_Sans } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import SkipToMainContent from "@/components/common/SkipToMainContent";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
+import ServiceWorkerUpdate from "@/components/common/ServiceWorkerUpdate";
 
 export const runtime = 'edge';
 
@@ -26,6 +27,7 @@ export default function RootLayout({
         {/* For IE  */}
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <link rel="icon" href="/favicon.png" sizes="any" />
+        <link rel="manifest" href="/manifest.json" />
         {/* Resource hints for critical CDN resources */}
         <link rel="preconnect" href="https://cdn.jsdelivr.net" />
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -41,6 +43,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ErrorBoundary>
             {children}
+            <ServiceWorkerUpdate />
           </ErrorBoundary>
         </ThemeProvider>
       </body>
