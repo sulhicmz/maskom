@@ -1,6 +1,7 @@
 import "../styles/index.scss";
 import { Spline_Sans } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { I18nProvider } from "@/contexts/I18nContext";
 import SkipToMainContent from "@/components/common/SkipToMainContent";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import ServiceWorkerUpdate from "@/components/common/ServiceWorkerUpdate";
@@ -41,10 +42,12 @@ export default function RootLayout({
       <body className={splineSans.className} suppressHydrationWarning>
         <SkipToMainContent />
         <ThemeProvider>
-          <ErrorBoundary>
-            {children}
-            <ServiceWorkerUpdate />
-          </ErrorBoundary>
+          <I18nProvider>
+            <ErrorBoundary>
+              {children}
+              <ServiceWorkerUpdate />
+            </ErrorBoundary>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

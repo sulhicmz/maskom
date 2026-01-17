@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
-import { useTheme } from '@/components/theme/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Permission } from '@/types/permission';
-import { loadCacheConfig, saveCacheConfig, clearCache, getCacheStatistics, validateCacheConfig, resetCacheConfig, formatBytes, formatDuration, type CacheConfig, type CacheStatistics } from '@/utils/cacheConfig';
+import { loadCacheConfig, saveCacheConfig, clearCache, getCacheStatistics, validateCacheConfig, resetCacheConfig, formatBytes, formatDuration } from '@/utils/cacheConfig';
+import type { CacheConfig, CacheStatistics } from '@/types/cache';
 import SectionTitle from '@/components/common/SectionTitle';
 import AnimationWrapper from '@/components/common/AnimationWrapper';
 
@@ -152,7 +153,7 @@ export default function CacheConfigPage() {
 
   return (
     <ProtectedRoute requiredPermission={Permission.MANAGE_SETTINGS}>
-      <AnimationWrapper animationClass="fadeInUp">
+      <AnimationWrapper animation="fadeInUp">
         <SectionTitle
           title="Konfigurasi Cache"
           subtitle="Kelola pengaturan cache service worker untuk optimasi performa"
