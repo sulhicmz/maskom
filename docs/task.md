@@ -1,5 +1,230 @@
 # Architecture Task Tracking
 
+## Task 285: [FEATURE ARCHITECT] Media Asset Library Data Model (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature - Data Model
+
+### Purpose
+
+Implement MediaAsset data structure and validation to support centralized media library management for content creators.
+
+### Acceptance Criteria
+
+- [ ] Create MediaAsset interface (id, url, type, alt, tags, createdAt)
+- [ ] Add MediaAssetData.ts data file with sample media assets
+- [ ] Implement validateMediaItem validator for media asset validation
+- [ ] Add media type validation (image, video)
+- [ ] Add URL format validation for media assets
+- [ ] Create tests for media asset validation (15 tests minimum)
+- [ ] Update docs/blueprint.md with media asset architecture
+
+### Implementation Details
+
+**MediaAsset Interface**:
+```typescript
+export interface MediaAsset {
+    id: number;
+    url: string;              // Cloudinary URL or local path
+    type: 'image' | 'video';  // Media type
+    alt: string;              // Alt text for accessibility
+    tags: string[];           // Categorization tags
+    createdAt: string;         // ISO 8601 date
+    usageCount?: number;       // Number of posts using this asset
+}
+```
+
+**Validation Requirements**:
+- URL validation (must be valid URL)
+- Alt text validation (required for images)
+- Media type validation (only 'image' or 'video')
+- Tag validation (max 10 tags, max 50 chars each)
+
+---
+
+## Task 286: [PERFORMANCE ENGINEER] Web Vitals API Integration (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Performance - Real-Time Monitoring
+
+### Purpose
+
+Integrate Web Vitals API to track Core Web Vitals (LCP, FID, CLS) in real-time and display metrics on analytics dashboard.
+
+### Acceptance Criteria
+
+- [ ] Create webVitals.ts utility with onLCP, onFID, onCLS functions
+- [ ] Implement performance metric types (LCP, FID, CLS interfaces)
+- [ ] Add performance metrics storage (localStorage for historical data)
+- [ ] Implement performance score calculation (Good, Needs Improvement, Poor)
+- [ ] Add performance threshold alerts (LCP > 2.5s, FID > 100ms, CLS > 0.1)
+- [ ] Update AnalyticsDashboard component with real-time metrics
+- [ ] Create tests for webVitals utilities (25 tests minimum)
+- [ ] Update docs/blueprint.md with web vitals architecture
+
+### Implementation Details
+
+**Performance Metrics Types**:
+```typescript
+export interface PerformanceMetric {
+    name: 'LCP' | 'FID' | 'CLS';
+    value: number;
+    rating: 'good' | 'needs-improvement' | 'poor';
+    timestamp: string;
+    url: string;
+}
+
+export interface PerformanceScore {
+    lcp: PerformanceMetric;
+    fid: PerformanceMetric;
+    cls: PerformanceMetric;
+    overall: 'good' | 'needs-improvement' | 'poor';
+}
+```
+
+**Thresholds**:
+- LCP: Good (< 2.5s), Needs Improvement (2.5s-4.0s), Poor (> 4.0s)
+- FID: Good (< 100ms), Needs Improvement (100ms-300ms), Poor (> 300ms)
+- CLS: Good (< 0.1), Needs Improvement (0.1-0.25), Poor (> 0.25)
+
+---
+
+## Task 287: [UX DESIGNER] Search Filter Presets (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: UX - Search Experience
+
+### Purpose
+
+Implement search filter presets functionality to allow users to save and reuse frequently-used search criteria.
+
+### Acceptance Criteria
+
+- [ ] Create SearchPreset interface (id, name, search, category, tag)
+- [ ] Implement search preset storage utility (localStorage, max 10 presets)
+- [ ] Add preset management page (/search-presets) with edit/delete
+- [ ] Add "Save as Preset" button to BlogArea filter actions
+- [ ] Implement preset selection dropdown in BlogArea
+- [ ] Add preset naming validation (min 3 chars, max 30 chars)
+- [ ] Create tests for preset functionality (20 tests minimum)
+- [ ] Update docs/blueprint.md with preset architecture
+
+### Implementation Details
+
+**SearchPreset Interface**:
+```typescript
+export interface SearchPreset {
+    id: number;
+    name: string;              // User-defined preset name
+    search: string;            // Search query
+    category?: string;          // Optional category filter
+    tag?: string;              // Optional tag filter
+    createdAt: string;          // ISO 8601 date
+}
+```
+
+**Storage Requirements**:
+- Max 10 presets per user
+- localStorage key: 'search-presets'
+- Preset name validation: 3-30 chars, alphanumeric + spaces
+- Prevent duplicate preset names
+
+---
+
+## Task 288: [INFRASTRUCTURE ARCHITECT] APM Provider Configuration (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Infrastructure - APM Configuration
+
+### Purpose
+
+Implement admin panel for configuring APM provider settings to enable switching between Console and Sentry providers without code changes.
+
+### Acceptance Criteria
+
+- [ ] Create APMConfig interface (provider, config, enabled)
+- [ ] Implement APM configuration storage (localStorage)
+- [ ] Create APM configuration admin page (/admin/apm-config)
+- [ ] Add provider selection dropdown (Console, Sentry)
+- [ ] Implement provider-specific configuration fields
+- [ ] Add configuration validation and save functionality
+- [ ] Implement configuration test button (send test error)
+- [ ] Create tests for APM configuration (20 tests minimum)
+- [ ] Update docs/blueprint.md with APM configuration architecture
+
+### Implementation Details
+
+**APMConfig Interface**:
+```typescript
+export interface APMConfig {
+    provider: 'console' | 'sentry';
+    enabled: boolean;
+    sampleRate: number;        // 0.0 - 1.0
+    environment: 'production' | 'staging' | 'development';
+    sentry?: {
+        dsn: string;          // Sentry DSN
+        tracesSampleRate: number;
+    };
+}
+```
+
+**Configuration Requirements**:
+- Default: Console provider, 1.0 sample rate, development environment
+- Sentry DSN validation (valid DSN format)
+- Sample rate validation (0.0 - 1.0)
+- Admin-only access (RBAC: MANAGE_SETTINGS permission)
+
+---
+
+## Task 289: [CONTENT MANAGER] Automated Version Snapshots (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Content Management - Version Control
+
+### Purpose
+
+Implement automatic version snapshot creation before publishing to guarantee rollback points for blog posts.
+
+### Acceptance Criteria
+
+- [ ] Add auto-snapshot configuration to versionStorage utilities
+- [ ] Implement automatic version creation on publish action
+- [ ] Add version snapshot annotation ("Pre-publish snapshot [timestamp]")
+- [ ] Update VersionHistoryPanel to display snapshots
+- [ ] Implement snapshot restoration with confirmation dialog
+- [ ] Add snapshot count display in admin dashboard
+- [ ] Implement snapshot cleanup policy (retain last 20)
+- [ ] Create tests for automatic snapshot functionality (20 tests minimum)
+- [ ] Update docs/blueprint.md with snapshot architecture
+
+### Implementation Details
+
+**Snapshot Creation Logic**:
+```typescript
+export interface VersionSnapshot {
+    id: number;
+    postId: number;
+    content: string;
+    timestamp: string;
+    annotation: string;        // "Pre-publish snapshot 2026-01-17 14:30:25"
+    isAutoSnapshot: boolean;    // true for pre-publish snapshots
+}
+```
+
+**Snapshot Requirements**:
+- Auto-create snapshot before every publish action
+- Annotation format: "Pre-publish snapshot {ISO timestamp}"
+- Snapshot limit: 20 snapshots per post (oldest deleted)
+- Restore requires confirmation dialog
+- Admin dashboard shows total snapshot count
+
+---
+
 ## Task 284: [PERFORMANCE OPTIMIZER] Bundle Size Reduction - html2canvas Async Loading (Jan 17, 2026)
 
 **Status**: ✅ Completed
