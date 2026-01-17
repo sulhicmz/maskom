@@ -198,3 +198,19 @@ export interface UseCaseSidebarItem {
    link: string;
    active?: boolean;
 }
+
+export interface DraftData<T = object> {
+   data: T;
+   savedAt: string;
+   formId: string;
+}
+
+export interface AutoSaveConfig<T = object> {
+   formId: string;
+   data: T;
+   onSave?: (data: T) => Promise<void> | void;
+   onRestore?: (data: T) => void;
+   autoSaveInterval?: number;
+   debounceMs?: number;
+   enabled?: boolean;
+}
