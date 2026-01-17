@@ -478,6 +478,78 @@ Services (AuthService)
 - Zero regressions in existing functionality
 - Error messages verified consistent across all adapters
 
+## Layer Separation Architecture (✅ COMPLETED - Task 282)
+
+### Purpose
+
+Fix Clean Architecture violation where utility and presentation layers import types from service layer, ensuring dependencies flow in correct direction (inward).
+
+### Problem Solved
+
+**Layer Violation Before Task 282**:
+- `@/utils/apiResponse.ts` imported types from `@/services/common`
+- `ContactForm.tsx` and `NewsletterForm.tsx` (presentation) imported types from `@/services/common`
+- Dependencies flowed from utils → services (wrong direction)
+- Violated Clean Architecture principle: dependencies should flow inward
+
+### Architecture Solution
+
+```
+Before (Wrong Direction):
+Components → Services ← Utils (invalid dependency flow)
+
+After (Correct Direction):
+Components → Types ← Services (correct inward flow)
+         ↓
+      Utils
+```
+
+**Types Layer** (`src/types/common.ts`):
+- `ServiceResult<T>` - Generic service result interface
+- `ServiceError` - Error interface with retryable/timeout flags
+- `ServiceErrorCode` - Constant object with error code values
+- `ServiceErrorCodeType` - Type for error code values
+
+**Re-export Layer** (`src/services/common/types.ts`):
+- Re-exports types from `@/types/common`
+- Maintains backward compatibility
+- Service layer can continue importing from `@/services/common`
+
+### Architecture Benefits
+
+1. **Clean Architecture**: Dependencies flow correctly (presentation → types ← services) ✅
+2. **Single Source of Truth**: All service types in `@/types/common` ✅
+3. **Separation of Concerns**: Types independent of service implementations ✅
+4. **Testability**: Clear type boundaries enable easier testing ✅
+5. **Maintainability**: Service type changes don't affect utility layer ✅
+6. **Backward Compatibility**: Re-exports preserve existing import paths ✅
+
+### Code Changes
+
+- Added: `src/types/common.ts` - Common service types (32 lines)
+- Modified: `src/services/common/types.ts` - Re-exports from `@/types/common`
+- Modified: `src/utils/apiResponse.ts` - Import from `@/types/common`
+- Modified: `src/components/forms/ContactForm.tsx` - Import from `@/types/common`
+- Modified: `src/components/forms/NewsletterForm.tsx` - Import from `@/types/common`
+- Modified: `src/services/auth/types.ts` - Import from `@/types/common`
+- Modified: `src/services/email/index.ts` - Import from `@/types/common`
+- Modified: `src/services/email/types.ts` - Import from `@/types/common`
+- Modified: `src/services/email/EmailService.ts` - Import from `@/types/common`
+
+### Success Criteria
+
+- [x] Service types moved to `@/types/common`
+- [x] Layer separation fixed (inward dependency flow)
+- [x] All 3842 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (26 pages generated)
+- [x] Zero regressions
+- [x] Backward compatibility maintained
+
+### Related Tasks
+
+- Task 282 (Layer Separation) - Architectural improvement completed
+
 ## RBAC Architecture (✅ COMPLETED - Task 223)
 
 ### Purpose

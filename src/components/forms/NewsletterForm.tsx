@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useRef, useEffect } from 'react';
 import { createNewsletterFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
-import type { ServiceResult } from '@/services/common';
+import type { ServiceResult } from '@/types/common';
 
 interface FormData {
    email: string;

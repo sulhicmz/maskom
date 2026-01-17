@@ -1,4 +1,4 @@
-import type { ServiceErrorCodeType } from '@/services/common';
+import type { ServiceErrorCodeType } from '@/types/common';
 import type { CircuitBreakerState } from '@/utils/resilience';
 import type { UserRole } from '@/types/role';
 import type { Permission } from '@/types/permission';
