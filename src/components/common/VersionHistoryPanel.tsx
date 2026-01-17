@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useEffect, useCallback } from 'react';
-import { BlogPostVersion, VersionDiff, InnerBlogPost } from '@/types/data';
+import { BlogPostVersion, VersionDiff } from '@/types/blog';
 import { versionStorage } from '@/utils/versionStorage';
 
 interface VersionHistoryPanelProps {
    postId: number;
-   _currentContent: Partial<InnerBlogPost>;
    onRestore: (version: BlogPostVersion) => void;
    isVisible: boolean;
    onClose: () => void;
@@ -14,7 +13,6 @@ interface VersionHistoryPanelProps {
 
 const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
    postId,
-   _currentContent,
    onRestore,
    isVisible,
    onClose
