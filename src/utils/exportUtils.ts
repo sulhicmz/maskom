@@ -3,22 +3,6 @@ import type { BlogFilterCriteria } from './blogFilters'
 import { tagsById } from '@/data/BlogTagData'
 import { blogCategoryById } from '@/data/BlogCategoryData'
 
-interface JsPDFType {
-  setFontSize: (...args: unknown[]) => void
-  setFont: (...args: unknown[]) => void
-  text: (...args: unknown[]) => void
-  line: (...args: unknown[]) => void
-  splitTextToSize: (...args: unknown[]) => string[]
-  internal: {
-    pageSize: {
-      getWidth: (...args: unknown[]) => number
-    }
-  }
-  addPage: (...args: unknown[]) => void
-  save: (...args: unknown[]) => void
-  setTextColor: (...args: unknown[]) => void
-}
-
 export interface ExportConfig {
   format: 'pdf' | 'csv'
   filename?: string
@@ -76,112 +60,13 @@ export function getFilterMetadataText(filters: BlogFilterCriteria): string[] {
   return metadataLines
 }
 
-function setupPDFDocument(doc: JsPDFType, metadata: ExportMetadata, pageWidth: number): { yPosition: number; margin: number; contentWidth: number } {
-  doc.setFontSize(16)
-  doc.setFont('helvetica', 'bold')
-  const margin = 20
-  const contentWidth = pageWidth - (margin * 2)
-  let yPosition = 30
-
-  doc.text('Blog Posts Export', pageWidth / 2, yPosition, { align: 'center' })
-  yPosition += 10
-
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Export Date: ${metadata.exportDate}`, margin, yPosition)
-  yPosition += 7
-
-  doc.text(`Total Posts: ${metadata.resultCount}`, margin, yPosition)
-  yPosition += 7
-
-  return { yPosition, margin, contentWidth }
-}
-
-function renderPDFMetadata(doc: JsPDFType, metadata: ExportMetadata, margin: number, yPosition: number): number {
-  if (metadata.filterCount > 0) {
-    doc.text('Active Filters:', margin, yPosition)
-    yPosition += 5
-    doc.setFontSize(9)
-
-    const filterText = getFilterMetadataText(metadata.filters)
-    filterText.forEach((text: string) => {
-      doc.text(`  - ${text}`, margin, yPosition)
-      yPosition += 5
-    })
-
-    doc.setFontSize(10)
-    yPosition += 5
-  }
-
-  doc.line(margin, yPosition, doc.internal.pageSize.getWidth() - margin, yPosition)
-  yPosition += 10
-
-  return yPosition
-}
-
-function renderPDFPost(doc: JsPDFType, post: InnerBlogPost, index: number, margin: number, contentWidth: number, yPosition: number): number {
-  doc.setFontSize(12)
-  doc.setFont('helvetica', 'bold')
-  doc.text(`${index + 1}. ${post.title}`, margin, yPosition)
-  yPosition += 8
-
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
-
-  const lines = doc.splitTextToSize(post.desc, contentWidth)
-  lines.forEach((line: string) => {
-    doc.text(line, margin, yPosition)
-    yPosition += 5
-  })
-
-  yPosition += 5
-  doc.setFontSize(9)
-  doc.setTextColor(100, 100, 100)
-  doc.text(`Author: ${post.user} | Date: ${post.date}`, margin, yPosition)
-  yPosition += 5
-
-  if (post.tagId) {
-    const tagName = tagsById.get(post.tagId)?.name
-    if (tagName) {
-      doc.text(`Tag: ${tagName}`, margin, yPosition)
-      yPosition += 5
-    }
-  }
-
-  if (post.category) {
-    doc.text(`Category: ${post.category}`, margin, yPosition)
-    yPosition += 5
-  }
-
-  doc.setTextColor(0, 0, 0)
-  yPosition += 8
-
-  return yPosition
-}
-
 export async function exportToPDF(
   posts: InnerBlogPost[],
   config: ExportConfig,
   metadata: ExportMetadata
 ): Promise<void> {
-  const jsPDF = (await import('jspdf')).default as unknown as new (...args: unknown[]) => JsPDFType
-  const doc = new jsPDF()
-  const pageWidth = doc.internal.pageSize.getWidth()
-
-  const { yPosition: startY, margin, contentWidth } = setupPDFDocument(doc, metadata, pageWidth)
-  let yPosition = renderPDFMetadata(doc, metadata, margin, startY)
-
-  posts.forEach((post, index) => {
-    if (yPosition > 270) {
-      doc.addPage()
-      yPosition = 20
-    }
-
-    yPosition = renderPDFPost(doc, post, index, margin, contentWidth, yPosition)
-  })
-
-  const filename = config.filename || `blog-export-${metadata.exportDate}.pdf`
-  doc.save(filename)
+  const { exportToPDF } = await import('./exportPDF')
+  await exportToPDF(posts, config, metadata)
 }
 
 export function exportToCSV(
