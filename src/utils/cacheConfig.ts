@@ -107,41 +107,34 @@ export async function clearCache(): Promise<void> {
         }
       };
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller?.postMessage(
         { type: 'CLEAR_CACHE' },
         [messageChannel.port2]
       );
     });
   } else {
     console.warn('[Cache Config] Service worker not available');
-    throw new Error('Service worker not available');
   }
 }
 
 export async function getCacheStatistics(): Promise<CacheStatistics> {
-  if (typeof window === 'undefined') {
-    return getEmptyStatistics();
-  }
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    return new Promise((resolve, reject) => {
+      const messageChannel = new MessageChannel();
 
-  try {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      return new Promise((resolve) => {
-        const messageChannel = new MessageChannel();
+      messageChannel.port1.onmessage = (event) => {
+        if (event.data.type === 'CACHE_STATS') {
+          resolve(event.data.stats);
+        } else if (event.data.type === 'CACHE_STATS_ERROR') {
+          reject(new Error(event.data.error));
+        }
+      };
 
-        messageChannel.port1.onmessage = (event) => {
-          if (event.data.type === 'CACHE_STATS') {
-            resolve(event.data.stats as CacheStatistics);
-          }
-        };
-
-        navigator.serviceWorker.controller.postMessage(
-          { type: 'GET_CACHE_STATS' },
-          [messageChannel.port2]
-        );
-      });
-    }
-  } catch (error) {
-    console.error('[Cache Config] Failed to get statistics:', error);
+      navigator.serviceWorker.controller?.postMessage(
+        { type: 'GET_CACHE_STATS' },
+        [messageChannel.port2]
+      );
+    });
   }
 
   return getEmptyStatistics();

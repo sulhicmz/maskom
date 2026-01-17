@@ -86,7 +86,7 @@ export async function cleanupOldEntries(): Promise<void> {
     const requests = await cache.keys();
 
     if (requests.length > maxEntries) {
-      const sortedRequests = requests.sort((a, b) => {
+      const sortedRequests = [...requests].sort((a, b) => {
         const aTime = a.url.match(/\d+$/)?.[0] || '0';
         const bTime = b.url.match(/\d+$/)?.[0] || '0';
         return parseInt(aTime) - parseInt(bTime);
