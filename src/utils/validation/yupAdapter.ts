@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import { PasswordRule, EmailRule } from './rules';
+import { VALIDATION } from '@/constants/validation';
 
 export function createEmailFieldSchema(label: string = "Email") {
     return yup.string()
@@ -71,8 +72,8 @@ export function createCommentFormSchema() {
         email: createEmailFieldSchema("Email"),
         content: yup.string()
             .required("Komentar diperlukan")
-            .min(10, "Komentar minimal 10 karakter")
-            .max(1000, "Komentar maksimal 1000 karakter")
+            .min(VALIDATION.COMMENT_MIN_LENGTH, `Komentar minimal ${VALIDATION.COMMENT_MIN_LENGTH} karakter`)
+            .max(VALIDATION.COMMENT_MAX_LENGTH, `Komentar maksimal ${VALIDATION.COMMENT_MAX_LENGTH} karakter`)
             .label("Komentar")
     }).required();
 }

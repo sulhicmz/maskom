@@ -1,5 +1,7 @@
 export const VALIDATION = {
     MIN_PASSWORD_LENGTH: 8,
     RATING_MIN: 0,
-    RATING_MAX: 5
+    RATING_MAX: 5,
+    COMMENT_MIN_LENGTH: 10,
+    COMMENT_MAX_LENGTH: 1000
 } as const;
