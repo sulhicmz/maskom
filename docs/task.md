@@ -1,5 +1,300 @@
 # Architecture Task Tracking
 
+## Task 263: [REFACTOR] Extract Duplicate Error Handling in AuthService (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (DRY Principle)
+
+### Purpose
+
+Eliminate duplicate error handling code in AuthService.login and AuthService.register methods to improve maintainability and reduce code duplication.
+
+### Problem Identified
+
+**Duplicate Error Handling Code**:
+- Lines 111-138 (login method) and lines 141-168 (register method) contain identical error handling logic
+- Both methods handle RateLimitExceededError, ServiceValidationError, and generic errors in exactly the same way
+- Changes to error handling require updating two methods
+- Violates DRY (Don't Repeat Yourself) principle
+
+**Code Duplication**:
+```typescript
+// login method (lines 127-138)
+if (error instanceof RateLimitExceededError) {
+    return createRateLimitErrorResult(error, MS_TO_SECONDS);
+}
+const standardizedError = error instanceof Error ? error : new Error('Unknown error');
+if (standardizedError instanceof ServiceValidationError) {
+    return createErrorResult(standardizedError.message, ServiceErrorCode.VALIDATION);
+}
+return createErrorResult(standardizedError.message);
+
+// register method (lines 157-168) - IDENTICAL
+```
+
+### Suggestion
+
+**Extract Error Handling to Private Method**:
+- Create private method `handleAuthError(error: unknown, operation: string): AuthResult`
+- Move common error handling logic to new method
+- Call from both login and register methods
+- Pass operation name for context (optional)
+
+### Expected Benefits
+
+1. **Reduced Duplication**: 24 lines of duplicate code removed
+2. **Single Source of Truth**: Error handling logic in one place
+3. **Maintainability**: Bug fixes only need to be made once
+4. **Testability**: Can test error handling independently
+5. **Consistency**: Ensures consistent error handling across all auth methods
+
+### Success Criteria
+
+- [ ] Private method `handleAuthError` created
+- [ ] login method calls `handleAuthError`
+- [ ] register method calls `handleAuthError`
+- [ ] All existing tests pass (no regressions)
+- [ ] Code reduction of 20+ lines achieved
+
+---
+
+## Task 264: [REFACTOR] Consolidate Rate Limit Status Methods in AuthService (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Code Refactoring (Extract Function)
+
+### Purpose
+
+Consolidate getLoginRateLimitStatus and getRegisterRateLimitStatus methods into a single generic method to eliminate code duplication.
+
+### Problem Identified
+
+**Duplicate Rate Limit Status Methods**:
+- Lines 215-223 (getLoginRateLimitStatus) and lines 225-233 (getRegisterRateLimitStatus) are 95% identical
+- Only difference: rateLimiter and RATE_LIMITS constant used
+- 18 lines of duplicate code
+- Adding new rate limit types requires creating new methods
+
+**Code Duplication**:
+```typescript
+// getLoginRateLimitStatus (lines 215-223)
+getLoginRateLimitStatus(email: string): RateLimitStatus {
+    const status = this.loginRateLimiter.getStatus(email);
+    return {
+        count: status.count,
+        firstAttempt: status.firstAttempt,
+        lockedUntil: status.lockedUntil,
+        attemptsRemaining: Math.max(0, RATE_LIMITS.LOGIN.maxAttempts - status.count)
+    };
+}
+
+// getRegisterRateLimitStatus (lines 225-233) - IDENTICAL except RATE_LIMITS.REGISTER
+```
+
+### Suggestion
+
+**Create Generic Rate Limit Status Method**:
+- Create private method `getRateLimitStatus(rateLimiter: RateLimiter, maxAttempts: number, email: string): RateLimitStatus`
+- Both login and register methods call the generic method
+- Use RATE_LIMITS.LOGIN.maxAttempts and RATE_LIMITS.REGISTER.maxAttempts as parameters
+
+### Expected Benefits
+
+1. **Reduced Duplication**: 18 lines of duplicate code removed
+2. **Extensibility**: New rate limit types easily supported
+3. **Maintainability**: Changes only need to be made once
+4. **Type Safety**: Generic type can be defined for RateLimitStatus
+
+### Success Criteria
+
+- [ ] Private generic method `getRateLimitStatus` created
+- [ ] getLoginRateLimitStatus uses generic method
+- [ ] getRegisterRateLimitStatus uses generic method
+- [ ] All existing tests pass (no regressions)
+- [ ] Code reduction of 15+ lines achieved
+
+---
+
+## Task 265: [REFACTOR] Consolidate Rate Limit Reset Methods in AuthService (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Code Refactoring (DRY Principle)
+
+### Purpose
+
+Consolidate resetLoginRateLimit and resetRegisterRateLimit methods into a single generic method to eliminate code duplication.
+
+### Problem Identified
+
+**Duplicate Rate Limit Reset Methods**:
+- Lines 235-237 (resetLoginRateLimit) and lines 239-241 (resetRegisterRateLimit) are identical except rateLimiter used
+- 6 lines of duplicate code
+- Adding new rate limit types requires creating new reset methods
+
+**Code Duplication**:
+```typescript
+// resetLoginRateLimit (lines 235-237)
+resetLoginRateLimit(email: string): void {
+    this.loginRateLimiter.reset(email);
+}
+
+// resetRegisterRateLimit (lines 239-241) - IDENTICAL except this.registerRateLimiter
+```
+
+### Suggestion
+
+**Create Generic Reset Method**:
+- Create private method `resetRateLimit(rateLimiter: RateLimiter, email: string): void`
+- Both login and register reset methods call the generic method
+- Consider making this method internal if it's useful for other services
+
+### Expected Benefits
+
+1. **Reduced Duplication**: 4 lines of duplicate code removed
+2. **Consistency**: All reset operations use same implementation
+3. **Maintainability**: Changes only need to be made once
+4. **Extensibility**: New rate limit types easily supported
+
+### Success Criteria
+
+- [ ] Private generic method `resetRateLimit` created
+- [ ] resetLoginRateLimit uses generic method
+- [ ] resetRegisterRateLimit uses generic method
+- [ ] All existing tests pass (no regressions)
+- [ ] Code reduction of 3+ lines achieved
+
+---
+
+## Task 266: [REFACTOR] Extract Filter Metadata Rendering in exportUtils.ts (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Extract Function)
+
+### Purpose
+
+Extract duplicate filter metadata rendering logic in exportToPDF and exportToCSV functions to eliminate code duplication.
+
+### Problem Identified
+
+**Duplicate Filter Metadata Rendering**:
+- Lines 79-107 (exportToPDF) and lines 181-201 (exportToCSV) have similar logic for rendering filter metadata
+- Both iterate through filters and render them in format-specific way
+- 48 lines of combined duplicate code
+- Adding new filter types requires updating both functions
+
+**Code Duplication**:
+```typescript
+// exportToPDF (lines 79-107)
+if (metadata.filterCount > 0) {
+    doc.text('Active Filters:', margin, yPosition)
+    yPosition += 5
+    if (metadata.filters.searchQuery) {
+        doc.text(`  - Search: "${metadata.filters.searchQuery}"`, margin, yPosition)
+        yPosition += 5
+    }
+    if (metadata.filters.categoryId) {
+        const categoryName = blogCategoryById.get(metadata.filters.categoryId)?.name
+        if (categoryName) {
+            doc.text(`  - Category: ${categoryName}`, margin, yPosition)
+            yPosition += 5
+        }
+    }
+    // ... tag and status filters
+}
+
+// exportToCSV (lines 181-201) - SIMILAR logic but uses array.push
+```
+
+### Suggestion
+
+**Create Filter Metadata Renderer**:
+- Create function `getFilterMetadataText(filters: BlogFilterCriteria): string[]` that returns array of filter strings
+- Both exportToPDF and exportToCSV call this function
+- PDF iterates and uses doc.text(), CSV iterates and uses array.push()
+- Format-specific rendering logic remains in export functions
+
+### Expected Benefits
+
+1. **Reduced Duplication**: 30+ lines of duplicate code removed
+2. **Maintainability**: Adding new filters only requires updating one function
+3. **Testability**: Filter metadata generation can be tested independently
+4. **Consistency**: Both exports render same filter information
+
+### Success Criteria
+
+- [ ] Function `getFilterMetadataText` created
+- [ ] exportToPDF uses function to get filter metadata
+- [ ] exportToCSV uses function to get filter metadata
+- [ ] All existing tests pass (no regressions)
+- [ ] Code reduction of 25+ lines achieved
+
+---
+
+## Task 267: [REFACTOR] Split Large exportToPDF Function in exportUtils.ts (Jan 17, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Extract Function)
+
+### Purpose
+
+Split the large exportToPDF function (100+ lines) into smaller, focused functions following Single Responsibility Principle.
+
+### Problem Identified
+
+**Large Function with Multiple Responsibilities**:
+- exportToPDF function (lines 54-157) is 103 lines long
+- Handles multiple responsibilities: page setup, metadata rendering, post rendering, pagination
+- Difficult to test individual concerns
+- Violates Single Responsibility Principle
+- Hard to understand and maintain
+
+**Current Function Structure**:
+```typescript
+export async function exportToPDF(
+  posts: InnerBlogPost[],
+  config: ExportConfig,
+  metadata: ExportMetadata
+): Promise<void> {
+  // Page setup (lines 60-78)
+  // Metadata rendering (lines 79-107)
+  // Post rendering loop (lines 112-153)
+  // File save (lines 155-156)
+}
+```
+
+### Suggestion
+
+**Extract Smaller Functions**:
+- `setupPDFDocument(doc: JsPDFType, metadata: ExportMetadata, pageWidth: number): number` - Page setup and initial positioning
+- `renderPDFMetadata(doc: JsPDFType, metadata: ExportMetadata, margin: number, yPosition: number): number` - Filter metadata rendering
+- `renderPDFPost(doc: JsPDFType, post: InnerBlogPost, index: number, margin: number, contentWidth: number, yPosition: number): number` - Single post rendering
+- Main exportToPDF orchestrates the flow
+
+### Expected Benefits
+
+1. **Single Responsibility**: Each function has one clear purpose
+2. **Testability**: Individual functions can be tested in isolation
+3. **Readability**: Clear function names make code self-documenting
+4. **Maintainability**: Changes to specific concerns are localized
+5. **Reusability**: Extracted functions can be reused elsewhere
+
+### Success Criteria
+
+- [ ] setupPDFDocument function created
+- [ ] renderPDFMetadata function created
+- [ ] renderPDFPost function created
+- [ ] exportToPDF refactored to orchestrate smaller functions
+- [ ] All existing tests pass (no regressions)
+- [ ] Function length under 50 lines (exportToPDF)
+- [ ] Extracted functions tested independently
+
+---
+
 ## Task 262: Documentation - User Guide Creation (Jan 17, 2026)
 
 **Status**: ✅ Completed
