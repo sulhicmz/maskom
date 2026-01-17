@@ -51,7 +51,7 @@ const CommentForm = ({ blogId, parentId, onSubmitSuccess, onCancelReply }: Comme
   };
 
   return (
-    <div className="comment-form-wrapper">
+    <div className="comment-form-wrapper" data-testid="comment-form">
       <form onSubmit={handleSubmit(handleSubmitComment)} noValidate>
         <div className="row">
           <div className="col-md-6">

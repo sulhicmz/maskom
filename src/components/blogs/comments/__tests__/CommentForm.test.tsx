@@ -41,27 +41,27 @@ describe("CommentForm", () => {
    });
 
    describe("Form Validation", () => {
-      test("should show validation error for empty name", async () => {
-         render(<CommentForm {...defaultProps} />);
+       test("should show validation error for empty name", async () => {
+          render(<CommentForm {...defaultProps} />);
 
-         const submitButton = screen.getByText("Kirim Komentar");
-         fireEvent.click(submitButton);
+          const submitButton = screen.getByText("Kirim Komentar");
+          fireEvent.click(submitButton);
 
-         await waitFor(() => {
-            expect(screen.getByText(/nama wajib diisi/i)).toBeInTheDocument();
-         });
-      });
+          await waitFor(() => {
+             expect(screen.getByText(/nama diperlukan/i)).toBeInTheDocument();
+          });
+       });
 
-      test("should show validation error for empty email", async () => {
-         render(<CommentForm {...defaultProps} />);
+       test("should show validation error for empty email", async () => {
+          render(<CommentForm {...defaultProps} />);
 
-         const submitButton = screen.getByText("Kirim Komentar");
-         fireEvent.click(submitButton);
+          const submitButton = screen.getByText("Kirim Komentar");
+          fireEvent.click(submitButton);
 
-         await waitFor(() => {
-            expect(screen.getByText(/email wajib diisi/i)).toBeInTheDocument();
-         });
-      });
+          await waitFor(() => {
+             expect(screen.getByText(/email diperlukan/i)).toBeInTheDocument();
+          });
+       });
 
       test("should show validation error for invalid email format", async () => {
          render(<CommentForm {...defaultProps} />);
@@ -74,16 +74,16 @@ describe("CommentForm", () => {
          });
       });
 
-      test("should show validation error for empty comment", async () => {
-         render(<CommentForm {...defaultProps} />);
+       test("should show validation error for empty comment", async () => {
+          render(<CommentForm {...defaultProps} />);
 
-         const submitButton = screen.getByText("Kirim Komentar");
-         fireEvent.click(submitButton);
+          const submitButton = screen.getByText("Kirim Komentar");
+          fireEvent.click(submitButton);
 
-         await waitFor(() => {
-            expect(screen.getByText(/komentar wajib diisi/i)).toBeInTheDocument();
-         });
-      });
+          await waitFor(() => {
+             expect(screen.getByText(/komentar diperlukan/i)).toBeInTheDocument();
+          });
+       });
 
       test("should show validation error for short comment (less than 10 characters)", async () => {
          render(<CommentForm {...defaultProps} />);
