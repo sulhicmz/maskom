@@ -130,7 +130,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | ProcessData.ts | ProcessItem | Yes | Yes | Yes | No | Process steps |
 | CauseData.ts | CauseItem | Yes | Yes | Yes | No | Cause cards |
 | PriceData.ts | PriceItem | Yes | Yes | Yes | No | Pricing tables |
-| BlogCommentData.ts | BlogCommentItem | No | Yes | No | No | Blog comments |
+| BlogCommentData.ts | BlogCommentItem | No | Yes | No | No | Blog comments with threading, moderation status, and voting (Task 270) |
 | SocialMediaData.ts | SocialLink | No | No | No | No | Social links |
 | InnerFaqData.ts | InnerFaqItem | No | Yes | No | No | FAQ categories |
 | DashboardData.ts | WiFiDevice, etc. | No | Yes | No | No | Dashboard widgets |
@@ -188,7 +188,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateAIStep` - AI process steps
 - ✅ `validateCategoryItem` - Blog category items with id and name (Task 240)
 - ✅ `validateBlogTagItem` - Blog tag items with id and name (Task 101)
-- ✅ `validateBlogCommentItem` - Blog comments
+- ✅ `validateBlogCommentItem` - Blog comments with threading, moderation status, and voting (Task 270)
 - ✅ `validateTeamMember` - Team member profiles
 - ✅ `validateInnerBlogPost` - Inner blog posts
 - ✅ `validateFaqDetail` - FAQ detail sections
@@ -203,11 +203,12 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
  - ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
  
 **Testing**:
-- ✅ 107 comprehensive tests for specific validators (100% passing)
+- ✅ 139 comprehensive tests for specific validators (100% passing) (Task 270)
 - ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
 - ✅ 7 tests for validateBlogTagItem (100% passing) (Task 102)
 - ✅ 24 tests for validateCategoryItem (100% passing) (Task 240)
 - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
+- ✅ 32 tests for validateBlogCommentItem (100% passing) (Task 270)
 - ✅ All validators tested with valid and invalid inputs
 - ✅ Base validation utilities tested directly:
   - `validateBaseDataItem()` - 11 tests

@@ -3,26 +3,47 @@ import { createValidator } from "./baseValidation";
 import blog_categories_data from "@/data/BlogCategoryData";
 
 export const validateCategoryItem = createValidator<CategoryItem>({
-   typeName: "CategoryItem",
-   numberFields: [{ key: "id", required: true, min: 1 }],
-   stringFields: [{ key: "name", required: true }],
+    typeName: "CategoryItem",
+    numberFields: [{ key: "id", required: true, min: 1 }],
+    stringFields: [{ key: "name", required: true }],
 });
 
 export const validateBlogTagItem = createValidator<BlogTagItem>({
-   typeName: "BlogTagItem",
-   numberFields: [{ key: "id", required: true, min: 1 }],
-   stringFields: [{ key: "name", required: true }],
+    typeName: "BlogTagItem",
+    numberFields: [{ key: "id", required: true, min: 1 }],
+    stringFields: [{ key: "name", required: true }],
 });
 
-export const validateBlogCommentItem = createValidator<BlogCommentItem>({
-  typeName: "BlogCommentItem",
-  numberFields: [{ key: "id", required: true, min: 1 }],
-  stringFields: [
-    { key: "name", required: true },
-    { key: "date", required: true },
-    { key: "content", required: true },
-  ],
-});
+export const validateBlogCommentItem = (item: BlogCommentItem): { isValid: boolean; errors: string[] } => {
+  const baseValidation = createValidator<BlogCommentItem>({
+    typeName: "BlogCommentItem",
+    numberFields: [
+      { key: "id", required: true, min: 1 },
+      { key: "parentId", required: false, min: 1 },
+      { key: "blogId", required: true, min: 1 },
+      { key: "upvotes", required: true, min: 0 },
+      { key: "downvotes", required: true, min: 0 },
+    ],
+    stringFields: [
+      { key: "name", required: true },
+      { key: "date", required: true },
+      { key: "content", required: true },
+    ],
+  })(item);
+
+  const errors: string[] = [...baseValidation.errors];
+
+  const validStatuses = ['pending', 'approved', 'rejected'] as const;
+  if (!validStatuses.includes(item.status)) {
+    errors.push(`status must be one of: pending, approved, rejected, got: ${item.status}`);
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, errors };
+  }
+
+  return { isValid: true, errors: [] };
+};
 
 export const validateInnerBlogPost = (item: InnerBlogPost): { isValid: boolean; errors: string[] } => {
    const baseValidation = createValidator<InnerBlogPost>({

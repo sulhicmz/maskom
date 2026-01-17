@@ -107,13 +107,19 @@ export interface CategoryItem {
    name: string;
 }
 
+export type CommentModerationStatus = 'pending' | 'approved' | 'rejected';
+
 export interface BlogCommentItem {
   id: number;
   blogId: number;
+  parentId: number | null;
   avatar: StaticImageData;
   name: string;
   date: string;
   content: string;
+  status: CommentModerationStatus;
+  upvotes: number;
+  downvotes: number;
 }
 
 export interface TeamMember {
