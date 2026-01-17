@@ -592,10 +592,14 @@ describe("dataValidation", () => {
       const item: BlogCommentItem = {
         id: 1,
         blogId: 1,
+        parentId: null,
         avatar: mockStaticImageData,
         name: "John Doe",
         date: "27 Aug, 2023",
         content: "Great article",
+        status: "approved",
+        upvotes: 5,
+        downvotes: 0,
       };
       const result = validateBlogCommentItem(item);
       expect(result.isValid).toBe(true);
@@ -606,10 +610,14 @@ describe("dataValidation", () => {
       const item: BlogCommentItem = {
         id: 1,
         blogId: 1,
+        parentId: null,
         avatar: mockStaticImageData,
         name: "",
         date: "27 Aug, 2023",
         content: "Great article",
+        status: "approved",
+        upvotes: 0,
+        downvotes: 0,
       };
       const result = validateBlogCommentItem(item);
       expect(result.isValid).toBe(false);
@@ -620,10 +628,14 @@ describe("dataValidation", () => {
       const item: BlogCommentItem = {
         id: 1,
         blogId: 1,
+        parentId: null,
         avatar: mockStaticImageData,
         name: "John Doe",
         date: "27 Aug, 2023",
         content: "",
+        status: "approved",
+        upvotes: 0,
+        downvotes: 0,
       };
       const result = validateBlogCommentItem(item);
       expect(result.isValid).toBe(false);
