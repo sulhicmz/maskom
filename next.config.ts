@@ -120,6 +120,14 @@ const nextConfig: NextConfig = {
               reuseExistingChunk: true,
               enforce: true,
             },
+            html2canvas: {
+              test: /[\\/]node_modules[\\/]html2canvas[\\/]/,
+              name: 'html2canvas',
+              chunks: 'async',
+              priority: 15,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
           },
         },
       };
