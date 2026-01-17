@@ -2,10 +2,11 @@
 import NavMenu from "./Menu/NavMenu"
 import Link from "next/link"
 import Image from "next/image"
-import { useState, memo } from "react";
+import { useState, memo, useRef, useEffect } from "react";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { LanguageSwitcher } from "@/components/common/i18n/LanguageSwitcher";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 import logo_1 from "@/assets/images/logo/main-logo.svg";
 import logo_2 from "@/assets/images/logo/white-logo.svg";
@@ -18,6 +19,19 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
    const { sticky } = UseSticky();
    const { isBreakpointOn } = useBreakpoint();
    const [offCanvas, setOffCanvas] = useState<boolean>(false);
+   const navMenuRef = useRef<HTMLDivElement>(null);
+   const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+   useFocusTrap(navMenuRef, { isActive: offCanvas, returnFocus: true });
+
+   useEffect(() => {
+      if (offCanvas && navMenuRef.current) {
+         const firstFocusable = navMenuRef.current.querySelector<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+         );
+         firstFocusable?.focus();
+      }
+   }, [offCanvas]);
 
    return (
       <>
@@ -39,8 +53,8 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
                             </div>
                          </div>
                          <div className="ac-header-one__right">
-                            <div className="ac-header-one__right-menu d-flex align-items-center">
-                               <div className={`ac-nav-menu ${offCanvas ? "menu-on" : ""}`} id="primary-nav">
+                             <div className="ac-header-one__right-menu d-flex align-items-center">
+                                <div className={`ac-nav-menu ${offCanvas ? "menu-on" : ""}`} id="primary-nav" ref={navMenuRef} aria-hidden={!offCanvas}>
                                   <div className="site-branding d-block d-xl-none text-center mb-30">
                                      <Link href="/"><Image src={logo_1} alt="Maskom - Logo Utama" /></Link>
                                   </div>
@@ -60,13 +74,14 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
                                     </div>
                                     <ThemeToggle />
                                     <LanguageSwitcher variant="minimal" />
-                                    <button
-                                      onClick={() => setOffCanvas(!offCanvas)}
-                                      className={`navbar-toggler ${offCanvas ? "active" : ""}`}
-                                      aria-label="Toggle navigation menu"
-                                      aria-expanded={offCanvas}
-                                      aria-controls="primary-nav"
-                                    >
+                                     <button
+                                       onClick={() => setOffCanvas(!offCanvas)}
+                                       className={`navbar-toggler ${offCanvas ? "active" : ""}`}
+                                       aria-label="Toggle navigation menu"
+                                       aria-expanded={offCanvas}
+                                       aria-controls="primary-nav"
+                                       ref={toggleButtonRef}
+                                     >
                                       <span></span>
                                       <span></span>
                                       <span></span>
