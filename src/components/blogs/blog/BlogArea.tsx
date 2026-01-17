@@ -14,7 +14,6 @@ import { blogCategoryById } from "@/data/BlogCategoryData"
 import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
 import BookmarkButton from "@/components/common/BookmarkButton"
-import ExportButton from "@/components/common/ExportButton"
 import SocialShareButtons from "@/components/common/SocialShareButtons"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
@@ -29,7 +28,9 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   )
 })
 
- const BlogArea = React.memo(() => {
+const ExportButton = dynamic(() => import("@/components/common/ExportButton"))
+
+const BlogArea = React.memo(() => {
    const router = useRouter()
  
    const [searchQuery, setSearchQuery] = useState("")
