@@ -207,32 +207,34 @@ class AuthService implements IAuthService {
         return this.currentUser.role === role;
     }
 
-    getLoginRateLimitStatus(email: string): { count: number; firstAttempt: number; lockedUntil?: number | null; attemptsRemaining: number } {
-        const status = this.loginRateLimiter.getStatus(email);
+    private getRateLimitStatus(rateLimiter: RateLimiter, maxAttempts: number, email: string): { count: number; firstAttempt: number; lockedUntil?: number | null; attemptsRemaining: number } {
+        const status = rateLimiter.getStatus(email);
         return {
             count: status.count,
             firstAttempt: status.firstAttempt,
             lockedUntil: status.lockedUntil,
-            attemptsRemaining: Math.max(0, RATE_LIMITS.LOGIN.maxAttempts - status.count)
+            attemptsRemaining: Math.max(0, maxAttempts - status.count)
         };
+    }
+
+    getLoginRateLimitStatus(email: string): { count: number; firstAttempt: number; lockedUntil?: number | null; attemptsRemaining: number } {
+        return this.getRateLimitStatus(this.loginRateLimiter, RATE_LIMITS.LOGIN.maxAttempts, email);
     }
 
     getRegisterRateLimitStatus(email: string): { count: number; firstAttempt: number; lockedUntil?: number | null; attemptsRemaining: number } {
-        const status = this.registerRateLimiter.getStatus(email);
-        return {
-            count: status.count,
-            firstAttempt: status.firstAttempt,
-            lockedUntil: status.lockedUntil,
-            attemptsRemaining: Math.max(0, RATE_LIMITS.REGISTER.maxAttempts - status.count)
-        };
+        return this.getRateLimitStatus(this.registerRateLimiter, RATE_LIMITS.REGISTER.maxAttempts, email);
+    }
+
+    private resetRateLimit(rateLimiter: RateLimiter, email: string): void {
+        rateLimiter.reset(email);
     }
 
     resetLoginRateLimit(email: string): void {
-        this.loginRateLimiter.reset(email);
+        this.resetRateLimit(this.loginRateLimiter, email);
     }
 
     resetRegisterRateLimit(email: string): void {
-        this.registerRateLimiter.reset(email);
+        this.resetRateLimit(this.registerRateLimiter, email);
     }
 
     resetAllRateLimits(): void {
