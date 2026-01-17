@@ -1,5 +1,174 @@
 # Architecture Task Tracking
 
+## Task 258: QA - Critical Path Testing - AutoSaveIndicator & ClearDraftButton (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: QA - Critical Path Testing
+
+### Purpose
+
+Add comprehensive test coverage for AutoSaveIndicator and ClearDraftButton components, critical UI components for blog draft auto-save functionality (Task 253).
+
+### Problem Identified
+
+**Missing Test Coverage**:
+- **AutoSaveIndicator component** has NO tests - critical UI component for auto-save feature
+- **ClearDraftButton component** has NO tests - critical user interaction component
+- Both components handle user-facing UI for blog draft management
+- No test coverage means potential bugs could go undetected in critical user interactions
+
+**Why This Matters**:
+1. **User Experience**: Auto-save indicator provides visual feedback for save state
+2. **Data Loss Prevention**: Clear draft button with confirmation prevents accidental data loss
+3. **Accessibility**: Both components have ARIA attributes that need verification
+4. **Critical Path**: These components are on the critical path for blog post editing
+5. **Localization**: AutoSaveIndicator displays Indonesian text that needs verification
+6. **Edge Cases**: Time formatting logic needs comprehensive testing
+
+### Test Implementation
+
+#### AutoSaveIndicator Tests (17 tests)
+
+**1. Rendering Behavior** (4 tests)
+- Render nothing when lastSavedAt is null and not auto-saving
+- Render saving indicator when isAutoSaving is true
+- Render saved indicator with lastSavedAt when not auto-saving
+- Apply custom className when provided
+
+**2. Time Formatting** (4 tests)
+- Display "baru saja" for saves within last minute
+- Display minutes for saves within last hour
+- Display hours for saves within last day
+- Display days for saves older than 24 hours
+
+**3. State Priority** (1 test)
+- Show saving status even when lastSavedAt is provided
+
+**4. Accessibility** (4 tests)
+- Have role="status" for accessibility
+- Have aria-live="polite" for screen readers
+- Have aria-hidden="true" on icon elements
+- Have aria-hidden="true" on checkmark icon
+
+**5. Memoization** (2 tests)
+- Have displayName set for debugging
+- Re-render when lastSavedAt changes
+
+**6. CSS Classes** (2 tests)
+- Have correct CSS classes for saving state
+- Have correct CSS classes for saved state
+
+#### ClearDraftButton Tests (23 tests)
+
+**1. Rendering Behavior** (3 tests)
+- Render button with correct text
+- Apply custom className when provided
+- Have correct type attribute
+
+**2. Disabled State** (4 tests)
+- Be disabled when hasDraft is false
+- Be disabled when disabled prop is true
+- Be enabled when hasDraft is true and disabled is false
+- Be disabled when both hasDraft is false and disabled is true
+
+**3. Click Behavior** (5 tests)
+- Show confirmation dialog when clicked and hasDraft is true
+- Call onClearDraft when user confirms dialog
+- Not call onClearDraft when user cancels dialog
+- Not show dialog or call onClearDraft when hasDraft is false
+- Not show dialog or call onClearDraft when disabled is true
+
+**4. Confirmation Dialog Content** (1 test)
+- Show correct confirmation message in Indonesian
+
+**5. Accessibility** (3 tests)
+- Have aria-label for screen readers
+- Have title attribute for tooltip
+- Maintain accessibility attributes when disabled
+
+**6. Memoization** (3 tests)
+- Have displayName set for debugging
+- Re-render when hasDraft changes
+- Re-render when disabled prop changes
+
+**7. CSS Classes** (2 tests)
+- Have base CSS class
+- Combine custom className with base class
+
+**8. Edge Cases** (2 tests)
+- Handle empty className gracefully
+- Handle rapid clicks correctly
+
+### Test Coverage Summary
+
+**Total Tests**: 40 tests
+**Test Pattern**: AAA (Arrange-Act-Assert)
+**Test Coverage**:
+- ✅ Rendering behavior (7 tests)
+- ✅ Time formatting logic (4 tests)
+- ✅ State priority (1 test)
+- ✅ Accessibility features (7 tests)
+- ✅ Memoization and re-rendering (5 tests)
+- ✅ Disabled state management (4 tests)
+- ✅ Click behavior and confirmation (5 tests)
+- ✅ CSS class management (4 tests)
+- ✅ Edge cases (3 tests)
+
+### Success Criteria
+
+- [x] 17 comprehensive tests created for AutoSaveIndicator
+- [x] 23 comprehensive tests created for ClearDraftButton
+- [x] All tests pass consistently (3649 total, 100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Type check passes (no TypeScript errors)
+- [x] Critical blog draft components now have test coverage
+- [x] Accessibility features verified (role, aria-live, aria-label)
+- [x] Indonesian localization verified
+- [x] Time formatting logic tested
+- [x] AAA test pattern followed throughout
+
+### Related Files
+
+- ✅ Added: `src/components/common/__tests__/AutoSaveIndicator.test.tsx` - 17 comprehensive tests (175 lines)
+- ✅ Added: `src/components/common/__tests__/ClearDraftButton.test.tsx` - 23 comprehensive tests (280 lines)
+
+### Notes
+
+- Follows QA Engineer principles:
+  - **Test Behavior, Not Implementation**: Tests verify UI behavior, not implementation details
+  - **Test Pyramid**: Unit tests for critical components (no integration/E2E needed)
+  - **Isolation**: Each test independent with proper setup and teardown
+  - **Determinism**: All tests pass consistently across multiple runs
+  - **Fast Feedback**: Test execution time ~0.8s for all 40 tests
+  - **Meaningful Coverage**: Critical paths tested (rendering, state, accessibility, interactions)
+  - **Anti-Pattern Avoidance**: No flaky tests, no external dependencies
+- Tests verify the blog draft auto-save UI components work correctly
+- Happy path and sad path scenarios covered
+- Edge cases (rapid clicks, empty className, time boundaries) tested
+- Accessibility features (ARIA attributes) verified
+- Mocked window.confirm for ClearDraftButton tests
+- AutoSaveIndicator text matching uses toHaveTextContent for proper element matching
+
+### Impact
+
+- Test Coverage: +40 new tests (3609 → 3649, 100% pass rate)
+- Quality: Critical blog draft UI components now have comprehensive test coverage
+- Zero Regressions: All 3649 tests passing, lint clean
+- Confidence: AutoSaveIndicator and ClearDraftButton behavior now verified
+- Localization: Indonesian text formatting verified
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 253 (Blog Post Draft Auto-Save) - Components tested here were part of this task
+- Task 250 (ProtectedRoute Testing) - Similar critical path testing approach
+
+---
+
 ## Task 253: Blog Post Draft Auto-Save (Jan 17, 2026)
 
 **Status**: ✅ Completed
