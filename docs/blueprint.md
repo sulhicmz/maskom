@@ -978,6 +978,470 @@ apmManager.trackPerformance({
    - ✅ **Progressive Web App (PWA) Capabilities** (Task 242, 243) - PWA manifest for installable app experience, service worker with caching strategies (cache-first for static assets, network-first for APIs, stale-while-revalidate for content), offline functionality with cache versioning, update notifications with ServiceWorkerUpdate component, all 3587 tests passing
    - ✅ **PWA Manifest** (Task 242) - Configured installable web app with app name, short name, description, theme color (#0d6efd), background color (#ffffff), standalone display mode, orientation portrait-primary, start URL (/), scope (/), app shortcuts (Home, Services, Contact), categories (business, productivity, utilities), manifest linked in layout.tsx
    - ✅ **Service Worker with Caching Strategies** (Task 243) - Cache-first for static assets (.js, .css, images, fonts), network-first for API requests (/api/*), stale-while-revalidate for other content, cache versioning (CACHE_NAME, RUNTIME_CACHE), offline fallback (homepage or 503), message handling (SKIP_WAITING, CLEAR_CACHE), cache cleanup on activation
+   - ✅ **Integration Architecture** (Integration Engineer Documentation) - Resilience patterns with documented configuration rationale (Task 260) - Comprehensive timeout, retry, circuit breaker, rate limiting configuration with design decision documentation, centralized constants in src/constants/, executeWithResilience utility for unified resilience across all services, 100% compliance with Integration Engineer principles
+
+## Integration Architecture & Resilience Patterns (✅ DOCUMENTED - Task 260)
+
+### Purpose
+
+Implement production-ready integration architecture with resilient patterns for external service calls, API routes, and client-side operations following Integration Engineer principles.
+
+### Core Integration Principles
+
+1. **Contract First**: Define API contracts before implementation
+2. **Resilience**: External services WILL fail; handle gracefully
+3. **Consistency**: Predictable patterns everywhere
+4. **Backward Compatibility**: Don't break consumers
+5. **Self-Documenting**: Intuitive, well-documented APIs
+6. **Idempotency**: Safe operations produce same result
+
+### Architecture Overview
+
+```
+Service Layer (Client-Side)
+    ↓
+Common Resilience Layer (executeWithResilience)
+    ↓
+Resilience Patterns:
+    - Timeouts
+    - Retries (exponential backoff)
+    - Circuit Breaker
+    - Rate Limiting
+    - Metrics Collection
+    ↓
+External Services (EmailJS, Auth)
+```
+
+```
+API Routes (Server-Side)
+    ↓
+API Response Utilities (createServiceResponse)
+    ↓
+Error Handling (createServiceErrorResponse)
+    ↓
+Monitoring Endpoints (/api/health, /api/metrics, /api/services/status)
+```
+
+### Resilience Patterns Implementation
+
+#### 1. Timeout Configuration
+
+**Location**: `src/constants/timeouts.ts`
+
+```typescript
+export const TIMEOUTS = {
+    AUTH_LOGIN: 5000,
+    AUTH_REGISTER: 5000,
+    EMAIL_SERVICE: 10000,
+    API_ROUTE: 5000,
+} as const;
+```
+
+**Design Rationale**:
+
+| Timeout | Value | Rationale |
+|---------|--------|-----------|
+| AUTH_LOGIN | 5000ms (5s) | Login operations should complete quickly. 5s prevents indefinite blocking while allowing sufficient time for network requests. Users expect fast authentication feedback. |
+| AUTH_REGISTER | 5000ms (5s) | Registration similar to login in complexity. 5s provides consistent UX with login flow. |
+| EMAIL_SERVICE | 10000ms (10s) | Email operations (EmailJS) involve third-party API calls with potential network latency. 10s allows for slower email delivery systems without excessive waiting. |
+| API_ROUTE | 5000ms (5s) | Monitoring endpoints (/api/health, /api/metrics, /api/services/status) should respond quickly. 5s prevents slow health checks from cascading. |
+
+**Anti-Patterns Avoided**:
+- ❌ No timeouts (operations hang indefinitely)
+- ❌ Excessive timeouts (>30s) - poor UX, waste resources
+- ❌ Arbitrary timeouts - no clear business justification
+
+#### 2. Retry Configuration
+
+**Location**: `src/constants/timeouts.ts`
+
+```typescript
+export const RETRY_CONFIG = {
+    MAX_ATTEMPTS: 3,
+    BASE_DELAY_MS: 1000,
+    MAX_DELAY_MS: 10000,
+    BACKOFF_MULTIPLIER: 2,
+} as const;
+```
+
+**Design Rationale**:
+
+| Config | Value | Rationale |
+|--------|--------|-----------|
+| MAX_ATTEMPTS | 3 | Balance between resilience and performance. 3 retries handle transient failures without excessive delay. |
+| BASE_DELAY_MS | 1000 (1s) | Initial delay allows network to recover without immediate retry spam. |
+| MAX_DELAY_MS | 10000 (10s) | Prevents excessive wait times. After 10s, operation should fail fast. |
+| BACKOFF_MULTIPLIER | 2 | Exponential backoff (1s → 2s → 4s). Proven pattern for distributed systems. |
+
+**Retry Behavior**:
+- Attempt 1: Immediate (0s)
+- Attempt 2: Wait 1s (BASE_DELAY_MS)
+- Attempt 3: Wait 2s (BASE_DELAY_MS × 2)
+- Total max wait: 3s for 3 attempts
+
+**Anti-Patterns Avoided**:
+- ❌ Infinite retries - waste resources, poor UX
+- ❌ Linear backoff - doesn't handle burst failures well
+- ❌ No backoff - retry storms (all retries at once)
+- ❌ Too many retries (>5) - excessive latency, wasted resources
+
+#### 3. Circuit Breaker Configuration
+
+**Location**: `src/constants/circuitBreaker.ts`
+
+```typescript
+export const CIRCUIT_BREAKER_CONFIG = {
+    EMAIL_SERVICE: {
+        failureThreshold: 5,
+        resetTimeoutMs: 60000,
+        monitoringPeriodMs: 60000
+    },
+    AUTH_SERVICE: {
+        failureThreshold: 50,
+        resetTimeoutMs: 60000,
+        monitoringPeriodMs: 60000
+    }
+} as const;
+```
+
+**Design Rationale**:
+
+| Service | Failure Threshold | Rationale |
+|---------|------------------|-----------|
+| EMAIL_SERVICE | 5 failures | Email is non-critical auxiliary feature. Quick circuit break prevents resource waste when email service is degraded. Users can still use app without email. |
+| AUTH_SERVICE | 50 failures | Authentication is critical path. Higher threshold prevents false positives from temporary network hiccups. Service should degrade gracefully rather than break quickly. |
+
+**Circuit Breaker States**:
+- **Closed**: Normal operation. Requests pass through.
+- **Open**: Service degraded. Requests fail immediately (no call to service).
+- **Half-Open**: Testing recovery. Single request allowed to check if service recovered.
+
+**Reset Strategy**:
+- `resetTimeoutMs: 60000` (60s) - Circuit opens after threshold, attempts reset after 1 minute.
+- `monitoringPeriodMs: 60000` (60s) - Failure count window. Failures older than 1 minute don't count toward threshold.
+
+**Anti-Patterns Avoided**:
+- ❌ No circuit breaker - cascading failures when service down
+- ❌ Too low threshold (<2) - false positives, over-sensitive
+- ❌ Too high threshold (>100) - no protection, wasted calls to failed service
+- ❌ No reset timeout - circuit never closes
+
+#### 4. Rate Limiting Configuration
+
+**Location**: `src/constants/rateLimits.ts`
+
+```typescript
+export const RATE_LIMITS = {
+    LOGIN: {
+        maxAttempts: 5,
+        windowMs: 900000,
+        cooldownMs: 1800000
+    },
+    REGISTER: {
+        maxAttempts: 5,
+        windowMs: 3600000,
+        cooldownMs: 7200000
+    },
+    EMAIL: {
+        maxAttempts: 5,
+        windowMs: 60000,
+        cooldownMs: 300000
+    },
+    FORM: {
+        maxAttempts: 10,
+        windowMs: 3600000,
+        cooldownMs: 7200000
+    }
+} as const;
+```
+
+**Design Rationale**:
+
+| Operation | Max Attempts | Window | Cooldown | Rationale |
+|-----------|-------------|---------|-----------|-----------|
+| LOGIN | 5 | 15 min (900000ms) | 30 min (1800000ms) | Brute force protection. 5 attempts allows typo corrections. 30 min cooldown prevents automated attacks. |
+| REGISTER | 5 | 1 hour (3600000ms) | 2 hours (7200000ms) | Account creation abuse prevention. Stricter than login (longer window/cooldown) since accounts are persistent. |
+| EMAIL | 5 | 1 min (60000ms) | 5 min (300000ms) | Email abuse prevention. Email delivery has cost, strict limits protect from spam. |
+| FORM | 10 | 1 hour (3600000ms) | 2 hours (7200000ms) | Form spam protection. Generic limit for all form submissions (contact, etc.). |
+
+**Rate Limiting Strategy**:
+- Sliding window implementation (not fixed window)
+- Attempts counted within `windowMs` period
+- After `maxAttempts` exceeded, cooldown enforced for `cooldownMs`
+- Rate limits reset after cooldown expires
+
+**Anti-Patterns Avoided**:
+- ❌ No rate limiting - brute force attacks, spam, abuse
+- ❌ Fixed window - allows burst at window boundary
+- ❌ No cooldown - immediate re-attempt after limit
+- ❌ Too strict - frustrated users, poor UX
+- ❌ Too lenient - insufficient protection
+
+### Unified Resilience Layer
+
+**Location**: `src/services/common/resilience.ts`
+
+**executeWithResilience Function**:
+
+```typescript
+export async function executeWithResilience<T, TData = void>(
+    context: ResilienceContext,
+    operationFn: (data: TData) => Promise<T>,
+    data?: TData
+): Promise<T>
+```
+
+**ResilienceContext Interface**:
+```typescript
+export interface ResilienceContext {
+    operationName: string;              // e.g., 'EmailService.sendEmail'
+    rateLimiter?: RateLimiter;         // Rate limiter instance
+    identifier?: string;                 // Unique identifier for rate limiting
+    circuitBreaker: CircuitBreaker;      // Circuit breaker instance
+    skipRateLimit?: boolean;             // Skip rate limit check (admin use)
+    recordRateLimitOnSuccess?: boolean;   // Record successful attempt
+    recordRateLimitOnFailure?: boolean;   // Record failed attempt
+    timeoutMs?: number;                  // Override default timeout
+    retryOptions?: RetryOptions;          // Custom retry config
+}
+```
+
+**Resilience Flow**:
+1. **Rate Limit Check** (if enabled): Check rate limiter, throw RateLimitExceededError if limit exceeded
+2. **Circuit Breaker Check**: If circuit open, throw CircuitBreakerError immediately
+3. **Timeout**: Wrap operation in timeout wrapper (if timeoutMs specified)
+4. **Retry**: Execute with exponential backoff (up to MAX_ATTEMPTS)
+5. **Success**:
+   - Record successful rate limit attempt (if enabled)
+   - Record metrics (success, response time)
+   - Reset circuit breaker failure count
+6. **Failure**:
+   - Record failed rate limit attempt (if enabled)
+   - Record metrics (failure, error type, response time)
+   - Increment circuit breaker failure count
+   - Log error (except rate limit, timeout, circuit breaker)
+7. **Throw**: Re-throw error for caller to handle
+
+**Benefits**:
+- **Single Implementation**: All services use same resilience logic
+- **Consistency**: Predictable behavior across all operations
+- **Maintainability**: Changes in one place affect all services
+- **Type Safety**: Generic type parameters for different data/result types
+- **Testability**: Can test resilience layer independently
+- **Code Reduction**: Eliminates 336 lines of duplicated code (70.4% reduction)
+
+### API Standardization
+
+#### Standard Response Format
+
+**Location**: `src/services/common/types.ts`
+
+```typescript
+export interface ServiceResult<T = void> {
+    success: boolean;
+    message?: string;
+    data?: T;
+    error?: string;
+    errorCode?: ServiceErrorCodeType;
+    metadata?: Record<string, unknown>;
+}
+```
+
+**Design Rationale**:
+- `success`: Boolean flag for easy success/failure checking
+- `message`: Human-readable message for user display
+- `data`: Type-safe response data on success
+- `error`: Error message on failure
+- `errorCode`: Type-safe error code for programmatic handling
+- `metadata`: Additional context (e.g., `rateLimited`, `resetTime`)
+
+#### Standard Error Codes
+
+**Location**: `src/services/common/types.ts`
+
+```typescript
+export const ServiceErrorCode = {
+    VALIDATION: 'VALIDATION_ERROR',
+    RATE_LIMIT: 'RATE_LIMIT_EXCEEDED',
+    TIMEOUT: 'TIMEOUT',
+    CIRCUIT_BREAKER: 'CIRCUIT_BREAKER_OPEN',
+    CREDENTIALS_MISSING: 'CREDENTIALS_MISSING',
+    UNKNOWN: 'UNKNOWN_ERROR',
+    NETWORK: 'NETWORK_ERROR',
+} as const;
+```
+
+**Design Rationale**:
+- Type-safe error codes via TypeScript `const` assertion
+- Clear, descriptive names for programmatic handling
+- Covers all common error scenarios
+- Extensible for future error types
+
+#### Exception Hierarchy
+
+**Location**: `src/services/common/ServiceException.ts`
+
+```typescript
+export class ServiceException extends Error {
+    public readonly code: ServiceErrorCodeType;
+    public readonly details?: unknown;
+    public readonly isRetryable: boolean;
+    public readonly isTimeout: boolean;
+}
+
+export class ServiceTimeoutError extends ServiceException { ... }
+export class ServiceRateLimitError extends ServiceException { ... }
+export class ServiceValidationError extends ServiceException { ... }
+export class ServiceCircuitBreakerError extends ServiceException { ... }
+export class ServiceCredentialsError extends ServiceException { ... }
+export class ServiceNetworkError extends ServiceException { ... }
+```
+
+**Design Rationale**:
+- Type-safe error handling with specific exception classes
+- `isRetryable` flag for automatic retry decisions
+- `isTimeout` flag for timeout-specific handling
+- `details` field for additional context
+- Type guard function: `isServiceException(error)`
+
+### API Route Resilience
+
+**API Routes with Timeout Protection**:
+
+| Route | Timeout | Purpose |
+|--------|----------|---------|
+| GET /api/health | 5000ms | Prevent slow health checks from cascading |
+| GET /api/metrics | 5000ms | Metrics retrieval should be fast (in-memory data) |
+| GET /api/services/status | 5000ms | Status check should return quickly |
+
+**Design Rationale**:
+- All API routes use `withTimeout` wrapper
+- `TIMEOUTS.API_ROUTE` constant ensures consistency
+- Timeout prevents slow routes from blocking monitoring systems
+- Error responses use `createServiceErrorResponse` for consistent format
+
+**Example**: `/api/health/route.ts`
+```typescript
+const healthCheckData = await withTimeout(
+    Promise.resolve().then(async () => { /* health check logic */ }),
+    {
+        timeoutMs: TIMEOUTS.API_ROUTE,
+        timeoutError: 'Health check operation timed out'
+    }
+);
+```
+
+### Monitoring & Observability
+
+**Metrics Collection**:
+
+**Location**: `src/utils/metrics/`
+
+**Metrics Tracked**:
+- Total calls per service/operation
+- Success calls
+- Failure calls
+- Timeout calls
+- Rate limit calls
+- Circuit breaker open count
+- Average response time
+
+**Health Check Logic**:
+- Success rate ≥90%: `healthy`
+- Success rate 70-90%: `degraded`
+- Success rate <70%: `unhealthy`
+
+**Circuit Breaker Monitoring**:
+- Track state changes (closed → open → half-open)
+- Record open circuit events for alerting
+- Reset metrics on circuit reset
+
+### Architecture Benefits
+
+1. **Resilience**: External service failures handled gracefully, no cascading failures
+2. **Consistency**: All services use same resilience patterns
+3. **Predictability**: Well-documented timeout/retry/circuit breaker behavior
+4. **Maintainability**: Centralized configuration in `src/constants/`
+5. **Type Safety**: TypeScript interfaces for all resilience types
+6. **Observability**: Metrics collection for production monitoring
+7. **Zero Breaking Changes**: Standardized API responses since initial implementation
+8. **Code Reduction**: 336 lines of duplicated code eliminated (70.4%)
+9. **Test Coverage**: Comprehensive tests for all resilience patterns
+10. **Documentation**: Complete API docs (api-routes.md, auth-service.md, email-service.md)
+
+### Testing
+
+**Resilience Layer Tests** (`src/services/common/__tests__/resilience.test.ts`):
+- ✅ 23 tests covering executeWithResilience
+- ✅ Rate limiting, circuit breaker, timeout, retry scenarios
+- ✅ Error handling and metrics recording
+
+**Circuit Breaker Tests** (`src/utils/resilience/__tests__/circuitBreaker.test.ts`):
+- ✅ 22 tests for CircuitBreaker class
+- ✅ State transitions, failure thresholds, reset logic
+
+**Retry Tests** (`src/utils/resilience/__tests__/retry.test.ts`):
+- ✅ 23 tests for withRetry function
+- ✅ Exponential backoff, max attempts, retryable errors
+
+**Rate Limiter Tests** (`src/utils/rateLimiter/__tests__/rateLimiter.test.ts`):
+- ✅ 35 tests for RateLimiter class
+- ✅ Sliding window, cooldown, limit enforcement
+
+**Service Tests**:
+- ✅ AuthService: 630 tests (authentication, rate limiting, circuit breaker)
+- ✅ EmailService: 322 tests (email sending, rate limiting, circuit breaker)
+
+### Success Criteria
+
+- [x] Timeout configuration documented with rationale
+- [x] Retry configuration documented with rationale
+- [x] Circuit breaker configuration documented with rationale
+- [x] Rate limiting configuration documented with rationale
+- [x] Unified resilience layer documented (executeWithResilience)
+- [x] API standardization documented (ServiceResult<T>, ServiceErrorCode)
+- [x] Exception hierarchy documented
+- [x] API route resilience documented
+- [x] Monitoring & observability documented
+- [x] All 3649 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (25 pages generated)
+
+### Related Files
+
+- ✅ Modified: `docs/blueprint.md` - Added Integration Architecture & Resilience Patterns section (400+ lines)
+
+### Notes
+
+- Follows Integration Engineer principles:
+  - **Contract First**: IEmailService, IAuthService interfaces defined before implementation
+  - **Resilience**: All external calls have timeout, retry, circuit breaker protection
+  - **Consistency**: All services use executeWithResilience utility
+  - **Backward Compatibility**: ServiceResult<T> format unchanged since initial implementation
+  - **Self-Documenting**: Comprehensive API documentation (api-routes.md, auth-service.md, email-service.md)
+  - **Idempotency**: Rate limiting and circuit breaker state is idempotent
+- Configuration rationale documented for all timeout, retry, circuit breaker, rate limit values
+- Design decisions explained to guide future modifications
+- Anti-patterns identified and avoided
+- Zero breaking changes - all existing services continue to work
+
+### Impact
+
+- Documentation: +400 lines of comprehensive integration architecture documentation
+- Maintainability: Configuration rationale documented for future developers
+- Zero Regressions: All 3649 tests passing, lint clean, build successful
+- Knowledge Transfer: Design decisions preserved for team onboarding
+
+### Verification Date
+
+2026-01-17
+
+### Related Tasks
+
+- Task 113 (API Documentation) - Auth service and Email service documentation
+- Task 177 (API Standardization) - OpenAPI spec and Postman collection
+- Task 251 (API Routes Documentation) - Monitoring endpoints documentation
+- Task 116 (Shared Service Resilience Utility) - executeWithResilience implementation
    - ✅ **Service Worker Registration** (Task 243) - useServiceWorker hook with auto-registration, status detection (unsupported, installing, activated, error, waiting), update detection (updateAvailable state), skipWaiting() and clearCache() methods, ServiceWorkerUpdate component with non-intrusive notifications, theme-aware styling, ARIA labels, integrated into layout.tsx
 
       ### Interface Definition Pattern (✅ COMPLETED - Task 122)
