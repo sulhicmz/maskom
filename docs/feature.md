@@ -509,4 +509,95 @@ As a Blog Reader, I want to export filtered blog results as PDF or CSV, so that 
 
 ---
 
+---
+
+## [FEATURE-021] PWA Capabilities & Offline Support
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Infrastructure/Performance
+
+### User Story
+
+As a User, I want to access the website offline and install it as an app, so that I can read content and browse without an internet connection.
+
+### Acceptance Criteria
+
+- [ ] Add PWA manifest.json configuration
+- [ ] Implement service worker for offline caching
+- [ ] Add "Add to Home Screen" prompt
+- [ ] Cache critical assets (styles, images, scripts)
+- [ ] Implement offline fallback pages
+- [ ] Add update notifications for service worker
+- [ ] Test PWA functionality across devices
+- [ ] Update docs/blueprint.md with PWA architecture
+
+---
+
+## [FEATURE-022] APM Integration & Production Monitoring
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Infrastructure/Analytics
+
+### User Story
+
+As a Site Administrator, I want real-time application performance monitoring, so that I can proactively detect and resolve issues before they impact users.
+
+### Acceptance Criteria
+
+- [ ] Integrate APM solution (New Relic, Datadog, or similar)
+- [ ] Add performance metrics tracking (response times, error rates)
+- [ ] Implement alerting for critical thresholds
+- [ ] Add performance dashboard to admin panel
+- [ ] Track user sessions and error traces
+- [ ] Add tests for APM integration
+- [ ] Update docs/blueprint.md with monitoring architecture
+
+---
+
+## [FEATURE-023] Customer Support Ticket System
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Customer Service
+
+### User Story
+
+As a Customer, I want to submit and track support tickets, so that I can get help with issues and monitor resolution progress.
+
+### Acceptance Criteria
+
+- [ ] Create support ticket submission form
+- [ ] Add ticket tracking page with status updates
+- [ ] Implement ticket status workflow (Open, In Progress, Resolved, Closed)
+- [ ] Add email notifications for ticket updates
+- [ ] Create admin interface for managing tickets
+- [ ] Add tests for ticket system
+- [ ] Update docs/blueprint.md with ticket system architecture
+
+---
+
+## [FEATURE-024] Team Member Directory & Profiles
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/Information
+
+### User Story
+
+As a Website Visitor, I want to view detailed team member profiles, so that I can learn about the expertise and background of the team.
+
+### Acceptance Criteria
+
+- [ ] Create team member detail page (/team/[id])
+- [ ] Add detailed profile information (bio, skills, social links)
+- [ ] Implement team member search and filter
+- [ ] Add department/team categorization
+- [ ] Optimize team profile images
+- [ ] Add tests for team directory
+- [ ] Update docs/blueprint.md with team directory architecture
+
+---
+
 **Last Updated**: 2026-01-16

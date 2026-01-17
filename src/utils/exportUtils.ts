@@ -3,7 +3,7 @@ import type { BlogFilterCriteria } from './blogFilters'
 import { tagsById } from '@/data/BlogTagData'
 import { blogCategoryById } from '@/data/BlogCategoryData'
 
-declare const jsPDF: new (...args: unknown[]) => {
+interface JsPDFType {
   setFontSize: (...args: unknown[]) => void
   setFont: (...args: unknown[]) => void
   text: (...args: unknown[]) => void
@@ -51,11 +51,12 @@ export function generateExportMetadata(
   }
 }
 
-export function exportToPDF(
+export async function exportToPDF(
   posts: InnerBlogPost[],
   config: ExportConfig,
   metadata: ExportMetadata
-): void {
+): Promise<void> {
+  const jsPDF = (await import('jspdf')).default as unknown as new (...args: unknown[]) => JsPDFType
   const doc = new jsPDF()
   const pageWidth = doc.internal.pageSize.getWidth()
   const margin = 20
@@ -240,16 +241,16 @@ export function exportToCSV(
   URL.revokeObjectURL(url)
 }
 
-export function exportBlogPosts(
+export async function exportBlogPosts(
   posts: InnerBlogPost[],
   filterCriteria: BlogFilterCriteria,
   config: ExportConfig
-): void {
+): Promise<void> {
   const metadata = generateExportMetadata(posts, filterCriteria)
 
   switch (config.format) {
     case 'pdf':
-      exportToPDF(posts, config, metadata)
+      await exportToPDF(posts, config, metadata)
       break
     case 'csv':
       exportToCSV(posts, config, metadata)

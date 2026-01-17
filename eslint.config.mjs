@@ -34,6 +34,12 @@ const eslintConfig = [
       "@next/next/no-img-element": "off",
     },
   },
+  {
+    files: ["src/utils/apm/apmManager.ts"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ];
 
 export default eslintConfig;
