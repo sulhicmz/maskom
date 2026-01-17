@@ -1,5 +1,126 @@
 # Architecture Task Tracking
 
+## Task 282: [CODE ARCHITECT] Layer Separation - Service Types (Jan 17, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Architecture - Layer Separation
+
+### Purpose
+
+Fix Clean Architecture violation where utility and presentation layers import types from service layer, causing dependencies to flow in wrong direction.
+
+### Problem Identified
+
+**Layer Violation**:
+- `@/utils/apiResponse.ts` imports types from `@/services/common`
+- `ContactForm.tsx` and `NewsletterForm.tsx` (presentation) import types from `@/services/common`
+- Dependencies should flow inward: presentation → business → data/services
+- Current flow: utils → services (violates clean architecture)
+
+### Implementation
+
+**1. Created @/types/common.ts**:
+- Moved `ServiceResult<T>` interface
+- Moved `ServiceError` interface
+- Moved `ServiceErrorCode` const
+- Moved `ServiceErrorCodeType` type
+
+**2. Updated @/services/common/types.ts**:
+- Changed to re-export from `@/types/common`
+- Maintains backward compatibility
+- Preserves existing imports in service layer
+
+**3. Updated Utility Layer**:
+- `apiResponse.ts` now imports from `@/types/common`
+
+**4. Updated Presentation Layer**:
+- `ContactForm.tsx` now imports from `@/types/common`
+- `NewsletterForm.tsx` now imports from `@/types/common`
+
+**5. Updated Service Layer**:
+- `AuthService.ts`, `EmailService.ts`, and related types now import from `@/types/common`
+
+### Results
+
+**Metrics Achieved**:
+- Layer separation fixed ✅
+- All 3842 tests passing (100% success rate) ✅
+- Lint passes (0 errors, 0 warnings) ✅
+- Build successful (26 pages generated) ✅
+- Zero regressions ✅
+
+### Architecture Benefits
+
+1. **Clean Architecture**: Dependencies now flow correctly (presentation → types ← services) ✅
+2. **Single Source of Truth**: Service types in one location (`@/types/common`) ✅
+3. **Separation of Concerns**: Types independent of implementation ✅
+4. **Testability**: Easier to test with clear type boundaries ✅
+5. **Maintainability**: Changes to service types don't affect utility layer ✅
+
+### Code Changes
+
+- Added: `src/types/common.ts` - Common service types (32 lines)
+- Modified: `src/services/common/types.ts` - Re-exports from @/types/common (13 lines)
+- Modified: `src/utils/apiResponse.ts` - Import from @/types/common
+- Modified: `src/components/forms/ContactForm.tsx` - Import from @/types/common
+- Modified: `src/components/forms/NewsletterForm.tsx` - Import from @/types/common
+- Modified: `src/services/auth/types.ts` - Import from @/types/common
+- Modified: `src/services/email/index.ts` - Import from @/types/common
+- Modified: `src/services/email/types.ts` - Import from @/types/common
+- Modified: `src/services/email/EmailService.ts` - Import from @/types/common
+
+### Success Criteria
+
+- [x] Service types moved to @/types/common
+- [x] All imports updated to use new location
+- [x] All 3842 tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (26 pages generated)
+- [x] Zero regressions in existing functionality
+- [x] Backward compatibility maintained (re-exports)
+
+### Related Files
+
+- ✅ Added: `src/types/common.ts` - Common service types (32 lines)
+- ✅ Modified: `src/services/common/types.ts` - Re-exports from @/types/common
+- ✅ Modified: `src/utils/apiResponse.ts` - Import from @/types/common
+- ✅ Modified: `src/components/forms/ContactForm.tsx` - Import from @/types/common
+- ✅ Modified: `src/components/forms/NewsletterForm.tsx` - Import from @/types/common
+- ✅ Modified: `src/services/auth/types.ts` - Import from @/types/common
+- ✅ Modified: `src/services/email/index.ts` - Import from @/types/common
+- ✅ Modified: `src/services/email/types.ts` - Import from @/types/common
+- ✅ Modified: `src/services/email/EmailService.ts` - Import from @/types/common
+
+### Notes
+
+- Follows Code Architect principles:
+  - **Clean Architecture**: Dependencies now flow correctly (inward)
+  - **Separation of Concerns**: Types in dedicated layer
+  - **Single Source of Truth**: One location for common service types
+  - **Backward Compatibility**: Re-exports maintain existing import paths
+- Service types now independent of service implementations
+- Easier to test and maintain with clear layer boundaries
+- All existing functionality preserved
+
+### Verification Date
+
+2026-01-17
+
+### Impact
+
+- Architecture: Layer separation fixed, Clean Architecture principles applied
+- Dependencies: Correct inward flow maintained (presentation → types ← services)
+- Quality: 3842 tests passing, lint clean, build successful
+- Zero Regressions: All existing functionality preserved
+
+### Related Tasks
+
+- Task 281 (Performance Optimizer) - Bundle size reduction
+- Task 280 (Security Specialist) - Security assessment completed
+
+---
+
 ## Task 281: [PERFORMANCE OPTIMIZER] Bundle Size Reduction - jspdf Async Loading (Jan 17, 2026)
 
 **Status**: ✅ Completed

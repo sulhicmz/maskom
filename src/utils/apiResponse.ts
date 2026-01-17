@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { ServiceResult, ServiceErrorCodeType } from '@/services/common';
+import type { ServiceResult, ServiceErrorCodeType } from '@/types/common';
 
 export interface ApiResponseConfig<T> {
     data: T;

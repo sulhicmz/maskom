@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { emailService } from '@/services/email';
 import { createContactFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
-import type { ServiceResult } from '@/services/common';
+import type { ServiceResult } from '@/types/common';
 import FormField from './FormField';
 import LoadingButton from './LoadingButton';
 

@@ -1,5 +1,5 @@
 import type { IEmailService, EmailSendParams, EmailSendOptions, ServiceMetrics } from './types';
-import type { ServiceResult } from '@/services/common';
+import type { ServiceResult } from '@/types/common';
 import { withTimeout, CircuitBreaker } from '@/utils/resilience';
 import { emailRateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
