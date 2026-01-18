@@ -67,7 +67,7 @@ export default function CacheConfigPage() {
   const handleConfigChange = <T extends keyof CacheConfig>(
     parentKey: T,
     childKey: string | null,
-    value: any
+    value: string | number | boolean | string[]
   ) => {
     if (!config) return;
 
@@ -76,15 +76,15 @@ export default function CacheConfigPage() {
       setConfig({
         ...config,
         [parentKey]: {
-          ...(currentValue as any),
+          ...(currentValue as unknown as Record<string, string | number | boolean | string[]>),
           [childKey]: value,
         },
-      });
+      } as CacheConfig);
     } else {
       setConfig({
         ...config,
         [parentKey]: value,
-      });
+      } as CacheConfig);
     }
   };
 
