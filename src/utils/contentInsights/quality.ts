@@ -1,7 +1,7 @@
 const WORD_REGEX = /\b\w+\b/g;
 const SENTENCE_REGEX = /[.!?]+/g;
 const PARAGRAPH_REGEX = /\n\n+/g;
-const PASSIVE_VOICE_REGEX = /\b(was|were|is|are|been|being)\s+(\w+ed)\b/gi;
+const PASSIVE_VOICE_REGEX = /\b(?:was|were|is|are|been|being)\s+\w*ed?\b/gi;
 const LONG_SENTENCE_THRESHOLD = 20;
 
 export interface ContentStructure {
@@ -56,15 +56,15 @@ export function analyzeContentStructure(text: string): ContentStructure {
     const avgWordsPerSentence = sentences > 0 ? words / sentences : 0;
     const avgWordsPerParagraph = paragraphs > 0 ? words / paragraphs : 0;
 
-    const sentenceLengths = text.split(SENTENCE_REGEX).map(s => 
+    const sentenceLengths = text.split(SENTENCE_REGEX).map(s =>
         (s.match(WORD_REGEX) || []).length
     ).filter(l => l > 0);
 
-    const sentenceVariety = sentenceLengths.length > 2 
+    const sentenceVariety = sentenceLengths.length > 2
         ? (Math.max(...sentenceLengths) - Math.min(...sentenceLengths)) > 5 ? 'Good' : 'Poor'
         : 'Poor';
 
-    const paragraphLengths = text.split(PARAGRAPH_REGEX).map(p => 
+    const paragraphLengths = text.split(PARAGRAPH_REGEX).map(p =>
         (p.match(WORD_REGEX) || []).length
     ).filter(l => l > 0);
 
@@ -219,7 +219,7 @@ export function generateRecommendations(
     return recommendations;
 }
 
-export function generateQualityScore(text: string): QualityRecommendations {
+export function analyzeContentQuality(text: string): QualityRecommendations {
     const structure = analyzeContentStructure(text);
     const longSentences = detectLongSentences(text);
     const passiveVoice = detectPassiveVoice(text);

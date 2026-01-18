@@ -199,7 +199,9 @@ export function updateRecommendations(
 
   const updatedHistory = readingHistory.filter(h => h.postId !== currentPostId)
 
-  return generateRecommendations(updatedHistory, mergedConfig)
+  const recommendations = generateRecommendations(updatedHistory, mergedConfig)
+
+  return recommendations.filter(rec => rec.postId !== currentPostId)
 }
 
 export function getRecommendedPosts(

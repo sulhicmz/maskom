@@ -32,7 +32,7 @@ export function calculateEngagementScore(input: EngagementInput): number {
   const shareRate = Math.min(shareCount / viewCount, 1) * 100;
   const bookmarkRate = Math.min(bookmarkCount / viewCount, 1) * 100;
   const commentRate = Math.min(commentCount / viewCount, 1) * 100;
-  const readTimeScore = Math.min(avgReadTime / 60, 5) * 20;
+  const readTimeScore = Math.min(avgReadTime / 60 * 20, 100);
 
   const weightedScore =
     (shareRate * SHARE_WEIGHT) +
@@ -40,7 +40,7 @@ export function calculateEngagementScore(input: EngagementInput): number {
     (commentRate * COMMENT_WEIGHT) +
     readTimeScore;
 
-  return Math.min(Math.round(weightedScore), MAX_ENGAGEMENT_SCORE);
+  return Math.min(weightedScore, MAX_ENGAGEMENT_SCORE);
 }
 
 export function calculateAvgReadTime(content: string): number {

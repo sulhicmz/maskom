@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
     getReadabilityScore,
     estimateReadingTime,
     generateSEOSuggestions,
-    generateQualityScore,
+    analyzeContentQuality,
     type ReadabilityScore,
     type ReadingTime,
     type SEOSuggestions,
@@ -30,13 +30,12 @@ const ContentInsightsPanel: React.FC<ContentInsightsPanelProps> = ({
     const [activeTab, setActiveTab] = useState<'readability' | 'seo' | 'quality'>('readability');
 
     const insights = React.useMemo(() => {
-        const fleschScore = generateQualityScore(content);
         const readingTime = estimateReadingTime(content);
         const readabilityScore = getReadabilityScore(
             calculateFleschReadingEaseFromText(content)
         );
         const seoSuggestions = generateSEOSuggestions(title, description, content);
-        const qualityScore = generateQualityScore(content);
+        const qualityScore = analyzeContentQuality(content);
 
         return {
             readabilityScore,

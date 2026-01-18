@@ -129,4 +129,5 @@ const inner_blog_data: InnerBlogPost[] = [
  ];
 
 export default inner_blog_data;
+export const blog_data = inner_blog_data;
 export const innerBlogById: IdIndex<InnerBlogPost> = createIdIndex(inner_blog_data);
