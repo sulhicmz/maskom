@@ -17,6 +17,7 @@ import { generateUUID } from '@/utils/uuid';
 import { UserRole, isValidRole, Permission, MFAStatus } from '@/types';
 import { hasPermission as checkPermission } from '@/data/rolesData';
 import { verifyTOTP, createMFASetupData } from '@/utils/mfa';
+import { logActivity, ActivityAction } from '@/utils/activityLogger';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
@@ -71,20 +72,30 @@ class AuthService implements IAuthService {
 
     private async loginWithoutResilience(credentials: LoginCredentials): Promise<AuthResult> {
         this.validateCredentials(credentials.email, credentials.password, false);
-
+ 
         const role: UserRole = 'user';
-
+        const userId = this.generateUserId();
+ 
         this.currentUser = {
-            id: this.generateUserId(),
+            id: userId,
             name: this.extractNameFromEmail(credentials.email),
             email: credentials.email,
             role,
             mfaEnabled: false,
         };
-
+ 
         const mfaStatus = await this.getMFAStatus();
-
+ 
         if (mfaStatus === 'required' && !credentials.totpCode) {
+            logActivity(
+                userId,
+                ActivityAction.LOGIN,
+                'auth',
+                userId,
+                { method: 'password', email: credentials.email },
+                false,
+                'MFA required for admin role'
+            );
             return {
                 success: false,
                 message: 'MFA diperlukan untuk peran admin',
@@ -92,14 +103,32 @@ class AuthService implements IAuthService {
                 user: this.currentUser,
             };
         }
-
+ 
         if (credentials.totpCode && mfaStatus === 'required') {
             const mfaResult = await this.verifyMFA(credentials.totpCode);
             if (!mfaResult.success) {
+                logActivity(
+                    userId,
+                    ActivityAction.LOGIN,
+                    'auth',
+                    userId,
+                    { method: 'mfa', email: credentials.email },
+                    false,
+                    'Invalid MFA code'
+                );
                 return mfaResult;
             }
         }
-
+ 
+        logActivity(
+            userId,
+            ActivityAction.LOGIN,
+            'auth',
+            userId,
+            { method: mfaStatus === 'enabled' ? 'mfa' : 'password', email: credentials.email },
+            true
+        );
+ 
         return {
             success: true,
             message: 'Berhasil masuk ke portal',
@@ -125,17 +154,26 @@ class AuthService implements IAuthService {
 
     private async registerWithoutResilience(userData: RegisterData): Promise<AuthResult> {
         this.validateCredentials(userData.email, userData.password, true, userData.name);
-
+ 
         const role: UserRole = userData.role && isValidRole(userData.role) ? userData.role : 'user';
-
+        const userId = this.generateUserId();
+ 
         this.currentUser = {
-            id: this.generateUserId(),
+            id: userId,
             name: userData.name,
             email: userData.email,
             role,
             mfaEnabled: false,
         };
-
+ 
+        logActivity(
+            userId,
+            ActivityAction.USER_REGISTER,
+            'auth',
+            userId,
+            { email: userData.email, role }
+        );
+ 
         return {
             success: true,
             message: 'Registrasi berhasil dikirim',
@@ -185,7 +223,17 @@ class AuthService implements IAuthService {
     }
 
     async logout(): Promise<AuthResult> {
+        const userId = this.currentUser?.id;
         try {
+            if (userId) {
+                logActivity(
+                    userId,
+                    ActivityAction.LOGOUT,
+                    'auth',
+                    userId,
+                    {}
+                );
+            }
             this.currentUser = null;
             this.mfaSetupData = null;
             logServiceSuccess('AuthService', 'logout');
@@ -314,26 +362,34 @@ class AuthService implements IAuthService {
             if (!this.currentUser) {
                 return createErrorResult('User not authenticated', ServiceErrorCode.VALIDATION);
             }
-
+ 
             if (!this.mfaSetupData) {
                 return createErrorResult('MFA setup not initiated', ServiceErrorCode.VALIDATION);
             }
-
+ 
             const isValid = await verifyTOTP({
                 secret: this.mfaSetupData.secret,
                 code: totpCode,
             });
-
+ 
             if (!isValid) {
                 return createErrorResult('Invalid TOTP code', ServiceErrorCode.VALIDATION);
             }
-
+ 
             this.currentUser.mfaEnabled = true;
             this.currentUser.mfaSecret = this.mfaSetupData.secret;
             this.currentUser.mfaBackupCodes = this.mfaSetupData.backupCodes;
             this.currentUser.mfaEnabledAt = new Date().toISOString();
             this.mfaSetupData = null;
 
+            logActivity(
+                this.currentUser.id,
+                ActivityAction.MFA_ENABLED,
+                'auth',
+                this.currentUser.id,
+                { method: 'totp', app: 'Google Authenticator' }
+            );
+ 
             logServiceSuccess('AuthService', 'enableMFA');
 
             return {
@@ -355,17 +411,25 @@ class AuthService implements IAuthService {
             if (!this.currentUser) {
                 return createErrorResult('User not authenticated', ServiceErrorCode.VALIDATION);
             }
-
+ 
             const passwordValidation = validatePassword(password);
             if (!passwordValidation.valid) {
                 return createErrorResult(passwordValidation.error || 'Invalid password', ServiceErrorCode.VALIDATION);
             }
-
+ 
             this.currentUser.mfaEnabled = false;
             this.currentUser.mfaSecret = undefined;
             this.currentUser.mfaBackupCodes = undefined;
             this.currentUser.mfaEnabledAt = undefined;
 
+            logActivity(
+                this.currentUser.id,
+                ActivityAction.MFA_DISABLED,
+                'auth',
+                this.currentUser.id,
+                {}
+            );
+ 
             logServiceSuccess('AuthService', 'disableMFA');
 
             return {
@@ -450,15 +514,23 @@ class AuthService implements IAuthService {
             if (!this.currentUser || !this.currentUser.mfaEnabled) {
                 return createErrorResult('MFA not enabled', ServiceErrorCode.VALIDATION);
             }
-
+ 
             const passwordValidation = validatePassword(password);
             if (!passwordValidation.valid) {
                 return createErrorResult(passwordValidation.error || 'Invalid password', ServiceErrorCode.VALIDATION);
             }
-
+ 
             const newBackupCodes = await (await import('@/utils/mfa')).generateBackupCodes();
             this.currentUser.mfaBackupCodes = newBackupCodes;
 
+            logActivity(
+                this.currentUser.id,
+                ActivityAction.BACKUP_CODES_GENERATED,
+                'auth',
+                this.currentUser.id,
+                { codesGenerated: newBackupCodes.length }
+            );
+ 
             logServiceSuccess('AuthService', 'regenerateBackupCodes');
 
             return {

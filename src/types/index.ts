@@ -39,3 +39,6 @@ export * from './seo';
 
 // Backup types (BackupConfig, BackupMetadata, DisasterRecoveryPlan, etc.)
 export * from './backup';
+
+// Audit types (ActivityLog, ActivityAction, etc.)
+export * from './audit';
