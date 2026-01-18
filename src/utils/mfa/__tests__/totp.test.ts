@@ -14,6 +14,10 @@ import {
 } from '../totp';
 import type { TOTPVerificationOptions } from '@/types/mfa';
 
+jest.mock('@/utils/uuid', () => ({
+  generateUUID: jest.fn(() => 'mock-uuid-12345'),
+}));
+
 describe('TOTP Utilities', () => {
   describe('generateSecret', () => {
     test('should generate secret with default length', () => {

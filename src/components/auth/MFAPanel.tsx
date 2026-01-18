@@ -18,10 +18,6 @@ const MFAPanel = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    loadUserInfo();
-  }, []);
-
   const loadUserInfo = useCallback(async () => {
     const currentUser = await authService.getCurrentUser();
     const status = await authService.getMFAStatus();
@@ -29,6 +25,10 @@ const MFAPanel = () => {
     setUser(currentUser);
     setMfaStatus(status);
   }, []);
+
+  useEffect(() => {
+    loadUserInfo();
+  }, [loadUserInfo]);
 
   const handleDisableMFA = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();

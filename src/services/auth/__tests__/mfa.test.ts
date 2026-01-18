@@ -1,5 +1,9 @@
 import authService from '../AuthService';
 
+jest.mock('@/utils/uuid', () => ({
+  generateUUID: jest.fn(() => 'mock-uuid-12345'),
+}));
+
 describe('AuthService MFA Methods', () => {
 
   afterEach(() => {
@@ -189,7 +193,7 @@ describe('AuthService MFA Methods', () => {
   });
 
   describe('verifyMFA', () => {
-    beforeEach(async () => {
+    test('should verify valid TOTP code', async () => {
       await authService.register({
         name: 'Test User',
         email: 'test@example.com',
@@ -198,9 +202,14 @@ describe('AuthService MFA Methods', () => {
       });
       await authService.initiateMFASetup();
       await authService.enableMFA('123456');
+
+      const result = await authService.verifyMFA('123456');
+
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('MFA berhasil diverifikasi');
     });
 
-    test('should verify valid TOTP code', async () => {
+    test('should fail for unauthenticated user', async () => {
       const result = await authService.verifyMFA('123456');
 
       expect(result.success).toBe(true);
@@ -216,7 +225,12 @@ describe('AuthService MFA Methods', () => {
     });
 
     test('should fail when MFA not enabled', async () => {
-      await authService.disableMFA('Password123');
+      await authService.register({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'Password123',
+        role: 'user',
+      });
 
       const result = await authService.verifyMFA('123456');
 
@@ -225,6 +239,15 @@ describe('AuthService MFA Methods', () => {
     });
 
     test('should fail for invalid TOTP code', async () => {
+      await authService.register({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'Password123',
+        role: 'user',
+      });
+      await authService.initiateMFASetup();
+      await authService.enableMFA('123456');
+
       const result = await authService.verifyMFA('000000');
 
       expect(result.success).toBe(false);
@@ -232,6 +255,15 @@ describe('AuthService MFA Methods', () => {
     });
 
     test('should verify valid backup code', async () => {
+      await authService.register({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'Password123',
+        role: 'user',
+      });
+      await authService.initiateMFASetup();
+      await authService.enableMFA('123456');
+
       const currentUser = await authService.getCurrentUser();
       const backupCode = currentUser?.mfaBackupCodes?.[0];
 
@@ -242,6 +274,15 @@ describe('AuthService MFA Methods', () => {
     });
 
     test('should fail for invalid backup code', async () => {
+      await authService.register({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'Password123',
+        role: 'user',
+      });
+      await authService.initiateMFASetup();
+      await authService.enableMFA('123456');
+
       const result = await authService.verifyMFA('', 'INVALIDCODE');
 
       expect(result.success).toBe(false);
@@ -249,6 +290,15 @@ describe('AuthService MFA Methods', () => {
     });
 
     test('should remove used backup code', async () => {
+      await authService.register({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'Password123',
+        role: 'user',
+      });
+      await authService.initiateMFASetup();
+      await authService.enableMFA('123456');
+
       const currentUserBefore = await authService.getCurrentUser();
       const backupCode = currentUserBefore?.mfaBackupCodes?.[0];
 

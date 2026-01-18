@@ -58,7 +58,7 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
     } finally {
       setLoading(false);
     }
-  }, [totpCode, onSuccess]);
+  }, [totpCode, onSuccess, setStep, setError, setLoading]);
 
   const handleCopyBackupCode = useCallback((code: string) => {
     navigator.clipboard.writeText(code);

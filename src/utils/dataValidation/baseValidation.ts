@@ -46,7 +46,8 @@ export interface ValidationConfig<T> {
 export function createValidator<T>(config: ValidationConfig<T>): (item: T) => ValidationResult {
   return (item: T): ValidationResult => {
     const errors: string[] = [];
-    const itemId = (item as any).id != null && typeof (item as any).id === "number" ? (item as any).id as number : "";
+    const itemRecord = item as Record<string, unknown>;
+    const itemId = itemRecord.id != null && typeof itemRecord.id === "number" ? itemRecord.id as number : "";
  
     if (config.baseValidation) {
       const baseResult = validateBaseDataItem(item as BaseDataItem, config.typeName);

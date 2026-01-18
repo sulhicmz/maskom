@@ -75,9 +75,9 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
   };
 
   const CommentItem = memo(({ comment, depth = 0 }: { comment: BlogCommentItem; depth?: number }) => {
-    const replies = useMemo(() => buildCommentTree(approvedComments, comment.id), [approvedComments, comment.id, buildCommentTree]);
-    const currentVote = useMemo(() => userVotes.get(comment.id), [userVotes, comment.id]);
-    const isReplying = useMemo(() => replyingTo === comment.id, [replyingTo, comment.id]);
+    const replies = useMemo(() => buildCommentTree(approvedComments, comment.id), [comment.id]);
+    const currentVote = userVotes.get(comment.id);
+    const isReplying = replyingTo === comment.id;
 
     return (
       <div
@@ -156,6 +156,8 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
       </div>
     );
   });
+
+  CommentItem.displayName = 'CommentItem';
 
   return (
     <div className="ac-postbox_comment mb-55 wow fadeInUp">
