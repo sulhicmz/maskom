@@ -1,11 +1,16 @@
-import { WebVitalsMetrics, WebVitalsEntry } from '@/types/analytics'
+import { WebVitalsMetrics, WebVitalsEntry, WebVitalMetric } from '@/types/analytics'
+import { onLCP, onCLS, onINP, onFCP, onTTFB, Metric } from 'web-vitals'
+
+const WEB_VITAL_STORAGE_KEY = 'web_vitals_history'
+const MAX_STORED_ENTRIES = 50
 
 const WEB_VITAL_THRESHOLDS = {
   LCP: { good: 2500, poor: 4000 },
   FID: { good: 100, poor: 300 },
   CLS: { good: 0.1, poor: 0.25 },
   FCP: { good: 1800, poor: 3000 },
-  TTFB: { good: 800, poor: 1800 }
+  TTFB: { good: 800, poor: 1800 },
+  INP: { good: 200, poor: 500 }
 }
 
 let metrics: WebVitalsMetrics = {
@@ -18,7 +23,7 @@ let metrics: WebVitalsMetrics = {
 
 let entries: WebVitalsEntry[] = []
 
-export function getRating(metric: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+export function getRating(metric: WebVitalMetric, value: number): 'good' | 'needs-improvement' | 'poor' {
   const thresholds = WEB_VITAL_THRESHOLDS[metric as keyof typeof WEB_VITAL_THRESHOLDS]
   if (!thresholds) return 'good'
 
@@ -28,13 +33,14 @@ export function getRating(metric: string, value: number): 'good' | 'needs-improv
 }
 
 export function recordMetric(
-  metric: 'LCP' | 'FID' | 'CLS' | 'FCP' | 'TTFB',
+  metric: WebVitalMetric,
   value: number
 ): void {
   const rating = getRating(metric, value)
+  const metricName = metric === 'INP' ? 'FID' : metric
   
   const entry: WebVitalsEntry = {
-    metric,
+    metric: metricName,
     value,
     rating,
     timestamp: new Date().toISOString()
@@ -42,7 +48,7 @@ export function recordMetric(
   
   entries.push(entry)
   
-  switch (metric) {
+  switch (metricName) {
     case 'LCP':
       metrics.lcp = value
       break
@@ -59,6 +65,94 @@ export function recordMetric(
       metrics.ttfb = value
       break
   }
+}
+
+function saveToLocalStorage(entry: WebVitalsEntry): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    const stored = localStorage.getItem(WEB_VITAL_STORAGE_KEY)
+    const history: WebVitalsEntry[] = stored ? JSON.parse(stored) : []
+    
+    history.push(entry)
+    
+    if (history.length > MAX_STORED_ENTRIES) {
+      history.splice(0, history.length - MAX_STORED_ENTRIES)
+    }
+    
+    localStorage.setItem(WEB_VITAL_STORAGE_KEY, JSON.stringify(history))
+  } catch (error) {
+    console.error('Failed to save web vital to localStorage:', error)
+  }
+}
+
+export function loadFromLocalStorage(): WebVitalsEntry[] {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const stored = localStorage.getItem(WEB_VITAL_STORAGE_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Failed to load web vitals from localStorage:', error)
+    return []
+  }
+}
+
+export function clearLocalStorage(): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.removeItem(WEB_VITAL_STORAGE_KEY)
+  } catch (error) {
+    console.error('Failed to clear web vitals from localStorage:', error)
+  }
+}
+
+export function reportWebVitals(metric: Metric): void {
+  let metricName: WebVitalMetric
+  
+  switch (metric.name) {
+    case 'CLS':
+      metricName = 'CLS'
+      break
+    case 'FCP':
+      metricName = 'FCP'
+      break
+    case 'INP':
+      metricName = 'INP'
+      break
+    case 'LCP':
+      metricName = 'LCP'
+      break
+    case 'TTFB':
+      metricName = 'TTFB'
+      break
+    default:
+      return
+  }
+  
+  const rating = getRating(metricName, metric.value)
+  const entryMetricName = metricName === 'INP' ? 'FID' : metricName
+  
+  const entry: WebVitalsEntry = {
+    metric: entryMetricName,
+    value: metric.value,
+    rating,
+    timestamp: new Date().toISOString()
+  }
+  
+  recordMetric(metricName, metric.value)
+  saveToLocalStorage(entry)
+}
+
+export function onWebVitalsLoaded(): void {
+  if (typeof window === 'undefined') return
+
+  onLCP(reportWebVitals)
+  onCLS(reportWebVitals)
+  onINP(reportWebVitals)
+  onFCP(reportWebVitals)
+  onTTFB(reportWebVitals)
 }
 
 export function getWebVitalsMetrics(): WebVitalsMetrics {

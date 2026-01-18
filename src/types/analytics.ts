@@ -60,6 +60,8 @@ export interface WebVitalsEntry {
   timestamp: string
 }
 
+export type WebVitalMetric = 'LCP' | 'FID' | 'CLS' | 'FCP' | 'TTFB' | 'INP'
+
 export interface PerformanceMetrics {
   metrics: WebVitalsMetrics
   entries: WebVitalsEntry[]

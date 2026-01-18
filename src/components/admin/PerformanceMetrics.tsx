@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { WebVitalsMetrics, WebVitalsEntry } from '@/types/analytics'
-import { getWebVitalsMetrics, getWebVitalsEntries, getPerformanceAlerts, hasPerformanceAlerts } from '@/utils/webVitals'
+import { getWebVitalsMetrics, getWebVitalsEntries, getPerformanceAlerts, hasPerformanceAlerts, loadFromLocalStorage } from '@/utils/webVitals'
 
 const PerformanceMetrics: React.FC = () => {
   const { theme } = useTheme()
@@ -15,6 +15,7 @@ const PerformanceMetrics: React.FC = () => {
     ttfb: 0
   })
   const [entries, setEntries] = useState<WebVitalsEntry[]>([])
+  const [historicalEntries, setHistoricalEntries] = useState<WebVitalsEntry[]>([])
   const [alerts, setAlerts] = useState<WebVitalsEntry[]>([])
   const [hasAlerts, setHasAlerts] = useState(false)
 
@@ -24,6 +25,8 @@ const PerformanceMetrics: React.FC = () => {
       setEntries(getWebVitalsEntries())
       setAlerts(getPerformanceAlerts())
       setHasAlerts(hasPerformanceAlerts())
+      const historical = loadFromLocalStorage()
+      setHistoricalEntries(historical)
     }
 
     loadMetrics()
@@ -111,7 +114,7 @@ const PerformanceMetrics: React.FC = () => {
           <div className="col-12">
             <div className="card shadow-sm">
               <div className="card-header bg-white">
-                <h5 className="mb-0">Web Vitals History</h5>
+                <h5 className="mb-0">Web Vitals History (Current Session)</h5>
               </div>
               <div className="card-body">
                 <div className="table-responsive">
@@ -133,6 +136,52 @@ const PerformanceMetrics: React.FC = () => {
                         </tr>
                       ) : (
                         entries.map((entry, index) => (
+                          <tr key={index}>
+                            <td>
+                              <span className="badge bg-primary">{entry.metric}</span>
+                            </td>
+                            <td>{formatMetricValue(entry.metric, entry.value)}</td>
+                            <td>{getRatingBadge(entry.rating)}</td>
+                            <td className="text-muted small">
+                              {new Date(entry.timestamp).toLocaleString()}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="row mt-4">
+          <div className="col-12">
+            <div className="card shadow-sm">
+              <div className="card-header bg-white">
+                <h5 className="mb-0">Web Vitals History (Historical - Last 50 Entries)</h5>
+              </div>
+              <div className="card-body">
+                <div className="table-responsive">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Rating</th>
+                        <th>Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historicalEntries.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="text-center text-muted">
+                            No historical performance data available
+                          </td>
+                        </tr>
+                      ) : (
+                        historicalEntries.map((entry, index) => (
                           <tr key={index}>
                             <td>
                               <span className="badge bg-primary">{entry.metric}</span>
