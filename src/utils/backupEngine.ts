@@ -10,18 +10,11 @@ import {
   BackupStatistics,
   BackupConfig,
   BackupSchedule,
-<<<<<<< HEAD
-=======
   BackupHealthStatus,
->>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
   UserDataBackup,
   ContentDataBackup,
   SettingsDataBackup,
   ActivityLogBackup,
-<<<<<<< HEAD
-  BackupHealthStatus,
-=======
->>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
 } from '@/types/backup'
 
 import { BACKUP_METADATA_KEY, BACKUP_DATA_KEY_PREFIX } from '@/types/backup'
@@ -484,13 +477,6 @@ class BackupEngine {
       combined.set(iv, 0)
       combined.set(new Uint8Array(keyBuffer), iv.length)
       combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.byteLength)
-=======
-        iv.length + keyBuffer.byteLength + encryptedData.byteLength,
-      )
-      combined.set(iv, 0)
-      combined.set(new Uint8Array(keyBuffer), iv.length)
-      combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.byteLength)
->>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
 
       const base64 = btoa(String.fromCharCode(...combined))
 
