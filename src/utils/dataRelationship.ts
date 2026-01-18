@@ -40,6 +40,22 @@ export function validateRelationships(
     );
 
     errors.push(...relationshipErrors);
+
+    if (relationship.sourceCollection === relationship.targetCollection) {
+      const circularCheck = checkSelfReferentialCircularDependencies(
+        relationship,
+        sourceCollection as Record<string, unknown>[]
+      );
+
+      if (circularCheck.hasCycles) {
+        for (const cycle of circularCheck.cycles) {
+          errors.push({
+            relationship,
+            error: `Circular dependency detected in self-referential relationship: ${cycle.join(' -> ')}`,
+          });
+        }
+      }
+    }
   }
 
   return {
@@ -302,6 +318,68 @@ export function validateForeignKey<T extends Record<string, unknown>, U extends 
   }
 
   return { isValid: true };
+}
+
+export function checkSelfReferentialCircularDependencies<T extends Record<string, unknown>>(
+  relationship: DataRelationship,
+  collection: T[]
+): { hasCycles: boolean; cycles: string[][] } {
+  if (relationship.sourceCollection !== relationship.targetCollection) {
+    return { hasCycles: false, cycles: [] };
+  }
+
+  const adjacencyMap = new Map<number, number[]>();
+  
+  for (const item of collection) {
+    const id = item.id as number;
+    const parentId = item[relationship.sourceField] as number | null | undefined;
+    
+    if (parentId !== null && parentId !== undefined && parentId !== 0) {
+      if (!adjacencyMap.has(parentId)) {
+        adjacencyMap.set(parentId, []);
+      }
+      adjacencyMap.get(parentId)!.push(id);
+    }
+  }
+
+  const cycles: string[][] = [];
+  const visited = new Set<number>();
+  const recursionStack = new Set<number>();
+  const path: number[] = [];
+
+  function detectCycle(nodeId: number): boolean {
+    visited.add(nodeId);
+    recursionStack.add(nodeId);
+    path.push(nodeId);
+
+    const children = adjacencyMap.get(nodeId) ?? [];
+    
+    for (const childId of children) {
+      if (!visited.has(childId)) {
+        if (detectCycle(childId)) {
+          return true;
+        }
+      } else if (recursionStack.has(childId)) {
+        const cycleIndex = path.indexOf(childId);
+        const cyclePath = path.slice(cycleIndex).concat(childId);
+        cycles.push(cyclePath.map(id => String(id)));
+        return true;
+      }
+    }
+
+    path.pop();
+    recursionStack.delete(nodeId);
+    return false;
+  }
+
+  for (const item of collection) {
+    const id = item.id as number;
+    if (!visited.has(id)) {
+      detectCycle(id);
+    }
+  }
+
+  return { hasCycles: cycles.length > 0, cycles };
 }
 
 export type { DataRelationship, RelationshipValidationError, ReferentialIntegrityResult };

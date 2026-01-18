@@ -1,8 +1,8 @@
 import { authService } from '../AuthService';
 import type { LoginCredentials, RegisterData } from '../types';
 
-jest.mock('uuid', () => ({
-    v4: () => '00000000-0000-4000-8000-000000000000',
+jest.mock('@/utils/uuid', () => ({
+    generateUUID: () => '00000000-0000-4000-8000-000000000000',
 }));
 
 describe('AuthService', () => {

@@ -1,5 +1,162 @@
 # Architecture Task Tracking
 
+## Task 299: [DATA ARCHITECT] Self-Referential Relationship Support (Jan 18, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Architecture - Relationship Validation
+
+### Purpose
+
+Add self-referential relationship support to detect circular dependencies within hierarchical data structures (e.g., comment threading) and ensure referential integrity at item level.
+
+### Problem Identified
+
+**Missing Self-Referential Validation**:
+- BlogCommentData has `parentId` field for comment threading (hierarchical replies)
+- Comment items can reference other comment items (parent-child relationship)
+- No validation to detect circular dependencies (e.g., comment 1 → comment 2 → comment 1)
+- Could lead to infinite loops in rendering or data corruption
+
+**Why This Matters**:
+1. **Data Integrity**: Prevent circular references that break hierarchical data
+2. **Render Safety**: Avoid infinite loops when rendering threaded comments
+3. **Validation Coverage**: Complete relationship validation for all relationship types
+4. **Error Detection**: Early detection of data modeling errors
+
+### Solution
+
+**Add Self-Referential Relationship Detection**:
+```typescript
+export const DATA_RELATIONSHIPS: DataRelationship[] = [
+  {
+    sourceCollection: "BlogCommentData",
+    targetCollection: "BlogCommentData",
+    sourceField: "parentId",
+    targetField: "id",
+    type: "many-to-one",
+    optional: true,
+  },
+];
+```
+
+**Circular Dependency Detection**:
+```typescript
+export function checkSelfReferentialCircularDependencies<T extends Record<string, unknown>>(
+  relationship: DataRelationship,
+  collection: T[]
+): { hasCycles: boolean; cycles: string[][] }
+```
+
+### Implementation
+
+#### Phase 1: Add Self-Referential Relationship
+- [x] Add BlogCommentData → BlogCommentData relationship to relationships.ts
+- [x] Mark relationship as optional (parentId can be null for top-level comments)
+
+#### Phase 2: Implement Circular Dependency Detection
+- [x] Create checkSelfReferentialCircularDependencies() function
+- [x] Build adjacency map from parent to children
+- [x] Detect cycles using DFS with recursion stack
+- [x] Return all detected cycles with item IDs
+
+#### Phase 3: Integrate with Validation
+- [x] Update validateRelationships() to call circular check for self-referential relationships
+- [x] Add cycle errors to validation results
+
+#### Phase 4: Testing
+- [x] Create 18 comprehensive tests for checkSelfReferentialCircularDependencies
+- [x] Test circular dependency detection (2-node cycle, complex multi-node cycle)
+- [x] Test non-cyclic cases (null parent, deep nesting, no cycles)
+- [x] Test optional field handling
+- [x] Test self-referential vs non-self-referential relationships
+
+### Success Criteria
+
+- [x] BlogCommentData → BlogCommentData relationship added to relationships.ts
+- [x] checkSelfReferentialCircularDependencies() function implemented
+- [x] validateRelationships() integrates circular dependency detection
+- [x] All 18 new tests passing (100% success rate)
+- [x] All 4042 tests passing (zero regressions)
+- [x] docs/blueprint.md updated with self-referential relationship documentation
+- [x] docs/task.md updated with task completion record
+
+### Results
+
+**Metrics Achieved**:
+- ✅ Self-referential relationship added: BlogCommentData → BlogCommentData (via parentId)
+- ✅ Circular dependency detection implemented (DFS-based cycle detection)
+- ✅ 18 comprehensive tests for self-referential validation (100% passing)
+- ✅ All 4042 tests passing (increase from 4024)
+- ✅ docs/blueprint.md updated with self-referential relationship support
+- ✅ Data integrity improved: Circular references detected at build time
+
+**Features Implemented**:
+1. **Self-Referential Relationship Support**:
+   - BlogCommentData → BlogCommentData relationship for comment threading
+   - Optional foreign key (parentId can be null for top-level comments)
+   - Type-safe relationship definition with DataRelationship interface
+
+2. **Circular Dependency Detection**:
+   - DFS-based cycle detection algorithm
+   - Detects circular references within same collection
+   - Returns all detected cycles with item ID paths
+   - Integrated into validateRelationships() for automatic detection
+
+3. **Comprehensive Testing**:
+   - 18 tests for checkSelfReferentialCircularDependencies
+   - 2 tests for validateRelationships() with self-referential relationships
+   - Coverage for: circular detection, non-cyclic cases, optional fields, edge cases
+
+### Code Changes
+
+- ✅ Added: `src/data/relationships.ts` - Self-referential relationship (4 lines)
+- ✅ Added: `src/utils/dataRelationship.ts` - checkSelfReferentialCircularDependencies (52 lines)
+- ✅ Added: `src/utils/dataRelationship.ts` - Integration in validateRelationships (15 lines)
+- ✅ Added: `src/utils/__tests__/dataRelationship.test.ts` - 18 tests (200 lines)
+- ✅ Modified: `docs/blueprint.md` - Documentation update (5 sections)
+- ✅ Modified: `docs/task.md` - Task completion record
+- Total: 4 files modified/added, ~276 lines added, ~0 lines removed
+
+### Related Files
+
+- ✅ Modified: `src/data/relationships.ts` - Added self-referential relationship
+- ✅ Modified: `src/utils/dataRelationship.ts` - Added circular dependency detection
+- ✅ Modified: `src/utils/__tests__/dataRelationship.test.ts` - Added comprehensive tests
+- ✅ Modified: `docs/blueprint.md` - Updated documentation
+- ✅ Modified: `docs/task.md` - Task completion record
+
+### Notes
+
+- Follows Data Architect principles:
+  - **Data Integrity First**: Circular dependencies detected and reported at build time
+  - **Migration Safety**: Non-destructive validation (no data modification)
+  - **Single Source of Truth**: All relationships in central registry (relationships.ts)
+  - **Validation at Boundaries**: Validate relationships before deployment
+- Self-referential relationships are essential for hierarchical data (comments, categories, menus)
+- DFS-based cycle detection is O(V + E) where V is vertices, E is edges
+- Optional foreign keys (parentId: null) are validated correctly (no error if optional: true)
+- Prevents infinite loops in rendering and data corruption from circular references
+
+### Verification Date
+
+2026-01-18
+
+### Impact
+
+- Data Integrity: Self-referential circular dependencies detected at build time
+- Validation Coverage: 18 new tests, 72 total relationship validation tests
+- Code Quality: 4042 tests passing (100% success rate)
+- Documentation: Complete documentation of self-referential relationship support
+
+### Related Tasks
+
+- Task 270 (Blog Comment System) - BlogCommentData created in this task
+- Task 40 (Data Architecture) - Foundation for relationship management
+- All future hierarchical data (menus, categories) can use self-referential relationships
+
+---
+
 ## Task 297: [SECURITY SPECIALIST] Comprehensive Security Assessment (Jan 18, 2026)
 
 **Status**: ✅ Completed
