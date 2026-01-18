@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BlogPostVersion, VersionDiff } from '@/types/blog';
 import { versionStorage } from '@/utils/versionStorage';
+import { formatTimestamp } from '@/utils/dateFormat';
+import { getDiffBadgeClass } from '@/utils/diffBadge';
 
 interface VersionHistoryPanelProps {
    postId: number;
@@ -52,34 +54,10 @@ const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
       if (selectedVersion?.id === versionId) {
          setSelectedVersion(null);
          setShowCompare(false);
-      }
-   };
+       }
+    };
 
-   const formatDate = (timestamp: string) => {
-      const date = new Date(timestamp);
-      return new Intl.DateTimeFormat('id-ID', {
-         day: '2-digit',
-         month: 'short',
-         year: 'numeric',
-         hour: '2-digit',
-         minute: '2-digit'
-      }).format(date);
-   };
-
-   const getDiffBadgeClass = (type: string) => {
-      switch (type) {
-         case 'added':
-            return 'diff-badge-added';
-         case 'removed':
-            return 'diff-badge-removed';
-         case 'changed':
-            return 'diff-badge-changed';
-         default:
-            return '';
-      }
-   };
-
-   if (!isVisible) return null;
+    if (!isVisible) return null;
 
    return (
       <div className="version-history-overlay">
@@ -113,9 +91,9 @@ const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                                  >
                                     <div className="version-info">
                                        <div className="version-header">
-                                          <span className="version-time">
-                                             {formatDate(version.timestamp)}
-                                          </span>
+                                           <span className="version-time">
+                                              {formatTimestamp(version.timestamp)}
+                                           </span>
                                           <span className="version-author">
                                              oleh {version.author}
                                           </span>
@@ -190,10 +168,10 @@ const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                               <div className="version-details">
                                  <h4>Detail Versi</h4>
                                  <div className="version-detail-grid">
-                                    <div className="version-detail-item">
-                                       <span className="version-detail-label">Waktu:</span>
-                                       <span>{formatDate(selectedVersion.timestamp)}</span>
-                                    </div>
+                                     <div className="version-detail-item">
+                                        <span className="version-detail-label">Waktu:</span>
+                                        <span>{formatTimestamp(selectedVersion.timestamp)}</span>
+                                     </div>
                                     <div className="version-detail-item">
                                        <span className="version-detail-label">Penulis:</span>
                                        <span>{selectedVersion.author}</span>

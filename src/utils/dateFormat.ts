@@ -166,3 +166,27 @@ export function formatCommentDate(isoDate: string): string {
 export function getTodayISO(): string {
   return new Date().toISOString().split("T")[0];
 }
+
+/**
+ * Format timestamp with date and time
+ *
+ * @param timestamp - ISO timestamp string
+ * @param locale - Locale string for formatting (default: "id-ID" for Indonesian)
+ * @returns Formatted timestamp string with date and time
+ *
+ * @example
+ * ```typescript
+ * formatTimestamp("2024-03-15T14:30:00Z") // "15 Mar 2024, 14:30"
+ * formatTimestamp("2024-03-15T14:30:00Z", "en-US") // "Mar 15, 2024, 2:30 PM"
+ * ```
+ */
+export function formatTimestamp(timestamp: string, locale: string = "id-ID"): string {
+  const date = new Date(timestamp);
+  return new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(date);
+}
