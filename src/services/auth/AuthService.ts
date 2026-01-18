@@ -187,6 +187,7 @@ class AuthService implements IAuthService {
     async logout(): Promise<AuthResult> {
         try {
             this.currentUser = null;
+            this.mfaSetupData = null;
             logServiceSuccess('AuthService', 'logout');
 
             return {
@@ -197,7 +198,7 @@ class AuthService implements IAuthService {
             const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat logout';
             const standardError = new Error(errorMessage);
             logServiceError(standardError, { service: 'AuthService', operation: 'logout' });
-            
+
             return {
                 success: false,
                 error: errorMessage,
@@ -376,7 +377,7 @@ class AuthService implements IAuthService {
             const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat menonaktifkan MFA';
             const standardError = new Error(errorMessage);
             logServiceError(standardError, { service: 'AuthService', operation: 'disableMFA' });
-            
+
             return createErrorResult(errorMessage);
         }
     }

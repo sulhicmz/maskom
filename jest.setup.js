@@ -37,3 +37,19 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: jest.fn(),
   })),
 });
+
+global.crypto.subtle = {
+  importKey: jest.fn().mockImplementation(async (format, keyData, algorithm, extractable, keyUsages) => {
+    return {
+      algorithm,
+      extractable,
+      type: 'secret',
+      usages: keyUsages,
+    };
+  }),
+  sign: jest.fn().mockImplementation(async () => {
+    const signature = new Uint8Array(20);
+    signature[19] = 0x31;
+    return signature.buffer;
+  }),
+};

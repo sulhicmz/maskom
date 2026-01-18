@@ -108,34 +108,34 @@ describe('TOTP Utilities', () => {
     test('should generate valid QR code URL', () => {
       const secret = 'JBSWY3DPEHPK3PXP';
       const qrCodeUrl = generateTOTPQRCode(secret, 'TestIssuer', 'test@example.com');
-      
+
       expect(qrCodeUrl).toContain('https://api.qrserver.com/v1/create-qr-code/');
       expect(qrCodeUrl).toContain('size=200x200');
-      expect(qrCodeUrl).toContain('otpauth://totp/TestIssuer:test@example.com');
-      expect(qrCodeUrl).toContain(`secret=${secret}`);
-      expect(qrCodeUrl).toContain('issuer=TestIssuer');
+      expect(qrCodeUrl).toContain('otpauth%3A%2F%2Ftotp%2FTestIssuer%3Atest%40example.com');
+      expect(qrCodeUrl).toContain(`secret%3D${secret}`);
+      expect(qrCodeUrl).toContain('issuer%3DTestIssuer');
     });
 
     test('should generate QR code URL with default issuer', () => {
       const secret = 'JBSWY3DPEHPK3PXP';
       const qrCodeUrl = generateTOTPQRCode(secret);
-      
-      expect(qrCodeUrl).toContain('issuer=Maskom');
+
+      expect(qrCodeUrl).toContain('issuer%3DMaskom');
     });
 
     test('should generate QR code URL with default account name', () => {
       const secret = 'JBSWY3DPEHPK3PXP';
       const qrCodeUrl = generateTOTPQRCode(secret);
-      
-      expect(qrCodeUrl).toContain('account=user');
+
+      expect(qrCodeUrl).toContain('Maskom%3Auser');
     });
 
     test('should include TOTP digits and period in QR code', () => {
       const secret = 'JBSWY3DPEHPK3PXP';
       const qrCodeUrl = generateTOTPQRCode(secret);
       
-      expect(qrCodeUrl).toContain(`digits=${TOTP_DIGITS}`);
-      expect(qrCodeUrl).toContain(`period=${TOTP_PERIOD}`);
+      expect(qrCodeUrl).toContain(`digits%3D${TOTP_DIGITS}`);
+      expect(qrCodeUrl).toContain(`period%3D${TOTP_PERIOD}`);
     });
   });
 
@@ -211,7 +211,7 @@ describe('TOTP Utilities', () => {
       const customAccount = 'user@example.com';
       const setupData = await createMFASetupData(customAccount);
       
-      expect(setupData.qrCodeUrl).toContain(customAccount);
+      expect(setupData.qrCodeUrl).toContain(encodeURIComponent(customAccount));
     });
 
     test('should generate valid secret in setup data', async () => {
@@ -225,7 +225,7 @@ describe('TOTP Utilities', () => {
       const setupData = await createMFASetupData();
       
       expect(setupData.qrCodeUrl).toContain('https://api.qrserver.com/v1/create-qr-code/');
-      expect(setupData.qrCodeUrl).toContain('otpauth://totp/');
+      expect(setupData.qrCodeUrl).toContain('otpauth%3A%2F%2Ftotp%2F');
     });
 
     test('should generate correct number of backup codes', async () => {

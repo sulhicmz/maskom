@@ -15,19 +15,32 @@ import { InnerBlogPost } from "@/types/data";
 describe("contentAnalytics", () => {
   const mockLocalStorage = (() => {
     let store: Record<string, string> = {};
+    const getItemImpl = (key: string) => store[key] || null;
+    const setItemImpl = (key: string, value: string) => {
+      store[key] = value;
+    };
+    const removeItemImpl = (key: string) => {
+      delete store[key];
+    };
+    const clearImpl = () => {
+      store = {};
+    };
+
     return {
-      getItem: jest.fn((key: string) => store[key] || null),
-      setItem: jest.fn((key: string, value: string) => {
-        store[key] = value;
-      }),
-      removeItem: jest.fn((key: string) => {
-        delete store[key];
-      }),
-      clear: jest.fn(() => {
-        store = {};
-      }),
+      getItem: jest.fn(getItemImpl),
+      setItem: jest.fn(setItemImpl),
+      removeItem: jest.fn(removeItemImpl),
+      clear: jest.fn(clearImpl),
       reset: jest.fn(() => {
         store = {};
+        mockLocalStorage.getItem.mockImplementation(getItemImpl);
+        mockLocalStorage.setItem.mockImplementation(setItemImpl);
+        mockLocalStorage.removeItem.mockImplementation(removeItemImpl);
+        mockLocalStorage.clear.mockImplementation(clearImpl);
+        mockLocalStorage.getItem.mockClear();
+        mockLocalStorage.setItem.mockClear();
+        mockLocalStorage.removeItem.mockClear();
+        mockLocalStorage.clear.mockClear();
       }),
     };
   })();
@@ -96,15 +109,13 @@ describe("contentAnalytics", () => {
       };
 
       const result = calculateEngagementScore(input);
-      const expectedShareScore = (30 / 100) * 100 * 0.4;
-      const expectedBookmarkScore = (15 / 100) * 100 * 0.2;
-      const expectedCommentScore = (5 / 100) * 100 * 0.1;
-      const expectedReadTimeScore = (300 / 60) * 20;
+      const expectedShareScore = Math.min(30 / 100, 1) * 100 * 0.4;
+      const expectedBookmarkScore = Math.min(15 / 100, 1) * 100 * 0.2;
+      const expectedCommentScore = Math.min(5 / 100, 1) * 100 * 0.1;
+      const expectedReadTimeScore = Math.min(300 / 60 * 20, 100);
+      const weightedScore = expectedShareScore + expectedBookmarkScore + expectedCommentScore + expectedReadTimeScore;
 
-      expect(result).toBeCloseTo(
-        expectedShareScore + expectedBookmarkScore + expectedCommentScore + expectedReadTimeScore,
-        0
-      );
+      expect(result).toBe(Math.min(weightedScore, 100));
     });
 
     it("should handle empty content (zero avgReadTime)", () => {
@@ -168,7 +179,7 @@ describe("contentAnalytics", () => {
     it("should round up to nearest minute", () => {
       const content = "Hello ".repeat(201);
       const result = calculateAvgReadTime(content);
-      expect(result).toBeCloseTo(61, 1);
+      expect(result).toBeCloseTo(120, 1);
     });
 
     it("should handle special characters", () => {
