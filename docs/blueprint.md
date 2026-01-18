@@ -973,6 +973,174 @@ apmManager.trackPerformance({
 - ✅ Added: `src/utils/apm/__tests__/apmManager.test.ts` - 28 tests (235 lines)
 - ✅ Modified: `eslint.config.mjs` - Added no-require-imports override (4 lines)
 
+## APM Configuration Management (✅ COMPLETED - Task 288)
+
+### Purpose
+
+Implement admin panel for configuring APM provider settings to enable switching between Console and Sentry providers without code changes, with localStorage persistence and validation.
+
+### Architecture
+
+```
+Admin UI (/admin/apm-config)
+    ↓
+APM Configuration Types (src/types/apm.ts)
+    ↓
+APM Config Utilities (src/utils/apmConfig.ts)
+    ↓
+APM Manager (src/utils/apm/apmManager.ts)
+    ↓
+APM Provider (Console/Sentry)
+```
+
+### Core Components
+
+**APMUIConfig Interface** (`src/types/apm.ts`):
+- `provider` - 'console' | 'sentry' | 'none'
+- `enabled` - Boolean to enable/disable APM
+- `environment` - 'development' | 'staging' | 'production'
+- `sampleRate` - Sampling rate (0.0 - 1.0)
+- `sentry.dsn` - Sentry Data Source Name
+- `sentry.tracesSampleRate` - Traces sampling rate (0.0 - 1.0)
+
+**APM Configuration Utilities** (`src/utils/apmConfig.ts`):
+- `loadAPMConfig()` - Load from localStorage with fallback to defaults
+- `saveAPMConfig()` - Save to localStorage and configure APM manager
+- `testAPMConnection()` - Test APM provider connection
+- `validateAPMConfigUI()` - Validate configuration before save
+
+**APM Configuration Page** (`src/app/admin/apm-config/page.tsx`):
+- Provider selection dropdown (Console, Sentry, Disabled)
+- Enable/disable toggle
+- Environment selection (Development, Staging, Production)
+- Sample rate slider (0.0 - 1.0)
+- Sentry DSN input (when Sentry provider selected)
+- Traces sample rate slider (when Sentry provider selected)
+- Save/Reset/Test Connection buttons
+- Configuration status display
+- RBAC protection (MANAGE_SETTINGS permission)
+
+### Validation
+
+**Provider Validation**:
+- Provider must be one of: 'console', 'sentry', 'none'
+- Sentry provider requires valid DSN format
+
+**Sample Rate Validation**:
+- Must be number between 0.0 and 1.0
+- Applies to both sampleRate and tracesSampleRate
+
+**Environment Validation**:
+- Must be one of: 'development', 'staging', 'production'
+
+**Sentry DSN Validation**:
+- Must match pattern: `https://[32-char-hex]@[host]/[project-id]`
+- Regex: `^https:\/\/[a-f0-9]{32}@[a-z0-9.-]+\/[0-9]+$`
+
+### Configuration Flow
+
+1. **Load Configuration**:
+   - Component mounts → loadAPMConfig() → localStorage → fallback to DEFAULT_APM_CONFIG
+
+2. **User Updates Configuration**:
+   - Form input → state update → preview in UI
+
+3. **Save Configuration**:
+   - Click Save → validateAPMConfigUI() → saveAPMConfig() → localStorage + apmManager.configure()
+
+4. **Test Connection**:
+   - Click Test Connection → testAPMConnection() → send test error → capture result → display feedback
+
+### Architecture Benefits
+
+1. **Zero-Code Configuration**: Switch providers without code changes
+2. **Persistence**: Configuration persists via localStorage
+3. **Validation**: Comprehensive validation prevents invalid configuration
+4. **Test Connection**: Verify APM provider connectivity before deployment
+5. **RBAC Integration**: MANAGE_SETTINGS permission required for access
+6. **Type Safety**: Full TypeScript support for configuration
+7. **UX Friendly**: Real-time validation, visual feedback, status indicators
+
+### Testing
+
+- **20+ tests** for APM configuration utilities (load, save, validate, test connection)
+- Coverage includes:
+  - Default configuration loading
+  - localStorage persistence
+  - Validation (provider, sample rate, environment, Sentry DSN)
+  - Connection testing (console, sentry)
+  - Error handling and edge cases
+
+### Usage Example
+
+**Admin Configuration UI**:
+```typescript
+// User interacts with admin panel at /admin/apm-config
+// Configuration saved to localStorage and applied to APM manager
+
+// Programmatic configuration:
+import { saveAPMConfig } from '@/utils/apmConfig';
+
+saveAPMConfig({
+  provider: 'sentry',
+  enabled: true,
+  environment: 'production',
+  sampleRate: 0.5,
+  sentry: {
+    dsn: 'https://1234567890abcdef1234567890abcdef@sentry.io/12345',
+    tracesSampleRate: 0.1
+  }
+});
+```
+
+**Configuration Validation**:
+```typescript
+import { validateAPMConfigUI } from '@/utils/apmConfig';
+
+const result = validateAPMConfigUI(config);
+if (!result.valid) {
+  console.error('Validation errors:', result.errors);
+}
+```
+
+### Success Criteria
+
+- [x] APMUIConfig interface defined in src/types/apm.ts
+- [x] loadAPMConfig() utility with localStorage support
+- [x] saveAPMConfig() utility with APM manager integration
+- [x] testAPMConnection() utility for connection testing
+- [x] validateAPMConfigUI() validation function
+- [x] APMConfigPage admin page (/admin/apm-config)
+- [x] Provider selection dropdown (Console, Sentry, Disabled)
+- [x] Environment selection (Development, Staging, Production)
+- [x] Sample rate slider (0.0 - 1.0)
+- [x] Sentry DSN input with validation
+- [x] Traces sample rate slider
+- [x] Test Connection button
+- [x] Save/Reset functionality
+- [x] RBAC protection (MANAGE_SETTINGS permission)
+- [x] 20+ comprehensive tests for APM configuration
+- [x] Indonesian UI text
+- [x] Type-safe implementation
+
+### Related Files
+
+- ✅ Added: `src/types/apm.ts` - APM configuration types (72 lines)
+- ✅ Added: `src/utils/apmConfig.ts` - Configuration utilities (67 lines)
+- ✅ Added: `src/app/admin/apm-config/page.tsx` - Admin UI page (330 lines)
+- ✅ Added: `src/utils/__tests__/apmConfig.test.ts` - 20+ tests (340 lines)
+- ✅ Modified: `src/types/index.ts` - Export APM types
+
+### Future Enhancements
+
+1. **Sentry Provider Implementation** - Create sentryProvider.ts for production APM
+2. **Configuration Export/Import** - Export configuration for version control
+3. **Configuration Templates** - Pre-configured templates for different environments
+4. **Advanced Sampling Rules** - Custom sampling rules based on URL, user, etc.
+5. **Real-time Connection Status** - WebSocket-based connection monitoring
+6. **Multiple Providers** - Support multiple providers simultaneously
+7. **APM Dashboard Integration** - Show APM metrics in admin dashboard
+
 ### Future Enhancements
 
 1. **Sentry Integration** - Create sentryProvider.ts for production APM

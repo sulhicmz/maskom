@@ -31,5 +31,8 @@ export * from './permission';
 // Role types (UserRole, RoleConfig, etc.)
 export * from './role';
 
+// APM types (APMUIConfig, APMValidationResult, etc.)
+export * from './apm';
+
 // SEO types (SeoProps, BlogPostSchema, etc.)
 export * from './seo';

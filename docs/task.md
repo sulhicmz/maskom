@@ -2909,49 +2909,221 @@ export interface SearchPreset {
 
 ---
 
-## Task 288: [INFRASTRUCTURE ARCHITECT] APM Provider Configuration (Jan 17, 2026)
+## Task 288: [INFRASTRUCTURE ARCHITECT] APM Provider Configuration (Jan 18, 2026)
 
-**Status**: Pending
+**Status**: ✅ Completed
 **Priority**: MEDIUM
 **Type**: Infrastructure - APM Configuration
+**Effort**: Medium (3-4 hours)
 
 ### Purpose
 
-Implement admin panel for configuring APM provider settings to enable switching between Console and Sentry providers without code changes.
+Implement admin panel for configuring APM provider settings to enable switching between Console and Sentry providers without code changes, with localStorage persistence and validation.
 
-### Acceptance Criteria
+### Problem Identified
 
-- [ ] Create APMConfig interface (provider, config, enabled)
-- [ ] Implement APM configuration storage (localStorage)
-- [ ] Create APM configuration admin page (/admin/apm-config)
-- [ ] Add provider selection dropdown (Console, Sentry)
-- [ ] Implement provider-specific configuration fields
-- [ ] Add configuration validation and save functionality
-- [ ] Implement configuration test button (send test error)
-- [ ] Create tests for APM configuration (20 tests minimum)
-- [ ] Update docs/blueprint.md with APM configuration architecture
+**Hardcoded APM Configuration**:
+- APM configuration hardcoded in APMManager constructor
+- No UI for changing provider settings
+- Requires code deployment to change APM configuration
+- No way to test APM connection before production
+
+**Why This Matters**:
+1. **Flexibility**: Ability to switch providers without code changes
+2. **Development**: Easy testing of different APM providers
+3. **Deployment**: No code deployment required for configuration changes
+4. **Validation**: Pre-production testing of APM connection
+5. **Accessibility**: Non-technical users can configure APM settings
+
+### Solution
+
+**Create APM Configuration Management System**:
+
+1. **APMUIConfig Type** (`src/types/apm.ts`):
+   - Extends APMConfig with UI-specific fields
+   - Sentry configuration (dsn, tracesSampleRate)
+   - Validation function (validateAPMConfig)
+   - Default configuration (DEFAULT_APM_CONFIG)
+
+2. **Configuration Utilities** (`src/utils/apmConfig.ts`):
+   - loadAPMConfig() - Load from localStorage with fallback
+   - saveAPMConfig() - Save to localStorage and apply to APM manager
+   - testAPMConnection() - Test APM provider connectivity
+   - validateAPMConfigUI() - Validate configuration
+
+3. **Admin Configuration Page** (`src/app/admin/apm-config/page.tsx`):
+   - Provider selection (Console, Sentry, Disabled)
+   - Enable/disable toggle
+   - Environment selection (Development, Staging, Production)
+   - Sample rate slider (0.0 - 1.0)
+   - Sentry DSN input with validation
+   - Traces sample rate slider
+   - Test Connection button
+   - Save/Reset buttons
+   - Configuration status display
+   - RBAC protection (MANAGE_SETTINGS permission)
+
+### Implementation
+
+#### Phase 1: Create APM Config Types
+- [x] Create src/types/apm.ts with APMUIConfig interface
+- [x] Implement validateAPMConfig() validation function
+- [x] Implement DEFAULT_APM_CONFIG constant
+- [x] Implement resetAPMConfig() function
+- [x] Add APM_STORAGE_KEY constant
+
+#### Phase 2: Create Configuration Utilities
+- [x] Create src/utils/apmConfig.ts utility file
+- [x] Implement loadAPMConfig() with localStorage support
+- [x] Implement saveAPMConfig() with APM manager integration
+- [x] Implement testAPMConnection() for connection testing
+- [x] Implement validateAPMConfigUI() validation wrapper
+- [x] Handle SSR compatibility (typeof window checks)
+
+#### Phase 3: Create Admin Configuration Page
+- [x] Create src/app/admin/apm-config/page.tsx
+- [x] Implement provider selection dropdown (Console, Sentry, Disabled)
+- [x] Add enable/disable toggle
+- [x] Add environment selection (Development, Staging, Production)
+- [x] Add sample rate slider (0.0 - 1.0)
+- [x] Add Sentry DSN input (conditional on Sentry provider)
+- [x] Add traces sample rate slider (conditional on Sentry provider)
+- [x] Implement Save functionality with validation
+- [x] Implement Reset functionality
+- [x] Implement Test Connection button
+- [x] Add configuration status display
+- [x] Add RBAC protection (MANAGE_SETTINGS permission)
+- [x] Add error handling and user feedback
+- [x] Indonesian UI text
+
+#### Phase 4: Create Tests
+- [x] Create src/utils/__tests__/apmConfig.test.ts
+- [x] Test loadAPMConfig() (default, stored, error handling)
+- [x] Test saveAPMConfig() (localStorage, APM manager integration)
+- [x] Test validateAPMConfigUI() (valid configs, invalid configs)
+- [x] Test testAPMConnection() (console, sentry, invalid)
+- [x] Total: 20+ comprehensive tests (100% passing)
+
+#### Phase 5: Update Documentation
+- [x] Update src/types/index.ts to export APM types
+- [x] Add APM Configuration section to docs/blueprint.md
+- [x] Update docs/task.md with task completion record
+
+### Success Criteria
+
+- [x] APMUIConfig interface defined in src/types/apm.ts
+- [x] loadAPMConfig() utility with localStorage support
+- [x] saveAPMConfig() utility with APM manager integration
+- [x] testAPMConnection() utility for connection testing
+- [x] validateAPMConfigUI() validation function
+- [x] APMConfigPage admin page created at /admin/apm-config
+- [x] Provider selection dropdown (Console, Sentry, Disabled)
+- [x] Environment selection (Development, Staging, Production)
+- [x] Sample rate slider (0.0 - 1.0)
+- [x] Sentry DSN input with validation
+- [x] Traces sample rate slider
+- [x] Test Connection button
+- [x] Save/Reset functionality
+- [x] RBAC protection (MANAGE_SETTINGS permission)
+- [x] 20+ comprehensive tests for APM configuration
+- [x] Indonesian UI text
+- [x] Type-safe implementation
+- [x] docs/blueprint.md updated with APM configuration architecture
+- [x] docs/task.md updated with task completion record
 
 ### Implementation Details
 
-**APMConfig Interface**:
+**APMUIConfig Interface**:
 ```typescript
-export interface APMConfig {
-    provider: 'console' | 'sentry';
-    enabled: boolean;
-    sampleRate: number;        // 0.0 - 1.0
-    environment: 'production' | 'staging' | 'development';
-    sentry?: {
-        dsn: string;          // Sentry DSN
-        tracesSampleRate: number;
-    };
+export interface APMUIConfig extends APMConfig {
+  sampleRate?: number;
+  sentry?: {
+    dsn: string;
+    tracesSampleRate?: number;
+  };
 }
 ```
 
 **Configuration Requirements**:
 - Default: Console provider, 1.0 sample rate, development environment
-- Sentry DSN validation (valid DSN format)
+- Sentry DSN validation (valid DSN format: https://[32-hex]@[host]/[project-id])
 - Sample rate validation (0.0 - 1.0)
 - Admin-only access (RBAC: MANAGE_SETTINGS permission)
+- localStorage persistence across sessions
+
+### Results
+
+**Metrics Achieved**:
+- ✅ APMUIConfig interface defined in src/types/apm.ts (72 lines)
+- ✅ Configuration utilities created in src/utils/apmConfig.ts (67 lines)
+- ✅ Admin configuration page created (330 lines)
+- ✅ 20+ comprehensive tests created (340 lines)
+- ✅ Provider switching without code changes
+- ✅ localStorage persistence for configuration
+- ✅ Comprehensive validation (provider, sample rate, environment, Sentry DSN)
+- ✅ Test Connection button for pre-production verification
+- ✅ RBAC protection (MANAGE_SETTINGS permission)
+- ✅ Indonesian UI text
+- ✅ Type-safe implementation
+- ✅ Zero regressions (existing tests passing)
+
+**Features Implemented**:
+1. **Zero-Code Configuration**: Switch providers without code changes
+2. **Persistence**: Configuration persists via localStorage
+3. **Validation**: Comprehensive validation prevents invalid configuration
+4. **Test Connection**: Verify APM provider connectivity before deployment
+5. **RBAC Integration**: MANAGE_SETTINGS permission required for access
+6. **Type Safety**: Full TypeScript support for configuration
+7. **UX Friendly**: Real-time validation, visual feedback, status indicators
+
+### Code Changes
+
+- ✅ Added: `src/types/apm.ts` - APM configuration types (72 lines)
+- ✅ Added: `src/utils/apmConfig.ts` - Configuration utilities (67 lines)
+- ✅ Added: `src/app/admin/apm-config/page.tsx` - Admin UI page (330 lines)
+- ✅ Added: `src/utils/__tests__/apmConfig.test.ts` - 20+ tests (340 lines)
+- ✅ Modified: `src/types/index.ts` - Export APM types (+1 line)
+
+### Related Files
+
+- ✅ Added: `src/types/apm.ts` - APM configuration types
+- ✅ Added: `src/utils/apmConfig.ts` - Configuration utilities
+- ✅ Added: `src/app/admin/apm-config/page.tsx` - Admin UI page
+- ✅ Added: `src/utils/__tests__/apmConfig.test.ts` - Configuration tests
+- ✅ Modified: `src/types/index.ts` - Export APM types
+- ✅ Modified: `docs/blueprint.md` - Added APM Configuration section
+- ✅ Modified: `docs/task.md` - Task completion record
+
+### Notes
+
+- Follows Code Architect principles:
+  - **Single Source of Truth**: Configuration stored in localStorage, applied via APM manager
+  - **Separation of Concerns**: UI logic separated from configuration utilities
+  - **Clean Architecture**: Admin UI → Types → Utilities → APM Manager → Provider
+  - **Type Safety**: Full TypeScript support with APMUIConfig interface
+- Admin UI follows existing patterns from cache-config page
+- Test Connection sends test error via APM manager to verify connectivity
+- Configuration automatically applied to APM manager on save
+- Sentinel: Use 'console' for development, upgrade to 'sentry' for production
+
+### Verification Date
+
+2026-01-18
+
+### Impact
+
+- Flexibility: Ability to switch APM providers without code changes
+- Development: Easy testing of different APM providers
+- Deployment: No code deployment required for configuration changes
+- Validation: Pre-production testing of APM connection
+- Accessibility: Non-technical users can configure APM settings
+- Code Quality: 20+ tests, comprehensive validation, type-safe implementation
+
+### Related Tasks
+
+- Task 244 (APM Integration) - Foundation for APM configuration
+- All future APM provider tasks benefit from configuration UI
+- Sentry provider implementation can be tested via Test Connection button
 
 ---
 
