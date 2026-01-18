@@ -13,13 +13,14 @@
  */
 
 import {
-  formatDate,
-  formatBlogDate,
-  formatCommentDate,
-  getTodayISO,
-  isValidISODate,
-  toISODate,
-} from "../dateFormat";
+   formatDate,
+   formatBlogDate,
+   formatCommentDate,
+   getTodayISO,
+   isValidISODate,
+   toISODate,
+   formatTimestamp,
+ } from "../dateFormat";
 
 describe("Date Formatting Utilities", () => {
   describe("isValidISODate", () => {
@@ -167,6 +168,45 @@ describe("Date Formatting Utilities", () => {
       const today = getTodayISO();
       const date = new Date(today);
       expect(isNaN(date.getTime())).toBe(false);
+    });
+  });
+
+  describe("formatTimestamp", () => {
+    it("formats ISO timestamp with date and time in Indonesian locale", () => {
+      const timestamp = "2024-03-15T14:30:00Z";
+      const formatted = formatTimestamp(timestamp);
+      expect(formatted).toContain("15");
+      expect(formatted).toContain("Mar");
+      expect(formatted).toContain("2024");
+      expect(formatted).toContain("14:30");
+    });
+
+    it("formats ISO timestamp with date and time in English locale", () => {
+      const timestamp = "2024-03-15T14:30:00Z";
+      const formatted = formatTimestamp(timestamp, "en-US");
+      expect(formatted).toContain("Mar");
+      expect(formatted).toContain("15");
+      expect(formatted).toContain("2024");
+      expect(formatted).toContain("2:30");
+    });
+
+    it("handles different timestamps", () => {
+      const timestamps = [
+        "2024-01-01T00:00:00Z",
+        "2024-06-15T12:30:00Z",
+        "2024-12-31T23:59:59Z",
+      ];
+      timestamps.forEach((timestamp) => {
+        const formatted = formatTimestamp(timestamp);
+        expect(formatted).toBeTruthy();
+        expect(typeof formatted).toBe("string");
+      });
+    });
+
+    it("handles ISO 8601 timestamps", () => {
+      const timestamp = "2024-03-15T14:30:00Z";
+      const formatted = formatTimestamp(timestamp);
+      expect(formatted).toMatch(/\d{2} \w{3} \d{4}, \d{2}:\d{2}/);
     });
   });
 
