@@ -59,6 +59,7 @@ describe('ActivityLogger', () => {
   }
 
   beforeEach(() => {
+    jest.resetModules()
     mockLocalStorage.clear()
     global.localStorage = mockLocalStorage as any
 
@@ -210,10 +211,40 @@ describe('ActivityLogger', () => {
 
     it('should handle malformed localStorage data', () => {
       mockLocalStorage.setItem('activity_logs', 'invalid json')
-
+      
       const logs = getLogs()
-
+      
       expect(logs).toEqual([])
+    })
+
+    it('should cache logs to avoid repeated localStorage reads', () => {
+      clearLogs()
+
+      logActivity('user-1', ActivityAction.LOGIN, 'auth')
+
+      const logs1 = getLogs()
+      const logs2 = getLogs()
+      const logs3 = getLogs()
+
+      expect(logs1).toBe(logs2)
+      expect(logs2).toBe(logs3)
+      expect(logs1).toHaveLength(1)
+      expect(logs1[0].userId).toBe('user-1')
+    })
+
+    it('should invalidate cache when new log is added', () => {
+      clearLogs()
+
+      logActivity('user-1', ActivityAction.LOGIN, 'auth')
+
+      const logs1 = getLogs()
+      expect(logs1).toHaveLength(1)
+
+      logActivity('user-2', ActivityAction.LOGOUT, 'auth')
+
+      const logs2 = getLogs()
+      expect(logs2).toHaveLength(2)
+      expect(logs2.length).toBeGreaterThan(logs1.length)
     })
   })
 
