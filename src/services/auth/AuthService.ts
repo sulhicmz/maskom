@@ -13,7 +13,7 @@ import {
 import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS, CIRCUIT_BREAKER_CONFIG } from '@/constants';
 import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
-import { v4 as uuidv4 } from 'uuid';
+import { generateUUID } from '@/utils/uuid';
 import { UserRole, isValidRole } from '@/types/role';
 import { Permission } from '@/types/permission';
 import { hasPermission as checkPermission } from '@/data/rolesData';
@@ -262,7 +262,7 @@ class AuthService implements IAuthService {
     }
 
     private generateUserId(): string {
-        return uuidv4();
+        return generateUUID();
     }
 
     private extractNameFromEmail(email: string): string {

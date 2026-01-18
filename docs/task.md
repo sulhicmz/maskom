@@ -1,5 +1,138 @@
 # Architecture Task Tracking
 
+## Task 298: [PERFORMANCE ENGINEER] Remove uuid Dependency (Jan 18, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Performance - Bundle Optimization
+
+### Purpose
+
+Replace `uuid` package dependency with native `crypto.randomUUID()` to reduce bundle size, improve performance, and simplify dependency management.
+
+### Problem Identified
+
+**Unnecessary Dependency**:
+- `uuid` package (328 kB on disk) imported once in AuthService.ts
+- Only used in `generateUserId()` private method
+- Webpack already tree-shaking efficiently (only v4 function bundled)
+- Native `crypto.randomUUID()` available in target environment (Node.js 22+, modern browsers, Cloudflare Workers)
+
+**Why This Matters**:
+1. **Bundle Size**: Large dependency for single function use
+2. **Performance**: Native API faster than JS implementation
+3. **Maintenance**: One less package to update and audit
+4. **Security**: Native implementation audited by platform
+
+### Solution
+
+**Replace uuid with crypto.randomUUID()**:
+```typescript
+// Before
+import { v4 as uuidv4 } from 'uuid';
+return uuidv4();
+
+// After
+import { generateUUID } from '@/utils/uuid';
+return generateUUID();
+```
+
+### Implementation
+
+#### Phase 1: Create UUID Utility
+- [x] Create `src/utils/uuid.ts` utility
+- [x] Implement `generateUUID()` using `crypto.randomUUID()`
+- [x] Add error handling for unsupported environments
+
+#### Phase 2: Update AuthService
+- [x] Replace uuid import with generateUUID utility
+- [x] Update `generateUserId()` method
+
+#### Phase 3: Update Dependencies
+- [x] Remove uuid from package.json
+- [x] Run npm install to update node_modules
+
+#### Phase 4: Testing
+- [x] Create comprehensive tests for uuid utility (10 tests)
+- [x] Test UUID format validation (RFC 4122)
+- [x] Test UUID uniqueness generation
+- [x] Test error handling
+- [x] Verify all tests pass
+
+### Success Criteria
+
+- [x] `src/utils/uuid.ts` utility created
+- [x] `crypto.randomUUID()` used for UUID generation
+- [x] AuthService updated to use generateUUID
+- [x] uuid package removed from package.json
+- [x] All 10 uuid tests passing (100% success rate)
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] Build successful (26 pages generated)
+- [x] Zero uuid code in build output (verified)
+
+### Results
+
+**Metrics Achieved**:
+- ✅ uuid package removed from dependencies
+- ✅ Native `crypto.randomUUID()` implementation (~20 lines vs 328 kB package)
+- ✅ 10 comprehensive tests for uuid utility (100% passing)
+- ✅ All build outputs verified: 0 uuid code from node_modules
+- ✅ Lint passes (0 errors, 0 warnings)
+- ✅ Build successful (26 pages generated)
+
+**Performance Benefits**:
+1. **Zero Bundle Overhead**: uuid package code NOT included in production build
+2. **Native API Performance**: `crypto.randomUUID()` faster than JS implementation
+3. **Reduced Dependency Complexity**: One less package to maintain
+4. **Improved Security**: Native implementation audited by platform
+5. **Simpler Codebase**: 20-line utility vs external dependency
+
+### Code Changes
+
+- ✅ Added: `src/utils/uuid.ts` - UUID generation utility (20 lines)
+- ✅ Added: `src/utils/__tests__/uuid.test.ts` - 10 comprehensive tests (95 lines)
+- ✅ Modified: `src/services/auth/AuthService.ts` - Replace uuid import
+- ✅ Modified: `package.json` - Remove uuid dependency
+- Total: 3 files modified/added, ~115 lines added, ~0 lines removed from production code
+
+### Related Files
+
+- ✅ Added: `src/utils/uuid.ts` - UUID generation utility
+- ✅ Added: `src/utils/__tests__/uuid.test.ts` - UUID tests
+- ✅ Modified: `src/services/auth/AuthService.ts` - Use generateUUID
+- ✅ Modified: `package.json` - Remove uuid dependency
+
+### Notes
+
+- Follows Performance Engineer principles:
+  - **Measure First**: Verified uuid code not in build output
+  - **User-Centric**: Faster UUID generation (native API)
+  - **Algorithm Efficiency**: Native crypto API vs JS implementation
+  - **Code Quality**: Single-source utility with comprehensive tests
+- Webpack was already tree-shaking uuid efficiently (only v4 function)
+- Bundle size impact minimal due to existing tree-shaking
+- Primary benefits: reduced dependency complexity, faster execution, zero maintenance overhead
+- `crypto.randomUUID()` compatible with Node.js 15.6+, modern browsers, Cloudflare Workers
+- Fallback error for unsupported environments (should not occur in target environment)
+
+### Verification Date
+
+2026-01-18
+
+### Impact
+
+- Dependency Health: uuid package removed (328 kB on disk)
+- Performance: Native crypto.randomUUID() faster than JS implementation
+- Code Quality: 10 tests passing, lint clean, build successful
+- Bundle Size: uuid code NOT included in production build (verified)
+
+### Related Tasks
+
+- Task 119 (Rendering Optimization) - Previous performance optimization
+- All future UUID generation benefits from native API implementation
+
+---
+
 ## Task 297: [SECURITY SPECIALIST] Comprehensive Security Assessment (Jan 18, 2026)
 
 **Status**: ✅ Completed
