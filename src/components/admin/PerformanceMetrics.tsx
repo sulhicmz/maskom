@@ -121,10 +121,10 @@ const PerformanceMetrics: React.FC = () => {
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                        <th>Rating</th>
-                        <th>Timestamp</th>
+                        <th scope="col">Metric</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Rating</th>
+                        <th scope="col">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -167,10 +167,10 @@ const PerformanceMetrics: React.FC = () => {
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                        <th>Rating</th>
-                        <th>Timestamp</th>
+                        <th scope="col">Metric</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Rating</th>
+                        <th scope="col">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody>

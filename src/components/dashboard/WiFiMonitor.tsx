@@ -1,15 +1,30 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { WiFiDevice } from "@/types/data";
 import { getOfflineDevices, getDeviceStats } from "@/utils/deviceFilters";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface WiFiMonitorProps {
   devices: WiFiDevice[];
   ssid?: string;
+  isLoading?: boolean;
 }
 
-const WiFiMonitor = ({ devices, ssid = "Maskom WiFi" }: WiFiMonitorProps) => {
+const WiFiMonitor = ({ devices, ssid = "Maskom WiFi", isLoading = false }: WiFiMonitorProps) => {
+  const [isMounted, setIsMounted] = useState(false);
   const offlineDevices = useMemo(() => getOfflineDevices(devices), [devices]);
   const { onlineCount } = useMemo(() => getDeviceStats(devices), [devices]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || isLoading) {
+    return (
+      <section className="wifi-monitor" aria-label="WiFi Network Monitor">
+        <LoadingSpinner minHeight={300} color="primary" />
+      </section>
+    );
+  }
 
    return (
       <section className="wifi-monitor" aria-label="WiFi Network Monitor">
@@ -43,13 +58,21 @@ const WiFiMonitor = ({ devices, ssid = "Maskom WiFi" }: WiFiMonitorProps) => {
                </tr>
             </thead>
             <tbody>
-               {devices.map(device => (
-                  <tr key={device.id}>
-                     <td>{device.name}</td>
-                     <td>{device.ip}</td>
-                     <td aria-label={`Device status: ${device.status}`}>{device.status}</td>
+               {devices.length === 0 ? (
+                  <tr>
+                     <td colSpan={3} className="text-center text-muted">
+                        No devices connected
+                     </td>
                   </tr>
-               ))}
+               ) : (
+                  devices.map(device => (
+                     <tr key={device.id}>
+                        <td>{device.name}</td>
+                        <td>{device.ip}</td>
+                        <td aria-label={`Device status: ${device.status}`}>{device.status}</td>
+                     </tr>
+                  ))
+               )}
             </tbody>
          </table>
       </section>

@@ -19,7 +19,7 @@ const StatusBadge = ({ type, children, className = '' }: StatusBadgeProps) => {
   }
 
   return (
-    <span className={`status-badge ${colorMap[type]} ${className}`}>
+    <span className={`status-badge ${colorMap[type]} ${className}`} role="status">
       {children}
     </span>
   )
