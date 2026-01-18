@@ -1,20 +1,6 @@
 import authService from '../AuthService';
-import type { User } from '../types';
-import { UserRole } from '@/types/role';
-import { MFAStatus } from '@/types/mfa';
 
 describe('AuthService MFA Methods', () => {
-  let mockUser: User;
-
-  beforeEach(() => {
-    mockUser = {
-      id: 'user-123',
-      name: 'Test User',
-      email: 'test@example.com',
-      role: 'user',
-      mfaEnabled: false,
-    };
-  });
 
   afterEach(() => {
     authService.logout();

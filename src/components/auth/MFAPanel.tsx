@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Button from '@/components/common/Button';
+import Button from '@/components/ui/Button';
 import authService from '@/services/auth/AuthService';
 import MFASetup from './MFASetup';
 import type { MFAStatus } from '@/types/mfa';
@@ -48,7 +48,7 @@ export default function MFAPanel() {
       } else {
         setError(result.error || 'Gagal menonaktifkan MFA');
       }
-    } catch (err) {
+    } catch {
       setError('Terjadi kesalahan saat menonaktifkan MFA');
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function MFAPanel() {
       } else {
         setError(result.error || 'Gagal membuat ulang kode cadangan');
       }
-    } catch (err) {
+    } catch {
       setError('Terjadi kesalahan saat membuat ulang kode cadangan');
     } finally {
       setLoading(false);

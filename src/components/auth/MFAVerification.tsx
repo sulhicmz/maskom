@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Button from '@/components/common/Button';
+import Button from '@/components/ui/Button';
 import authService from '@/services/auth/AuthService';
 import type { AuthResult } from '@/services/auth/types';
 
@@ -29,7 +29,7 @@ export default function MFAVerification({ email, onVerify, onUseBackupCode }: MF
       } else {
         setError(result.error || 'Kode TOTP tidak valid');
       }
-    } catch (err) {
+    } catch {
       setError('Terjadi kesalahan saat memverifikasi MFA');
     } finally {
       setLoading(false);

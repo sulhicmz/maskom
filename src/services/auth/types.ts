@@ -1,4 +1,4 @@
-import type { ServiceErrorCodeType, UserRole, Permission, MFAData, MFAStatus } from '@/types';
+import type { ServiceErrorCodeType, UserRole, Permission, MFAStatus } from '@/types';
 import type { CircuitBreakerState } from '@/utils/resilience';
 
 export interface IAuthService {

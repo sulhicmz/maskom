@@ -133,6 +133,7 @@ class AuthService implements IAuthService {
             name: userData.name,
             email: userData.email,
             role,
+            mfaEnabled: false,
         };
 
         return {

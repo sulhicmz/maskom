@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Button from '@/components/common/Button';
+import { useState } from 'react';
+import Image from 'next/image';
+import Button from '@/components/ui/Button';
 import authService from '@/services/auth/AuthService';
 import type { MFASetupData } from '@/services/auth/types';
 
@@ -31,7 +32,7 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
       } else {
         setError(result.error || 'Gagal menginisialisasi MFA');
       }
-    } catch (err) {
+    } catch {
       setError('Terjadi kesalahan saat menginisialisasi MFA');
     } finally {
       setLoading(false);
@@ -52,7 +53,7 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
       } else {
         setError(result.error || 'Kode TOTP tidak valid');
       }
-    } catch (err) {
+    } catch {
       setError('Terjadi kesalahan saat memverifikasi MFA');
     } finally {
       setLoading(false);
@@ -101,10 +102,13 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
         </p>
         
         <div className="mfa-setup__qr">
-          <img 
+          <Image 
             src={setupData.qrCodeUrl} 
             alt="QR Code for MFA" 
+            width={200}
+            height={200}
             className="mfa-setup__qr-image"
+            unoptimized
           />
         </div>
         
