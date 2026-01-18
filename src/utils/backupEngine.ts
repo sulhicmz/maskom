@@ -479,12 +479,11 @@ class BackupEngine {
 
       const encryptedDataArray = new Uint8Array(encryptedData)
       const combined = new Uint8Array(
-<<<<<<< HEAD
-        iv.length + keyBuffer.length + encryptedDataArray.length,
+        iv.length + keyBuffer.byteLength + encryptedData.byteLength,
       )
       combined.set(iv, 0)
-      combined.set(keyBuffer, iv.length)
-      combined.set(encryptedDataArray, iv.length + keyBuffer.length)
+      combined.set(new Uint8Array(keyBuffer), iv.length)
+      combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.byteLength)
 =======
         iv.length + keyBuffer.byteLength + encryptedData.byteLength,
       )
