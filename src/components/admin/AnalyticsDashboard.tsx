@@ -127,12 +127,12 @@ const AnalyticsDashboard: React.FC = () => {
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>Form Type</th>
-                        <th>Total</th>
-                        <th>Successful</th>
-                        <th>Failed</th>
-                        <th>Success Rate</th>
-                        <th>Avg Completion Time</th>
+                        <th scope="col">Form Type</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Successful</th>
+                        <th scope="col">Failed</th>
+                        <th scope="col">Success Rate</th>
+                        <th scope="col">Avg Completion Time</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -158,11 +158,11 @@ const AnalyticsDashboard: React.FC = () => {
                   <table className="table table-hover">
                     <thead>
                       <tr>
-                        <th>Page</th>
-                        <th>Total Views</th>
-                        <th>Unique Views</th>
-                        <th>Avg Time on Page</th>
-                        <th>Bounce Rate</th>
+                        <th scope="col">Page</th>
+                        <th scope="col">Total Views</th>
+                        <th scope="col">Unique Views</th>
+                        <th scope="col">Avg Time on Page</th>
+                        <th scope="col">Bounce Rate</th>
                       </tr>
                     </thead>
                     <tbody>
