@@ -114,13 +114,13 @@ const MFAPanel = () => {
       <h2>Pengaturan Autentikasi Dua Faktor</h2>
       
       {message && (
-        <div className="mfa-panel__message mfa-panel__message--success">
+        <div className="mfa-panel__message mfa-panel__message--success" role="status" aria-live="polite">
           {message}
         </div>
       )}
-      
+
       {error && (
-        <div className="mfa-panel__message mfa-panel__message--error">
+        <div className="mfa-panel__message mfa-panel__message--error" role="alert" aria-live="assertive">
           {error}
         </div>
       )}
@@ -144,7 +144,7 @@ const MFAPanel = () => {
           <p className="mfa-panel__description">
             Aktifkan autentikasi dua faktor untuk keamanan akun tambahan. Anda akan memerlukan aplikasi otentikator seperti Google Authenticator atau Authy.
           </p>
-          <Button onClick={() => setShowSetup(true)}>
+          <Button onClick={() => setShowSetup(true)} ariaLabel="Aktifkan autentikasi dua faktor">
             Aktifkan MFA
           </Button>
         </div>
@@ -171,13 +171,13 @@ const MFAPanel = () => {
                   {newBackupCodes.map((code, index) => (
                     <li key={index} className="mfa-panel__backup-item">
                       <code>{code}</code>
-                      <Button variant="text" size="small" onClick={() => handleCopyBackupCode(code)}>
+                      <Button variant="text" size="small" onClick={() => handleCopyBackupCode(code)} ariaLabel="Salin kode cadangan">
                         Salin
                       </Button>
                     </li>
                   ))}
                 </ul>
-                <Button variant="text" onClick={handleCopyAllBackupCodes}>
+                <Button variant="text" onClick={handleCopyAllBackupCodes} ariaLabel="Salin semua kode cadangan">
                   Salin Semua Kode
                 </Button>
               </div>
@@ -196,7 +196,7 @@ const MFAPanel = () => {
                     disabled={loading}
                   />
                 </div>
-                <Button type="submit" disabled={loading || !disablePassword}>
+                <Button type="submit" disabled={loading || !disablePassword} ariaLabel="Buat ulang kode cadangan MFA">
                   {loading ? 'Memproses...' : 'Buat Ulang Kode Cadangan'}
                 </Button>
               </form>
@@ -225,19 +225,19 @@ const MFAPanel = () => {
                   />
                 </div>
                 <div className="mfa-panel__actions-row">
-                  <Button type="submit" disabled={loading || !disablePassword}>
+                  <Button type="submit" disabled={loading || !disablePassword} ariaLabel="Nonaktifkan autentikasi dua faktor">
                     {loading ? 'Memproses...' : 'Nonaktifkan MFA'}
                   </Button>
                   <Button variant="secondary" onClick={() => {
                     setShowDisable(false);
                     setDisablePassword('');
-                  }}>
+                  }} ariaLabel="Batal nonaktifkan MFA">
                     Batal
                   </Button>
                 </div>
               </form>
             ) : (
-              <Button variant="danger" onClick={() => setShowDisable(true)}>
+              <Button variant="danger" onClick={() => setShowDisable(true)} ariaLabel="Mulai proses nonaktifkan MFA">
                 Nonaktifkan MFA
               </Button>
             )}
@@ -255,7 +255,7 @@ const MFAPanel = () => {
             </p>
           </div>
           
-          <Button onClick={() => setShowSetup(true)}>
+          <Button onClick={() => setShowSetup(true)} ariaLabel="Aktifkan autentikasi dua faktor sekarang">
             Aktifkan MFA Sekarang
           </Button>
         </div>

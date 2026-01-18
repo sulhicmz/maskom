@@ -63,17 +63,17 @@ export default function MFAVerification({ email, onVerify, onUseBackupCode }: MF
           />
         </div>
         
-        {error && <p className="error-message mfa-verification__error">{error}</p>}
+        {error && <p className="error-message mfa-verification__error" role="alert" aria-live="assertive">{error}</p>}
         
         <div className="mfa-verification__actions">
-          <Button type="submit" disabled={loading || totpCode.length !== 6}>
+          <Button type="submit" disabled={loading || totpCode.length !== 6} ariaLabel="Verifikasi kode MFA">
             {loading ? 'Memverifikasi...' : 'Verifikasi'}
           </Button>
         </div>
 
         {onUseBackupCode && (
           <div className="mfa-verification__backup">
-            <Button variant="text" onClick={onUseBackupCode}>
+            <Button variant="text" onClick={onUseBackupCode} ariaLabel="Gunakan kode cadangan MFA">
               Gunakan Kode Cadangan
             </Button>
           </div>

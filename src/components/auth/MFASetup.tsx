@@ -79,16 +79,16 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
           Aktifkan autentikasi dua faktor (2FA) untuk keamanan akun tambahan. Anda akan memerlukan aplikasi otentikator seperti Google Authenticator atau Authy.
         </p>
         <div className="mfa-setup__actions">
-          <Button onClick={handleInitiate} disabled={loading}>
+          <Button onClick={handleInitiate} disabled={loading} ariaLabel="Mulai pengaturan MFA">
             {loading ? 'Memuat...' : 'Mulai Pengaturan'}
           </Button>
           {onCancel && (
-            <Button variant="secondary" onClick={onCancel}>
+            <Button variant="secondary" onClick={onCancel} ariaLabel="Batal pengaturan MFA">
               Batal
             </Button>
           )}
         </div>
-        {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message" role="alert" aria-live="assertive">{error}</p>}
       </div>
     );
   }
@@ -137,13 +137,13 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
             />
           </div>
           
-          {error && <p className="error-message">{error}</p>}
+        {error && <p className="error-message" role="alert" aria-live="assertive">{error}</p>}
           
           <div className="mfa-setup__actions">
-            <Button type="submit" disabled={loading || totpCode.length !== 6}>
+            <Button type="submit" disabled={loading || totpCode.length !== 6} ariaLabel="Verifikasi dan aktifkan MFA">
               {loading ? 'Memverifikasi...' : 'Verifikasi & Aktifkan'}
             </Button>
-            <Button variant="secondary" onClick={onCancel}>
+            <Button variant="secondary" onClick={onCancel} ariaLabel="Batal verifikasi MFA">
               Batal
             </Button>
           </div>
@@ -164,10 +164,11 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
         <div className="mfa-setup__backup-codes">
           <div className="mfa-setup__backup-header">
             <h4>Kode Cadangan</h4>
-            <Button 
-              variant="text" 
+            <Button
+              variant="text"
               size="small"
               onClick={() => setBackupCodesVisible(!backupCodesVisible)}
+              ariaLabel={backupCodesVisible ? 'Sembunyikan kode cadangan' : 'Tampilkan kode cadangan'}
             >
               {backupCodesVisible ? 'Sembunyikan' : 'Tampilkan'}
             </Button>
@@ -180,7 +181,7 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
               </p>
               
               <div className="mfa-setup__backup-actions">
-                <Button variant="text" size="small" onClick={handleCopyAllBackupCodes}>
+                <Button variant="text" size="small" onClick={handleCopyAllBackupCodes} ariaLabel="Salin semua kode cadangan">
                   Salin Semua Kode
                 </Button>
               </div>
@@ -189,10 +190,11 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
                 {setupData.backupCodes.map((code, index) => (
                   <li key={index} className="mfa-setup__backup-item">
                     <code>{code}</code>
-                    <Button 
-                      variant="text" 
+                    <Button
+                      variant="text"
                       size="small"
                       onClick={() => handleCopyBackupCode(code)}
+                      ariaLabel="Salin kode cadangan"
                     >
                       Salin
                     </Button>
@@ -204,7 +206,7 @@ const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
         </div>
 
         <div className="mfa-setup__actions">
-          <Button onClick={onCancel}>
+          <Button onClick={onCancel} ariaLabel="Tutup pengaturan MFA">
             Selesai
           </Button>
         </div>
