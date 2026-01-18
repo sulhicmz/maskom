@@ -321,9 +321,18 @@ export interface DataRelationship {
 - ✅ Bundle size optimization - First Load JS reduced by 104 kB (25% improvement) via jspdf async loading (Task 281)
 - ✅ Bundle size optimization - First Load JS reduced by 46 kB (14.6% improvement) via html2canvas async loading (Task 284)
 - ✅ Webpack code splitting - framework, nextCore, nextIntl, forms, swiper, toastify, paginate, modalVideo, emailjs, jspdf, html2canvas chunks (Task 281, Task 284)
-- ✅ Lazy loading of heavy libraries - ExportButton, forms, swiper, toastify loaded on demand (Task 275, Task 119)
-- ✅ React.memo optimization - WiFiMonitor, BlogArea, ContactArea, WebsiteBuilder, UseCases, AboutArea, FormField, FormSubmissionRow, PageViewRow (Task 119, Task 235, Task 239)
-
+ - ✅ Lazy loading of heavy libraries - ExportButton, forms, swiper, toastify loaded on demand (Task 275, Task 119)
+ - ✅ React.memo optimization - WiFiMonitor, BlogArea, ContactArea, WebsiteBuilder, UseCases, AboutArea, FormField, FormSubmissionRow, PageViewRow (Task 119, Task 235, Task 239)
+ - ✅ **Web Vitals API Integration** (COMPLETE - Task 286):
+   - ✅ Real-time Core Web Vitals tracking (LCP, CLS, INP, FCP, TTFB)
+   - ✅ localStorage persistence for historical data (max 50 entries)
+   - ✅ Performance score calculation (Good, Needs Improvement, Poor)
+   - ✅ Performance threshold alerts (LCP > 4.0s, INP > 500ms, CLS > 0.25, FCP > 3.0s, TTFB > 1.8s)
+   - ✅ Analytics dashboard integration with real-time metrics display
+   - ✅ 17 comprehensive tests for localStorage functions (100% passing)
+   - ✅ WebVitalsReporter component for automatic initialization in layout
+   - ✅ Historical data tracking across sessions for trend analysis
+ 
 ### Data Integrity Best Practices
 
 1. **Schema First**: Define TypeScript interfaces before creating data files
@@ -1390,32 +1399,90 @@ export class ServiceNetworkError extends ServiceException { ... }
 - `details` field for additional context
 - Type guard function: `isServiceException(error)`
 
-### API Route Resilience
+### API Route Resilience (✅ COMPLETED - Task 291)
 
-**API Routes with Timeout Protection**:
+**API Routes with Full Resilience Protection**:
 
-| Route | Timeout | Purpose |
-|--------|----------|---------|
-| GET /api/health | 5000ms | Prevent slow health checks from cascading |
-| GET /api/metrics | 5000ms | Metrics retrieval should be fast (in-memory data) |
-| GET /api/services/status | 5000ms | Status check should return quickly |
+| Route | Timeout | Circuit Breaker | Retry | Purpose |
+|--------|----------|------------------|--------|---------|
+| GET /api/health | 5000ms | 3 failures, 30s reset | Yes | Prevent slow health checks from cascading |
+| GET /api/metrics | 5000ms | 3 failures, 30s reset | Yes | Metrics retrieval should be fast (in-memory data) |
+| GET /api/services/status | 5000ms | 3 failures, 30s reset | Yes | Status check should return quickly |
 
 **Design Rationale**:
-- All API routes use `withTimeout` wrapper
-- `TIMEOUTS.API_ROUTE` constant ensures consistency
-- Timeout prevents slow routes from blocking monitoring systems
+- All API routes use centralized `executeApiRoute` handler
+- Circuit breaker pattern prevents cascading failures
+- Retry logic with exponential backoff for transient failures (network, timeout, 503)
+- `CIRCUIT_BREAKER_CONFIG.API_ROUTES` constants ensure consistency
 - Error responses use `createServiceErrorResponse` for consistent format
+- Metrics collection for monitoring and observability
 
-**Example**: `/api/health/route.ts`
+**Resilience Patterns Implemented**:
+- ✅ **Circuit Breaker**: Protects against repeated failures (3 failure threshold)
+- ✅ **Retry Logic**: Exponential backoff on transient failures (max 3 attempts)
+- ✅ **Timeout Protection**: Prevents slow routes from blocking (5000ms default)
+- ✅ **Error Classification**: Distinguishes between timeout, network, circuit_breaker errors
+- ✅ **Centralized Error Handler**: Consistent error responses across all routes
+- ✅ **Circuit Breaker State Management**: Track and reset circuit breakers per route
+
+**Example**: `/api/health/route.ts` (after Task 291)
 ```typescript
-const healthCheckData = await withTimeout(
-    Promise.resolve().then(async () => { /* health check logic */ }),
-    {
-        timeoutMs: TIMEOUTS.API_ROUTE,
-        timeoutError: 'Health check operation timed out'
-    }
-);
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const thresholdParam = searchParams.get('threshold');
+    const threshold = thresholdParam ? parseFloat(thresholdParam) : DEFAULT_SUCCESS_RATE_THRESHOLD;
+
+    return executeApiRoute({
+        operationName: 'HealthCheck.GET',
+        circuitBreakerConfig: CIRCUIT_BREAKER_CONFIG.API_ROUTES.HEALTH_CHECK,
+        handler: async () => {
+            const allHealthChecks: HealthCheckResult[] = metricsCollector.getAllHealthChecks(threshold);
+            const overallHealth = allHealthChecks.every(check => check.healthy);
+
+            const response = {
+                status: overallHealth ? 'healthy' : 'degraded',
+                timestamp: new Date().toISOString(),
+                services: allHealthChecks,
+                summary: {
+                    totalServices: allHealthChecks.length,
+                    healthyServices: allHealthChecks.filter(c => c.healthy).length,
+                    unhealthyServices: allHealthChecks.filter(c => !c.healthy).length,
+                    successRateThreshold: threshold
+                }
+            };
+
+            const status = overallHealth ? 200 : 503;
+
+            return createServiceResponse({
+                data: response,
+                message: overallHealth ? 'All services healthy' : 'One or more services degraded',
+                status
+            });
+        }
+    });
+}
 ```
+
+**API Route Handler Utility** (`src/utils/apiRouteHandler.ts`):
+- `executeApiRoute<T>()` - Centralized handler with circuit breaker, retry, and error handling
+- `getCircuitBreakerState(routeName)` - Query circuit breaker state for monitoring
+- `resetCircuitBreaker(routeName)` - Reset specific circuit breaker (admin function)
+- `resetAllCircuitBreakers()` - Reset all circuit breakers (emergency function)
+
+**Retry Configuration** (from `RETRY_CONFIG` constants):
+- `maxAttempts`: 3
+- `baseDelayMs`: 1000ms
+- `maxDelayMs`: 10000ms
+- `backoffMultiplier`: 2
+- `retryableErrors`: [/network/i, /timeout/i, /ECONN/i, /503/i]
+
+**Error Response Codes**:
+| Error Type | HTTP Status | Message |
+|------------|--------------|----------|
+| Circuit Breaker Open | 503 | Service temporarily unavailable |
+| Timeout | 504 | Request timed out |
+| Network Error | 503 | Network error occurred |
+| Unknown Error | 500 | Internal server error |
 
 ### Monitoring & Observability
 

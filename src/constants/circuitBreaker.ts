@@ -8,6 +8,23 @@ export const CIRCUIT_BREAKER_CONFIG = {
         failureThreshold: 50,
         resetTimeoutMs: 60000,
         monitoringPeriodMs: 60000
+    },
+    API_ROUTES: {
+        HEALTH_CHECK: {
+            failureThreshold: 3,
+            resetTimeoutMs: 30000,
+            monitoringPeriodMs: 60000
+        },
+        METRICS: {
+            failureThreshold: 3,
+            resetTimeoutMs: 30000,
+            monitoringPeriodMs: 60000
+        },
+        SERVICES_STATUS: {
+            failureThreshold: 3,
+            resetTimeoutMs: 30000,
+            monitoringPeriodMs: 60000
+        }
     }
 } as const;
 
