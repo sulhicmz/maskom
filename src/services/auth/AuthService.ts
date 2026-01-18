@@ -1,4 +1,4 @@
-import type { IAuthService, LoginCredentials, RegisterData, User, AuthResult } from './types';
+import type { IAuthService, LoginCredentials, RegisterData, User, AuthResult, MFASetupData } from './types';
 import { validateEmail, validatePassword } from '@/utils/validation';
 import { RateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
@@ -17,12 +17,15 @@ import { generateUUID } from '@/utils/uuid';
 import { UserRole, isValidRole } from '@/types/role';
 import { Permission } from '@/types/permission';
 import { hasPermission as checkPermission } from '@/data/rolesData';
+import { verifyTOTP, createMFASetupData } from '@/utils/mfa';
+import type { MFAStatus } from '@/types/mfa';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;
     private loginRateLimiter: RateLimiter;
     private registerRateLimiter: RateLimiter;
     private circuitBreaker: CircuitBreaker;
+    private mfaSetupData: MFASetupData | null = null;
 
     constructor() {
         this.loginRateLimiter = new RateLimiter(RATE_LIMITS.LOGIN);
@@ -78,7 +81,26 @@ class AuthService implements IAuthService {
             name: this.extractNameFromEmail(credentials.email),
             email: credentials.email,
             role,
+            mfaEnabled: false,
         };
+
+        const mfaStatus = await this.getMFAStatus();
+
+        if (mfaStatus === 'required' && !credentials.totpCode) {
+            return {
+                success: false,
+                message: 'MFA diperlukan untuk peran admin',
+                errorCode: ServiceErrorCode.VALIDATION,
+                user: this.currentUser,
+            };
+        }
+
+        if (credentials.totpCode && mfaStatus === 'required') {
+            const mfaResult = await this.verifyMFA(credentials.totpCode);
+            if (!mfaResult.success) {
+                return mfaResult;
+            }
+        }
 
         return {
             success: true,
@@ -285,6 +307,204 @@ class AuthService implements IAuthService {
         return nameParts
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
+    }
+
+    async enableMFA(totpCode: string): Promise<AuthResult> {
+        try {
+            if (!this.currentUser) {
+                return createErrorResult('User not authenticated', ServiceErrorCode.VALIDATION);
+            }
+
+            if (!this.mfaSetupData) {
+                return createErrorResult('MFA setup not initiated', ServiceErrorCode.VALIDATION);
+            }
+
+            const isValid = await verifyTOTP({
+                secret: this.mfaSetupData.secret,
+                code: totpCode,
+            });
+
+            if (!isValid) {
+                return createErrorResult('Invalid TOTP code', ServiceErrorCode.VALIDATION);
+            }
+
+            this.currentUser.mfaEnabled = true;
+            this.currentUser.mfaSecret = this.mfaSetupData.secret;
+            this.currentUser.mfaBackupCodes = this.mfaSetupData.backupCodes;
+            this.currentUser.mfaEnabledAt = new Date().toISOString();
+            this.mfaSetupData = null;
+
+            logServiceSuccess('AuthService', 'enableMFA');
+
+            return {
+                success: true,
+                message: 'MFA berhasil diaktifkan',
+                user: this.currentUser,
+            };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat mengaktifkan MFA';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'enableMFA' });
+            
+            return createErrorResult(errorMessage);
+        }
+    }
+
+    async disableMFA(password: string): Promise<AuthResult> {
+        try {
+            if (!this.currentUser) {
+                return createErrorResult('User not authenticated', ServiceErrorCode.VALIDATION);
+            }
+
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                return createErrorResult(passwordValidation.error || 'Invalid password', ServiceErrorCode.VALIDATION);
+            }
+
+            this.currentUser.mfaEnabled = false;
+            this.currentUser.mfaSecret = undefined;
+            this.currentUser.mfaBackupCodes = undefined;
+            this.currentUser.mfaEnabledAt = undefined;
+
+            logServiceSuccess('AuthService', 'disableMFA');
+
+            return {
+                success: true,
+                message: 'MFA berhasil dinonaktifkan',
+                user: this.currentUser,
+            };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat menonaktifkan MFA';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'disableMFA' });
+            
+            return createErrorResult(errorMessage);
+        }
+    }
+
+    async verifyMFA(totpCode: string, backupCode?: string): Promise<AuthResult> {
+        try {
+            if (!this.currentUser || !this.currentUser.mfaEnabled) {
+                return createErrorResult('MFA not enabled', ServiceErrorCode.VALIDATION);
+            }
+
+            if (backupCode) {
+                if (!this.currentUser.mfaBackupCodes || !this.currentUser.mfaBackupCodes.includes(backupCode)) {
+                    return createErrorResult('Invalid backup code', ServiceErrorCode.VALIDATION);
+                }
+
+                this.currentUser.mfaBackupCodes = this.currentUser.mfaBackupCodes.filter(code => code !== backupCode);
+
+                logServiceSuccess('AuthService', 'verifyMFA (backup code)');
+
+                return {
+                    success: true,
+                    message: 'Backup code verified',
+                    user: this.currentUser,
+                };
+            }
+
+            if (!this.currentUser.mfaSecret) {
+                return createErrorResult('MFA secret not found', ServiceErrorCode.VALIDATION);
+            }
+
+            const isValid = await verifyTOTP({
+                secret: this.currentUser.mfaSecret,
+                code: totpCode,
+            });
+
+            if (!isValid) {
+                return createErrorResult('Invalid TOTP code', ServiceErrorCode.VALIDATION);
+            }
+
+            logServiceSuccess('AuthService', 'verifyMFA');
+
+            return {
+                success: true,
+                message: 'MFA berhasil diverifikasi',
+                user: this.currentUser,
+            };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat memverifikasi MFA';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'verifyMFA' });
+            
+            return createErrorResult(errorMessage);
+        }
+    }
+
+    async getMFAStatus(): Promise<MFAStatus> {
+        if (!this.currentUser) {
+            return 'disabled';
+        }
+
+        if (this.currentUser.role === 'admin' && !this.currentUser.mfaEnabled) {
+            return 'required';
+        }
+
+        return this.currentUser.mfaEnabled ? 'enabled' : 'disabled';
+    }
+
+    async regenerateBackupCodes(password: string): Promise<AuthResult> {
+        try {
+            if (!this.currentUser || !this.currentUser.mfaEnabled) {
+                return createErrorResult('MFA not enabled', ServiceErrorCode.VALIDATION);
+            }
+
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                return createErrorResult(passwordValidation.error || 'Invalid password', ServiceErrorCode.VALIDATION);
+            }
+
+            const newBackupCodes = await (await import('@/utils/mfa')).generateBackupCodes();
+            this.currentUser.mfaBackupCodes = newBackupCodes;
+
+            logServiceSuccess('AuthService', 'regenerateBackupCodes');
+
+            return {
+                success: true,
+                message: 'Kode cadangan berhasil dibuat ulang',
+                user: this.currentUser,
+                metadata: {
+                    backupCodes: newBackupCodes,
+                },
+            };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat membuat ulang kode cadangan';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'regenerateBackupCodes' });
+            
+            return createErrorResult(errorMessage);
+        }
+    }
+
+    async initiateMFASetup(): Promise<AuthResult> {
+        try {
+            if (!this.currentUser) {
+                return createErrorResult('User not authenticated', ServiceErrorCode.VALIDATION);
+            }
+
+            if (this.currentUser.mfaEnabled) {
+                return createErrorResult('MFA already enabled', ServiceErrorCode.VALIDATION);
+            }
+
+            const setupData = await createMFASetupData(this.currentUser.email);
+            this.mfaSetupData = setupData;
+
+            logServiceSuccess('AuthService', 'initiateMFASetup');
+
+            return {
+                success: true,
+                message: 'MFA setup initiated',
+                mfaSetupData: setupData,
+            };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan saat inisialisasi MFA';
+            const standardError = new Error(errorMessage);
+            logServiceError(standardError, { service: 'AuthService', operation: 'initiateMFASetup' });
+            
+            return createErrorResult(errorMessage);
+        }
     }
 }
 

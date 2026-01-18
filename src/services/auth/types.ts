@@ -2,6 +2,7 @@ import type { ServiceErrorCodeType } from '@/types/common';
 import type { CircuitBreakerState } from '@/utils/resilience';
 import type { UserRole } from '@/types/role';
 import type { Permission } from '@/types/permission';
+import type { MFAData, MFAStatus } from '@/types/mfa';
 
 export interface IAuthService {
     login(credentials: LoginCredentials): Promise<AuthResult>;
@@ -13,11 +14,18 @@ export interface IAuthService {
     hasRole(role: UserRole): Promise<boolean>;
     getCircuitBreakerState(): CircuitBreakerState;
     resetCircuitBreaker(): void;
+    enableMFA(totpCode: string): Promise<AuthResult>;
+    disableMFA(password: string): Promise<AuthResult>;
+    verifyMFA(totpCode: string, backupCode?: string): Promise<AuthResult>;
+    getMFAStatus(): Promise<MFAStatus>;
+    regenerateBackupCodes(password: string): Promise<AuthResult>;
+    initiateMFASetup(): Promise<AuthResult>;
 }
 
 export interface LoginCredentials {
     email: string;
     password: string;
+    totpCode?: string;
 }
 
 export interface RegisterData {
@@ -35,6 +43,13 @@ export interface AuthResult {
     user?: User;
     token?: string;
     metadata?: Record<string, unknown>;
+    mfaSetupData?: MFASetupData;
+}
+
+export interface MFASetupData {
+    secret: string;
+    qrCodeUrl: string;
+    backupCodes: string[];
 }
 
 export interface User {
@@ -42,4 +57,8 @@ export interface User {
     name: string;
     email: string;
     role: UserRole;
+    mfaEnabled: boolean;
+    mfaSecret?: string;
+    mfaBackupCodes?: string[];
+    mfaEnabledAt?: string;
 }
