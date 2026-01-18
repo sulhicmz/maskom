@@ -3,31 +3,38 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import SocialShareButtons from "../SocialShareButtons"
 
 describe("SocialShareButtons", () => {
-   beforeEach(() => {
-      Object.defineProperty(window, "location", {
-         value: {
-            href: "https://maskom.co.id/test",
-         },
-         writable: true,
-         configurable: true,
-      })
-      window.open = jest.fn()
-   })
+    beforeEach(() => {
+       Object.defineProperty(window, "location", {
+          value: {
+             href: "https://maskom.co.id/test",
+          },
+          writable: true,
+          configurable: true,
+       })
+       window.open = jest.fn()
+       Object.defineProperty(navigator, "clipboard", {
+          value: {
+             writeText: jest.fn().mockResolvedValue(undefined),
+          },
+          writable: true,
+          configurable: true,
+       })
+    })
 
-   afterEach(() => {
-      jest.clearAllMocks()
-      jest.resetAllMocks()
-   })
+    afterEach(() => {
+       jest.clearAllMocks()
+       jest.resetAllMocks()
+    })
 
-   describe("Rendering", () => {
-      it("should render social share buttons", () => {
-         render(<SocialShareButtons />)
+    describe("Rendering", () => {
+       it("should render social share buttons", () => {
+          render(<SocialShareButtons />)
 
-         expect(screen.getByLabelText("Share on Facebook")).toBeInTheDocument()
-         expect(screen.getByLabelText("Share on Twitter")).toBeInTheDocument()
-         expect(screen.getByLabelText("Share on LinkedIn")).toBeInTheDocument()
-         expect(screen.getByLabelText("Share on Instagram")).toBeInTheDocument()
-      })
+          expect(screen.getByLabelText("Share on Facebook")).toBeInTheDocument()
+          expect(screen.getByLabelText("Share on Twitter")).toBeInTheDocument()
+          expect(screen.getByLabelText("Share on LinkedIn")).toBeInTheDocument()
+          expect(screen.getByLabelText("Copy link for Instagram")).toBeInTheDocument()
+       })
 
       it("should render with custom className", () => {
          render(<SocialShareButtons className="custom-class" />)
@@ -61,14 +68,14 @@ describe("SocialShareButtons", () => {
          })
       })
 
-      it("should have title attributes on buttons", () => {
-         render(<SocialShareButtons />)
+       it("should have title attributes on buttons", () => {
+          render(<SocialShareButtons />)
 
-         expect(screen.getByTitle("Share on Facebook")).toBeInTheDocument()
-         expect(screen.getByTitle("Share on Twitter")).toBeInTheDocument()
-         expect(screen.getByTitle("Share on LinkedIn")).toBeInTheDocument()
-         expect(screen.getByTitle("Share on Instagram")).toBeInTheDocument()
-      })
+          expect(screen.getByTitle("Share on Facebook")).toBeInTheDocument()
+          expect(screen.getByTitle("Share on Twitter")).toBeInTheDocument()
+          expect(screen.getByTitle("Share on LinkedIn")).toBeInTheDocument()
+          expect(screen.getByTitle("Copy link for Instagram")).toBeInTheDocument()
+       })
    })
 
    describe("Social Platform Buttons", () => {
@@ -96,13 +103,13 @@ describe("SocialShareButtons", () => {
          expect(button).toHaveAttribute("type", "button")
       })
 
-      it("should render Instagram button with correct aria-label", () => {
-         render(<SocialShareButtons />)
+       it("should render Instagram button with correct aria-label", () => {
+          render(<SocialShareButtons />)
 
-         const button = screen.getByLabelText("Share on Instagram")
-         expect(button).toBeInTheDocument()
-         expect(button).toHaveAttribute("type", "button")
-      })
+          const button = screen.getByLabelText("Copy link for Instagram")
+          expect(button).toBeInTheDocument()
+          expect(button).toHaveAttribute("type", "button")
+       })
    })
 
    describe("Facebook Sharing", () => {
@@ -184,19 +191,16 @@ describe("SocialShareButtons", () => {
       })
    })
 
-   describe("Instagram Sharing", () => {
-      it("should open Instagram homepage when clicked", () => {
-         render(<SocialShareButtons />)
+    describe("Instagram Sharing", () => {
+       it("should copy link to clipboard when clicked", async () => {
+          render(<SocialShareButtons />)
 
-         const button = screen.getByLabelText("Share on Instagram")
-         fireEvent.click(button)
+          const button = screen.getByLabelText("Copy link for Instagram")
+          fireEvent.click(button)
 
-         expect(window.open).toHaveBeenCalledWith(
-            "https://www.instagram.com/",
-            "_blank",
-            "noopener,noreferrer,width=600,height=400"
-         )
-      })
+          expect(navigator.clipboard.writeText).toHaveBeenCalledWith("https://maskom.co.id/test")
+          expect(window.open).not.toHaveBeenCalled()
+       })
    })
 
    describe("Custom Props", () => {
@@ -248,21 +252,21 @@ describe("SocialShareButtons", () => {
    })
 
    describe("Accessibility", () => {
-      it("should be keyboard navigable", () => {
-         render(<SocialShareButtons />)
+       it("should be keyboard navigable", () => {
+          render(<SocialShareButtons />)
 
-         const buttons = [
-            screen.getByLabelText("Share on Facebook"),
-            screen.getByLabelText("Share on Twitter"),
-            screen.getByLabelText("Share on LinkedIn"),
-            screen.getByLabelText("Share on Instagram"),
-         ]
+          const buttons = [
+             screen.getByLabelText("Share on Facebook"),
+             screen.getByLabelText("Share on Twitter"),
+             screen.getByLabelText("Share on LinkedIn"),
+             screen.getByLabelText("Copy link for Instagram"),
+          ]
 
-         buttons.forEach((button) => {
-            button.focus()
-            expect(button).toHaveFocus()
-         })
-      })
+          buttons.forEach((button) => {
+             button.focus()
+             expect(button).toHaveFocus()
+          })
+       })
    })
 
    describe("Edge Cases", () => {
