@@ -939,7 +939,7 @@ describe("dataValidation", () => {
        };
        const result = validateContactInfoItem(item);
        expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("ContactInfoItem: id must be a positive number");
+        expect(result.errors).toContain("ContactInfoItem[0]: id must be a positive number");
       });
 
     it("should reject contact info item with empty string in lines array", () => {
@@ -1114,7 +1114,7 @@ describe("dataValidation", () => {
     it("should reject view count exceeding MAX_SAFE_INTEGER", () => {
       const result = validateViewCount(Number.MAX_SAFE_INTEGER + 1);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("viewCount exceeds maximum safe integer value");
+      expect(result.errors).toContain("viewCount exceeds maximum safe integer value, got: 9007199254740992");
     });
   });
 
@@ -1329,5 +1329,3 @@ describe("dataValidation", () => {
     });
   });
 });
-  });
- });

@@ -5,7 +5,7 @@ import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Permission } from '@/types';
 import { loadAPMConfig, saveAPMConfig, testAPMConnection, validateAPMConfigUI, resetAPMConfig } from '@/utils/apmConfig';
-import { APMUIConfig, APMValidationResult } from '@/types';
+import { APMUIConfig } from '@/types';
 import SectionTitle from '@/components/common/SectionTitle';
 import AnimationWrapper from '@/components/common/AnimationWrapper';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -47,7 +47,7 @@ export default function APMConfigPage() {
       setSaving(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error) {
+    } catch {
       setSaving(false);
       setErrors(['Failed to save configuration']);
     }
@@ -85,14 +85,14 @@ export default function APMConfigPage() {
     setConfig({ ...config, [key]: value });
   };
 
-  const handleSentryChange = <K extends NonNullable<APMUIConfig['sentry']>>(
+  const handleSentryChange = <K extends keyof NonNullable<APMUIConfig['sentry']>>(
     key: K,
     value: NonNullable<APMUIConfig['sentry']>[K]
   ) => {
     if (!config) return;
     setConfig({
       ...config,
-      sentry: { ...config.sentry, [key]: value }
+      sentry: { ...(config.sentry || { dsn: '' }), [key]: value }
     });
   };
 
@@ -123,7 +123,7 @@ export default function APMConfigPage() {
   return (
     <ProtectedRoute requiredPermission={Permission.MANAGE_SETTINGS}>
       <section className="apm-config" aria-label="APM Configuration">
-        <AnimationWrapper animation="fadeIn">
+        <AnimationWrapper animation="fadeInUp">
           <div className="container">
             <SectionTitle
               title="Konfigurasi APM"
@@ -163,7 +163,7 @@ export default function APMConfigPage() {
                         id="apm-provider"
                         className="form-select"
                         value={config.provider}
-                        onChange={(e) => handleConfigChange('provider', e.target.value as any)}
+                        onChange={(e) => handleConfigChange('provider', e.target.value as 'console' | 'sentry' | 'none')}
                       >
                         <option value="console">Console (Development)</option>
                         <option value="sentry">Sentry (Production)</option>
@@ -198,7 +198,7 @@ export default function APMConfigPage() {
                         id="apm-environment"
                         className="form-select"
                         value={config.environment}
-                        onChange={(e) => handleConfigChange('environment', e.target.value as any)}
+                        onChange={(e) => handleConfigChange('environment', e.target.value as 'development' | 'staging' | 'production')}
                       >
                         <option value="development">Development</option>
                         <option value="staging">Staging</option>

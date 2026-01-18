@@ -46,8 +46,8 @@ export interface ValidationConfig<T> {
 export function createValidator<T>(config: ValidationConfig<T>): (item: T) => ValidationResult {
   return (item: T): ValidationResult => {
     const errors: string[] = [];
-    const itemId = typeof (item as BaseDataItem & { id?: number }).id === "number" ? (item as BaseDataItem & { id?: number }).id! : "";
-
+    const itemId = (item as any).id != null && typeof (item as any).id === "number" ? (item as any).id as number : "";
+ 
     if (config.baseValidation) {
       const baseResult = validateBaseDataItem(item as BaseDataItem, config.typeName);
       errors.push(...baseResult.errors);
@@ -57,9 +57,10 @@ export function createValidator<T>(config: ValidationConfig<T>): (item: T) => Va
       for (const field of config.stringFields) {
         const value = (item as Record<string, unknown>)[field.key];
         if (field.required) {
+          const includeIdInError = field.key === "id";
           if (typeof value !== "string" || value.trim() === "") {
             errors.push(
-              `${config.typeName}${itemId ? `[${itemId}]` : ""}: ${field.key} must be a non-empty string`
+              `${config.typeName}${includeIdInError && itemId !== "" ? `[${itemId}]` : ""}: ${field.key} must be a non-empty string`
             );
           }
         }
@@ -70,14 +71,15 @@ export function createValidator<T>(config: ValidationConfig<T>): (item: T) => Va
       for (const field of config.numberFields) {
         const value = (item as Record<string, unknown>)[field.key];
         if (field.required) {
+          const includeIdInError = field.key === "id";
           if (typeof value !== "number") {
             errors.push(
-              `${config.typeName}${itemId ? `[${itemId}]` : ""}: ${field.key} must be a number`
+              `${config.typeName}${includeIdInError && itemId !== "" ? `[${itemId}]` : ""}: ${field.key} must be a number`
             );
           } else {
             if (field.min !== undefined && value < field.min) {
               errors.push(
-                `${config.typeName}${itemId ? `[${itemId}]` : ""}: ${field.key} must be a positive number`
+                `${config.typeName}${includeIdInError && itemId !== "" ? `[${itemId}]` : ""}: ${field.key} must be a positive number`
               );
             }
           }
@@ -89,10 +91,11 @@ export function createValidator<T>(config: ValidationConfig<T>): (item: T) => Va
       for (const field of config.enumFields) {
         const value = (item as Record<string, unknown>)[field.key];
         if (field.required) {
+          const includeIdInError = field.key === "id";
           if (!field.allowedValues.includes(value as string)) {
             const allowed = field.allowedValues as unknown as string[];
             errors.push(
-              `${config.typeName}${itemId ? `[${itemId}]` : ""}: ${field.key} must be either "${allowed[0]}" or "${allowed[1]}"`
+              `${config.typeName}${includeIdInError && itemId !== "" ? `[${itemId}]` : ""}: ${field.key} must be either "${allowed[0]}" or "${allowed[1]}"`
             );
           }
         }
@@ -103,9 +106,10 @@ export function createValidator<T>(config: ValidationConfig<T>): (item: T) => Va
       for (const field of config.arrayFields) {
         const value = (item as Record<string, unknown>)[field.key];
         if (field.required) {
+          const includeIdInError = field.key === "id";
           if (!Array.isArray(value) || value.length === 0) {
             errors.push(
-              `${config.typeName}${itemId ? `[${itemId}]` : ""}: ${field.key} must be a non-empty array`
+              `${config.typeName}${includeIdInError && itemId !== "" ? `[${itemId}]` : ""}: ${field.key} must be a non-empty array`
             );
           } else if (field.itemValidator) {
             value.forEach((item: unknown, index: number) => {

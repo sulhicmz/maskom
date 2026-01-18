@@ -9,7 +9,7 @@ jest.useFakeTimers();
 const mockEmailjsSend = emailjs.send as jest.MockedFunction<typeof emailjs.send>;
 
 describe('EmailService', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let emailServiceInstance: any;
 
     const validParams = {

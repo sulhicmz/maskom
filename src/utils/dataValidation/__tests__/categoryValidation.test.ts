@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { validateCategoryItem, validateInnerBlogPost } from "../blogValidation";
 import blog_categories_data from "@/data/BlogCategoryData";
 

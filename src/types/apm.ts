@@ -42,15 +42,15 @@ export function validateAPMConfig(config: APMUIConfig): APMValidationResult {
   }
 
   if (config.provider === 'sentry') {
-    if (!config.sentry || !config.sentry.dsn) {
+    if (!config.sentry?.dsn) {
       errors.push('Sentry DSN is required when using Sentry provider');
     } else if (!isValidSentryDSN(config.sentry.dsn)) {
       errors.push('Invalid Sentry DSN format. Expected format: https://[key]@[host]/[project]');
     }
 
-    if (config.sentry.tracesSampleRate !== undefined) {
-      if (typeof config.sentry.tracesSampleRate !== 'number' || 
-          config.sentry.tracesSampleRate < 0 || 
+    if (config.sentry?.tracesSampleRate !== undefined) {
+      if (typeof config.sentry.tracesSampleRate !== 'number' ||
+          config.sentry.tracesSampleRate < 0 ||
           config.sentry.tracesSampleRate > 1) {
         errors.push('Traces sample rate must be a number between 0.0 and 1.0');
       }

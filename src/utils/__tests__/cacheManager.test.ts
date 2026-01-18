@@ -293,7 +293,7 @@ describe('cacheManager', () => {
 
       const configAfter = getCacheConfig();
       expect(configAfter.cleanupPolicy.enabled).toBe(false);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       expect((global as any).caches.keys).not.toHaveBeenCalled();
     });
 
@@ -349,14 +349,14 @@ describe('cacheManager', () => {
     });
 
     it('should return zero when no entries in caches', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       (global as any).caches.keys.mockResolvedValue(['cache-1']);
       const size = await checkCacheSize();
       expect(size).toBeGreaterThanOrEqual(0);
     });
 
     it('should handle missing content-length header gracefully', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       (global as any).caches.keys.mockResolvedValue(['cache-1']);
       const size = await checkCacheSize();
       expect(typeof size).toBe('number');

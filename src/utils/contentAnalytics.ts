@@ -16,7 +16,6 @@ export interface EngagementInput {
   avgReadTime?: number;
 }
 
-const VIEW_WEIGHT = 0.3;
 const SHARE_WEIGHT = 0.4;
 const BOOKMARK_WEIGHT = 0.2;
 const COMMENT_WEIGHT = 0.1;

@@ -1,5 +1,5 @@
 import { APMUIConfig, APMValidationResult, APM_STORAGE_KEY, DEFAULT_APM_CONFIG, validateAPMConfig, resetAPMConfig } from '@/types/apm';
-import apmManager from '@/utils/apm';
+import { apmManager } from '@/utils/apm';
 
 export function loadAPMConfig(): APMUIConfig {
   if (typeof window === 'undefined') {
