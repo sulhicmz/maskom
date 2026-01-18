@@ -269,7 +269,8 @@ export interface DataRelationship {
 - ✅ `getRelatedItems()` - Get all related items for a source
 - ✅ `getRelatedItem()` - Get single related item (one-to-one/one-to-many)
 - ✅ `getOneToManyRelations()` - Get multiple related collections
-- ✅ `checkCircularDependencies()` - Detect circular reference issues
+- ✅ `checkCircularDependencies()` - Detect circular reference issues (collection-level)
+- ✅ `checkSelfReferentialCircularDependencies()` - Detect cycles within self-referential relationships (item-level)
 - ✅ `getRelationshipGraph()` - Build relationship traversal graph
 - ✅ `findRelationshipsByCollection()` - Find relationships by collection name
 - ✅ `cascadeDelete()` - Identify items to delete on cascade
@@ -278,24 +279,28 @@ export interface DataRelationship {
 **Relationship Registry** (`src/data/relationships.ts`):
 - ✅ Central relationship configuration file
 - ✅ BlogCommentData → InnerBlogData (many-to-one via blogId foreign key)
+- ✅ BlogCommentData → BlogCommentData (self-referential many-to-one via parentId foreign key for comment threading)
 - ✅ InnerBlogData → BlogTagData (many-to-one via tagId foreign key)
 - ✅ InnerBlogData → BlogCategoryData (many-to-one via categoryId foreign key) (Task 240)
 - ✅ Type-safe relationship definitions with DataRelationship interface
 - ✅ Supports validation of all relationships at build time
+- ✅ Self-referential relationship support for hierarchical data (comment threads)
 
 **Referential Integrity**:
 - Validate foreign key references at build time
 - Cascade deletion/update strategies
 - Prevent orphaned records
-- Circular dependency detection
+- Circular dependency detection (collection-level)
+- Self-referential circular dependency detection (item-level for hierarchical data)
 
-**Relationship Validation** (35 tests):
+**Relationship Validation** (72 tests):
 - ✅ Valid relationships with no errors
 - ✅ Collection not found errors
 - ✅ Referential integrity violations
 - ✅ Optional foreign key handling
 - ✅ String to number comparison
-- ✅ Circular dependency detection
+- ✅ Circular dependency detection (collection-level)
+- ✅ Self-referential circular dependency detection (item-level)
 - ✅ Relationship graph building
 - ✅ Cascade delete operations
 
@@ -359,16 +364,18 @@ export interface DataRelationship {
    - Multi-field indexes for complex queries
 
 3. **✅ Data Relationship Management** (COMPLETE - Phase 3):
-     - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
-     - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
-     - ✅ Referential integrity checks with foreign key validation
-     - ✅ Circular dependency detection
-     - ✅ Cascade deletion support
-     - ✅ Relationship graph traversal
-     - ✅ Central relationship registry (src/data/relationships.ts)
-     - ✅ BlogCommentData → InnerBlogData relationship (many-to-one)
-     - ✅ blogId foreign key added to BlogCommentItem type
-     - ✅ 35 comprehensive tests covering all relationship utilities
+      - ✅ Relationship type definitions (one-to-one, one-to-many, many-to-one, many-to-many)
+      - ✅ Relationship validation utilities (validateRelationships, checkReferentialIntegrity)
+      - ✅ Referential integrity checks with foreign key validation
+      - ✅ Circular dependency detection (collection-level)
+      - ✅ Self-referential circular dependency detection (item-level for hierarchical data)
+      - ✅ Cascade deletion support
+      - ✅ Relationship graph traversal
+      - ✅ Central relationship registry (src/data/relationships.ts)
+      - ✅ BlogCommentData → InnerBlogData relationship (many-to-one)
+      - ✅ BlogCommentData → BlogCommentData self-referential relationship (comment threading via parentId)
+      - ✅ blogId and parentId foreign keys in BlogCommentItem type
+      - ✅ 72 comprehensive tests covering all relationship utilities
 
   4. **✅ Data Standardization** (COMPLETE - Phase 4):
         - ✅ Standardize date formats (ISO 8601) - Date formatting utilities created

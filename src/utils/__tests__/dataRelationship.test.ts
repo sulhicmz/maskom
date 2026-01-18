@@ -5,6 +5,7 @@ import {
     getRelatedItem,
     getOneToManyRelations,
     checkCircularDependencies,
+    checkSelfReferentialCircularDependencies,
     getRelationshipGraph,
     findRelationshipsByCollection,
     cascadeDelete,
@@ -962,6 +963,240 @@ describe('dataRelationship', () => {
             const result = validateForeignKey(item, relationship, targetCollection);
 
             expect(result.isValid).toBe(true);
+        });
+    });
+
+    describe('checkSelfReferentialCircularDependencies', () => {
+        it('should detect circular dependency in self-referential relationship', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+                optional: true,
+            };
+
+            const collection = [
+                { id: 1, parentId: 2 },
+                { id: 2, parentId: 1 },
+                { id: 3, parentId: null },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(true);
+            expect(result.cycles.length).toBeGreaterThan(0);
+            expect(result.cycles[0].length).toBe(3);
+            expect(result.cycles[0][0]).toEqual(result.cycles[0][2]);
+        });
+
+        it('should detect multiple circular dependencies', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, parentId: 2 },
+                { id: 2, parentId: 1 },
+                { id: 3, parentId: 4 },
+                { id: 4, parentId: 3 },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(true);
+            expect(result.cycles.length).toBeGreaterThan(0);
+        });
+
+        it('should return no cycles when no circular dependencies exist', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, parentId: null },
+                { id: 2, parentId: 1 },
+                { id: 3, parentId: 1 },
+                { id: 4, parentId: 2 },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(false);
+            expect(result.cycles).toHaveLength(0);
+        });
+
+        it('should handle null parent values', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, parentId: null },
+                { id: 2, parentId: null },
+                { id: 3, parentId: null },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(false);
+            expect(result.cycles).toHaveLength(0);
+        });
+
+        it('should handle undefined parent values', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, parentId: undefined },
+                { id: 2, parentId: undefined },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(false);
+            expect(result.cycles).toHaveLength(0);
+        });
+
+        it('should return empty cycles for non-self-referential relationship', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'posts',
+                sourceField: 'postId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, postId: 100 },
+                { id: 2, postId: 100 },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(false);
+            expect(result.cycles).toHaveLength(0);
+        });
+
+        it('should handle deep nesting without cycles', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, parentId: null },
+                { id: 2, parentId: 1 },
+                { id: 3, parentId: 2 },
+                { id: 4, parentId: 3 },
+                { id: 5, parentId: 4 },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(false);
+            expect(result.cycles).toHaveLength(0);
+        });
+
+        it('should detect complex cycle', () => {
+            const relationship: DataRelationship = {
+                sourceCollection: 'comments',
+                targetCollection: 'comments',
+                sourceField: 'parentId',
+                targetField: 'id',
+                type: 'many-to-one',
+            };
+
+            const collection = [
+                { id: 1, parentId: 4 },
+                { id: 2, parentId: 1 },
+                { id: 3, parentId: 2 },
+                { id: 4, parentId: 3 },
+            ];
+
+            const result = checkSelfReferentialCircularDependencies(relationship, collection);
+
+            expect(result.hasCycles).toBe(true);
+            expect(result.cycles.length).toBeGreaterThan(0);
+            expect(result.cycles[0].length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('validateRelationships with self-referential circular dependencies', () => {
+        it('should detect circular dependency in self-referential relationship', () => {
+            const relationships: DataRelationship[] = [
+                {
+                    sourceCollection: 'comments',
+                    targetCollection: 'comments',
+                    sourceField: 'parentId',
+                    targetField: 'id',
+                    type: 'many-to-one',
+                    optional: true,
+                },
+            ];
+
+            const collections: Record<string, unknown[]> = {
+                comments: [
+                    { id: 1, parentId: 2 },
+                    { id: 2, parentId: 1 },
+                ],
+            };
+
+            const result = validateRelationships(relationships, collections);
+
+            expect(result.isValid).toBe(false);
+            expect(result.errors).toHaveLength(1);
+            expect(result.errors[0].error).toContain('Circular dependency');
+        });
+
+        it('should pass validation with no circular dependencies', () => {
+            const relationships: DataRelationship[] = [
+                {
+                    sourceCollection: 'comments',
+                    targetCollection: 'comments',
+                    sourceField: 'parentId',
+                    targetField: 'id',
+                    type: 'many-to-one',
+                    optional: true,
+                },
+            ];
+
+            const collections: Record<string, unknown[]> = {
+                comments: [
+                    { id: 1, parentId: null },
+                    { id: 2, parentId: 1 },
+                    { id: 3, parentId: 1 },
+                ],
+            };
+
+            const result = validateRelationships(relationships, collections);
+
+            if (!result.isValid) {
+                console.log('Errors:', JSON.stringify(result.errors, null, 2));
+            }
+            expect(result.isValid).toBe(true);
+            expect(result.errors).toHaveLength(0);
         });
     });
 });
