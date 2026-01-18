@@ -1135,4 +1135,166 @@ As a Content Creator, I want to schedule automatic version snapshots before publ
 
 ---
 
-**Last Updated**: 2026-01-17
+## [FEATURE-042] Content Performance Analytics
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Analytics/Content Management
+
+### User Story
+
+As a Content Creator, I want to view performance analytics for my blog posts (views, engagement, shares), so that I can understand what content resonates with readers and optimize future posts.
+
+### Acceptance Criteria
+
+- [ ] Add performance metrics to InnerBlogPost interface (viewCount, engagementScore, shareCount)
+- [ ] Implement analytics tracking for blog post views and engagement
+- [ ] Create content performance dashboard in admin panel
+- [ ] Add performance trend visualization (weekly/monthly charts)
+- [ ] Implement top-performing posts highlight
+- [ ] Add content performance comparison (compare periods)
+- [ ] Export performance data as CSV
+- [ ] Add tests for performance analytics
+- [ ] Update docs/blueprint.md with content performance architecture
+
+**Implementation Notes**:
+- Extends FEATURE-009 (Analytics Dashboard) with content-specific metrics
+- Leverages existing APM integration (FEATURE-022) for tracking
+- Integrates with RBAC system (FEATURE-013) - Editors can view their content performance
+- Uses existing data validation layer for performance metrics
+- Applies dark mode support via ThemeContext
+
+---
+
+## [FEATURE-043] Smart Content Recommendations
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/Engagement
+
+### User Story
+
+As a Blog Reader, I want to see recommended blog posts based on my reading history and interests, so that I can discover relevant content without manual searching.
+
+### Acceptance Criteria
+
+- [ ] Implement reading history tracking (localStorage with expiration)
+- [ ] Create recommendation engine based on categories and tags
+- [ ] Add "Recommended For You" section to blog area
+- [ ] Implement content similarity scoring algorithm
+- [ ] Add fallback recommendations for new users (trending posts)
+- [ ] Store user preferences (preferred categories, topics)
+- [ ] Add recommendation feedback mechanism (helpful/not helpful)
+- [ ] Add tests for recommendation algorithm
+- [ ] Update docs/blueprint.md with recommendation architecture
+
+**Implementation Notes**:
+- Extends FEATURE-006 (Advanced Blog Search & Filtering) with personalized results
+- Integrates with FEATURE-014 (Blog Post Bookmarking) for reading history
+- Uses existing BlogTagData and BlogCategoryData for category matching
+- Applies privacy-first approach (no user tracking, localStorage only)
+- Leverages existing validation layer for user preferences
+
+---
+
+## [FEATURE-044] Collaborative Editing with Real-Time Sync
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Content Management/Collaboration
+
+### User Story
+
+As a Content Creator, I want to collaboratively edit blog posts with other editors in real-time, so that I can co-author content and receive immediate feedback without version conflicts.
+
+### Acceptance Criteria
+
+- [ ] Implement WebSocket or polling-based real-time sync
+- [ ] Add collaborative editing mode toggle to BlogForm
+- [ ] Show active editors on post (user avatars)
+- [ ] Implement conflict resolution for simultaneous edits
+- [ ] Add edit history with collaborator attribution
+- [ ] Implement cursor position tracking for collaborators
+- [ ] Add real-time commenting on draft posts
+- [ ] Show notifications for collaborative actions
+- [ ] Add tests for collaborative editing
+- [ ] Update docs/blueprint.md with collaborative editing architecture
+
+**Implementation Notes**:
+- Extends FEATURE-034 (Content Version Control & History) with collaborative features
+- Extends FEATURE-025 (Blog Post Draft Auto-Save) with multi-user sync
+- Integrates with RBAC system (FEATURE-013) - Only editors/admins can collaborate
+- Uses existing data validation for draft content
+- Leverages existing APM integration for monitoring sync performance
+- Requires WebSocket infrastructure or API polling mechanism
+
+---
+
+## [FEATURE-045] Automated Content Insights
+
+**Status**: Pending
+**Priority**: P2
+**Type**: AI/Content Management
+
+### User Story
+
+As a Content Creator, I want AI-powered insights on my blog drafts (readability score, SEO suggestions, topic gaps), so that I can improve content quality before publishing.
+
+### Acceptance Criteria
+
+- [ ] Add readability score calculation to BlogForm (Flesch Reading Ease)
+- [ ] Implement SEO keyword density analysis
+- [ ] Add content length and structure recommendations
+- [ ] Create insights panel in BlogForm with actionable suggestions
+- [ ] Implement topic coverage analysis (missing related topics)
+- [ ] Add headline quality scoring
+- [ ] Implement tone analysis (formal, casual, technical)
+- [ ] Add preview of insights impact on engagement
+- [ ] Store insights history for improvement tracking
+- [ ] Add tests for content insights algorithms
+- [ ] Update docs/blueprint.md with content insights architecture
+
+**Implementation Notes**:
+- Extends FEATURE-010 (Blog Post Scheduling & Drafts) with pre-publish insights
+- Uses existing InnerBlogPost data model for analysis
+- Leverages existing validation layer for content quality checks
+- Applies existing FORMATTER utilities for text processing
+- Integrates with ThemeContext for dark mode support
+- Can use simple heuristics initially, ready for future AI integration
+
+---
+
+## [FEATURE-046] Multi-Factor Authentication (MFA)
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Security/Authentication
+
+### User Story
+
+As a Security-Conscious User, I want to enable multi-factor authentication (2FA) for my account, so that I can protect my account even if my password is compromised.
+
+### Acceptance Criteria
+
+- [ ] Add MFA configuration to user profile settings
+- [ ] Implement TOTP (Time-based One-Time Password) support
+- [ ] Add QR code generation for authenticator apps
+- [ ] Create backup codes generation and storage
+- [ ] Implement MFA verification during login
+- [ ] Add MFA enforcement for admin roles
+- [ ] Implement MFA recovery flow
+- [ ] Add MFA status indicators in user dashboard
+- [ ] Add tests for MFA authentication flow
+- [ ] Update docs/blueprint.md with MFA architecture
+
+**Implementation Notes**:
+- Extends FEATURE-013 (User Roles & Permissions) with enhanced security
+- Integrates with existing AuthService (FEATURE-001)
+- Uses existing validation layer for OTP codes
+- Leverages existing RBAC system for admin MFA enforcement
+- Requires TOTP library integration (e.g., speakeasy, otpauth)
+- Adds new user preferences field (mfaEnabled, mfaSecret, backupCodes)
+
+---
+
+**Last Updated**: 2026-01-18
