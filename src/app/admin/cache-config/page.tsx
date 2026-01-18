@@ -64,6 +64,30 @@ export default function CacheConfigPage() {
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
+  const handleConfigChange = <T extends keyof CacheConfig>(
+    parentKey: T,
+    childKey: string | null,
+    value: any
+  ) => {
+    if (!config) return;
+
+    const currentValue = config[parentKey];
+    if (childKey && typeof currentValue === 'object' && currentValue !== null && !Array.isArray(currentValue)) {
+      setConfig({
+        ...config,
+        [parentKey]: {
+          ...(currentValue as any),
+          [childKey]: value,
+        },
+      });
+    } else {
+      setConfig({
+        ...config,
+        [parentKey]: value,
+      });
+    }
+  };
+
   const handleClearCache = async () => {
     if (!confirm('Apakah Anda yakin ingin menghapus semua cache? Tindakan ini akan menghapus semua data yang tersimpan di cache.')) {
       return;
@@ -318,13 +342,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cacheTTL.staticAssets}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cacheTTL: {
-                          ...config.cacheTTL,
-                          staticAssets: parseInt(e.target.value) || 0,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cacheTTL', 'staticAssets', parseInt(e.target.value) || 0)}
                       min="0"
                     />
                     <small className="text-muted">{formatDuration(config.cacheTTL.staticAssets)}</small>
@@ -335,13 +353,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cacheTTL.apiResponses}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cacheTTL: {
-                          ...config.cacheTTL,
-                          apiResponses: parseInt(e.target.value) || 0,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cacheTTL', 'apiResponses', parseInt(e.target.value) || 0)}
                       min="0"
                     />
                     <small className="text-muted">{formatDuration(config.cacheTTL.apiResponses)}</small>
@@ -352,13 +364,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cacheTTL.images}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cacheTTL: {
-                          ...config.cacheTTL,
-                          images: parseInt(e.target.value) || 0,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cacheTTL', 'images', parseInt(e.target.value) || 0)}
                       min="0"
                     />
                     <small className="text-muted">{formatDuration(config.cacheTTL.images)}</small>
@@ -369,13 +375,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cacheTTL.fonts}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cacheTTL: {
-                          ...config.cacheTTL,
-                          fonts: parseInt(e.target.value) || 0,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cacheTTL', 'fonts', parseInt(e.target.value) || 0)}
                       min="0"
                     />
                     <small className="text-muted">{formatDuration(config.cacheTTL.fonts)}</small>
@@ -396,10 +396,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cacheSizeLimit}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cacheSizeLimit: parseInt(e.target.value) || 1,
-                      })}
+                      onChange={(e) => handleConfigChange('cacheSizeLimit', null, parseInt(e.target.value) || 1)}
                       min="1"
                       max="1000"
                     />
@@ -411,13 +408,7 @@ export default function CacheConfigPage() {
                         type="checkbox"
                         id="cleanupEnabled"
                         checked={config.cleanupPolicy.enabled}
-                        onChange={(e) => setConfig({
-                          ...config,
-                          cleanupPolicy: {
-                            ...config.cleanupPolicy,
-                            enabled: e.target.checked,
-                          },
-                        })}
+                        onChange={(e) => handleConfigChange('cleanupPolicy', 'enabled', e.target.checked)}
                       />
                       <label className="form-check-label" htmlFor="cleanupEnabled">
                         Aktifkan Pembersihan Otomatis
@@ -430,13 +421,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cleanupPolicy.maxAge}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cleanupPolicy: {
-                          ...config.cleanupPolicy,
-                          maxAge: parseInt(e.target.value) || 0,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cleanupPolicy', 'maxAge', parseInt(e.target.value) || 0)}
                       min="0"
                       disabled={!config.cleanupPolicy.enabled}
                     />
@@ -448,13 +433,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cleanupPolicy.maxEntries}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cleanupPolicy: {
-                          ...config.cleanupPolicy,
-                          maxEntries: parseInt(e.target.value) || 1,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cleanupPolicy', 'maxEntries', parseInt(e.target.value) || 1)}
                       min="1"
                       max="10000"
                       disabled={!config.cleanupPolicy.enabled}
@@ -466,13 +445,7 @@ export default function CacheConfigPage() {
                       type="number"
                       className="form-control mb-3"
                       value={config.cleanupPolicy.autoCleanupInterval}
-                      onChange={(e) => setConfig({
-                        ...config,
-                        cleanupPolicy: {
-                          ...config.cleanupPolicy,
-                          autoCleanupInterval: parseInt(e.target.value) || 1,
-                        },
-                      })}
+                      onChange={(e) => handleConfigChange('cleanupPolicy', 'autoCleanupInterval', parseInt(e.target.value) || 1)}
                       min="1"
                       disabled={!config.cleanupPolicy.enabled}
                     />
