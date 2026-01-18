@@ -1,14 +1,5 @@
 import {
     validateFeedbackItem,
-    validateFaqItem,
-    validatePriceItem,
-    validatePriceDetailItem,
-    validateFeatureItem,
-    validateProcessItem,
-    validateCauseItem,
-    validateMenuItem,
-    checkDuplicateIds,
-    validateDataArray,
     validateWiFiDevice,
     validateWebsiteTemplate,
     validateAIStep,
@@ -30,12 +21,6 @@ import {
   } from "@/utils/dataValidation";
  import {
    FeedbackItem,
-   FaqItem,
-   PriceItem,
-   FeatureItem,
-   ProcessItem,
-   CauseItem,
-   MenuItem,
    WiFiDevice,
    WebsiteTemplate,
    AIStep,
