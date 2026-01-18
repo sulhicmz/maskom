@@ -143,6 +143,11 @@ export interface InnerBlogPost {
    category?: string;
    status?: BlogPostStatus;
    publishDate?: string;
+   viewCount?: number;
+   engagementScore?: number;
+   shareCount?: number;
+   avgReadTime?: number;
+   lastViewedAt?: string;
 }
 
 export interface FaqDetail {

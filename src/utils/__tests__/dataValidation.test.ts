@@ -1,28 +1,33 @@
 import {
-   validateFeedbackItem,
-   validateFaqItem,
-   validatePriceItem,
-   validatePriceDetailItem,
-   validateFeatureItem,
-   validateProcessItem,
-   validateCauseItem,
-   validateMenuItem,
-   checkDuplicateIds,
-   validateDataArray,
-   validateWiFiDevice,
-   validateWebsiteTemplate,
-   validateAIStep,
-   validateBlogCommentItem,
-   validateTeamMember,
-   validateInnerBlogPost,
-   validateFaqDetail,
-   validateInnerFaqItem,
-   validateSocialLink,
-   validateNavigationItem,
-   validateNavigationSection,
-   validateContactInfoItem,
-   validateFeatureHomeOneItem,
- } from "@/utils/dataValidation";
+    validateFeedbackItem,
+    validateFaqItem,
+    validatePriceItem,
+    validatePriceDetailItem,
+    validateFeatureItem,
+    validateProcessItem,
+    validateCauseItem,
+    validateMenuItem,
+    checkDuplicateIds,
+    validateDataArray,
+    validateWiFiDevice,
+    validateWebsiteTemplate,
+    validateAIStep,
+    validateBlogCommentItem,
+    validateTeamMember,
+    validateInnerBlogPost,
+    validateFaqDetail,
+    validateInnerFaqItem,
+    validateSocialLink,
+    validateNavigationItem,
+    validateNavigationSection,
+    validateContactInfoItem,
+    validateFeatureHomeOneItem,
+    validateViewCount,
+    validateEngagementScore,
+    validateAvgReadTime,
+    validateShareCount,
+    validateContentMetrics,
+  } from "@/utils/dataValidation";
  import {
    FeedbackItem,
    FaqItem,
@@ -1062,16 +1067,267 @@ describe("dataValidation", () => {
        expect(result.errors).toContain("FeatureHomeOneItem[-1]: id must be a positive number");
     });
 
-    it("should reject feature home one item with zero id", () => {
-       const item: FeatureHomeOneItem = {
-         id: 0,
-         icon: "fas fa-network-wired",
-         title: "Konektivitas Tinggi",
-         desc: "Solusi SD-WAN untuk koneksi stabil",
-       };
-       const result = validateFeatureHomeOneItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("FeatureHomeOneItem: id must be a positive number");
+     it("should reject feature home one item with zero id", () => {
+        const item: FeatureHomeOneItem = {
+          id: 0,
+          icon: "fas fa-network-wired",
+          title: "Konektivitas Tinggi",
+          desc: "Solusi SD-WAN untuk koneksi stabil",
+        };
+        const result = validateFeatureHomeOneItem(item);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("FeatureHomeOneItem[0]: id must be a positive number");
+     });
+  });
+
+  describe("validateViewCount", () => {
+    it("should validate a valid view count", () => {
+      const result = validateViewCount(1000);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
     });
+
+    it("should validate zero view count", () => {
+      const result = validateViewCount(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number view count", () => {
+      const result = validateViewCount("1000" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be a number, got: string");
+    });
+
+    it("should reject float view count", () => {
+      const result = validateViewCount(1000.5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be an integer, got: 1000.5");
+    });
+
+    it("should reject negative view count", () => {
+      const result = validateViewCount(-10);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be non-negative, got: -10");
+    });
+
+    it("should reject view count exceeding MAX_SAFE_INTEGER", () => {
+      const result = validateViewCount(Number.MAX_SAFE_INTEGER + 1);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount exceeds maximum safe integer value");
+    });
+  });
+
+  describe("validateEngagementScore", () => {
+    it("should validate a valid engagement score", () => {
+      const result = validateEngagementScore(85);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero engagement score", () => {
+      const result = validateEngagementScore(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate maximum engagement score (100)", () => {
+      const result = validateEngagementScore(100);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number engagement score", () => {
+      const result = validateEngagementScore("85" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be a number, got: string");
+    });
+
+    it("should reject float engagement score", () => {
+      const result = validateEngagementScore(85.5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be an integer, got: 85.5");
+    });
+
+    it("should reject negative engagement score", () => {
+      const result = validateEngagementScore(-10);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be non-negative, got: -10");
+    });
+
+    it("should reject engagement score exceeding 100", () => {
+      const result = validateEngagementScore(101);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be at most 100, got: 101");
+    });
+  });
+
+  describe("validateAvgReadTime", () => {
+    it("should validate a valid average read time", () => {
+      const result = validateAvgReadTime(300);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero average read time", () => {
+      const result = validateAvgReadTime(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number average read time", () => {
+      const result = validateAvgReadTime("300" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be a number, got: string");
+    });
+
+    it("should reject negative average read time", () => {
+      const result = validateAvgReadTime(-10);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be non-negative, got: -10");
+    });
+
+    it("should reject infinite average read time", () => {
+      const result = validateAvgReadTime(Infinity);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be a finite number, got: Infinity");
+    });
+
+    it("should reject NaN average read time", () => {
+      const result = validateAvgReadTime(NaN);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be a finite number, got: NaN");
+    });
+  });
+
+  describe("validateShareCount", () => {
+    it("should validate a valid share count", () => {
+      const result = validateShareCount(50);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero share count", () => {
+      const result = validateShareCount(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number share count", () => {
+      const result = validateShareCount("50" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be a number, got: string");
+    });
+
+    it("should reject float share count", () => {
+      const result = validateShareCount(50.5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be an integer, got: 50.5");
+    });
+
+    it("should reject negative share count", () => {
+      const result = validateShareCount(-5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be non-negative, got: -5");
+    });
+  });
+
+  describe("validateContentMetrics", () => {
+    it("should validate all valid content metrics", () => {
+      const metrics = {
+        viewCount: 1000,
+        engagementScore: 85,
+        shareCount: 50,
+        avgReadTime: 300,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate metrics with some undefined values", () => {
+      const metrics = {
+        viewCount: 1000,
+        shareCount: 50,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate all zero metrics", () => {
+      const metrics = {
+        viewCount: 0,
+        engagementScore: 0,
+        shareCount: 0,
+        avgReadTime: 0,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject invalid view count", () => {
+      const metrics = {
+        viewCount: -10,
+        engagementScore: 85,
+        shareCount: 50,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be non-negative, got: -10");
+    });
+
+    it("should reject invalid engagement score", () => {
+      const metrics = {
+        viewCount: 1000,
+        engagementScore: 150,
+        shareCount: 50,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be at most 100, got: 150");
+    });
+
+    it("should reject invalid share count", () => {
+      const metrics = {
+        viewCount: 1000,
+        shareCount: -5,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be non-negative, got: -5");
+    });
+
+    it("should reject invalid average read time", () => {
+      const metrics = {
+        viewCount: 1000,
+        avgReadTime: -100,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be non-negative, got: -100");
+    });
+
+    it("should reject multiple invalid metrics", () => {
+      const metrics = {
+        viewCount: -10,
+        engagementScore: 150,
+        shareCount: -5,
+        avgReadTime: -100,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors.length).toBeGreaterThan(1);
+    });
+
+    it("should validate empty metrics object", () => {
+      const metrics = {};
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+});
   });
  });
