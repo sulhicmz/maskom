@@ -1,5 +1,5 @@
 import type { InnerBlogPost } from '@/types/data'
-import { blog_data } from '@/data/InnerBlogData'
+import { blog_data, innerBlogById } from '@/data/InnerBlogData'
 import type { ReadingHistoryEntry } from './readingHistory'
 
 export interface RecommendationScore {
@@ -49,10 +49,21 @@ export function calculateJaccardSimilarity(
   setB: Set<number>
 ): number {
   if (setA.size === 0 && setB.size === 0) return 0
-
-  const intersection = new Set([...setA].filter(x => setB.has(x)))
-  const union = new Set([...setA, ...setB])
-
+  
+  const intersection = new Set<number>()
+  const union = new Set<number>()
+  
+  for (const item of setA) {
+    union.add(item)
+    if (setB.has(item)) {
+      intersection.add(item)
+    }
+  }
+  
+  for (const item of setB) {
+    union.add(item)
+  }
+  
   return intersection.size / union.size
 }
 
@@ -208,7 +219,7 @@ export function getRecommendedPosts(
   recommendations: RecommendationScore[]
 ): InnerBlogPost[] {
   return recommendations
-    .map(rec => blog_data.find(post => post.id === rec.postId))
+    .map(rec => innerBlogById.get(rec.postId))
     .filter((post): post is InnerBlogPost => post !== undefined)
 }
 
