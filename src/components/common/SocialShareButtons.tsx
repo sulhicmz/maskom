@@ -1,8 +1,9 @@
 "use client"
 
-import { memo } from "react"
-
-type SocialPlatform = "facebook" | "twitter" | "linkedin" | "instagram"
+import { memo, useState } from "react"
+import type { SocialPlatform } from "@/utils/socialPlatforms"
+import { getShareUrl } from "@/utils/socialPlatforms"
+import SocialShareButton from "./SocialShareButton"
 
 interface SocialShareButtonsProps {
    title?: string
@@ -19,75 +20,49 @@ const SocialShareButtons = memo(({
    className = "",
    ariaLabel = "Share on social media"
 }: SocialShareButtonsProps) => {
-   const handleShare = (platform: SocialPlatform) => {
+   const [sharingPlatform, setSharingPlatform] = useState<SocialPlatform | null>(null)
+
+   const platforms: SocialPlatform[] = ["facebook", "twitter", "linkedin", "instagram"]
+
+   const handleShare = async (platform: SocialPlatform) => {
+      if (sharingPlatform) return
+
+      setSharingPlatform(platform)
       const url = customUrl || (typeof window !== "undefined" ? window.location.href : "https://maskom.co.id")
       const shareText = text || `Check out ${title}!`
-      const encodedUrl = encodeURIComponent(url)
-      const encodedText = encodeURIComponent(shareText)
 
-      let shareUrl = ""
-      switch (platform) {
-         case "facebook":
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
-            break
-         case "twitter":
-            shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`
-            break
-         case "linkedin":
-            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
-            break
-         case "instagram":
-            shareUrl = "https://www.instagram.com/"
-            break
+      const shareUrl = getShareUrl(platform, url, shareText)
+
+      if (platform === "instagram" || shareUrl === null) {
+         try {
+            await navigator.clipboard.writeText(url)
+            alert("Link copied! Open Instagram and paste to share.")
+         } catch (err) {
+            console.error("Failed to copy link:", err)
+            alert("Failed to copy link. Please copy manually and paste to Instagram.")
+         }
+         setSharingPlatform(null)
+         return
       }
 
       if (shareUrl) {
          window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400")
+         setSharingPlatform(null)
       }
    }
 
    return (
       <ul className={`social-link ${className}`} role="list" aria-label={ariaLabel}>
-         <li>
-            <button
-               type="button"
-               onClick={() => handleShare("facebook")}
-               aria-label="Share on Facebook"
-               title="Share on Facebook"
-            >
-               <i className="fab fa-facebook-f" aria-hidden="true" />
-            </button>
-         </li>
-         <li>
-            <button
-               type="button"
-               onClick={() => handleShare("twitter")}
-               aria-label="Share on Twitter"
-               title="Share on Twitter"
-            >
-               <i className="fab fa-twitter" aria-hidden="true" />
-            </button>
-         </li>
-         <li>
-            <button
-               type="button"
-               onClick={() => handleShare("linkedin")}
-               aria-label="Share on LinkedIn"
-               title="Share on LinkedIn"
-            >
-               <i className="fab fa-linkedin-in" aria-hidden="true" />
-            </button>
-         </li>
-         <li>
-            <button
-               type="button"
-               onClick={() => handleShare("instagram")}
-               aria-label="Share on Instagram"
-               title="Share on Instagram"
-            >
-               <i className="fab fa-instagram" aria-hidden="true" />
-            </button>
-         </li>
+         {platforms.map((platform) => (
+            <li key={platform}>
+               <SocialShareButton
+                  platform={platform}
+                  onClick={() => handleShare(platform)}
+                  isSharing={sharingPlatform === platform}
+                  disabled={sharingPlatform !== null}
+               />
+            </li>
+         ))}
       </ul>
    )
 })

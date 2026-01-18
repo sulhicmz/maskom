@@ -24,6 +24,7 @@ export default function BookmarkButton({
 }: BookmarkButtonProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -32,6 +33,10 @@ export default function BookmarkButton({
   }, [postId]);
 
   const handleToggleBookmark = () => {
+    if (isToggling) return;
+
+    setIsToggling(true);
+
     if (isBookmarked) {
       const removed = removeBookmark(postId);
       if (removed) {
@@ -49,6 +54,8 @@ export default function BookmarkButton({
       setIsBookmarked(true);
       onBookmarkChange?.(true);
     }
+
+    setIsToggling(false);
   };
 
   if (!mounted) {
@@ -67,11 +74,15 @@ export default function BookmarkButton({
     <button
       className={className}
       onClick={handleToggleBookmark}
-      aria-label={isBookmarked ? 'Remove from bookmarks' : 'Bookmark this post'}
+      aria-label={isToggling ? 'Saving bookmark...' : (isBookmarked ? 'Remove from bookmarks' : 'Bookmark this post')}
       aria-pressed={isBookmarked}
+      aria-busy={isToggling}
+      disabled={isToggling}
       type="button"
     >
-      {isBookmarked ? (
+      {isToggling ? (
+        <i className="fas fa-spinner fa-spin" aria-hidden="true" />
+      ) : isBookmarked ? (
         <i className="fas fa-bookmark" aria-hidden="true" />
       ) : (
         <i className="far fa-bookmark" aria-hidden="true" />

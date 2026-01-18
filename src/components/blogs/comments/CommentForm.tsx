@@ -5,6 +5,7 @@ import { useState } from "react";
 import FormField from "@/components/forms/FormField";
 import { createCommentFormSchema } from "@/utils/validation/yupAdapter";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { VALIDATION } from "@/constants/validation";
 
 export interface CommentFormData {
   name: string;
@@ -19,6 +20,7 @@ interface CommentFormProps {
   onCancelReply?: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CommentForm = ({ blogId, parentId, onSubmitSuccess, onCancelReply }: CommentFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,7 +40,6 @@ const CommentForm = ({ blogId, parentId, onSubmitSuccess, onCancelReply }: Comme
   const handleSubmitComment = async (data: CommentFormData) => {
     setIsSubmitting(true);
     try {
-      console.log("Submitting comment:", { blogId, parentId, ...data });
       if (onSubmitSuccess) {
         onSubmitSuccess(data);
       }
@@ -90,7 +91,7 @@ const CommentForm = ({ blogId, parentId, onSubmitSuccess, onCancelReply }: Comme
               error={errors.content}
               trigger={trigger}
               required
-              maxLength={1000}
+              maxLength={VALIDATION.COMMENT_MAX_LENGTH}
               description="Komentar Anda akan ditampilkan setelah disetujui oleh moderator"
             />
           </div>

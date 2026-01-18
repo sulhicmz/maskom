@@ -212,11 +212,24 @@ export interface DraftData<T = object> {
 }
 
 export interface AutoSaveConfig<T = object> {
-   formId: string;
-   data: T;
-   onSave?: (data: T) => Promise<void> | void;
-   onRestore?: (data: T) => void;
-   autoSaveInterval?: number;
-   debounceMs?: number;
-   enabled?: boolean;
+    formId: string;
+    data: T;
+    onSave?: (data: T) => Promise<void> | void;
+    onRestore?: (data: T) => void;
+    autoSaveInterval?: number;
+    debounceMs?: number;
+    enabled?: boolean;
 }
+
+export type MediaType = 'image' | 'video';
+
+export interface MediaAsset {
+    id: number;
+    url: string;
+    type: MediaType;
+    alt: string;
+    tags: string[];
+    createdAt: string;
+    usageCount?: number;
+}
+

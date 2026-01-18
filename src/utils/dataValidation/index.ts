@@ -78,8 +78,13 @@ import {
 } from "./useCaseValidation"
 
 import {
-   validateBlogCategoryData,
+    validateBlogCategoryData,
 } from "./blogCategoryValidation"
+
+import {
+    validateMediaItem,
+    validateMediaAssets,
+} from "./mediaValidation"
 
 export type {
   ValidationResult,
@@ -119,6 +124,8 @@ export type {
      validateTeamMember,
      validateSocialLink,
      validateContactInfoItem,
-     validateUseCaseSidebarItem,
-     validateBlogCategoryData,
+      validateUseCaseSidebarItem,
+      validateBlogCategoryData,
+      validateMediaItem,
+      validateMediaAssets,
  };

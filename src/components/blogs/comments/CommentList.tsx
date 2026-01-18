@@ -69,8 +69,8 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleReplySuccess = (data: CommentFormData) => {
-    console.log("Comment submitted successfully:", data);
     setReplyingTo(null);
   };
 

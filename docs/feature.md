@@ -975,4 +975,164 @@ As a Website Visitor, I want to receive notifications for relevant updates (new 
 
 ---
 
+## [FEATURE-037] Media Asset Library
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to manage media assets in a centralized library, so that I can reuse images and videos across multiple blog posts efficiently.
+
+### Acceptance Criteria
+
+- [ ] Create media asset data structure (MediaAsset interface with id, url, type, alt, tags)
+- [ ] Implement media library page with grid view
+- [ ] Add media upload functionality with validation
+- [ ] Implement search and filter by media type (image, video)
+- [ ] Add tag-based categorization for media assets
+- [ ] Display media usage count (how many posts use each asset)
+- [ ] Implement media metadata editing (alt text, tags)
+- [ ] Add bulk delete functionality for unused assets
+- [ ] Add tests for media library functionality
+- [ ] Update docs/blueprint.md with media library architecture
+
+**Implementation Notes**:
+- Uses existing Image data pattern from TeamData and BlogData
+- Leverages validation layer for media asset validation
+- Integrate with existing ThemeContext for dark mode
+- Apply PageBuilder for consistent admin UI
+- Use localStorage for media metadata persistence
+
+---
+
+## [FEATURE-038] Real-Time Core Web Vitals Monitoring
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Performance/Analytics
+
+### User Story
+
+As an Analytics User, I want to view real-time Core Web Vitals metrics (LCP, FID, CLS) on the admin dashboard, so that I can identify performance bottlenecks proactively.
+
+### Acceptance Criteria
+
+- [ ] Integrate Web Vitals API for metric collection (LCP, FID, CLS)
+- [ ] Add real-time performance metrics section to analytics dashboard
+- [ ] Implement performance threshold alerts (LCP > 2.5s, FID > 100ms, CLS > 0.1)
+- [ ] Store performance data for historical analysis
+- [ ] Add performance trend visualization (charts/graphs)
+- [ ] Implement performance degradation alerts
+- [ ] Add performance score calculation (Good, Needs Improvement, Poor)
+- [ ] Add tests for performance tracking utilities
+- [ ] Update docs/blueprint.md with performance monitoring architecture
+
+**Implementation Notes**:
+- Extends FEATURE-009 (Analytics Dashboard)
+- Extends FEATURE-018 (Admin Dashboard Performance Metrics)
+- Leverages existing APM integration (FEATURE-022)
+- Use Web Vitals API for privacy-friendly tracking
+- Apply real-time data updates to analytics dashboard
+
+---
+
+## [FEATURE-039] Search Filter Presets
+
+**Status**: Pending
+**Priority**: P3
+**Type**: UX/User Experience
+
+### User Story
+
+As a Blog Reader, I want to save custom search filters as presets, so that I can quickly apply my preferred search criteria without re-entering them.
+
+### Acceptance Criteria
+
+- [ ] Create search preset data structure (SearchPreset interface)
+- [ ] Add "Save as Preset" button to blog search filters
+- [ ] Implement preset management page with edit/delete functionality
+- [ ] Add quick preset selection dropdown in BlogArea
+- [ ] Store presets in localStorage
+- [ ] Limit preset count per user (max 10 presets)
+- [ ] Implement preset naming with validation
+- [ ] Add "Apply Preset" button with visual feedback
+- [ ] Add tests for preset functionality
+- [ ] Update docs/blueprint.md with preset architecture
+
+**Implementation Notes**:
+- Extends FEATURE-006 (Advanced Blog Search & Filtering)
+- Uses existing search and filter patterns
+- Leverage localStorage for persistence
+- Apply real-time validation for preset names
+- Integrate with ThemeContext for dark mode support
+
+---
+
+## [FEATURE-040] APM Provider Configuration
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Infrastructure/Admin
+
+### User Story
+
+As a Site Administrator, I want to configure APM provider settings (Sentry vs Console) via admin panel, so that I can switch monitoring providers without code changes.
+
+### Acceptance Criteria
+
+- [ ] Create APM configuration interface (APMConfig type)
+- [ ] Add admin panel for APM settings (/admin/apm-config)
+- [ ] Implement provider selection dropdown (Console, Sentry)
+- [ ] Add provider-specific configuration fields (DSN, environment, sample rate)
+- [ ] Implement configuration validation and save functionality
+- [ ] Add APM provider status indicator (active/inactive)
+- [ ] Implement configuration test button (send test error to verify)
+- [ ] Add configuration history and rollback capability
+- [ ] Add tests for APM configuration management
+- [ ] Update docs/blueprint.md with APM configuration architecture
+
+**Implementation Notes**:
+- Extends FEATURE-022 (APM Integration & Production Monitoring)
+- Uses existing APM manager and provider interface (IAPMProvider)
+- Leverages existing ConsoleAPMProvider implementation
+- Ready for SentryAPMProvider integration (when needed)
+- Apply validation layer for configuration
+- Integrate with RBAC system (admin-only access)
+
+---
+
+## [FEATURE-041] Automated Version Snapshots
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management
+
+### User Story
+
+As a Content Creator, I want to schedule automatic version snapshots before publishing, so that I have a guaranteed rollback point before each live deployment.
+
+### Acceptance Criteria
+
+- [ ] Add auto-snapshot configuration to blog form settings
+- [ ] Implement automatic version creation on publish action
+- [ ] Add version snapshot annotation (e.g., "Pre-publish snapshot")
+- [ ] Display snapshot history in VersionHistoryPanel
+- [ ] Implement snapshot restoration with confirmation
+- [ ] Add snapshot count display in admin dashboard
+- [ ] Implement snapshot cleanup policy (retain last 20 snapshots)
+- [ ] Add tests for automatic snapshot functionality
+- [ ] Update docs/blueprint.md with snapshot architecture
+
+**Implementation Notes**:
+- Extends FEATURE-034 (Content Version Control & History)
+- Uses existing VersionHistoryPanel component
+- Leverages existing versionStorage utilities
+- Apply validation layer for snapshot metadata
+- Integrate with ThemeContext for dark mode support
+- Ready for integration with BlogForm when available
+
+---
+
 **Last Updated**: 2026-01-17

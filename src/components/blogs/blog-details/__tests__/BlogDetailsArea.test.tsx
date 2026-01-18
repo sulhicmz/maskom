@@ -209,7 +209,7 @@ describe('BlogDetailsArea', () => {
     expect(screen.getByLabelText('Share on Facebook')).toBeInTheDocument();
     expect(screen.getByLabelText('Share on Twitter')).toBeInTheDocument();
     expect(screen.getByLabelText('Share on LinkedIn')).toBeInTheDocument();
-    expect(screen.getByLabelText('Share on Instagram')).toBeInTheDocument();
+    expect(screen.getByLabelText('Copy link for Instagram')).toBeInTheDocument();
   });
 
   it('renders tags and categories', () => {
