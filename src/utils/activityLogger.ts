@@ -1,4 +1,4 @@
-import { ActivityLog, ActivityAction, ActivityLogFilter, ActivityStatistics, AlertRule, SuspiciousActivityAlert } from '@/types/audit';
+import { ActivityLog, ActivityAction, ActivityLogFilter, ActivityStatistics, AlertRule, SuspiciousActivityAlert, ActivityDetails } from '@/types/audit';
 
 const LOG_STORAGE_KEY = 'activity_logs';
 const ALERT_RULES_STORAGE_KEY = 'alert_rules';
@@ -25,7 +25,7 @@ export const logActivity = (
     action: ActivityAction,
     resource: string,
     resourceId?: string,
-    details: Record<string, any> = {},
+    details: ActivityDetails = {},
     success: boolean = true,
     errorMessage?: string
 ): ActivityLog => {
@@ -141,10 +141,10 @@ export const calculateActivityStatistics = (): ActivityStatistics => {
     const successfulLogs = logs.filter(log => log.success).length;
     const failedLogs = logs.filter(log => !log.success).length;
 
-    const logsByAction: Record<ActivityAction, number> = {} as any;
-    Object.values(ActivityAction).forEach(action => {
-        logsByAction[action] = logs.filter(log => log.action === action).length;
-    });
+    const logsByAction = Object.values(ActivityAction).reduce<Record<ActivityAction, number>>((acc, action) => {
+        acc[action] = logs.filter(log => log.action === action).length;
+        return acc;
+    }, {} as Record<ActivityAction, number>);
 
     const logsByUser: Record<string, number> = {};
     logs.forEach(log => {

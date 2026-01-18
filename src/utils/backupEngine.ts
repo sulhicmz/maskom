@@ -10,11 +10,18 @@ import {
   BackupStatistics,
   BackupConfig,
   BackupSchedule,
+<<<<<<< HEAD
+=======
+  BackupHealthStatus,
+>>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
   UserDataBackup,
   ContentDataBackup,
   SettingsDataBackup,
   ActivityLogBackup,
+<<<<<<< HEAD
   BackupHealthStatus,
+=======
+>>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
 } from '@/types/backup'
 
 import { BACKUP_METADATA_KEY, BACKUP_DATA_KEY_PREFIX } from '@/types/backup'
@@ -325,9 +332,9 @@ class BackupEngine {
         message: 'Loading backup data...',
       })
 
-      const backupData = await this.loadBackupFromStorage(backupId)
+      const backupDataString = await this.loadBackupFromStorage(backupId)
 
-      if (!backupData) {
+      if (!backupDataString) {
         throw new Error(`Backup data for ${backupId} not found`)
       }
 
@@ -352,6 +359,8 @@ class BackupEngine {
       const startTime = Date.now()
       const errors: string[] = []
       const warnings: string[] = []
+
+      const backupData: BackupData = JSON.parse(backupDataString)
 
       try {
         await this.restoreUserData(backupData.userData, errors, warnings)
@@ -470,11 +479,19 @@ class BackupEngine {
 
       const encryptedDataArray = new Uint8Array(encryptedData)
       const combined = new Uint8Array(
+<<<<<<< HEAD
         iv.length + keyBuffer.length + encryptedDataArray.length,
       )
       combined.set(iv, 0)
       combined.set(keyBuffer, iv.length)
       combined.set(encryptedDataArray, iv.length + keyBuffer.length)
+=======
+        iv.length + keyBuffer.byteLength + encryptedData.byteLength,
+      )
+      combined.set(iv, 0)
+      combined.set(new Uint8Array(keyBuffer), iv.length)
+      combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.byteLength)
+>>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
 
       const base64 = btoa(String.fromCharCode(...combined))
 
@@ -785,7 +802,7 @@ class BackupEngine {
     return ((backups.length - expiredCount) / backups.length) * 100
   }
 
-  private async collectUserData() {
+  private async collectUserData(): Promise<UserDataBackup> {
     return {
       authState: [],
       preferences: [],
@@ -793,7 +810,7 @@ class BackupEngine {
     }
   }
 
-  private async collectContentData() {
+  private async collectContentData(): Promise<ContentDataBackup> {
     return {
       blogPosts: [],
       blogComments: [],
@@ -801,12 +818,65 @@ class BackupEngine {
     }
   }
 
-  private async collectSettingsData() {
+  private async collectSettingsData(): Promise<SettingsDataBackup> {
     return {
-      cacheConfig: {},
-      apmConfig: {},
-      rbacConfig: {},
-      backupConfig: {},
+      cacheConfig: {
+        cacheFirstExtensions: [],
+        networkFirstPatterns: [],
+        cacheTTL: {
+          staticAssets: 0,
+          apiResponses: 0,
+          images: 0,
+          fonts: 0,
+        },
+        cacheSizeLimit: 0,
+        cleanupPolicy: {
+          enabled: false,
+          maxAge: 0,
+          maxEntries: 0,
+          autoCleanupInterval: 0,
+        },
+      },
+      apmConfig: {
+        provider: 'none',
+        enabled: false,
+        environment: 'development',
+        sampleRate: 0,
+      },
+      rbacConfig: {
+        roles: {
+          admin: [],
+          editor: [],
+          user: [],
+        },
+        permissions: {
+          view_analytics: [],
+          manage_users: [],
+          manage_roles: [],
+          manage_content: [],
+          publish_content: [],
+          edit_content: [],
+          delete_content: [],
+          view_admin_dashboard: [],
+          manage_settings: [],
+        },
+      },
+      backupConfig: {
+        enabled: false,
+        schedule: 'manual',
+        time: '00:00',
+        retentionDays: 0,
+        storageType: 'none',
+        encryptionEnabled: false,
+        compressionEnabled: false,
+        retentionPolicy: {
+          keepLastCount: 0,
+          keepDailyFor: 0,
+          keepWeeklyFor: 0,
+          keepMonthlyFor: 0,
+          maxSizeGB: 0,
+        },
+      },
     }
   }
 
@@ -814,7 +884,7 @@ class BackupEngine {
     return []
   }
 
-  private async calculateChangesSinceBackup(lastBackupTimestamp: string) {
+  private async calculateChangesSinceBackup(lastBackupTimestamp: string): Promise<Omit<BackupData, 'backupInfo'>> {
     return {
       userData: {
         authState: [],
@@ -827,10 +897,63 @@ class BackupEngine {
         mediaAssets: [],
       },
       settingsData: {
-        cacheConfig: {},
-        apmConfig: {},
-        rbacConfig: {},
-        backupConfig: {},
+        cacheConfig: {
+          cacheFirstExtensions: [],
+          networkFirstPatterns: [],
+          cacheTTL: {
+            staticAssets: 0,
+            apiResponses: 0,
+            images: 0,
+            fonts: 0,
+          },
+          cacheSizeLimit: 0,
+          cleanupPolicy: {
+            enabled: false,
+            maxAge: 0,
+            maxEntries: 0,
+            autoCleanupInterval: 0,
+          },
+        },
+        apmConfig: {
+          provider: 'none',
+          enabled: false,
+          environment: 'development',
+          sampleRate: 0,
+        },
+        rbacConfig: {
+          roles: {
+            admin: [],
+            editor: [],
+            user: [],
+          },
+          permissions: {
+            view_analytics: [],
+            manage_users: [],
+            manage_roles: [],
+            manage_content: [],
+            publish_content: [],
+            edit_content: [],
+            delete_content: [],
+            view_admin_dashboard: [],
+            manage_settings: [],
+          },
+        },
+        backupConfig: {
+          enabled: false,
+          schedule: 'manual',
+          time: '00:00',
+          retentionDays: 0,
+          storageType: 'none',
+          encryptionEnabled: false,
+          compressionEnabled: false,
+          retentionPolicy: {
+            keepLastCount: 0,
+            keepDailyFor: 0,
+            keepWeeklyFor: 0,
+            keepMonthlyFor: 0,
+            maxSizeGB: 0,
+          },
+        },
       },
       activityLogs: [],
     }

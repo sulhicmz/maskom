@@ -10,9 +10,8 @@ import {
     exportLogsToCSV,
     exportLogsToJSON,
     downloadLogs,
-    type ActivityLog,
-    ActivityAction,
 } from '@/utils/activityLogger'
+import { ActivityLog, ActivityAction, ActivityDetails } from '@/types/audit'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import ProtectedRoute from '@/components/common/ProtectedRoute'
 import { Permission } from '@/types/permission'
@@ -88,7 +87,7 @@ const LogRow = memo(({ log, index }: { log: ActivityLog; index: number }) => {
         })
     }
 
-    const formatDetails = (details: Record<string, any>): string => {
+    const formatDetails = (details: ActivityDetails): string => {
         if (Object.keys(details).length === 0) return '-'
         return Object.entries(details)
             .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)

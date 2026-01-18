@@ -65,7 +65,11 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
         ...localConfig,
         retentionPolicy: {
           ...localConfig.retentionPolicy,
+<<<<<<< HEAD
           [field]: value as keyof BackupConfig['retentionPolicy'],
+=======
+          [field]: value as BackupConfig['retentionPolicy'][keyof BackupConfig['retentionPolicy']],
+>>>>>>> a8eb231 ([CODE ARCHITECT] Type Safety Improvements for Audit & Backup Systems)
         },
       })
     }

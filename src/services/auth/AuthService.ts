@@ -17,7 +17,8 @@ import { generateUUID } from '@/utils/uuid';
 import { UserRole, isValidRole, Permission, MFAStatus } from '@/types';
 import { hasPermission as checkPermission } from '@/data/rolesData';
 import { verifyTOTP, createMFASetupData } from '@/utils/mfa';
-import { logActivity, ActivityAction } from '@/utils/activityLogger';
+import { logActivity } from '@/utils/activityLogger';
+import { ActivityAction } from '@/types/audit';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;

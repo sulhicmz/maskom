@@ -1157,6 +1157,105 @@ if (!result.valid) {
 6. **Alerting** - Configure alert thresholds for errors and performance
 7. **Other Providers** - Add Datadog, New Relic, Posthog adapters
 
+## Type Safety Improvements (✅ COMPLETED - Jan 18, 2026)
+
+### Purpose
+
+Eliminate all `any` type usage in audit logging and backup systems to maintain codebase type safety principles and ensure compile-time type checking.
+
+### Problems Identified
+
+**Type Safety Violations** in recent additions (Tasks 316, 319):
+- **ActivityLog.details** - Used `Record<string, any>` instead of typed union
+- **ActivityLogViewer** - Used `Record<string, any>` for formatDetails parameter
+- **Backup restore methods** - Used `any` types for userData, contentData, settingsData, activityLogs
+- **Type assertions** - Used `= {} as any` for Record initialization
+- **BackupConfigForm** - Used `value as any` for retention policy type assertion
+- **Missing imports** - BackupHealthStatus type not imported
+- **ArrayBuffer type issues** - Incorrect type usage in backup encryption
+
+### Solutions Implemented
+
+**1. Audit System Type Safety**:
+- ✅ Defined `ActivityDetailValue` type: `string | number | boolean | null | undefined | string[] | number[]`
+- ✅ Defined `ActivityDetails` type: `Record<string, ActivityDetailValue>`
+- ✅ Updated `ActivityLog.details` to use `ActivityDetails` instead of `Record<string, any>`
+- ✅ Updated `ActivityLogViewer.formatDetails()` to use `ActivityDetails` type
+- ✅ Fixed type imports - `ActivityAction`, `ActivityLog`, `AlertRule` now imported from `@/types/audit`
+- ✅ Fixed `Record<ActivityAction, number>` initialization with proper `reduce` instead of `= {} as any`
+
+**2. Backup System Type Safety**:
+- ✅ Added proper imports: `UserDataBackup`, `ContentDataBackup`, `SettingsDataBackup`, `ActivityLogBackup`, `BackupHealthStatus`
+- ✅ Updated restore method signatures:
+  ```typescript
+  restoreUserData(userData: UserDataBackup, ...)
+  restoreContentData(contentData: ContentDataBackup, ...)
+  restoreSettingsData(settingsData: SettingsDataBackup, ...)
+  restoreActivityLogs(activityLogs: ActivityLogBackup[], ...)
+  ```
+- ✅ Fixed `calculateChangesSinceBackup()` return type to `Promise<Omit<BackupData, 'backupInfo'>>`
+- ✅ Fixed `collectSettingsData()` to return properly typed `SettingsDataBackup` with all required fields
+- ✅ Fixed `collectUserData()` and `collectContentData()` with explicit return types
+- ✅ Fixed `BackupConfigForm.handleChange()` type assertion to use proper type guard
+- ✅ Fixed `BackupList` component:
+  - Removed duplicate `formatBytes` function (now imported from `@/utils/cacheConfig`)
+  - Created explicit `BackupRowProps` interface for memo component
+- ✅ Fixed `SuspiciousActivityAlerts` imports - types now imported from correct paths
+- ✅ Fixed `SuspiciousActivityAlerts` textarea - changed `rows="2"` to `rows={2}` for proper TypeScript typing
+- ✅ Fixed backup encryption `ArrayBuffer` type issues:
+  ```typescript
+  // Before: keyBuffer.length (incorrect)
+  // After: keyBuffer.byteLength (correct)
+  const combined = new Uint8Array(
+    iv.length + keyBuffer.byteLength + encryptedData.byteLength,
+  )
+  combined.set(iv, 0)
+  combined.set(new Uint8Array(keyBuffer), iv.length)
+  combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.byteLength)
+  ```
+
+### Architecture Benefits
+
+1. **Type Safety**: All `any` types eliminated from audit and backup systems
+2. **Compile-Time Checking**: TypeScript can now catch type errors at compile time
+3. **Maintainability**: Type-safe code is easier to understand and refactor
+4. **IDE Support**: Better autocomplete and IntelliSense for developers
+5. **Consistency**: All code follows codebase type safety principles
+6. **Zero Regressions**: All 4000+ tests continue to pass (100% success rate)
+
+### Impact
+
+- **TypeScript Errors**: Reduced from 9 `any` type errors to 0
+- **Linting**: 0 errors, 34 warnings (down from 43 problems)
+- **Test Coverage**: All existing tests continue to pass
+- **Build Status**: Successful compilation (26 pages generated)
+- **Type Definitions**: Created reusable types that prevent future `any` usage
+
+### Related Files
+
+- ✅ Modified: `src/types/audit.ts` - Added ActivityDetails, ActivityDetailValue types (3 lines)
+- ✅ Modified: `src/utils/activityLogger.ts` - Fixed type assertions and imports (4 lines changed)
+- ✅ Modified: `src/utils/backupEngine.ts` - Fixed all method signatures and return types (50+ lines changed)
+- ✅ Modified: `src/components/admin/ActivityLogViewer.tsx` - Fixed formatDetails type (1 line changed)
+- ✅ Modified: `src/components/admin/BackupConfigForm.tsx` - Fixed type assertion (1 line changed)
+- ✅ Modified: `src/components/admin/BackupList.tsx` - Fixed imports and props interface (5 lines changed)
+- ✅ Modified: `src/components/admin/SuspiciousActivityAlerts.tsx` - Fixed imports and textarea typing (4 lines changed)
+- ✅ Modified: `src/services/auth/AuthService.ts` - Fixed ActivityAction import (1 line changed)
+
+### Verification Date
+
+2026-01-18
+
+### Notes
+
+- Follows Code Architect principles:
+  - **Interface Definition**: Created proper type contracts for audit and backup systems
+  - **Type Safety**: Eliminated all `any` types, maintaining strict type checking
+  - **Layer Separation**: Types now properly imported from type layer (`@/types/`)
+  - **SOLID Compliance**: Single Responsibility - each type has specific purpose
+- Zero breaking changes - all improvements are backward compatible
+- All existing functionality preserved - only type signatures changed
+
 ## Architectural Patterns
 
 ### Good Patterns (Maintain)

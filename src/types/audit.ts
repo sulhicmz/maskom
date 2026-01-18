@@ -28,13 +28,16 @@ export enum ActivityAction {
     COMMENT_MODERATE = 'comment_moderate',
 }
 
+export type ActivityDetailValue = string | number | boolean | null | undefined | string[] | number[];
+export type ActivityDetails = Record<string, ActivityDetailValue>;
+
 export interface ActivityLog {
     id: string;
     userId: string;
     action: ActivityAction;
     resource: string;
     resourceId?: string;
-    details: Record<string, any>;
+    details: ActivityDetails;
     timestamp: string;
     ipAddress: string;
     userAgent: string;

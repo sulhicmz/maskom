@@ -12,10 +12,9 @@ import {
     saveAlertRule,
     updateAlertRule,
     deleteAlertRule,
-    type SuspiciousActivityAlert,
-    AlertRule,
 } from '@/utils/activityLogger'
-import { ActivityAction, Permission } from '@/types/audit'
+import { SuspiciousActivityAlert, AlertRule, ActivityAction } from '@/types/audit'
+import { Permission } from '@/types/permission'
 
 const AlertRow = memo(({ alert, onResolve }: { alert: SuspiciousActivityAlert; onResolve: (alertId: string) => void }) => {
     const { theme } = useTheme()
@@ -387,7 +386,7 @@ const SuspiciousActivityAlertsPanel: React.FC = () => {
                                                         className="form-control"
                                                         value={newRule.description}
                                                         onChange={(e) => setNewRule({ ...newRule, description: e.target.value })}
-                                                        rows="2"
+                                                        rows={2}
                                                     />
                                                 </div>
                                                 <div className="col-md-12 mb-3">

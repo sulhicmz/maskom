@@ -7,6 +7,7 @@ import { getBackupMetadata } from '@/data/BackupData'
 import { BACKUP_METADATA_KEY } from '@/types/backup'
 import StatusBadge from '@/components/ui/StatusBadge'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { formatBytes } from '@/utils/cacheConfig'
 
 interface BackupListProps {
   onRestore: (backupId: string) => void
@@ -14,18 +15,15 @@ interface BackupListProps {
   onExport: (backupId: string) => void
 }
 
-const BackupRow = memo(({
-  backup,
-  onRestore,
-  onDelete,
-  onExport,
-}: {
+interface BackupRowProps {
   backup: BackupMetadata
   onRestore: (id: string) => void
   onDelete: (id: string) => void
   onExport: (id: string) => void
   index: number
-}) => {
+}
+
+const BackupRow = memo(({ backup, onRestore, onDelete, onExport, index }: BackupRowProps) => {
   const { theme } = useTheme()
   const date = new Date(backup.timestamp)
   const formattedDate = date.toLocaleDateString('id-ID', {
@@ -159,14 +157,6 @@ const BackupList: React.FC<BackupListProps> = ({
     }
 
     setFilteredBackups(filtered)
-  }
-
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
   }
 
   if (loading) {
