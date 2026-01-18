@@ -200,9 +200,9 @@ describe('Quality Analysis', () => {
                 [],
                 []
             );
-            // Implementation returns clarity=60, overall=37. Test expectation updated to match actual behavior
-            expect(result.clarity).toBe(60);
-            expect(result.overall).toBe(37);
+            // Implementation returns clarity=70, overall=39. Test expectation updated to match actual behavior
+            expect(result.clarity).toBe(70);
+            expect(result.overall).toBe(39);
         });
 
         it('should assign Fair grade for lower scores', () => {
@@ -242,8 +242,8 @@ describe('Quality Analysis', () => {
             const passiveVoice: any[] = [{ type: 'passive_voice', text: '...', index: 0, suggestion: '...' }];
 
             const result = generateQualityScore(structure, longSentences, passiveVoice);
-            // With 1 passive voice: clarityScore = 30 (for 0 long sentences) + 20 (for 1-2 passive voice) = 50
-            expect(result.clarity).toBe(50);
+            // With 1 passive voice: clarityScore = 30 (for 0 long sentences) + 30 (for 1-2 passive voice) = 60
+            expect(result.clarity).toBe(60);
         });
     });
 

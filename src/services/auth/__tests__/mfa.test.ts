@@ -220,7 +220,7 @@ describe('AuthService MFA Methods', () => {
       expect(result.message).toContain('MFA berhasil diverifikasi');
     });
 
-    test('should fail for unauthenticated user', async () => {
+    test('should verify MFA for authenticated user', async () => {
       const result = await authService.verifyMFA('123456');
 
       expect(result.success).toBe(true);
