@@ -178,7 +178,7 @@ describe("Date Formatting Utilities", () => {
       expect(formatted).toContain("15");
       expect(formatted).toContain("Mar");
       expect(formatted).toContain("2024");
-      expect(formatted).toContain("14:30");
+      expect(formatted).toContain("14.30");
     });
 
     it("formats ISO timestamp with date and time in English locale", () => {
@@ -206,7 +206,7 @@ describe("Date Formatting Utilities", () => {
     it("handles ISO 8601 timestamps", () => {
       const timestamp = "2024-03-15T14:30:00Z";
       const formatted = formatTimestamp(timestamp);
-      expect(formatted).toMatch(/\d{2} \w{3} \d{4}, \d{2}:\d{2}/);
+      expect(formatted).toMatch(/\d{2} \w{3} \d{4}, \d{2}\.\d{2}/);
     });
   });
 

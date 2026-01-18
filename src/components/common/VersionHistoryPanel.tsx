@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { BlogPostVersion, VersionDiff } from '@/types/blog';
 import { versionStorage } from '@/utils/versionStorage';
 import { formatTimestamp } from '@/utils/dateFormat';
-import { getDiffBadgeClass, DiffType } from '@/utils/diffBadge';
+import { getDiffBadgeClass } from '@/utils/diffBadge';
 
 interface VersionHistoryPanelProps {
    postId: number;

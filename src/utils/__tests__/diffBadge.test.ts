@@ -1,4 +1,4 @@
-import { getDiffBadgeClass } from '../diffBadge';
+import { getDiffBadgeClass, DiffType } from '../diffBadge';
 
 describe('getDiffBadgeClass', () => {
   test('returns correct CSS class for "added" type', () => {
@@ -14,25 +14,25 @@ describe('getDiffBadgeClass', () => {
   });
 
   test('returns empty string for unknown type', () => {
-    expect(getDiffBadgeClass('unknown' as any)).toBe('');
+    expect(getDiffBadgeClass('unknown' as unknown as DiffType)).toBe('');
   });
 
   test('returns empty string for undefined type', () => {
-    expect(getDiffBadgeClass(undefined as any)).toBe('');
+    expect(getDiffBadgeClass(undefined as unknown as DiffType)).toBe('');
   });
 
   test('returns empty string for null type', () => {
-    expect(getDiffBadgeClass(null as any)).toBe('');
+    expect(getDiffBadgeClass(null as unknown as DiffType)).toBe('');
   });
 
   test('handles empty string type', () => {
-    expect(getDiffBadgeClass('' as any)).toBe('');
+    expect(getDiffBadgeClass('' as unknown as DiffType)).toBe('');
   });
 
   test('supports all three valid diff types', () => {
-    const diffTypes = ['added', 'removed', 'changed'];
+    const diffTypes: DiffType[] = ['added', 'removed', 'changed'];
     diffTypes.forEach((type) => {
-      const result = getDiffBadgeClass(type as any);
+      const result = getDiffBadgeClass(type);
       expect(result).toBe(`diff-badge-${type}`);
       expect(result).toBeTruthy();
     });
