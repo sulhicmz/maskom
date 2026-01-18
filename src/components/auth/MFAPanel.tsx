@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from '@/components/ui/Button';
 import authService from '@/services/auth/AuthService';
 import MFASetup from './MFASetup';
 import type { MFAStatus } from '@/types/mfa';
 import type { User } from '@/services/auth/types';
 
-export default function MFAPanel() {
+const MFAPanel = () => {
   const [user, setUser] = useState<User | null>(null);
   const [mfaStatus, setMfaStatus] = useState<MFAStatus>('disabled');
   const [showSetup, setShowSetup] = useState(false);
@@ -22,15 +22,15 @@ export default function MFAPanel() {
     loadUserInfo();
   }, []);
 
-  const loadUserInfo = async () => {
+  const loadUserInfo = useCallback(async () => {
     const currentUser = await authService.getCurrentUser();
     const status = await authService.getMFAStatus();
     
     setUser(currentUser);
     setMfaStatus(status);
-  };
+  }, []);
 
-  const handleDisableMFA = async (e: React.FormEvent) => {
+  const handleDisableMFA = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -53,9 +53,9 @@ export default function MFAPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [disablePassword, loadUserInfo]);
 
-  const handleRegenerateBackupCodes = async () => {
+  const handleRegenerateBackupCodes = useCallback(async () => {
     setLoading(true);
     setError('');
     setNewBackupCodes(null);
@@ -76,23 +76,23 @@ export default function MFAPanel() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [disablePassword]);
 
-  const handleCopyBackupCode = (code: string) => {
+  const handleCopyBackupCode = useCallback((code: string) => {
     navigator.clipboard.writeText(code);
-  };
+  }, []);
 
-  const handleCopyAllBackupCodes = () => {
+  const handleCopyAllBackupCodes = useCallback(() => {
     if (newBackupCodes) {
       const allCodes = newBackupCodes.join('\n');
       navigator.clipboard.writeText(allCodes);
     }
-  };
+  }, [newBackupCodes]);
 
-  const handleSetupSuccess = () => {
+  const handleSetupSuccess = useCallback(() => {
     setShowSetup(false);
     loadUserInfo();
-  };
+  }, [loadUserInfo]);
 
   if (showSetup) {
     return (
@@ -263,3 +263,7 @@ export default function MFAPanel() {
     </div>
   );
 }
+
+MFAPanel.displayName = 'MFAPanel';
+
+export default React.memo(MFAPanel);

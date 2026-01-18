@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { WebVitalsMetrics, WebVitalsEntry } from '@/types/analytics'
 import { getWebVitalsMetrics, getWebVitalsEntries, getPerformanceAlerts, hasPerformanceAlerts, loadFromLocalStorage } from '@/utils/webVitals'
@@ -32,10 +32,10 @@ const PerformanceMetrics: React.FC = () => {
     loadMetrics()
     const interval = setInterval(loadMetrics, 30000)
 
-    return () => clearInterval(interval)
+     return () => clearInterval(interval)
   }, [])
 
-  const getRatingBadge = (rating: string) => {
+  const getRatingBadge = useCallback((rating: string) => {
     switch (rating) {
       case 'good':
         return <span className="badge bg-success">Good</span>
@@ -46,22 +46,22 @@ const PerformanceMetrics: React.FC = () => {
       default:
         return <span className="badge bg-secondary">Unknown</span>
     }
-  }
+  }, [])
 
-  const formatMetricValue = (metric: string, value: number) => {
+  const formatMetricValue = useCallback((metric: string, value: number) => {
     if (metric === 'CLS') return value.toFixed(3)
     if (metric === 'LCP' || metric === 'FCP' || metric === 'TTFB') return `${Math.round(value)}ms`
     if (metric === 'FID') return `${Math.round(value)}ms`
     return value.toString()
-  }
+  }, [])
 
-  const metricCards = [
+  const metricCards = useMemo(() => [
     { key: 'lcp', label: 'Largest Contentful Paint', description: 'Time to load the largest content element' },
     { key: 'fid', label: 'First Input Delay', description: 'Time until the page responds to user interaction' },
     { key: 'cls', label: 'Cumulative Layout Shift', description: 'Unexpected layout movement during page load' },
     { key: 'fcp', label: 'First Contentful Paint', description: 'Time to render the first content element' },
     { key: 'ttfb', label: 'Time to First Byte', description: 'Time to receive the first byte of response' }
-  ]
+  ], [])
 
   return (
     <section className={`performance-metrics-section ${theme === 'dark' ? 'dark-mode' : ''}`}>
@@ -219,8 +219,10 @@ const PerformanceMetrics: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+     </section>
   )
 }
 
-export default PerformanceMetrics
+PerformanceMetrics.displayName = 'PerformanceMetrics';
+
+export default React.memo(PerformanceMetrics);

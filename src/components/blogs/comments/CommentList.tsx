@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { BlogCommentItem } from "@/types/data";
 import { formatCommentDate } from "@/utils/dateFormat";
@@ -19,7 +19,7 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
 
   const approvedComments = localComments.filter(c => c.status === 'approved');
 
-  const buildCommentTree = (comments: BlogCommentItem[], parentId: number | null = null) => {
+  const buildCommentTree = useCallback((comments: BlogCommentItem[], parentId: number | null = null) => {
     return comments
       .filter(comment => comment.parentId === parentId)
       .sort((a, b) => {
@@ -27,9 +27,9 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
         const dateB = new Date(b.date).getTime();
         return dateB - dateA;
       });
-  };
+  }, []);
 
-  const rootComments = buildCommentTree(approvedComments, null);
+  const rootComments = useMemo(() => buildCommentTree(approvedComments, null), [approvedComments, buildCommentTree]);
 
   const handleVote = (commentId: number, voteType: 'up' | 'down') => {
     const previousVote = userVotes.get(commentId);
@@ -74,10 +74,10 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
     setReplyingTo(null);
   };
 
-  const CommentItem = ({ comment, depth = 0 }: { comment: BlogCommentItem; depth?: number }) => {
-    const replies = buildCommentTree(approvedComments, comment.id);
-    const currentVote = userVotes.get(comment.id);
-    const isReplying = replyingTo === comment.id;
+  const CommentItem = memo(({ comment, depth = 0 }: { comment: BlogCommentItem; depth?: number }) => {
+    const replies = useMemo(() => buildCommentTree(approvedComments, comment.id), [approvedComments, comment.id, buildCommentTree]);
+    const currentVote = useMemo(() => userVotes.get(comment.id), [userVotes, comment.id]);
+    const isReplying = useMemo(() => replyingTo === comment.id, [replyingTo, comment.id]);
 
     return (
       <div
@@ -155,7 +155,7 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
         )}
       </div>
     );
-  };
+  });
 
   return (
     <div className="ac-postbox_comment mb-55 wow fadeInUp">

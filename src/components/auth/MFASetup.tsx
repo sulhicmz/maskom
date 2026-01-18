@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import authService from '@/services/auth/AuthService';
@@ -11,7 +11,7 @@ interface MFASetupProps {
   onCancel?: () => void;
 }
 
-export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
+const MFASetup = ({ onSuccess, onCancel }: MFASetupProps) => {
   const [setupData, setSetupData] = useState<MFASetupData | null>(null);
   const [totpCode, setTotpCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
   const [step, setStep] = useState<'initiate' | 'scan' | 'verify'>('initiate');
   const [backupCodesVisible, setBackupCodesVisible] = useState(false);
 
-  const handleInitiate = async () => {
+  const handleInitiate = useCallback(async () => {
     setLoading(true);
     setError('');
     
@@ -37,9 +37,9 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleVerify = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -58,18 +58,18 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [totpCode, onSuccess]);
 
-  const handleCopyBackupCode = (code: string) => {
+  const handleCopyBackupCode = useCallback((code: string) => {
     navigator.clipboard.writeText(code);
-  };
+  }, []);
 
-  const handleCopyAllBackupCodes = () => {
+  const handleCopyAllBackupCodes = useCallback(() => {
     if (setupData) {
       const allCodes = setupData.backupCodes.join('\n');
       navigator.clipboard.writeText(allCodes);
     }
-  };
+  }, [setupData]);
 
   if (step === 'initiate') {
     return (
@@ -214,3 +214,7 @@ export default function MFASetup({ onSuccess, onCancel }: MFASetupProps) {
 
   return null;
 }
+
+MFASetup.displayName = 'MFASetup';
+
+export default React.memo(MFASetup);
