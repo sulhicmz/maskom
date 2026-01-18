@@ -1,8 +1,8 @@
 "use client"
 
 import { memo, useState } from "react"
-
-type SocialPlatform = "facebook" | "twitter" | "linkedin" | "instagram"
+import type { SocialPlatform } from "@/utils/socialPlatforms"
+import { getPlatformIcon, getPlatformAriaLabel, getPlatformTitle, getShareUrl } from "@/utils/socialPlatforms"
 
 interface SocialShareButtonsProps {
    title?: string
@@ -21,94 +21,47 @@ const SocialShareButtons = memo(({
 }: SocialShareButtonsProps) => {
    const [sharingPlatform, setSharingPlatform] = useState<SocialPlatform | null>(null)
 
-   const handleShare = async (platform: SocialPlatform) => {
-      if (sharingPlatform) return
+    const handleShare = async (platform: SocialPlatform) => {
+       if (sharingPlatform) return
 
-      setSharingPlatform(platform)
-      const url = customUrl || (typeof window !== "undefined" ? window.location.href : "https://maskom.co.id")
-      const shareText = text || `Check out ${title}!`
+       setSharingPlatform(platform)
+       const url = customUrl || (typeof window !== "undefined" ? window.location.href : "https://maskom.co.id")
+       const shareText = text || `Check out ${title}!`
 
-      if (platform === "instagram") {
-         try {
-            await navigator.clipboard.writeText(url)
-            alert("Link copied! Open Instagram and paste to share.")
-         } catch (err) {
-            console.error("Failed to copy link:", err)
-            alert("Failed to copy link. Please copy manually and paste to Instagram.")
-         }
-         setSharingPlatform(null)
-         return
-      }
+       const shareUrl = getShareUrl(platform, url, shareText)
 
-      const encodedUrl = encodeURIComponent(url)
-      const encodedText = encodeURIComponent(shareText)
+       if (platform === "instagram" || shareUrl === null) {
+          try {
+             await navigator.clipboard.writeText(url)
+             alert("Link copied! Open Instagram and paste to share.")
+          } catch (err) {
+             console.error("Failed to copy link:", err)
+             alert("Failed to copy link. Please copy manually and paste to Instagram.")
+          }
+          setSharingPlatform(null)
+          return
+       }
 
-      let shareUrl = ""
-      switch (platform) {
-         case "facebook":
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
-            break
-         case "twitter":
-            shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`
-            break
-         case "linkedin":
-            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
-            break
-      }
+       if (shareUrl) {
+          window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400")
+          setSharingPlatform(null)
+       }
+    }
 
-      if (shareUrl) {
-         window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400")
-         setSharingPlatform(null)
-      }
-   }
+    const getIcon = (platform: SocialPlatform) => {
+       if (sharingPlatform === platform) {
+          return <i className="fas fa-spinner fa-spin" aria-hidden="true" />
+       }
+       return <i className={getPlatformIcon(platform)} aria-hidden="true" />
+    }
 
-   const getIcon = (platform: SocialPlatform) => {
-      if (sharingPlatform === platform) {
-         return <i className="fas fa-spinner fa-spin" aria-hidden="true" />
-      }
-      switch (platform) {
-         case "facebook":
-            return <i className="fab fa-facebook-f" aria-hidden="true" />
-         case "twitter":
-            return <i className="fab fa-twitter" aria-hidden="true" />
-         case "linkedin":
-            return <i className="fab fa-linkedin-in" aria-hidden="true" />
-         case "instagram":
-            return <i className="fab fa-instagram" aria-hidden="true" />
-      }
-   }
+    const getButtonAriaLabel = (platform: SocialPlatform) => {
+       return sharingPlatform === platform ? "Sharing..." : getPlatformAriaLabel(platform)
+    }
 
-   const getButtonAriaLabel = (platform: SocialPlatform) => {
-      if (sharingPlatform === platform) {
-         return "Sharing..."
-      }
-      switch (platform) {
-         case "facebook":
-            return "Share on Facebook"
-         case "twitter":
-            return "Share on Twitter"
-         case "linkedin":
-            return "Share on LinkedIn"
-         case "instagram":
-            return "Copy link for Instagram"
-      }
-   }
-
-   const getButtonTitle = (platform: SocialPlatform) => {
-      if (sharingPlatform === platform) {
-         return "Sharing..."
-      }
-      switch (platform) {
-         case "facebook":
-            return "Share on Facebook"
-         case "twitter":
-            return "Share on Twitter"
-         case "linkedin":
-            return "Share on LinkedIn"
-         case "instagram":
-            return "Copy link for Instagram"
-      }
-   }
+    const getButtonTitle = (platform: SocialPlatform) => {
+       return sharingPlatform === platform ? "Sharing..." : getPlatformTitle(platform)
+    }
 
    return (
       <ul className={`social-link ${className}`} role="list" aria-label={ariaLabel}>
