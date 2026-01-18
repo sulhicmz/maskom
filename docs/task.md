@@ -1,5 +1,464 @@
 # Architecture Task Tracking
 
+## Task 292: [REFACTOR] Consolidate SocialShareButtons Switch Statements (Jan 18, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Eliminate Duplication)
+**Effort**: Small (1-2 hours)
+
+### Problem Identified
+
+**Duplicate Switch Statements**:
+- `getIcon()` (lines 65-79): Switch statement for platform icons
+- `getButtonAriaLabel()` (lines 81-95): Switch statement for accessibility labels
+- `getButtonTitle()` (lines 97-111): Switch statement for button titles
+- All three switch statements operate on same `SocialPlatform` type
+- Adding new platform requires updating three separate switch statements
+- Violates DRY principle - platform data scattered across multiple functions
+
+**Why This Matters**:
+1. **Maintainability**: Adding new social platform requires changes in 3 locations
+2. **Readability**: Platform metadata (icon, label, title) is not centralized
+3. **Testability**: Harder to test platform-specific behavior when logic is scattered
+4. **Extensibility**: New platforms require boilerplate code in multiple places
+
+### Solution
+
+**Consolidate Platform Metadata into Data Structure**:
+```typescript
+const SOCIAL_PLATFORMS: Record<SocialPlatform, {
+  shareUrl: string
+  icon: string
+  ariaLabel: string
+  title: string
+}> = {
+  facebook: {
+    shareUrl: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+    icon: 'fab fa-facebook-f',
+    ariaLabel: 'Share on Facebook',
+    title: 'Share on Facebook'
+  },
+  twitter: {
+    shareUrl: (url: string) => `https://twitter.com/intent/tweet?text=${url}`,
+    icon: 'fab fa-twitter',
+    ariaLabel: 'Share on Twitter',
+    title: 'Share on Twitter'
+  },
+  linkedin: {
+    shareUrl: (url: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+    icon: 'fab fa-linkedin-in',
+    ariaLabel: 'Share on LinkedIn',
+    title: 'Share on LinkedIn'
+  },
+  instagram: {
+    shareUrl: null, // Special case: copy to clipboard
+    icon: 'fab fa-instagram',
+    ariaLabel: 'Copy link for Instagram',
+    title: 'Copy link for Instagram'
+  }
+}
+```
+
+### Implementation
+
+#### Phase 1: Create Platform Configuration
+- [ ] Create `src/utils/socialPlatforms.ts` configuration file
+- [ ] Define `SOCIAL_PLATFORMS` constant with platform metadata
+- [ ] Add `getShareUrl()` function to generate platform-specific URLs
+- [ ] Handle Instagram special case (clipboard copy)
+
+#### Phase 2: Update SocialShareButtons Component
+- [ ] Import `SOCIAL_PLATFORMS` configuration
+- [ ] Replace `getIcon()` with `SOCIAL_PLATFORMS[platform].icon`
+- [ ] Replace `getButtonAriaLabel()` with `SOCIAL_PLATFORMS[platform].ariaLabel`
+- [ ] Replace `getButtonTitle()` with `SOCIAL_PLATFORMS[platform].title`
+- [ ] Remove three duplicate switch statements (40+ lines removed)
+- [ ] Update `handleShare()` to use `getShareUrl(platform, url)`
+
+#### Phase 3: Testing
+- [ ] Verify Facebook sharing still works
+- [ ] Verify Twitter sharing still works
+- [ ] Verify LinkedIn sharing still works
+- [ ] Verify Instagram copy to clipboard still works
+- [ ] Verify accessibility labels are correct
+- [ ] Test with existing tests (ensure no regressions)
+
+### Success Criteria
+
+- [ ] `SOCIAL_PLATFORMS` configuration created in `src/utils/socialPlatforms.ts`
+- [ ] Three switch statements removed from SocialShareButtons
+- [ ] getIcon() replaced with platform config lookup
+- [ ] getButtonAriaLabel() replaced with platform config lookup
+- [ ] getButtonTitle() replaced with platform config lookup
+- [ ] All social sharing functionality preserved
+- [ ] Existing tests still passing
+- [ ] Code reduced by 30+ lines
+
+### Expected Benefits
+
+1. **Single Source of Truth**: Platform metadata in one configuration file
+2. **Maintainability**: Add new platform by adding one entry to config
+3. **DRY Compliance**: Eliminates duplicate switch statements
+4. **Testability**: Platform-specific logic easier to test
+5. **Extensibility**: New platforms require minimal code changes
+6. **Code Reduction**: Remove 40+ lines of repetitive switch statements
+
+### Related Files
+
+- Modify: `src/components/common/SocialShareButtons.tsx` - Replace switch statements with config
+- Add: `src/utils/socialPlatforms.ts` - Platform configuration file
+- Add: `src/utils/__tests__/socialPlatforms.test.ts` - Configuration tests
+
+---
+
+## Task 293: [REFACTOR] Extract SocialShareButton Component (Jan 18, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Component Extraction)
+**Effort**: Small (1 hour)
+
+### Problem Identified
+
+**Duplicate Button JSX Pattern**:
+- Lines 115-125: Facebook button markup
+- Lines 127-137: Twitter button markup (identical structure, different onClick)
+- Lines 139-149: LinkedIn button markup (identical structure, different onClick)
+- Lines 151-161: Instagram button markup (identical structure, different onClick)
+- 48 lines of repetitive JSX for rendering social buttons
+- Any change to button structure requires updating 4 locations
+- Difficult to add accessibility improvements uniformly
+
+**Why This Matters**:
+1. **Code Duplication**: Same button pattern repeated 4 times
+2. **Maintainability**: Button changes require 4 updates
+3. **Error-Prone**: Manual updates can miss some buttons
+4. **Readability**: Large JSX blocks reduce clarity
+
+### Solution
+
+**Extract Reusable SocialShareButton Component**:
+```typescript
+interface SocialShareButtonProps {
+  platform: SocialPlatform
+  onClick: () => void
+  isSharing: boolean
+  disabled: boolean
+}
+
+const SocialShareButton: React.FC<SocialShareButtonProps> = ({
+  platform,
+  onClick,
+  isSharing,
+  disabled
+}) => {
+  const config = SOCIAL_PLATFORMS[platform]
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={isSharing ? "Sharing..." : config.ariaLabel}
+      aria-busy={isSharing}
+      title={isSharing ? "Sharing..." : config.title}
+      disabled={disabled}
+    >
+      {isSharing ? (
+        <i className="fas fa-spinner fa-spin" aria-hidden="true" />
+      ) : (
+        <i className={config.icon} aria-hidden="true" />
+      )}
+    </button>
+  )
+}
+```
+
+### Implementation
+
+#### Phase 1: Create SocialShareButton Component
+- [ ] Create `src/components/common/SocialShareButton.tsx`
+- [ ] Implement `SocialShareButtonProps` interface
+- [ ] Use `SOCIAL_PLATFORMS` configuration from Task 292
+- [ ] Add conditional spinner icon when sharing
+- [ ] Apply memo optimization
+
+#### Phase 2: Update SocialShareButtons Component
+- [ ] Import `SocialShareButton` component
+- [ ] Replace inline button JSX with `<SocialShareButton />` components
+- [ ] Map over platform array to render buttons
+- [ ] Remove 48 lines of duplicate JSX
+
+#### Phase 3: Testing
+- [ ] Create tests for SocialShareButton component
+- [ ] Test button renders correctly for each platform
+- [ ] Test spinner icon displays when sharing
+- [ ] Test disabled state
+- [ ] Test aria-label and aria-busy attributes
+- [ ] Verify all existing SocialShareButtons tests still pass
+
+### Success Criteria
+
+- [ ] `SocialShareButton` component created in `src/components/common/`
+- [ ] All inline button JSX replaced with SocialShareButton
+- [ ] SocialShareButtons uses map to render buttons
+- [ ] 48 lines of duplicate JSX removed
+- [ ] Component exports properly
+- [ ] All tests passing (existing + new SocialShareButton tests)
+- [ ] No regressions in social sharing functionality
+
+### Expected Benefits
+
+1. **DRY Compliance**: Button markup defined once, reused 4 times
+2. **Maintainability**: Button changes only require one location update
+3. **Readability**: Clear component separation
+4. **Code Reduction**: Remove 48 lines of duplicate JSX
+5. **Testability**: SocialShareButton can be tested in isolation
+6. **Type Safety**: Props interface ensures correct usage
+
+### Related Files
+
+- Add: `src/components/common/SocialShareButton.tsx` - Reusable button component
+- Modify: `src/components/common/SocialShareButtons.tsx` - Replace inline buttons
+- Add: `src/components/common/__tests__/SocialShareButton.test.tsx` - Component tests
+
+---
+
+## Task 294: [REFACTOR] Extract Config Change Handlers in CacheConfigPage (Jan 18, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Extract Function)
+**Effort**: Medium (2-3 hours)
+
+### Problem Identified
+
+**Duplicate onChange Handler Pattern**:
+- Lines 321-328: TTL static assets onChange handler
+- Lines 337-344: TTL API responses onChange handler
+- Lines 354-361: TTL images onChange handler
+- Lines 371-378: TTL fonts onChange handler
+- Lines 399-402: Cache size limit onChange handler
+- Lines 414-420: Cleanup policy enabled onChange handler
+- Lines 433-439: Cleanup policy maxAge onChange handler
+- Lines 450-456: Cleanup policy maxEntries onChange handler
+- Lines 468-474: Cleanup policy interval onChange handler
+
+**Pattern Repetition**:
+```typescript
+onChange={(e) => setConfig({
+  ...config,
+  [parentKey]: {
+    ...config[parentKey],
+    [childKey]: parseInt(e.target.value) || 0,
+  },
+})}
+```
+This exact pattern repeated 8+ times with only parentKey and childKey changing
+
+**Why This Matters**:
+1. **Code Duplication**: 8+ nearly identical onChange handlers
+2. **Maintainability**: Changes to config update logic require 8+ updates
+3. **Readability**: Repetitive code reduces clarity
+4. **Error-Prone**: Manual updates can miss some handlers
+5. **Component Size**: Adds ~100 lines of boilerplate
+
+### Solution
+
+**Create Generic Config Change Handler**:
+```typescript
+const handleConfigChange = <T extends keyof CacheConfig>(
+  parentKey: T,
+  childKey: string,
+  value: any
+) => {
+  if (!config) return
+
+  const currentValue = config[parentKey]
+  if (typeof currentValue === 'object' && currentValue !== null) {
+    setConfig({
+      ...config,
+      [parentKey]: {
+        ...(currentValue as any),
+        [childKey]: value,
+      },
+    })
+  } else {
+    setConfig({
+      ...config,
+      [parentKey]: value,
+    })
+  }
+}
+
+// Usage:
+onChange={(e) => handleConfigChange('cacheTTL', 'staticAssets', parseInt(e.target.value) || 0)}
+```
+
+### Implementation
+
+#### Phase 1: Create Generic Handler
+- [ ] Add `handleConfigChange<T>()` helper function
+- [ ] Support nested object updates (cacheTTL, cleanupPolicy)
+- [ ] Support flat value updates (cacheSizeLimit)
+- [ ] Handle undefined config gracefully
+
+#### Phase 2: Replace onChange Handlers
+- [ ] Replace TTL static assets onChange handler
+- [ ] Replace TTL API responses onChange handler
+- [ ] Replace TTL images onChange handler
+- [ ] Replace TTL fonts onChange handler
+- [ ] Replace cache size limit onChange handler
+- [ ] Replace cleanup policy enabled onChange handler
+- [ ] Replace cleanup policy maxAge onChange handler
+- [ ] Replace cleanup policy maxEntries onChange handler
+- [ ] Replace cleanup policy interval onChange handler
+
+#### Phase 3: Testing
+- [ ] Test nested config updates (cacheTTL.*, cleanupPolicy.*)
+- [ ] Test flat config updates (cacheSizeLimit)
+- [ ] Test with existing cache config tests
+- [ ] Verify cache config page still functions correctly
+- [ ] Verify all input fields still update config properly
+
+### Success Criteria
+
+- [ ] `handleConfigChange()` generic handler created
+- [ ] 8+ duplicate onChange handlers replaced
+- [ ] All config inputs use generic handler
+- [ ] 100+ lines of boilerplate removed
+- [ ] All existing tests still passing
+- [ ] Cache config page functionality preserved
+
+### Expected Benefits
+
+1. **DRY Compliance**: Config update logic defined once
+2. **Maintainability**: Changes to update logic only require one location
+3. **Code Reduction**: Remove 100+ lines of repetitive handlers
+4. **Readability**: Clear intent with generic handler
+5. **Type Safety**: Generic type ensures correct usage
+6. **Testability**: Handler can be tested independently
+
+### Related Files
+
+- Modify: `src/app/admin/cache-config/page.tsx` - Add generic handler, replace onChange handlers
+
+---
+
+## Task 295: [REFACTOR] Extract Utility Functions from VersionHistoryPanel (Jan 18, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Code Refactoring (Extract Function)
+**Effort**: Small (1 hour)
+
+### Problem Identified
+
+**Utility Functions Inside Component**:
+- `formatDate()` (lines 58-67): Date formatting logic
+- `getDiffBadgeClass()` (lines 69-80): CSS class mapping
+
+**Issues**:
+1. **Wrong Location**: Utility functions should be in `src/utils/`, not in component
+2. **Reusability**: Other components may need date formatting or diff styling
+3. **Testability**: Harder to test utility functions when embedded in component
+4. **Separation of Concerns**: Component should focus on UI, not formatting logic
+
+**Why This Matters**:
+1. **Code Organization**: Utilities belong in separate modules
+2. **Reusability**: Other components can use these functions
+3. **Testability**: Utility functions can be tested independently
+4. **Maintainability**: Changes to formatting logic isolated in one place
+
+### Solution
+
+**Extract Utility Functions**:
+
+**1. formatDate to `src/utils/dateFormat.ts`**:
+```typescript
+export const formatTimestamp = (timestamp: string): string => {
+  const date = new Date(timestamp)
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date)
+}
+```
+
+**2. getDiffBadgeClass to `src/utils/diffBadge.ts`**:
+```typescript
+export type DiffType = 'added' | 'removed' | 'changed'
+
+export const getDiffBadgeClass = (type: DiffType): string => {
+  switch (type) {
+    case 'added':
+      return 'diff-badge-added'
+    case 'removed':
+      return 'diff-badge-removed'
+    case 'changed':
+      return 'diff-badge-changed'
+    default:
+      return ''
+  }
+}
+```
+
+### Implementation
+
+#### Phase 1: Extract formatDate
+- [ ] Add `formatTimestamp()` to `src/utils/dateFormat.ts`
+- [ ] Export function from `src/utils/dateFormat/index.ts`
+- [ ] Add tests for `formatTimestamp()` (empty string, invalid date, valid dates)
+- [ ] Update VersionHistoryPanel to import `formatTimestamp`
+- [ ] Remove `formatDate()` from component (10 lines removed)
+
+#### Phase 2: Extract getDiffBadgeClass
+- [ ] Create `src/utils/diffBadge.ts` utility file
+- [ ] Add `DiffType` type definition
+- [ ] Implement `getDiffBadgeClass()` function
+- [ ] Add tests for `getDiffBadgeClass()` (all diff types, default case)
+- [ ] Update VersionHistoryPanel to import `getDiffBadgeClass`
+- [ ] Remove `getDiffBadgeClass()` from component (12 lines removed)
+
+#### Phase 3: Testing
+- [ ] Test formatTimestamp with various timestamps
+- [ ] Test getDiffBadgeClass with all diff types
+- [ ] Test VersionHistoryPanel with extracted utilities
+- [ ] Verify no regressions in version history functionality
+
+### Success Criteria
+
+- [ ] `formatTimestamp()` added to `src/utils/dateFormat.ts`
+- [ ] `getDiffBadgeClass()` added to `src/utils/diffBadge.ts`
+- [ ] Both functions exported from their utility modules
+- [ ] Tests created for both utility functions (10+ tests)
+- [ ] VersionHistoryPanel uses extracted utilities
+- [ ] 22 lines of utility code removed from component
+- [ ] All existing tests still passing
+- [ ] No regressions in version history functionality
+
+### Expected Benefits
+
+1. **Code Organization**: Utilities in proper location
+2. **Reusability**: Other components can use these functions
+3. **Testability**: Utility functions tested independently
+4. **Separation of Concerns**: Component focused on UI logic
+5. **Code Reduction**: Component reduced by 22 lines
+6. **Maintainability**: Formatting changes isolated in utility modules
+
+### Related Files
+
+- Modify: `src/utils/dateFormat.ts` - Add formatTimestamp function
+- Modify: `src/utils/diffBadge.ts` - Add getDiffBadgeClass function (new file)
+- Modify: `src/components/common/VersionHistoryPanel.tsx` - Import utilities, remove inline functions
+- Add: `src/utils/__tests__/dateFormat.test.ts` - Add formatTimestamp tests
+- Add: `src/utils/__tests__/diffBadge.test.ts` - Add getDiffBadgeClass tests
+
+---
+
 ## Task 291: [INTEGRATION ENGINEER] API Route Hardening (Jan 18, 2026)
 
 **Status**: ✅ Completed
@@ -73,7 +532,7 @@ API_ROUTES: {
 - ✅ API route constants updated with circuit breaker thresholds
 - ✅ All 3 API routes refactored to use executeApiRoute
 - ✅ docs/blueprint.md updated with API route resilience architecture
-- ✅ All 3930 tests passing (100% success rate)
+- ✅ 3930 total tests (3929 passing, 1 known issue - SocialShareButtons test)
 - ✅ Lint passes (0 errors, 1 warning in coverage report only)
 - ✅ Build successful (26 pages generated)
 
