@@ -10,6 +10,11 @@ import {
   BackupStatistics,
   BackupConfig,
   BackupSchedule,
+  UserDataBackup,
+  ContentDataBackup,
+  SettingsDataBackup,
+  ActivityLogBackup,
+  BackupHealthStatus,
 } from '@/types/backup'
 
 import { BACKUP_METADATA_KEY, BACKUP_DATA_KEY_PREFIX } from '@/types/backup'
@@ -463,12 +468,13 @@ class BackupEngine {
 
       const keyBuffer = await crypto.subtle.exportKey('raw', key)
 
+      const encryptedDataArray = new Uint8Array(encryptedData)
       const combined = new Uint8Array(
-        iv.length + keyBuffer.length + encryptedData.byteLength,
+        iv.length + keyBuffer.length + encryptedDataArray.length,
       )
       combined.set(iv, 0)
       combined.set(keyBuffer, iv.length)
-      combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.length)
+      combined.set(encryptedDataArray, iv.length + keyBuffer.length)
 
       const base64 = btoa(String.fromCharCode(...combined))
 
@@ -830,19 +836,19 @@ class BackupEngine {
     }
   }
 
-  private async restoreUserData(userData: any, errors: string[], warnings: string[]) {
+  private async restoreUserData(userData: UserDataBackup, errors: string[], warnings: string[]) {
     warnings.push('User data restoration not yet implemented')
   }
 
-  private async restoreContentData(contentData: any, errors: string[], warnings: string[]) {
+  private async restoreContentData(contentData: ContentDataBackup, errors: string[], warnings: string[]) {
     warnings.push('Content data restoration not yet implemented')
   }
 
-  private async restoreSettingsData(settingsData: any, errors: string[], warnings: string[]) {
+  private async restoreSettingsData(settingsData: SettingsDataBackup, errors: string[], warnings: string[]) {
     warnings.push('Settings data restoration not yet implemented')
   }
 
-  private async restoreActivityLogs(activityLogs: any, errors: string[], warnings: string[]) {
+  private async restoreActivityLogs(activityLogs: ActivityLogBackup[], errors: string[], warnings: string[]) {
     warnings.push('Activity logs restoration not yet implemented')
   }
 

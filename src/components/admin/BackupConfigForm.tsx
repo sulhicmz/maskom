@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
-import { DEFAULT_BACKUP_CONFIG, BackupConfig } from '@/types/backup'
-import { BACKUP_STORAGE_KEY } from '@/types/backup'
+import { BackupConfig } from '@/types/backup'
 
 interface BackupConfigFormProps {
   config: BackupConfig
@@ -66,7 +65,7 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
         ...localConfig,
         retentionPolicy: {
           ...localConfig.retentionPolicy,
-          [field]: value as any,
+          [field]: value as keyof BackupConfig['retentionPolicy'],
         },
       })
     }
