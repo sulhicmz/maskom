@@ -14,11 +14,9 @@ import { RATE_LIMITS, TIMEOUTS, MS_TO_SECONDS, CIRCUIT_BREAKER_CONFIG } from '@/
 import { logServiceError, logServiceSuccess } from '@/services/common';
 import { CircuitBreaker, withTimeout } from '@/utils/resilience';
 import { generateUUID } from '@/utils/uuid';
-import { UserRole, isValidRole } from '@/types/role';
-import { Permission } from '@/types/permission';
+import { UserRole, isValidRole, Permission, MFAStatus } from '@/types';
 import { hasPermission as checkPermission } from '@/data/rolesData';
 import { verifyTOTP, createMFASetupData } from '@/utils/mfa';
-import type { MFAStatus } from '@/types/mfa';
 
 class AuthService implements IAuthService {
     private currentUser: User | null = null;

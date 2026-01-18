@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Permission } from '@/types/permission';
+import { Permission, CacheConfig, CacheStatistics } from '@/types';
 import { loadCacheConfig, saveCacheConfig, clearCache, getCacheStatistics, validateCacheConfig, resetCacheConfig, formatBytes, formatDuration } from '@/utils/cacheConfig';
-import type { CacheConfig, CacheStatistics } from '@/types/cache';
 import SectionTitle from '@/components/common/SectionTitle';
 import AnimationWrapper from '@/components/common/AnimationWrapper';
 

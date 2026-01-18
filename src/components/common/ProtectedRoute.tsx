@@ -2,9 +2,7 @@
  
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { UserRole } from '@/types/role'
-import { Permission } from '@/types/permission'
-import { MFAStatus } from '@/types/mfa'
+import { UserRole, Permission, MFAStatus } from '@/types'
 import authService from '@/services/auth/AuthService'
 import { canAccessRoute, getUnauthorizedRedirectPath } from '@/utils/rbac'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'

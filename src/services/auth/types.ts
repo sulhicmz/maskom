@@ -1,8 +1,5 @@
-import type { ServiceErrorCodeType } from '@/types/common';
+import type { ServiceErrorCodeType, UserRole, Permission, MFAData, MFAStatus } from '@/types';
 import type { CircuitBreakerState } from '@/utils/resilience';
-import type { UserRole } from '@/types/role';
-import type { Permission } from '@/types/permission';
-import type { MFAData, MFAStatus } from '@/types/mfa';
 
 export interface IAuthService {
     login(credentials: LoginCredentials): Promise<AuthResult>;
