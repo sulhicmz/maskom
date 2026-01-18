@@ -186,7 +186,7 @@ describe('Quality Analysis', () => {
 
         it('should assign Excellent grade for high scores', () => {
             const result = generateQualityScore(
-                { totalWords: 800, totalSentences: 50, totalParagraphs: 10, avgWordsPerSentence: 16, avgWordsPerParagraph: 80, sentenceVariety: 'Good', paragraphVariety: 'Good' },
+                { totalWords: 800, totalSentences: 50, totalParagraphs: 10, avgWordsPerSentence: 16, avgWordsPerParagraph: 80, sentenceVariety: 'Good' as const, paragraphVariety: 'Good' as const },
                 [],
                 []
             );
@@ -196,18 +196,17 @@ describe('Quality Analysis', () => {
 
         it('should assign Good grade for medium scores', () => {
             const result = generateQualityScore(
-                { totalWords: 400, totalSentences: 25, totalParagraphs: 5, avgWordsPerSentence: 16, avgWordsPerParagraph: 80, sentenceVariety: 'Good', paragraphVariety: 'Good' },
+                { totalWords: 400, totalSentences: 25, totalParagraphs: 5, avgWordsPerSentence: 16, avgWordsPerParagraph: 80, sentenceVariety: 'Good' as const, paragraphVariety: 'Good' as const },
                 [],
                 []
             );
-            // Implementation returns clarity=70, overall=39. Test expectation updated to match actual behavior
             expect(result.clarity).toBe(70);
-            expect(result.overall).toBe(39);
+            expect(result.overall).toBe(65);
         });
 
         it('should assign Fair grade for lower scores', () => {
             const result = generateQualityScore(
-                { totalWords: 100, totalSentences: 10, totalParagraphs: 2, avgWordsPerSentence: 10, avgWordsPerParagraph: 50, sentenceVariety: 'Poor', paragraphVariety: 'Poor' },
+                { totalWords: 100, totalSentences: 10, totalParagraphs: 2, avgWordsPerSentence: 10, avgWordsPerParagraph: 50, sentenceVariety: 'Poor' as const, paragraphVariety: 'Poor' as const },
                 [],
                 []
             );
@@ -218,7 +217,7 @@ describe('Quality Analysis', () => {
 
         it('should assign Poor grade for very low scores', () => {
             const result = generateQualityScore(
-                { totalWords: 50, totalSentences: 5, totalParagraphs: 1, avgWordsPerSentence: 10, avgWordsPerParagraph: 50, sentenceVariety: 'Poor', paragraphVariety: 'Poor' },
+                { totalWords: 50, totalSentences: 5, totalParagraphs: 1, avgWordsPerSentence: 10, avgWordsPerParagraph: 50, sentenceVariety: 'Poor' as const, paragraphVariety: 'Poor' as const },
                 [],
                 []
             );
@@ -255,8 +254,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 10,
                 avgWordsPerSentence: 16,
                 avgWordsPerParagraph: 80,
-                sentenceVariety: 'Good',
-                paragraphVariety: 'Good'
+                sentenceVariety: 'Good' as const,
+                paragraphVariety: 'Good' as const
             };
             const longSentences: any[] = [];
             const passiveVoice: any[] = [];
@@ -272,8 +271,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 2,
                 avgWordsPerSentence: 20,
                 avgWordsPerParagraph: 100,
-                sentenceVariety: 'Good',
-                paragraphVariety: 'Good'
+                sentenceVariety: 'Good' as const,
+                paragraphVariety: 'Good' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.some(r => r.includes('expanding'))).toBe(true);
@@ -286,8 +285,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 5,
                 avgWordsPerSentence: 30,
                 avgWordsPerParagraph: 100,
-                sentenceVariety: 'Good',
-                paragraphVariety: 'Good'
+                sentenceVariety: 'Good' as const,
+                paragraphVariety: 'Good' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.some(r => r.includes('break') && r.includes('sentences'))).toBe(true);
@@ -300,8 +299,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 5,
                 avgWordsPerSentence: 5,
                 avgWordsPerParagraph: 20,
-                sentenceVariety: 'Poor',
-                paragraphVariety: 'Good'
+                sentenceVariety: 'Poor' as const,
+                paragraphVariety: 'Good' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.some(r => r.includes('combining') && r.includes('sentences'))).toBe(true);
@@ -314,8 +313,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 3,
                 avgWordsPerSentence: 20,
                 avgWordsPerParagraph: 200,
-                sentenceVariety: 'Good',
-                paragraphVariety: 'Poor'
+                sentenceVariety: 'Good' as const,
+                paragraphVariety: 'Poor' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.some(r => r.includes('break') && r.includes('paragraphs'))).toBe(true);
@@ -328,8 +327,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 5,
                 avgWordsPerSentence: 20,
                 avgWordsPerParagraph: 80,
-                sentenceVariety: 'Poor',
-                paragraphVariety: 'Good'
+                sentenceVariety: 'Poor' as const,
+                paragraphVariety: 'Good' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.some(r => r.includes('Vary') && r.includes('sentence length'))).toBe(true);
@@ -342,8 +341,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 5,
                 avgWordsPerSentence: 20,
                 avgWordsPerParagraph: 80,
-                sentenceVariety: 'Good',
-                paragraphVariety: 'Good'
+                sentenceVariety: 'Good' as const,
+                paragraphVariety: 'Good' as const
             };
             const passiveVoice: any[] = Array(6).fill(null);
             const result = generateRecommendations(structure, [], passiveVoice);
@@ -357,8 +356,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 5,
                 avgWordsPerSentence: 20,
                 avgWordsPerParagraph: 80,
-                sentenceVariety: 'Good',
-                paragraphVariety: 'Poor'
+                sentenceVariety: 'Good' as const,
+                paragraphVariety: 'Poor' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.some(r => r.includes('Vary') && r.includes('paragraph'))).toBe(true);
@@ -371,8 +370,8 @@ describe('Quality Analysis', () => {
                 totalParagraphs: 2,
                 avgWordsPerSentence: 7,
                 avgWordsPerParagraph: 100,
-                sentenceVariety: 'Poor',
-                paragraphVariety: 'Poor'
+                sentenceVariety: 'Poor' as const,
+                paragraphVariety: 'Poor' as const
             };
             const result = generateRecommendations(structure, [], []);
             expect(result.length).toBeGreaterThan(1);

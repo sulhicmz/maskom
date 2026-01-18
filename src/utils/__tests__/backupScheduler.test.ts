@@ -51,7 +51,9 @@ describe('BackupScheduler', () => {
     } as BackupMetadata)
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await cancelScheduledBackup()
+    mockLocalStorage.clear()
     jest.useRealTimers()
     jest.restoreAllMocks()
   })
@@ -329,15 +331,15 @@ describe('BackupScheduler', () => {
       const config = createMockBackupConfig()
       await scheduleBackup('daily', '00:00', config)
 
-      const notification = {
-        type: 'success' as const,
-        message: 'Test notification',
-        timestamp: new Date().toISOString(),
-      }
+      jest.advanceTimersByTime(24 * 60 * 60 * 1000)
 
-      (backupScheduler as any).notify(notification)
-
-      expect(callback).toHaveBeenCalledWith(notification)
+      expect(callback).toHaveBeenCalled()
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'success',
+          message: expect.any(String),
+        })
+      )
     })
   })
 
@@ -484,7 +486,7 @@ describe('BackupScheduler', () => {
 
       const result = await scheduleBackup('daily', 'invalid', config)
 
-      expect(result).toBe(true)
+      expect(result).toBe(false)
     })
 
     it('should handle 24:00 time format', async () => {

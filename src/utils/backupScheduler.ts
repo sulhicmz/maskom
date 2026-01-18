@@ -362,7 +362,13 @@ class BackupScheduler {
     time: string,
   ): string {
     const now = new Date()
-    const [hours, minutes] = time.split(':').map(Number)
+    const timeParts = time.split(':').map(Number)
+    const hours = timeParts[0]
+    const minutes = timeParts[1]
+
+    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 24 || minutes < 0 || minutes > 59) {
+      throw new Error(`Invalid time format: ${time}`)
+    }
 
     let nextRun = new Date(now)
     nextRun.setHours(hours, minutes, 0, 0)
