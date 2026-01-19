@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, memo, useMemo } from 'react'
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import { useRouter } from 'next/navigation'
@@ -115,7 +115,7 @@ const LogRow = memo(({ log }: { log: ActivityLog }) => {
 
 LogRow.displayName = 'LogRow'
 
-const ActivityLogViewer: React.FC = () => {
+const ActivityLogViewer = memo(() => {
     const { theme } = useTheme()
     useAuthService()
     useRouter()
@@ -186,24 +186,24 @@ const ActivityLogViewer: React.FC = () => {
         }
     }, [isClient])
 
-    const handleExportCSV = () => {
+    const handleExportCSV = useCallback(() => {
         downloadLogs(filteredLogs, 'csv', 'activity_logs')
-    }
+    }, [filteredLogs])
 
-    const handleExportJSON = () => {
+    const handleExportJSON = useCallback(() => {
         downloadLogs(filteredLogs, 'json', 'activity_logs')
-    }
+    }, [filteredLogs])
 
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setSearchTerm('')
         setSelectedAction('')
         setSelectedUser('')
         setSelectedResource('')
         setSuccessFilter('all')
-    }
+    }, [])
 
-    const uniqueUsers = Array.from(new Set(logs.map(log => log.userId)))
-    const uniqueResources = Array.from(new Set(logs.map(log => log.resource)))
+    const uniqueUsers = useMemo(() => Array.from(new Set(logs.map(log => log.userId))), [logs])
+    const uniqueResources = useMemo(() => Array.from(new Set(logs.map(log => log.resource))), [logs])
 
     if (!isClient) {
         return <LoadingSpinner minHeight={400} color="primary" />
@@ -364,6 +364,8 @@ const ActivityLogViewer: React.FC = () => {
             </section>
         </ProtectedRoute>
     )
-}
+})
+
+ActivityLogViewer.displayName = 'ActivityLogViewer'
 
 export default ActivityLogViewer
