@@ -96,3 +96,51 @@ export interface SuspiciousActivityAlert {
     resolvedAt?: string;
     resolvedBy?: string;
 }
+
+export interface PermissionChange {
+    activityLogId: string;
+    timestamp: string;
+    userId: string;
+    action: ActivityAction;
+    resource: string;
+    resourceId: string;
+    beforeValues: Record<string, ActivityDetailValue>;
+    afterValues: Record<string, ActivityDetailValue>;
+    diffFields: string[];
+    changeReason?: string;
+    approvedBy?: string;
+}
+
+export interface PermissionAuditReport {
+    id: string;
+    dateRange: DateRange;
+    filters: AuditFilters;
+    summary: AuditSummary;
+    changes: PermissionChange[];
+    generatedAt: string;
+    generatedBy: string;
+}
+
+export interface DateRange {
+    startDate: string;
+    endDate: string;
+}
+
+export interface AuditFilters {
+    userId?: string;
+    action?: ActivityAction[];
+    resource?: string;
+    resourceId?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+export interface AuditSummary {
+    totalChanges: number;
+    changesByAction: Record<ActivityAction, number>;
+    changesByUser: Record<string, number>;
+    changesByResource: Record<string, number>;
+    suspiciousChanges: number;
+    approvedChanges: number;
+    pendingApproval: number;
+}
