@@ -122,10 +122,12 @@ export class EmailQueue {
 
     private loadQueue(): void {
         try {
-            if (typeof (global as any).localStorage === 'undefined' && typeof (window as any).localStorage === 'undefined') {
+            const globalStorage = (global as typeof globalThis & { localStorage?: Storage }).localStorage;
+            const windowStorage = (window as Window & { localStorage?: Storage }).localStorage;
+            if (!globalStorage && !windowStorage) {
                 return;
             }
-            const storage = (global as any).localStorage || (window as any).localStorage;
+            const storage = globalStorage || windowStorage;
             const stored = storage.getItem(this.storageKey);
             if (stored) {
                 this.queue = JSON.parse(stored);
@@ -139,10 +141,12 @@ export class EmailQueue {
 
     private saveQueue(): void {
         try {
-            if (typeof (global as any).localStorage === 'undefined' && typeof (window as any).localStorage === 'undefined') {
+            const globalStorage = (global as typeof globalThis & { localStorage?: Storage }).localStorage;
+            const windowStorage = (window as Window & { localStorage?: Storage }).localStorage;
+            if (!globalStorage && !windowStorage) {
                 return;
             }
-            const storage = (global as any).localStorage || (window as any).localStorage;
+            const storage = globalStorage || windowStorage;
             storage.setItem(this.storageKey, JSON.stringify(this.queue));
         } catch (error) {
             console.warn('[EmailQueue] Failed to save queue to localStorage:', error);
