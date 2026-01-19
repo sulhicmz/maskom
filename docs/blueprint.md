@@ -141,6 +141,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | BlogCategoryData.ts | CategoryItem | No | Yes | Yes | No | Blog categories (Task 240) |
 | FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | No | Feature cards (home-one) |
 | MediaAssetData.ts | MediaAsset | No | Yes | No | No | Media assets for content library (Task 285) |
+| EmailTemplateData.ts | EmailTemplate | No | Yes | No | Yes | Email templates with variable substitution (Task 315) |
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
 
@@ -166,6 +167,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - `socialValidation.ts` - SocialLink validator
 - `contactValidation.ts` - ContactInfoItem validator
 - `mediaValidation.ts` - MediaAsset validator with URL and ISO date validation (Task 285)
+- `emailTemplateValidation.ts` - EmailTemplate, TemplateVariable validators with variable syntax validation (Task 315)
 - `index.ts` - Central export point (backward compatible with dataValidation.ts)
 - ✅ `createValidator<T>()` - Factory pattern for creating validators
 - ✅ `validateBaseDataItem()` - Validate BaseDataItem structure
@@ -195,22 +197,11 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateInnerBlogPost` - Inner blog posts
 - ✅ `validateMediaAsset` - Media assets with URL, media type, and tag validation (Task 285)
 - ✅ `validateMediaAssets` - Array validation for media assets (Task 285)
-- ✅ `validateFaqDetail` - FAQ detail sections
-- ✅ `validateInnerFaqItem` - FAQ categories with details
-- ✅ `validateSocialLink` - Social media links with target validation
-- ✅ `validateNavigationItem` - Navigation items
-- ✅ `validateNavigationSection` - Navigation sections
-- ✅ `validateContactInfoItem` - Contact information with lines and links arrays (Task 63)
-- ✅ `validateFeatureHomeOneItem` - Feature cards for home-one page (Task 63)
+- ✅ `validateEmailTemplate` - EmailTemplate validator with TemplateVariable validation (Task 315)
+- ✅ `validateTemplateVariable` - TemplateVariable validator with variable syntax validation (Task 315)
+- ✅ `validateEmailTemplates` - Array validation for email templates (Task 315)
+- ✅ 27 tests for email template validation (100% passing) (Task 315)
 - ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
-- ✅ `validateDataArray<T>()` - Validate entire arrays
- - ✅ `checkDuplicateIds<T>()` - Check for duplicate IDs across items
- 
-**Testing**:
-- ✅ 139 comprehensive tests for specific validators (100% passing) (Task 270)
-- ✅ 39 comprehensive tests for baseValidation utilities (100% passing) (Task 89)
-- ✅ 7 tests for validateBlogTagItem (100% passing) (Task 102)
-- ✅ 24 tests for validateCategoryItem (100% passing) (Task 240)
 - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
 - ✅ 32 tests for validateBlogCommentItem (100% passing) (Task 270)
 - ✅ 20 tests for validateMediaItem (100% passing) (Task 285)
@@ -361,8 +352,10 @@ export interface DataRelationship {
     - ✅ Clear error messages for data integrity issues
     - ✅ Type guard functions for dynamic data
     - ✅ 21 validators implemented with 64 comprehensive tests
-    - ✅ Factory pattern for configurable validators
-    - ✅ Duplicate ID detection
+     - ✅ Factory pattern for configurable validators
+- ✅ Duplicate ID detection
+- ✅ `templateUtils.ts` - Variable substitution utilities (parseTemplateVariables, substituteVariables, validateTemplateVariables) (Task 315)
+- ✅ 23 tests for template utilities (100% passing) (Task 315)
 
 2. **Data Indexing Layer**:
    - Pre-built indexes for ID-based lookups

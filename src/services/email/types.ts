@@ -1,10 +1,16 @@
 import type { ServiceResult } from '@/types/common';
+import type { EmailTemplate } from '@/types/data';
 
 export interface IEmailService {
-    sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>>;
-    getCircuitBreakerState(): CircuitBreakerState;
-    resetCircuitBreaker(): void;
-    getMetrics(): ServiceMetrics | undefined;
+     sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>>;
+     sendTemplatedEmail(
+         templateId: number,
+         variables: Record<string, string>,
+         options?: EmailSendOptions,
+     ): Promise<ServiceResult<{ subject: string; body: string; text: string }>>;
+     getCircuitBreakerState(): CircuitBreakerState;
+     resetCircuitBreaker(): void;
+     getMetrics(): ServiceMetrics | undefined;
 }
 
 export interface EmailSendParams {

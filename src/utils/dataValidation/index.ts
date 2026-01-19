@@ -89,7 +89,13 @@ import {
 import {
     validateMediaItem,
     validateMediaAssets,
-} from "./mediaValidation"
+ } from "./mediaValidation"
+
+import {
+  validateEmailTemplate,
+  validateTemplateVariable,
+  validateEmailTemplates,
+} from "./emailTemplateValidation"
 
 export type {
   ValidationResult,
@@ -132,8 +138,11 @@ export type {
        validateUseCaseSidebarItem,
        validateBlogCategoryData,
        validateMediaItem,
-       validateMediaAssets,
-      validateViewCount,
+        validateMediaAssets,
+       validateEmailTemplate,
+       validateTemplateVariable,
+       validateEmailTemplates,
+       validateViewCount,
       validateEngagementScore,
       validateAvgReadTime,
       validateShareCount,

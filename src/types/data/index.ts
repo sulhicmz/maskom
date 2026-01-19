@@ -238,3 +238,22 @@ export interface MediaAsset {
     usageCount?: number;
 }
 
+export interface TemplateVariable {
+    key: string;
+    description: string;
+    required: boolean;
+}
+
+export interface EmailTemplate {
+    id: number;
+    name: string;
+    subject: string;
+    body: string;
+    category: string;
+    tags: string[];
+    variables: TemplateVariable[];
+    createdAt: string;
+    updatedAt: string;
+    sentCount?: number;
+}
+
