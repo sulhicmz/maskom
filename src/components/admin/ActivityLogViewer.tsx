@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, memo, useCallback } from 'react'
+import React, { useState, useEffect, memo, useMemo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import { useRouter } from 'next/navigation'
@@ -121,7 +121,6 @@ const ActivityLogViewer: React.FC = () => {
     useRouter()
     const [isClient, setIsClient] = useState(false)
     const [logs, setLogs] = useState<ActivityLog[]>([])
-    const [filteredLogs, setFilteredLogs] = useState<ActivityLog[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedAction, setSelectedAction] = useState<string>('')
@@ -129,8 +128,8 @@ const ActivityLogViewer: React.FC = () => {
     const [selectedResource, setSelectedResource] = useState<string>('')
     const [successFilter, setSuccessFilter] = useState<string>('all')
 
-    const applyFilters = useCallback((logsToFilter: ActivityLog[]) => {
-        let result = logsToFilter
+    const filteredLogs = useMemo(() => {
+        let result = logs
 
         if (searchTerm) {
             const term = searchTerm.toLowerCase()
@@ -162,8 +161,8 @@ const ActivityLogViewer: React.FC = () => {
             })
         }
 
-        setFilteredLogs(result)
-    }, [searchTerm, selectedAction, selectedUser, selectedResource, successFilter])
+        return result
+    }, [logs, searchTerm, selectedAction, selectedUser, selectedResource, successFilter])
 
     useEffect(() => {
         setIsClient(true)
@@ -176,7 +175,6 @@ const ActivityLogViewer: React.FC = () => {
                 try {
                     const allLogs = getLogs()
                     setLogs(allLogs)
-                    applyFilters(allLogs)
                 } catch (error) {
                     console.error('Failed to load logs:', error)
                 } finally {
@@ -186,7 +184,7 @@ const ActivityLogViewer: React.FC = () => {
 
             loadLogs()
         }
-    }, [isClient, applyFilters])
+    }, [isClient])
 
     const handleExportCSV = () => {
         downloadLogs(filteredLogs, 'csv', 'activity_logs')
@@ -202,7 +200,6 @@ const ActivityLogViewer: React.FC = () => {
         setSelectedUser('')
         setSelectedResource('')
         setSuccessFilter('all')
-        setFilteredLogs(logs)
     }
 
     const uniqueUsers = Array.from(new Set(logs.map(log => log.userId)))
@@ -261,20 +258,14 @@ const ActivityLogViewer: React.FC = () => {
                                                 className="form-control"
                                                 placeholder="Cari logs..."
                                                 value={searchTerm}
-                                                onChange={(e) => {
-                                                    setSearchTerm(e.target.value)
-                                                    applyFilters(logs)
-                                                }}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
                                             />
                                         </div>
                                         <div className="col-md-2 mb-2">
                                             <select
                                                 className="form-select"
                                                 value={selectedAction}
-                                                onChange={(e) => {
-                                                    setSelectedAction(e.target.value)
-                                                    applyFilters(logs)
-                                                }}
+                                                onChange={(e) => setSelectedAction(e.target.value)}
                                             >
                                                 <option value="">Semua Aksi</option>
                                                 {Object.values(ActivityAction).map(action => (
@@ -286,10 +277,7 @@ const ActivityLogViewer: React.FC = () => {
                                             <select
                                                 className="form-select"
                                                 value={selectedUser}
-                                                onChange={(e) => {
-                                                    setSelectedUser(e.target.value)
-                                                    applyFilters(logs)
-                                                }}
+                                                onChange={(e) => setSelectedUser(e.target.value)}
                                             >
                                                 <option value="">Semua Pengguna</option>
                                                 {uniqueUsers.map(user => (
@@ -301,10 +289,7 @@ const ActivityLogViewer: React.FC = () => {
                                             <select
                                                 className="form-select"
                                                 value={selectedResource}
-                                                onChange={(e) => {
-                                                    setSelectedResource(e.target.value)
-                                                    applyFilters(logs)
-                                                }}
+                                                onChange={(e) => setSelectedResource(e.target.value)}
                                             >
                                                 <option value="">Semua Resource</option>
                                                 {uniqueResources.map(resource => (
@@ -316,10 +301,7 @@ const ActivityLogViewer: React.FC = () => {
                                             <select
                                                 className="form-select"
                                                 value={successFilter}
-                                                onChange={(e) => {
-                                                    setSuccessFilter(e.target.value)
-                                                    applyFilters(logs)
-                                                }}
+                                                onChange={(e) => setSuccessFilter(e.target.value)}
                                             >
                                                 <option value="all">Semua Status</option>
                                                 <option value="success">Berhasil</option>

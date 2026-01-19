@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, memo, useCallback } from 'react'
+import React, { useState, useEffect, memo, useCallback, useMemo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { BackupMetadata, BackupType, BackupStatus } from '@/types/backup'
 import { BACKUP_METADATA_KEY } from '@/types/backup'
@@ -99,7 +99,6 @@ const BackupList: React.FC<BackupListProps> = ({
 }) => {
   const { theme } = useTheme()
   const [backups, setBackups] = useState<BackupMetadata[]>([])
-  const [filteredBackups, setFilteredBackups] = useState<BackupMetadata[]>([])
   const [loading, setLoading] = useState(true)
   const [filterType, setFilterType] = useState<BackupType | 'all'>('all')
   const [filterStatus, setFilterStatus] = useState<BackupStatus | 'all'>('all')
@@ -126,7 +125,7 @@ const BackupList: React.FC<BackupListProps> = ({
     }
   }, [])
 
-  const applyFilters = useCallback(() => {
+  const filteredBackups = useMemo(() => {
     let filtered = [...backups]
 
     if (filterType !== 'all') {
@@ -146,16 +145,12 @@ const BackupList: React.FC<BackupListProps> = ({
       )
     }
 
-    setFilteredBackups(filtered)
+    return filtered
   }, [backups, filterType, filterStatus, searchTerm])
 
   useEffect(() => {
     loadBackups()
   }, [loadBackups])
-
-  useEffect(() => {
-    applyFilters()
-  }, [applyFilters])
 
   if (loading) {
     return <LoadingSpinner minHeight={300} color="primary" />
