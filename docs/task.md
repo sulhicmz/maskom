@@ -46717,3 +46717,915 @@ const filteredBackups = useMemo(() => { /* filter */ }, [deps])
 ---
 
 **Last Updated**: 2026-01-19
+
+---
+
+## Task 342: [INTEGRATION ENGINEER] GraphQL API Layer Implementation (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: HIGH
+**Type**: Integration - API Architecture
+**Effort**: Large (8-10 hours)
+
+### Purpose
+
+Implement GraphQL API layer to provide flexible data querying, reduce over-fetching, and improve developer experience for API consumers.
+
+### Problem Identified
+
+**REST API Limitations**:
+- REST API endpoints return fixed data structures
+- Over-fetching: Clients receive more data than needed
+- Multiple API calls required for nested data
+- No schema validation at query time
+- No query introspection for self-documentation
+
+**Why This Matters**:
+1. **Performance**: GraphQL eliminates over-fetching (20-50% bandwidth savings)
+2. **Developer Experience**: GraphQL Playground for API exploration
+3. **Type Safety**: Code Generator provides TypeScript types
+4. **Flexibility**: Clients query exactly what they need
+5. **Single Endpoint**: All data queries through one GraphQL endpoint
+
+### Solution
+
+**GraphQL Architecture**:
+```
+API Layer (src/api/graphql/)
+    ├── schema.ts - GraphQL type definitions
+    ├── resolvers/ - Query/Mutation resolvers
+    │   ├── blogResolvers.ts
+    │   ├── userResolvers.ts
+    │   └── analyticsResolvers.ts
+    └── context.ts - Auth and RBAC context
+        ↓
+    GraphQL Server (Apollo Server / Yoga)
+        ↓
+    GraphQL API Route (/api/graphql)
+        ↓
+    GraphQL Playground (/api/graphql/playground)
+```
+
+**Implementation Phases**:
+
+#### Phase 1: GraphQL Schema Definition
+- [ ] Create GraphQL schema in `src/api/graphql/schema.ts`
+- [ ] Define types for blog posts, users, analytics
+- [ ] Define Query operations (getBlogPosts, getUsers, getAnalytics)
+- [ ] Define Mutation operations (createBlogPost, updateUser)
+- [ ] Add input types for filtering and pagination
+- [ ] Add enum types for status fields
+
+#### Phase 2: Resolver Implementation
+- [ ] Create `blogResolvers.ts` with blog post CRUD operations
+- [ ] Create `userResolvers.ts` with user operations (auth required)
+- [ ] Create `analyticsResolvers.ts` with analytics queries
+- [ ] Implement resolver context with auth/RBAC
+- [ ] Add resolver-level error handling
+- [ ] Integrate with existing data models (src/data/*.ts)
+
+#### Phase 3: GraphQL Server Setup
+- [ ] Install Apollo Server or graphql-yoga
+- [ ] Create GraphQL server instance in `src/api/graphql/server.ts`
+- [ ] Configure schema and resolvers
+- [ ] Enable GraphQL Playground in development
+- [ ] Add Next.js API route at `/api/graphql`
+- [ ] Configure CORS and rate limiting
+
+#### Phase 4: GraphQL Code Generation
+- [ ] Install GraphQL Code Generator
+- [ ] Configure code generator (schema path, output path)
+- [ ] Generate TypeScript types from schema
+- [ ] Create generated types export file
+- [ ] Add codegen script to package.json
+
+#### Phase 5: Query Complexity Analysis
+- [ ] Add query complexity calculation
+- [ ] Set maximum query complexity threshold
+- [ ] Reject expensive queries before execution
+- [ ] Add complexity logging to APM
+
+#### Phase 6: API Documentation
+- [ ] Create GraphQL API documentation
+- [ ] Document schema types and operations
+- [ ] Provide example queries and mutations
+- [ ] Document authentication/authorization
+- [ ] Document query complexity rules
+- [ ] Update docs/blueprint.md with GraphQL architecture
+
+#### Phase 7: Testing
+- [ ] Create resolver unit tests (30+ tests)
+- [ ] Create query integration tests (20+ tests)
+- [ ] Test query complexity analysis
+- [ ] Test authentication/authorization
+- [ ] Test error handling
+
+### Success Criteria
+
+- [ ] GraphQL schema defined for all data models
+- [ ] All resolvers implemented (Query + Mutation)
+- [ ] GraphQL server running at `/api/graphql`
+- [ ] GraphQL Playground available in development
+- [ ] GraphQL Code Generator produces TypeScript types
+- [ ] Query complexity analysis implemented
+- [ ] API documentation created
+- [ ] 50+ comprehensive tests for GraphQL API
+- [ ] Lint passes (0 errors)
+- [ ] TypeScript type checking passes
+- [ ] Zero regressions in existing functionality
+
+### Related Files
+
+- Add: `src/api/graphql/schema.ts` - GraphQL type definitions
+- Add: `src/api/graphql/resolvers/` - Resolver implementations
+- Add: `src/api/graphql/server.ts` - GraphQL server configuration
+- Add: `src/api/graphql/context.ts` - Auth/RBAC context
+- Add: `src/api/graphql/__tests__/` - GraphQL tests
+- Add: `docs/graphql-api.md` - API documentation
+- Modify: `src/app/api/graphql/route.ts` - Next.js API route
+- Modify: `package.json` - Add GraphQL dependencies and codegen script
+- Modify: `docs/blueprint.md` - Add GraphQL architecture
+
+### Implementation Notes
+
+- Follows Integration Engineer principles:
+  - **Contract First**: GraphQL schema defined before resolvers
+  - **Type Safety**: Code Generator provides TypeScript types
+  - **Documentation**: Self-documenting with GraphQL Playground
+  - **Performance**: Query complexity prevents expensive queries
+  - **Security**: RBAC integrated in resolver context
+- Zero breaking changes - adds new GraphQL endpoint alongside existing REST
+- All existing functionality preserved
+- Ready for GraphQL subscriptions (real-time updates in future)
+
+---
+
+## Task 343: [PRODUCT MANAGER] Newsletter Management System (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Product - Content Management & Communication
+**Effort**: Medium (4-6 hours)
+
+### Purpose
+
+Implement newsletter management system to enable automated recurring digests from curated blog content, improving subscriber engagement with consistent communication.
+
+### Problem Identified
+
+**No Newsletter System**:
+- Email templates exist (FEATURE-047) but no newsletter management
+- Content creators manually compile newsletter content
+- No recurring newsletter automation
+- No subscriber list management or segmentation
+- No newsletter performance tracking (open rates, click rates)
+
+**Why This Matters**:
+1. **Engagement**: Regular newsletters keep subscribers engaged
+2. **Automation**: Automated recurring digests save content creator time
+3. **Curation**: Smart content curation selects best posts automatically
+4. **Analytics**: Track newsletter performance (open rate, click rate)
+5. **Segmentation**: Target specific subscriber segments
+
+### Solution
+
+**Newsletter Data Model**:
+```typescript
+interface Newsletter {
+    id: string;
+    name: string;
+    frequency: NewsletterFrequency;
+    templateId: number;
+    contentRules: ContentRule[];
+    subscriberLists: SubscriberList[];
+    status: NewsletterStatus;
+    nextSendDate: string; // ISO 8601 date
+    sentCount: number;
+    openCount: number;
+    clickCount: number;
+    unsubscribeCount: number;
+    createdAt: string;
+    lastSentAt?: string;
+}
+
+enum NewsletterFrequency {
+    WEEKLY = 'weekly',
+    BI_WEEKLY = 'bi_weekly',
+    MONTHLY = 'monthly'
+}
+
+enum NewsletterStatus {
+    DRAFT = 'draft',
+    ACTIVE = 'active',
+    PAUSED = 'paused',
+    ARCHIVED = 'archived'
+}
+```
+
+**Newsletter Management Components**:
+- NewsletterList: Display all newsletters with filters (status, frequency)
+- NewsletterWizard: Step-by-step newsletter creation (frequency, rules, scheduling)
+- NewsletterPreview: Live preview with variable substitution
+- NewsletterAnalytics: Performance metrics (sent, opens, clicks, unsubscribes)
+- SubscriberListBuilder: Segment subscribers by tags, roles, custom criteria
+
+### Implementation
+
+#### Phase 1: Create Newsletter Data Model
+- [ ] Define Newsletter, NewsletterFrequency, NewsletterStatus types
+- [ ] Create NewsletterData.ts with sample newsletters
+- [ ] Define ContentRule and SubscriberList types
+- [ ] Add newsletter validation utilities
+
+#### Phase 2: Create Newsletter Management Utilities
+- [ ] Create newsletterManager.ts with CRUD operations
+- [ ] Implement createNewsletter(), updateNewsletter(), deleteNewsletter()
+- [ ] Implement generateNewsletterContent() with curation rules
+- [ ] Implement scheduleNewsletter() and sendNewsletter()
+- [ ] Implement trackNewsletterMetrics()
+
+#### Phase 3: Create Newsletter Components
+- [ ] Create NewsletterList component with filters
+- [ ] Create NewsletterWizard component (frequency → rules → scheduling)
+- [ ] Create NewsletterPreview component with live preview
+- [ ] Create NewsletterAnalytics component with charts
+- [ ] Create SubscriberListBuilder component for segmentation
+
+#### Phase 4: Integrate with EmailService
+- [ ] Extend EmailService for newsletter sending
+- [ ] Integrate newsletter tracking (opens, clicks, unsubscribes)
+- [ ] Add newsletter metrics aggregation
+
+#### Phase 5: Admin Panel Integration
+- [ ] Create admin page at /admin/newsletters
+- [ ] Integrate all newsletter components
+- [ ] Add RBAC protection (Editors can manage newsletters)
+- [ ] Add newsletter performance dashboard
+
+#### Phase 6: Verification
+- [ ] Run lint
+- [ ] Run typecheck
+- [ ] Run all tests (40+ new tests for newsletter management)
+
+### Success Criteria
+
+- [ ] Newsletter data model defined
+- [ ] Newsletter management utilities created (CRUD, scheduling, tracking)
+- [ ] 5 newsletter components created (list, wizard, preview, analytics, builder)
+- [ ] EmailService integrated for newsletter sending and tracking
+- [ ] Admin page at /admin/newsletters functional
+- [ ] Content curation rules implemented (top posts, category, tag filters)
+- [ ] 40+ comprehensive tests for newsletter management
+- [ ] All tests passing (zero regressions)
+- [ ] Lint passes (0 errors, 0 warnings)
+
+### Related Files
+
+- Add: `src/types/newsletter.ts` - Newsletter types
+- Add: `src/data/NewsletterData.ts` - Sample newsletters
+- Add: `src/utils/newsletterManager.ts` - Newsletter utilities
+- Add: `src/components/admin/NewsletterList.tsx`
+- Add: `src/components/admin/NewsletterWizard.tsx`
+- Add: `src/components/admin/NewsletterPreview.tsx`
+- Add: `src/components/admin/NewsletterAnalytics.tsx`
+- Add: `src/components/admin/SubscriberListBuilder.tsx`
+- Add: `src/app/admin/newsletters/page.tsx`
+- Modify: `src/services/email/EmailService.ts` - Newsletter support
+- Modify: `docs/blueprint.md` - Add newsletter architecture
+
+### Implementation Notes
+
+- Follows Product Manager principles:
+  - **User-Centric**: Automated newsletter saves content creator time
+  - **Analytics**: Performance tracking (open rate, click rate)
+  - **Curation**: Smart rules select best content automatically
+  - **Segmentation**: Target specific subscriber segments
+- Extends FEATURE-047 (Email Templates) with newsletter functionality
+- Extends FEATURE-055 (Email Campaigns) with recurring newsletters
+- Integrates with existing RBAC system (Editors can manage newsletters)
+- Indonesian language support for newsletter content
+- Zero breaking changes - only new functionality
+
+---
+
+## Task 344: [PERFORMANCE ENGINEER] CDN Asset Optimization (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: HIGH
+**Type**: Performance - CDN Integration
+**Effort**: Large (8-10 hours)
+
+### Purpose
+
+Implement CDN asset optimization to serve static assets faster to global users, reduce server load, and improve Core Web Vitals.
+
+### Problem Identified
+
+**No CDN Integration**:
+- Static assets served directly from server
+- No geographic distribution for global users
+- High latency for international users
+- No automatic image optimization (WebP conversion)
+- Server load increases with traffic
+- Bundle size not optimized for production
+
+**Why This Matters**:
+1. **Performance**: CDN reduces latency by 50-70% for global users
+2. **Scalability**: Offloads server traffic, reduces infrastructure costs
+3. **Optimization**: Automatic WebP conversion reduces image sizes by 25-35%
+4. **Core Web Vitals**: Faster LCP (Largest Contentful Paint)
+5. **User Experience**: Faster page loads improve bounce rates
+
+### Solution
+
+**CDN Architecture**:
+```
+Build Process
+    ↓
+Asset Upload (images, CSS, JS)
+    ↓
+CDN Provider (Cloudflare / Vercel / Netlify)
+    ↓
+Asset Optimization (WebP, minification)
+    ↓
+Global Edge Distribution (200+ locations)
+    ↓
+User Request (nearest edge serves asset)
+```
+
+**CDN Configuration**:
+- Cloudflare CDN (recommended for zero config with Vercel/Netlify)
+- Automatic image optimization (WebP, AVIF)
+- Smart routing (Anycast DNS)
+- Cache control headers
+- Cache purge API for invalidation
+- Real-time analytics dashboard
+
+### Implementation
+
+#### Phase 1: CDN Configuration Setup
+- [ ] Select CDN provider (Cloudflare recommended for Vercel/Netlify)
+- [ ] Create CDN account and configure domain
+- [ ] Configure CDN cache rules for asset types (images, CSS, JS, fonts)
+- [ ] Set up cache TTL policies (static assets: 1 year, HTML: 1 hour)
+- [ ] Configure cache purge API key
+
+#### Phase 2: Asset Optimization Pipeline
+- [ ] Create asset optimization utilities in `src/utils/assetOptimization.ts`
+- [ ] Implement automatic WebP conversion for images
+- [ ] Implement CSS/JS minification
+- [ ] Add image lazy loading hooks
+- [ ] Add responsive image generation (multiple sizes)
+
+#### Phase 3: Build-Time CDN Upload
+- [ ] Create CDN upload script in `scripts/upload-to-cdn.js`
+- [ ] Configure Next.js build to upload assets to CDN
+- [ ] Add CDN URL rewriting for production
+- [ ] Generate manifest file for asset mappings
+- [ ] Add upload script to package.json build step
+
+#### Phase 4: CDN Integration in Next.js
+- [ ] Configure Next.js Image component to use CDN URLs
+- [ ] Add CDN base URL environment variable (CDN_URL)
+- [ ] Update all image imports to use CDN URLs in production
+- [ ] Add cache-busting hash to asset URLs
+
+#### Phase 5: CDN Configuration Admin Panel
+- [ ] Create admin page at `/admin/cdn-config`
+- [ ] Add CDN provider selection dropdown
+- [ ] Add CDN configuration fields (API key, zone ID)
+- [ ] Add cache TTL configuration
+- [ ] Add manual cache purge button
+- [ ] Display CDN performance metrics (cache hit rate, response times)
+- [ ] Add RBAC protection (Admins only)
+
+#### Phase 6: CDN Health Monitoring
+- [ ] Integrate CDN health checks with APM
+- [ ] Monitor cache hit rates and response times
+- [ ] Set up alerts for CDN failures or cache miss spikes
+- [ ] Add CDN metrics to analytics dashboard
+
+#### Phase 7: Testing
+- [ ] Test CDN asset delivery in multiple regions
+- [ ] Verify WebP conversion and serving
+- [ ] Test cache invalidation (manual purge)
+- [ ] Test CDN failover behavior
+- [ ] Run performance benchmarks (LCP, CLS, FID)
+
+### Success Criteria
+
+- [ ] CDN provider configured (Cloudflare/Vercel/Netlify)
+- [ ] Asset optimization pipeline created (WebP, minification)
+- [ ] Build-time CDN upload implemented
+- [ ] Next.js Image component uses CDN URLs
+- [ ] CDN configuration admin panel created
+- [ ] CDN health monitoring integrated with APM
+- [ ] LCP improved by 30-50% (Core Web Vitals)
+- [ ] Cache hit rate > 80% for static assets
+- [ ] 20+ comprehensive tests for CDN integration
+- [ ] Lint passes (0 errors)
+- [ ] Build process uploads assets to CDN automatically
+
+### Related Files
+
+- Add: `src/utils/assetOptimization.ts` - Asset optimization utilities
+- Add: `scripts/upload-to-cdn.js` - CDN upload script
+- Add: `src/app/admin/cdn-config/page.tsx` - CDN config admin panel
+- Add: `src/components/admin/CDNConfigForm.tsx` - Configuration form
+- Add: `src/components/admin/CDNMetrics.tsx` - CDN metrics display
+- Add: `src/components/admin/CDNHealthIndicator.tsx` - Health status
+- Modify: `next.config.js` - CDN URL configuration
+- Modify: `package.json` - Add CDN upload script
+- Modify: `.env.example` - Add CDN_URL variable
+- Modify: `docs/blueprint.md` - Add CDN architecture
+- Modify: `docs/roadmap.md` - Update performance metrics
+
+### Implementation Notes
+
+- Follows Performance Engineer principles:
+  - **Measure First**: Benchmark LCP before/after CDN
+  - **User-Centric**: Faster page loads improve user experience
+  - **Scalability**: Offloads server traffic to CDN
+  - **Sustainable**: Reduces infrastructure costs with better caching
+- Cloudflare CDN recommended (free tier, zero config with Vercel/Netlify)
+- Automatic WebP conversion reduces image sizes by 25-35%
+- Cache hit rate target > 80% for static assets
+- LCP improvement target: 30-50% (Core Web Vitals)
+- Zero breaking changes - CDN URLs only in production
+- All existing functionality preserved
+
+---
+
+## Task 345: [ANALYTICS ENGINEER] User Behavior Analytics (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Analytics - User Behavior Tracking
+**Effort**: Medium (4-6 hours)
+
+### Purpose
+
+Implement user behavior analytics with heatmap tracking and session recordings to understand user interaction patterns and identify UX improvement opportunities.
+
+### Problem Identified
+
+**Limited Behavioral Insights**:
+- Analytics dashboard (FEATURE-009) tracks page views and form submissions
+- No heatmap data (click density, scroll depth)
+- No session recordings (user journey replay)
+- No behavior anomaly detection (rage clicks, dead clicks)
+- Limited visibility into UX friction points
+
+**Why This Matters**:
+1. **UX Optimization**: Heatmaps reveal how users interact with content
+2. **Conversion**: Session recordings identify drop-off points
+3. **Anomaly Detection**: Rage clicks indicate UX frustration
+4. **Journey Mapping**: Understand user flows between pages
+5. **Data-Driven**: Make UX decisions based on actual behavior
+
+### Solution
+
+**Behavior Analytics Architecture**:
+```
+User Interaction
+    ↓
+Behavior Tracking SDK (Clarity / Hotjar / Open-source)
+    ↓
+Data Collection (clicks, scrolls, mouse movements)
+    ↓
+Behavior Analytics Service (src/services/behaviorAnalytics.ts)
+    ↓
+Heatmap Visualization (component-based)
+    ↓
+Session Recording Dashboard (replay with controls)
+```
+
+**Tracking Capabilities**:
+- Heatmaps: Click density, move tracking, scroll depth
+- Session recordings: Screen capture, speed controls, user flow
+- Behavior anomalies: Rage clicks, dead clicks, rage scrolls
+- Journey mapping: Flow between pages, time on page
+- Privacy controls: Exclude pages, mask sensitive data, user opt-in
+
+### Implementation
+
+#### Phase 1: Behavior Analytics Service
+- [ ] Create behavior analytics service in `src/services/behaviorAnalytics.ts`
+- [ ] Integrate tracking library (Microsoft Clarity - free, privacy-focused)
+- [ ] Implement click tracking (element-level tracking)
+- [ ] Implement scroll depth tracking (25%, 50%, 75%, 100%)
+- [ ] Implement session recording (with privacy controls)
+- [ ] Implement behavior anomaly detection (rage clicks: 5 clicks in 1 second)
+- [ ] Add privacy controls (exclude pages, mask inputs, user opt-in)
+
+#### Phase 2: Behavior Data Types
+- [ ] Create types in `src/types/behavior.ts`
+- [ ] Define HeatmapData, SessionRecording, BehaviorEvent types
+- [ ] Define AnomalyDetection rules (rage click, dead click, rage scroll)
+- [ ] Add validation for behavior data
+
+#### Phase 3: Heatmap Components
+- [ ] Create HeatmapViewer component (click density heatmap)
+- [ ] Create ScrollDepthViewer component (scroll depth heatmap)
+- [ ] Create MoveHeatmapViewer component (mouse movement heatmap)
+- [ ] Add heatmap date range selector
+- [ ] Add heatmap page selector
+- [ ] Add heatmap export (PNG image)
+
+#### Phase 4: Session Recording Dashboard
+- [ ] Create SessionRecordingList component (filterable by date, duration, user)
+- [ ] Create SessionReplayPlayer component (play/pause, speed controls)
+- [ ] Add session event timeline (clicks, scrolls, navigation)
+- [ ] Add session filter (error sessions, high drop-off sessions)
+- [ ] Add session export (download recording MP4)
+
+#### Phase 5: Behavior Anomaly Dashboard
+- [ ] Create AnomalyList component (rage clicks, dead clicks, rage scrolls)
+- [ ] Add anomaly aggregation (by page, by user, by time)
+- [ ] Add anomaly severity scoring (low, medium, high)
+- [ ] Create anomaly investigation modal (view session context)
+- [ ] Add anomaly alerting (APM integration)
+
+#### Phase 6: User Journey Mapping
+- [ ] Create JourneyMap component (flow visualization)
+- [ ] Add journey filtering (by user, by date range)
+- [ ] Add journey path analysis (most common paths, drop-off points)
+- [ ] Create JourneyAnalytics component (time on page, bounce rate)
+
+#### Phase 7: Admin Panel Integration
+- [ ] Create admin page at `/admin/behavior-analytics`
+- [ ] Integrate all behavior analytics components
+- [ ] Add RBAC protection (Admins only)
+- [ ] Add privacy consent banner (user opt-in)
+
+#### Phase 8: Testing
+- [ ] Create behavior analytics service tests (20+ tests)
+- [ ] Create heatmap component tests (15+ tests)
+- [ ] Create session replay tests (15+ tests)
+- [ ] Test privacy controls (excluded pages, masked data)
+
+### Success Criteria
+
+- [ ] Behavior analytics service created with Clarity integration
+- [ ] Heatmap components created (click, scroll, movement)
+- [ ] Session recording dashboard created (replay player, timeline)
+- [ ] Behavior anomaly detection implemented (rage clicks, dead clicks)
+- [ ] User journey mapping created (flow visualization)
+- [ ] Admin page at `/admin/behavior-analytics` functional
+- [ ] Privacy controls implemented (user opt-in, page exclusion)
+- [ ] 50+ comprehensive tests for behavior analytics
+- [ ] All tests passing (zero regressions)
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] GDPR-compliant (explicit opt-in, data minimization)
+
+### Related Files
+
+- Add: `src/types/behavior.ts` - Behavior types
+- Add: `src/services/behaviorAnalytics.ts` - Behavior analytics service
+- Add: `src/components/admin/HeatmapViewer.tsx`
+- Add: `src/components/admin/ScrollDepthViewer.tsx`
+- Add: `src/components/admin/SessionReplayPlayer.tsx`
+- Add: `src/components/admin/JourneyMap.tsx`
+- Add: `src/components/admin/AnomalyList.tsx`
+- Add: `src/app/admin/behavior-analytics/page.tsx`
+- Add: `src/components/common/PrivacyConsentBanner.tsx`
+- Modify: `src/services/apm/apmManager.ts` - Anomaly alerting
+- Modify: `docs/blueprint.md` - Add behavior analytics architecture
+- Modify: `src/app/layout.tsx` - Add Clarity script tag
+
+### Implementation Notes
+
+- Follows Analytics Engineer principles:
+  - **Privacy-First**: GDPR-compliant with explicit opt-in
+  - **Data Minimization**: Only collect necessary behavior data
+  - **User Consent**: Privacy consent banner required before tracking
+  - **Cost Efficient**: Microsoft Clarity free tier (300K sessions/month)
+- Extends FEATURE-009 (Analytics Dashboard) with behavior analytics
+- Integrates with existing APM system (FEATURE-022) for anomaly alerting
+- RBAC integration: Admins only access to behavior analytics
+- Session recordings stored securely with 30-day retention
+- Ready for A/B testing integration (heatmap comparison)
+- Zero breaking changes - only new analytics capabilities
+
+---
+
+## Task 346: [CONTENT MANAGER] Editorial Calendar (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Content Management - Editorial Planning
+**Effort**: Medium (4-6 hours)
+
+### Purpose
+
+Implement editorial calendar to provide unified view of all scheduled content (blog posts, newsletters, campaigns) and enable drag-and-drop rescheduling for better content planning.
+
+### Problem Identified
+
+**Disjointed Content Scheduling**:
+- Blog posts scheduled in blog dashboard (FEATURE-010)
+- Email campaigns managed separately (FEATURE-055)
+- Newsletters managed separately (FEATURE-062)
+- No unified view of all scheduled content
+- Manual scheduling conflicts checking
+- No content gap visualization (empty days, low content days)
+
+**Why This Matters**:
+1. **Planning**: Unified calendar enables strategic content planning
+2. **Efficiency**: Drag-and-drop rescheduling saves time
+3. **Conflicts**: Visual detection of scheduling conflicts
+4. **Gaps**: Content gap visualization identifies under-scheduled periods
+5. **Collaboration**: Team assignments and comments on scheduled items
+
+### Solution
+
+**Editorial Calendar Architecture**:
+```
+Content Sources
+    ├── Blog Posts (InnerBlogData)
+    ├── Email Campaigns (CampaignData)
+    └── Newsletters (NewsletterData)
+        ↓
+    Editorial Calendar Service (src/utils/editorialCalendar.ts)
+        ↓
+    Unified Calendar Component (src/components/admin/EditorialCalendar.tsx)
+        ↓
+    Calendar Views
+        ├── Month View
+        ├── Week View
+        └── Day View
+```
+
+**Calendar Features**:
+- Multi-content type display (blog, campaigns, newsletters)
+- Drag-and-drop rescheduling
+- Content filters (by type, status, author)
+- Event details modal (edit content, view draft, change schedule)
+- Content gap visualization (empty days, low content days)
+- Team collaboration (assignments, comments)
+- Calendar export (iCal, Google Calendar sync)
+- Recurring content indicators
+
+### Implementation
+
+#### Phase 1: Editorial Calendar Service
+- [ ] Create editorial calendar service in `src/utils/editorialCalendar.ts`
+- [ ] Implement `getCalendarEvents()` - Unify all content types
+- [ ] Implement `updateEventDate()` - Drag-and-drop rescheduling
+- [ ] Implement `getContentGaps()` - Identify empty/low-content days
+- [ ] Implement `detectConflicts()` - Scheduling conflict detection
+- [ ] Add calendar data validation
+
+#### Phase 2: Calendar Components
+- [ ] Create EditorialCalendar component with view switcher (month/week/day)
+- [ ] Create MonthView component (grid layout)
+- [ ] Create WeekView component (7-day layout)
+- [ ] Create DayView component (hourly timeline)
+- [ ] Create CalendarEvent component (event card with content type indicator)
+- [ ] Add drag-and-drop support (react-beautiful-dnd)
+
+#### Phase 3: Calendar Filters
+- [ ] Create CalendarFilters component (type, status, author)
+- [ ] Implement filter by content type (blog, campaign, newsletter)
+- [ ] Implement filter by status (draft, scheduled, published)
+- [ ] Implement filter by author/creator
+- [ ] Add "Clear filters" button
+
+#### Phase 4: Event Details Modal
+- [ ] Create EventDetailsModal component
+- [ ] Display event information (title, type, status, author)
+- [ ] Add "Edit Content" button (opens relevant editor)
+- [ ] Add "View Draft" preview button
+- [ ] Add "Reschedule" picker
+- [ ] Add team assignment (dropdown with users)
+- [ ] Add comments section (for collaboration)
+
+#### Phase 5: Content Gap Visualization
+- [ ] Create ContentGapIndicator component (highlight empty days)
+- [ ] Add "Low Content" indicator (< 1 item per day)
+- [ ] Add "No Content" indicator (0 items per day)
+- [ ] Create GapSuggestions component (suggest rescheduling options)
+
+#### Phase 6: Calendar Export
+- [ ] Implement iCal export (RFC 5545 format)
+- [ ] Implement Google Calendar sync (add to Google Calendar button)
+- [ ] Add export button to calendar header
+
+#### Phase 7: Admin Panel Integration
+- [ ] Create admin page at `/admin/editorial-calendar`
+- [ ] Integrate all calendar components
+- [ ] Add RBAC protection (Editors and Admins)
+- [ ] Add calendar legend (content type colors)
+
+#### Phase 8: Testing
+- [ ] Create calendar service tests (20+ tests)
+- [ ] Create calendar component tests (30+ tests)
+- [ ] Test drag-and-drop functionality
+- [ ] Test conflict detection
+- [ ] Test content gap visualization
+
+### Success Criteria
+
+- [ ] Editorial calendar service created (unify content types)
+- [ ] Calendar components created (month, week, day views)
+- [ ] Drag-and-drop rescheduling implemented
+- [ ] Content filters implemented (type, status, author)
+- [ ] Event details modal created (edit, preview, reschedule)
+- [ ] Content gap visualization implemented
+- [ ] Calendar export implemented (iCal, Google Calendar)
+- [ ] Admin page at `/admin/editorial-calendar` functional
+- [ ] RBAC protection (Editors and Admins)
+- [ ] 50+ comprehensive tests for editorial calendar
+- [ ] All tests passing (zero regressions)
+- [ ] Lint passes (0 errors, 0 warnings)
+
+### Related Files
+
+- Add: `src/utils/editorialCalendar.ts` - Calendar service
+- Add: `src/types/editorialCalendar.ts` - Calendar types
+- Add: `src/components/admin/EditorialCalendar.tsx`
+- Add: `src/components/admin/MonthView.tsx`
+- Add: `src/components/admin/WeekView.tsx`
+- Add: `src/components/admin/DayView.tsx`
+- Add: `src/components/admin/CalendarEvent.tsx`
+- Add: `src/components/admin/EventDetailsModal.tsx`
+- Add: `src/components/admin/ContentGapIndicator.tsx`
+- Add: `src/app/admin/editorial-calendar/page.tsx`
+- Add: `src/utils/calendarExport.ts` - iCal export utilities
+- Modify: `docs/blueprint.md` - Add editorial calendar architecture
+
+### Implementation Notes
+
+- Follows Content Manager principles:
+  - **Planning**: Unified calendar enables strategic content planning
+  - **Efficiency**: Drag-and-drop saves rescheduling time
+  - **Collaboration**: Team assignments and comments
+  - **Insight**: Content gaps visualization
+- Extends FEATURE-010 (Blog Post Scheduling) with multi-content support
+- Extends FEATURE-055 (Email Campaigns) with calendar view
+- Extends FEATURE-062 (Newsletters) with calendar integration
+- Integrates with existing ThemeContext for dark mode support
+- RBAC integration: Editors and Admins can access
+- Real-time sync for team collaboration
+- iCal export enables offline calendar apps (Google, Outlook, Apple)
+- Zero breaking changes - adds new calendar interface
+- All existing functionality preserved
+
+---
+
+## Task 347: [PRODUCT MANAGER] Conversion Funnel Analytics (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Product - Analytics & Conversion
+**Effort**: Medium (4-6 hours)
+
+### Purpose
+
+Implement conversion funnel analytics to track user journeys (signup, subscription), identify drop-off points, and enable A/B test comparison for funnel optimization.
+
+### Problem Identified
+
+**Limited Conversion Insights**:
+- Analytics dashboard (FEATURE-009) tracks page views and form submissions
+- No conversion funnel visualization
+- No drop-off point identification
+- No cohort analysis (time-based segmentation)
+- No A/B test comparison for funnel variants
+
+**Why This Matters**:
+1. **Conversion Rate**: Funnels identify drop-off points for optimization
+2. **Cohort Analysis**: Track conversion rates over time
+3. **A/B Testing**: Compare funnel performance across variants
+4. **Data-Driven**: Make optimization decisions based on funnel data
+5. **Revenue**: Improved conversion rates increase revenue
+
+### Solution
+
+**Conversion Funnel Architecture**:
+```
+Funnel Definition
+    ├── Funnel Stages (signup, verification, subscription)
+    ├── Funnel Events (page view, form submit, success)
+    └── Funnel Metrics (conversion rate, drop-off rate)
+        ↓
+    Funnel Analytics Service (src/services/funnelAnalytics.ts)
+        ↓
+    Funnel Visualization (FunnelChart, StageBreakdown)
+        ↓
+    A/B Test Comparison (compare variants side-by-side)
+```
+
+**Funnel Features**:
+- Predefined funnels (signup funnel, subscription funnel, contact form funnel)
+- Custom funnel builder (drag-and-drop stage definition)
+- Funnel visualization (funnel chart with drop-off rates)
+- Stage breakdown (user count, conversion rate, drop-off rate)
+- Cohort analysis (weekly, monthly conversion trends)
+- A/B test comparison (funnel performance across variants)
+- Funnel export (PDF report, CSV data)
+
+### Implementation
+
+#### Phase 1: Funnel Data Model
+- [ ] Create funnel types in `src/types/funnel.ts`
+- [ ] Define FunnelStage, FunnelEvent, FunnelMetrics types
+- [ ] Define FunnelDefinition interface (stages, name, description)
+- [ ] Define CohortAnalysis interface (time-based segmentation)
+- [ ] Add funnel data validation
+
+#### Phase 2: Predefined Funnels
+- [ ] Create SignupFunnel definition (landing → signup form → verify → success)
+- [ ] Create SubscriptionFunnel definition (pricing → payment → confirmation)
+- [ ] Create ContactFormFunnel definition (contact form → submit → success)
+- [ ] Store predefined funnels in `src/data/funnels.ts`
+
+#### Phase 3: Funnel Analytics Service
+- [ ] Create funnel analytics service in `src/services/funnelAnalytics.ts`
+- [ ] Implement `calculateFunnelMetrics()` - Conversion and drop-off rates
+- [ ] Implement `getFunnelCohorts()` - Time-based segmentation
+- [ ] Implement `compareFunnels()` - A/B test comparison
+- [ ] Implement `detectDropOffPoints()` - Identify stage drop-offs
+- [ ] Integrate with ActivityLog (FEATURE-048) for funnel events
+
+#### Phase 4: Funnel Visualization Components
+- [ ] Create FunnelChart component (funnel visualization with drop-off)
+- [ ] Create StageBreakdown component (stage metrics table)
+- [ ] Create CohortChart component (time-based conversion trends)
+- [ ] Add funnel date range selector
+- [ ] Add funnel selector (predefined + custom)
+
+#### Phase 5: Funnel Builder
+- [ ] Create FunnelBuilder component (drag-and-drop stage definition)
+- [ ] Create StageSelector component (page view, form submit, custom event)
+- [ ] Add stage configuration (event type, URL match, timeout)
+- [ ] Add funnel save functionality
+- [ ] Add funnels list management (create, edit, delete)
+
+#### Phase 6: A/B Test Comparison
+- [ ] Create FunnelComparison component (side-by-side variant comparison)
+- [ ] Add variant selector (A, B, A/B split)
+- [ ] Create ComparisonChart component (conversion rate comparison)
+- [ ] Add statistical significance calculation
+
+#### Phase 7: Admin Panel Integration
+- [ ] Create admin page at `/admin/conversion-funnels`
+- [ ] Integrate all funnel components
+- [ ] Add RBAC protection (Admins only)
+- [ ] Add funnel performance dashboard
+
+#### Phase 8: Testing
+- [ ] Create funnel service tests (20+ tests)
+- [ ] Create funnel component tests (30+ tests)
+- [ ] Test A/B test comparison
+- [ ] Test cohort analysis
+
+### Success Criteria
+
+- [ ] Funnel data model defined (stages, events, metrics)
+- [ ] Predefined funnels created (signup, subscription, contact)
+- [ ] Funnel analytics service created (calculation, cohorts, comparison)
+- [ ] Funnel visualization components created (chart, breakdown, cohort)
+- [ ] Funnel builder created (drag-and-drop stage definition)
+- [ ] A/B test comparison implemented
+- [ ] Admin page at `/admin/conversion-funnels` functional
+- [ ] RBAC protection (Admins only)
+- [ ] 50+ comprehensive tests for funnel analytics
+- [ ] All tests passing (zero regressions)
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] Funnel export implemented (PDF, CSV)
+
+### Related Files
+
+- Add: `src/types/funnel.ts` - Funnel types
+- Add: `src/data/funnels.ts` - Predefined funnels
+- Add: `src/services/funnelAnalytics.ts` - Funnel analytics service
+- Add: `src/components/admin/FunnelChart.tsx`
+- Add: `src/components/admin/StageBreakdown.tsx`
+- Add: `src/components/admin/CohortChart.tsx`
+- Add: `src/components/admin/FunnelBuilder.tsx`
+- Add: `src/components/admin/FunnelComparison.tsx`
+- Add: `src/app/admin/conversion-funnels/page.tsx`
+- Add: `src/utils/funnelExport.ts` - Funnel export utilities
+- Modify: `docs/blueprint.md` - Add funnel analytics architecture
+- Modify: `src/utils/activityLogger.ts` - Funnel event tracking
+
+### Implementation Notes
+
+- Follows Product Manager principles:
+  - **Data-Driven**: Funnel insights drive optimization decisions
+  - **Revenue**: Improved conversion rates increase revenue
+  - **A/B Testing**: Compare funnel performance across variants
+  - **Cohort Analysis**: Track conversion trends over time
+- Extends FEATURE-009 (Analytics Dashboard) with funnel analytics
+- Integrates with existing ActivityLog (FEATURE-048) for event tracking
+- Uses existing APM system (FEATURE-022) for performance correlation
+- RBAC integration: Admins only access to funnel analytics
+- Privacy-focused: Anonymized user data, GDPR-compliant
+- Statistical significance calculation for A/B test comparison
+- Zero breaking changes - only new analytics capabilities
+- All existing functionality preserved
+
+---
+
+**Last Updated**: 2026-01-19 (Tasks 342-347 added in Phase 15 Creative Enhancement)

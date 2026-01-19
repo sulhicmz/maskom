@@ -2059,3 +2059,240 @@ As a Content Creator, I want to compare content insights across multiple version
 ---
 
 **Last Updated**: 2026-01-19
+
+---
+
+## [FEATURE-061] GraphQL API Layer
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Infrastructure/API
+
+### User Story
+
+As an API Consumer, I want to access data through a flexible GraphQL API, so that I can query exactly the data I need without over-fetching and reduce network bandwidth.
+
+### Acceptance Criteria
+
+- [ ] Create GraphQL schema for all existing data models (blog, users, analytics)
+- [ ] Implement GraphQL server with resolvers (Apollo Server or similar)
+- [ ] Add query and mutation operations for CRUD operations
+- [ ] Implement GraphQL Code Generator for TypeScript types
+- [ ] Add GraphQL Playground for API exploration
+- [ ] Implement query complexity analysis to prevent expensive queries
+- [ ] Add rate limiting specific to GraphQL queries
+- [ ] Create API documentation with schema examples
+- [ ] Add tests for GraphQL resolvers and queries
+- [ ] Update docs/blueprint.md with GraphQL architecture
+
+### Implementation Notes:
+- Extends existing data architecture (src/data/*.ts) with GraphQL schema
+- Leverages existing validation layer for GraphQL resolvers
+- Integrates with existing RBAC system for query authorization
+- Uses Apollo Server or graphql-yoga for Next.js integration
+- Applies caching strategies for query performance
+- Ready for GraphQL subscriptions (real-time updates in future)
+- Type safety with GraphQL Code Generator
+- Improves over REST API: flexible queries, single endpoint, reduced over-fetching
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-062] Newsletter Management System
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management/Communication
+
+### User Story
+
+As a Newsletter Editor, I want to create and manage recurring newsletters from curated blog content, so that I can engage subscribers with automated digest emails on a regular schedule.
+
+### Acceptance Criteria
+
+- [ ] Create newsletter data structure (frequency, template, content selection rules)
+- [ ] Implement newsletter wizard for creating recurring digests
+- [ ] Add content curation rules (top posts by category, tag, date range)
+- [ ] Implement newsletter scheduling (weekly, bi-weekly, monthly)
+- [ ] Add subscriber list management (import, export, segmentation)
+- [ ] Integrate with existing EmailTemplate system (FEATURE-047)
+- [ ] Implement newsletter preview with variable substitution
+- [ ] Add newsletter performance tracking (open rate, click rate, unsubscribe rate)
+- [ ] Create newsletter management admin page
+- [ ] Add tests for newsletter functionality
+- [ ] Update docs/blueprint.md with newsletter architecture
+
+### Implementation Notes:
+- Extends FEATURE-047 (Email Template Management System) with newsletter functionality
+- Extends FEATURE-055 (Email Campaign Management System) with recurring newsletters
+- Leverages existing InnerBlogData for content curation
+- Uses existing EmailService for newsletter delivery
+- Integrates with existing RBAC system (Editors can manage newsletters)
+- Applies data validation for newsletter rules
+- Ready for subscriber preferences (frequency, topics)
+- Indonesian language support for newsletter content
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-063] CDN Asset Optimization
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Infrastructure/Performance
+
+### User Story
+
+As a Site Administrator, I want to optimize asset delivery through CDN integration, so that I can serve static assets faster to global users and reduce server load.
+
+### Acceptance Criteria
+
+- [ ] Create CDN configuration interface in admin panel
+- [ ] Implement Cloudflare CDN integration (or Vercel/Netlify CDN)
+- [ ] Add automatic asset optimization (image WebP conversion, CSS/JS minification)
+- [ ] Implement CDN cache invalidation strategy
+- [ ] Add CDN performance metrics (cache hit rate, response times by region)
+- [ ] Create CDN asset upload/management workflow
+- [ ] Implement automatic asset upload to CDN on build
+- [ ] Add CDN health monitoring and alerts
+- [ ] Create CDN configuration dashboard
+- [ ] Add tests for CDN integration
+- [ ] Update docs/blueprint.md with CDN architecture
+
+### Implementation Notes:
+- Extends existing service worker caching (FEATURE-026) with CDN integration
+- Leverages existing Web Vitals API tracking (FEATURE-038) for CDN performance
+- Integrates with existing MediaAsset data model for CDN asset management
+- Uses existing APM system for CDN performance monitoring
+- Applies image optimization patterns (WebP, lazy loading)
+- Zero-touch deployment: automatic CDN upload on build
+- Supports multiple CDN providers (Cloudflare, Vercel, Netlify)
+- RBAC integration: Admins can configure CDN
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-064] User Behavior Analytics
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Analytics/UX
+
+### User Story
+
+As a Marketing Analyst, I want to track user behavior patterns (heatmaps, session recordings), so that I can understand how users interact with content and identify UX improvement opportunities.
+
+### Acceptance Criteria
+
+- [ ] Integrate heatmap tracking library (Hotjar, Clarity, or open-source)
+- [ ] Implement session recording with privacy controls
+- [ ] Add click tracking and scroll depth analytics
+- [ ] Create heatmap visualization dashboard
+- [ ] Implement session replay with speed controls
+- [ ] Add user journey mapping (flow between pages)
+- [ ] Create behavior anomaly detection (rage clicks, dead clicks)
+- [ ] Add privacy controls (exclude pages, mask sensitive data)
+- [ ] Create behavior analytics admin page
+- [ ] Integrate with existing APM system for correlated insights
+- [ ] Add tests for behavior tracking utilities
+- [ ] Update docs/blueprint.md with behavior analytics architecture
+
+### Implementation Notes:
+- Extends FEATURE-009 (Analytics Dashboard) with behavior analytics
+- Extends FEATURE-033 (Advanced Analytics & User Behavior Tracking) with heatmap/recording
+- Leverages existing APM integration (FEATURE-022) for correlated insights
+- Integrates with existing RBAC system for admin-only access
+- Privacy-first: GDPR-compliant with explicit opt-in
+- Uses open-source libraries (Clarity, Hotjar alternatives) for cost efficiency
+- Session recordings stored securely with expiration policies
+- Ready for A/B testing integration with heatmap data
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-065] Editorial Calendar
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Content Management/Workflow
+
+### User Story
+
+As an Editorial Manager, I want to view and manage content across multiple content types in a unified calendar, so that I can plan content strategy effectively and avoid scheduling conflicts.
+
+### Acceptance Criteria
+
+- [ ] Create editorial calendar view component (month, week, day views)
+- [ ] Display all content types on calendar (blog posts, newsletters, campaigns)
+- [ ] Add drag-and-drop for rescheduling content
+- [ ] Implement content filters by type, status, author
+- [ ] Add calendar event details modal (edit content, view draft, change schedule)
+- [ ] Create content gap visualization (empty days, low content days)
+- [ ] Add collaboration features (team assignments, comments on scheduled items)
+- [ ] Integrate with existing blog scheduling (FEATURE-010)
+- [ ] Integrate with email campaigns (FEATURE-055)
+- [ ] Integrate with newsletters (FEATURE-062)
+- [ ] Create editorial calendar admin page
+- [ ] Add calendar export (iCal, Google Calendar sync)
+- [ ] Add tests for calendar functionality
+- [ ] Update docs/blueprint.md with editorial calendar architecture
+
+### Implementation Notes:
+- Extends FEATURE-060 (Content Scheduling Calendar) with multi-content support
+- Extends FEATURE-058 (Collaborative Content Review Workflow) with scheduling
+- Leverages existing blog post scheduling (FEATURE-010)
+- Integrates with email campaign system (FEATURE-055)
+- Integrates with newsletter system (FEATURE-062)
+- Uses existing ThemeContext for dark mode support
+- RBAC integration: Editors can view/edit assigned content
+- Real-time sync for team collaboration
+- Calendar export standards (iCal, Google Calendar, Outlook)
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-066] Conversion Funnel Analytics
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Analytics/Product
+
+### User Story
+
+As a Product Manager, I want to analyze conversion funnels for user journeys (signup, subscription), so that I can identify drop-off points and optimize conversion rates.
+
+### Acceptance Criteria
+
+- [ ] Create conversion funnel data structure (stages, metrics, drop-off rates)
+- [ ] Implement funnel definition interface (drag-and-drop funnel builder)
+- [ ] Add predefined funnels (signup funnel, subscription funnel, contact form funnel)
+- [ ] Implement funnel analytics with time-based segmentation (cohort analysis)
+- [ ] Create funnel visualization dashboard (funnel chart, stage breakdown)
+- [ ] Add drop-off analysis with user-level insights
+- [ ] Implement A/B test comparison for funnel variants
+- [ ] Add funnel export (PDF report, CSV data)
+- [ ] Create funnel analytics admin page
+- [ ] Integrate with existing analytics dashboard (FEATURE-009)
+- [ ] Add tests for funnel analytics
+- [ ] Update docs/blueprint.md with funnel analytics architecture
+
+### Implementation Notes:
+- Extends FEATURE-009 (Analytics Dashboard) with conversion funnels
+- Extends FEATURE-033 (Advanced Analytics & User Behavior Tracking) with funnels
+- Leverages existing ActivityLog (FEATURE-048) for funnel events
+- Uses existing APM integration (FEATURE-022) for performance correlation
+- Integrates with existing RBAC system for admin-only access
+- Cohort analysis capabilities (weekly, monthly retention)
+- A/B test integration for funnel optimization
+- Privacy-focused: Anonymized user data, GDPR-compliant
+
+**Completion Date**: TBD
+
+---
+
+**Last Updated**: 2026-01-19 (FEATURE-061 through FEATURE-066 added in Phase 15 Creative Enhancement)
