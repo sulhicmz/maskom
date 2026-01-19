@@ -103,7 +103,6 @@ export class EmailQueue {
     }
 
     removeExpired(): number {
-        const expiredEmails = this.getExpiredEmails();
         const initialSize = this.queue.length;
         this.queue = this.queue.filter(email => 
             (Date.now() - email.timestamp) <= this.config.maxRetentionMs

@@ -4,26 +4,8 @@ const LOG_STORAGE_KEY = 'activity_logs';
 const ALERT_RULES_STORAGE_KEY = 'alert_rules';
 const ALERT_STORAGE_KEY = 'suspicious_alerts';
 const MAX_LOGS = 10000;
-const CACHE_VERSION_KEY = 'activity_logs_version';
 
 let logsCache: ActivityLog[] | null = null;
-let localCacheVersion = 0;
-
-export type { AlertRule, SuspiciousActivityAlert };
-
-const initCacheVersion = (): void => {
-    if (typeof window !== 'undefined') {
-        const version = localStorage.getItem(CACHE_VERSION_KEY);
-        if (!version) {
-            localStorage.setItem(CACHE_VERSION_KEY, '0');
-        }
-        localCacheVersion = parseInt(version || '0');
-    }
-};
-
-export const initializeCache = (): void => {
-    initCacheVersion();
-};
 
 export const getLogs = (): ActivityLog[] => {
     if (typeof window === 'undefined') return [];
@@ -36,7 +18,6 @@ export const getLogs = (): ActivityLog[] => {
         const stored = localStorage.getItem(LOG_STORAGE_KEY);
         if (stored) {
             const parsed = JSON.parse(stored);
-            localCacheVersion++;
             logsCache = parsed as ActivityLog[];
             return logsCache;
         }
@@ -50,7 +31,6 @@ export const getLogs = (): ActivityLog[] => {
 export const saveLogs = (logs: ActivityLog[]): void => {
     const updatedLogs = logs.slice(0, MAX_LOGS);
 
-    localCacheVersion++;
     logsCache = updatedLogs;
 
     try {
@@ -72,7 +52,6 @@ export const clearLogs = (beforeDate?: Date): number => {
     }
 
     logsCache = [];
-    localCacheVersion++;
 
     try {
         localStorage.setItem(LOG_STORAGE_KEY, '[]');
@@ -127,4 +106,4 @@ export const saveSuspiciousAlerts = (alerts: SuspiciousActivityAlert[]): void =>
     } catch (error) {
         console.error('Failed to save suspicious alerts:', error);
     }
-};
+}

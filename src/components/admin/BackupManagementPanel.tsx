@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import { useRouter } from 'next/navigation'
@@ -11,14 +11,13 @@ import {
   BackupStatistics,
   DEFAULT_BACKUP_CONFIG,
 } from '@/types/backup'
-import { BACKUP_STORAGE_KEY, DISASTER_RECOVERY_PLAN_KEY } from '@/types/backup'
+import { BACKUP_STORAGE_KEY } from '@/types/backup'
 import BackupConfigForm from './BackupConfigForm'
 import BackupList from './BackupList'
 import BackupRestoreModal from './BackupRestoreModal'
 import DisasterRecoveryPlanComponent from './DisasterRecoveryPlan'
 import { createFullBackup, getBackupStatistics, deleteBackup, exportBackupToFile } from '@/utils/backupEngine'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { formatAsPercentage } from '@/utils/formatPercentage'
 
 const BackupManagementPanel: React.FC = () => {
   const { theme } = useTheme()
@@ -38,7 +37,6 @@ const BackupManagementPanel: React.FC = () => {
 
   const [selectedBackup, setSelectedBackup] = useState<BackupMetadata | null>(null)
   const [showRestoreModal, setShowRestoreModal] = useState(false)
-  const [restoreResult, setRestoreResult] = useState<RestoreResult | null>(null)
   const [showDisasterRecovery, setShowDisasterRecovery] = useState(false)
 
   const [statistics, setStatistics] = useState<BackupStatistics | null>(null)
@@ -131,14 +129,12 @@ const BackupManagementPanel: React.FC = () => {
     }
   }
 
-  const handleRestore = (backupId: string) => {
+  const handleRestore = () => {
     setSelectedBackup(null)
     setShowRestoreModal(true)
   }
 
   const handleRestoreComplete = (result: RestoreResult) => {
-    setRestoreResult(result)
-
     if (result.success) {
       setShowSuccessMessage(true)
       setSuccessMessage(`Backup ${result.backupId} berhasil dipulihkan! ${result.itemsRestored} item dipulihkan.`)
@@ -149,7 +145,6 @@ const BackupManagementPanel: React.FC = () => {
 
     setTimeout(() => {
       setShowRestoreModal(false)
-      setRestoreResult(null)
     }, 5000)
   }
 

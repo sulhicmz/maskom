@@ -1,6 +1,5 @@
 import type { IEmailService, EmailSendParams, EmailSendOptions, ServiceMetrics } from './types';
 import type { ServiceResult } from '@/types/common';
-import type { EmailTemplate } from '@/types/data';
 import { withTimeout, CircuitBreaker } from '@/utils/resilience';
 import { emailRateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
@@ -91,7 +90,7 @@ class EmailService implements IEmailService {
         }
 
         const emailjs = this.emailjsModule;
-        const result = await withTimeout(
+        const withTimeoutResult = await withTimeout(
             emailjs.send(
                 this.serviceId,
                 this.templateId,
@@ -100,7 +99,7 @@ class EmailService implements IEmailService {
             ),
             { timeoutMs: TIMEOUTS.EMAIL_SERVICE, timeoutError: 'EmailJS request timed out' }
         );
-        return { text: result.text };
+        return { text: withTimeoutResult.text };
     }
 
     getCircuitBreakerState() {
@@ -139,8 +138,8 @@ class EmailService implements IEmailService {
 
             try {
                 emailQueue.markAttempt(queuedEmail.id);
-                
-                const result = await executeWithResilience<{ text: string }>(
+
+                await executeWithResilience<{ text: string }>(
                     {
                         operationName: 'EmailService.processQueue',
                         rateLimiter: emailRateLimiter,
@@ -149,7 +148,7 @@ class EmailService implements IEmailService {
                         skipRateLimit: true,
                         timeoutMs: TIMEOUTS.EMAIL_SERVICE
                     },
-                    () => this.sendEmailWithTimeout({ 
+                    () => this.sendEmailWithTimeout({
                         templateParams: {
                             user_name: (queuedEmail.params as Record<string, string>).user_name || '',
                             user_email: (queuedEmail.params as Record<string, string>).user_email || '',

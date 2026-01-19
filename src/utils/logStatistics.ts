@@ -1,4 +1,4 @@
-import { ActivityLog, ActivityAction, ActivityStatistics } from '@/types/audit';
+import { ActivityAction, ActivityStatistics } from '@/types/audit';
 import { getLogs } from './logStorage';
 
 export const calculateActivityStatistics = (): ActivityStatistics => {

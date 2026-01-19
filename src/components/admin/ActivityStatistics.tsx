@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
-import { getLogs, calculateActivityStatistics } from '@/utils/activityLogger'
+import { calculateActivityStatistics } from '@/utils/activityLogger'
 import { ActivityStatistics } from '@/types/audit'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 

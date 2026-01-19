@@ -11,20 +11,15 @@ interface DisasterRecoveryPlanProps {
 
 const StepItem = memo(({
   step,
-  stepIndex,
   completedSteps,
   onToggleStep,
-  index,
 }: {
   step: DisasterRecoveryPlan['restoreSteps'][0]
-  stepIndex: number
   completedSteps: Set<number>
   onToggleStep: (stepNumber: number) => void
-  index: number
 }) => {
   const { theme } = useTheme()
   const isCompleted = completedSteps.has(step.step)
-  const isCurrent = stepIndex === 0 && completedSteps.size === 0
   const canStart = step.dependencies.every((dep) => completedSteps.has(dep))
 
   return (
@@ -221,14 +216,12 @@ const DisasterRecoveryPlanComponent: React.FC<DisasterRecoveryPlanProps> = ({
                   selesai
                 </small>
 
-                {currentPlan.restoreSteps.map((step, index) => (
+                {currentPlan.restoreSteps.map((step) => (
                   <StepItem
                     key={step.step}
                     step={step}
-                    stepIndex={index}
                     completedSteps={completedSteps}
                     onToggleStep={handleToggleStep}
-                    index={index}
                   />
                 ))}
               </div>

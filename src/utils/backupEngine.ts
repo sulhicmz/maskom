@@ -2,14 +2,10 @@ import {
   BackupData,
   BackupMetadata,
   BackupType,
-  BackupStatus,
-  BackupEncryption,
-  StorageType,
   BackupInfo,
   RestoreResult,
   BackupStatistics,
   BackupConfig,
-  BackupSchedule,
   BackupHealthStatus,
   UserDataBackup,
   ContentDataBackup,
@@ -469,14 +465,13 @@ class BackupEngine {
       )
 
       const keyBuffer = await crypto.subtle.exportKey('raw', key)
-
-      const encryptedDataArray = new Uint8Array(encryptedData)
+      const encryptedDataUint8Array = new Uint8Array(encryptedData)
       const combined = new Uint8Array(
         iv.length + keyBuffer.byteLength + encryptedData.byteLength,
       )
       combined.set(iv, 0)
       combined.set(new Uint8Array(keyBuffer), iv.length)
-      combined.set(new Uint8Array(encryptedData), iv.length + keyBuffer.byteLength)
+      combined.set(encryptedDataUint8Array, iv.length + keyBuffer.byteLength)
 
       const base64 = btoa(String.fromCharCode(...combined))
 
@@ -541,7 +536,7 @@ class BackupEngine {
       const compressedStream = new CompressionStream('gzip')
       const writer = compressedStream.writable.getWriter()
 
-      const compressed = await writer.write(dataBuffer)
+      await writer.write(dataBuffer)
       await writer.close()
 
       const reader = compressedStream.readable.getReader()
@@ -869,7 +864,7 @@ class BackupEngine {
     return []
   }
 
-  private async calculateChangesSinceBackup(lastBackupTimestamp: string): Promise<Omit<BackupData, 'backupInfo'>> {
+  private async calculateChangesSinceBackup(): Promise<Omit<BackupData, 'backupInfo'>> {
     return {
       userData: {
         authState: [],
@@ -963,7 +958,6 @@ class BackupEngine {
   private async saveBackupToStorage(
     backupId: string,
     data: string,
-    metadata: BackupMetadata,
   ): Promise<void> {
     if (typeof window === 'undefined') {
       return

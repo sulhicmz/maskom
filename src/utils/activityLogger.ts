@@ -4,23 +4,11 @@ const LOG_STORAGE_KEY = 'activity_logs';
 const ALERT_RULES_STORAGE_KEY = 'alert_rules';
 const ALERT_STORAGE_KEY = 'suspicious_alerts';
 const MAX_LOGS = 10000;
-const CACHE_VERSION_KEY = 'activity_logs_version';
 
 let logsCache: ActivityLog[] | null = null;
-let localCacheVersion = 0;
 
 export const generateLogId = (): string => {
     return `LOG-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-};
-
-export const initializeCacheVersion = (): void => {
-    if (typeof window !== 'undefined') {
-        const version = localStorage.getItem(CACHE_VERSION_KEY);
-        if (!version) {
-            localStorage.setItem(CACHE_VERSION_KEY, '0');
-        }
-        localCacheVersion = parseInt(version || '0');
-    }
 };
 
 export const getClientIP = (): string => {
@@ -60,9 +48,7 @@ export const logActivity = (
     const existingLogs = getLogs();
     const updatedLogs = [log, ...existingLogs].slice(0, MAX_LOGS);
 
-    localCacheVersion++
     logsCache = updatedLogs;
-    localCacheVersion++;
 
     try {
         localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(updatedLogs));
@@ -86,7 +72,6 @@ export const getLogs = (): ActivityLog[] => {
         const stored = localStorage.getItem(LOG_STORAGE_KEY);
         if (stored) {
             const parsed = JSON.parse(stored);
-            localCacheVersion++
             logsCache = parsed as ActivityLog[];
             return logsCache;
         }
@@ -104,49 +89,41 @@ export const filterLogs = (filter: ActivityLogFilter): ActivityLog[] => {
         logs = logs.filter(log => log.userId === filter.userId);
     }
 
-    if (filter.action && filter.action.length > 0) {
-        logs = logs.filter(log => filter.action!.includes(log.action));
+    if (filter.action) {
+        logs = logs.filter(log => log.action === filter.action);
     }
 
     if (filter.resource) {
         logs = logs.filter(log => log.resource === filter.resource);
     }
 
-    if (filter.resourceId) {
-        logs = logs.filter(log => log.resourceId === filter.resourceId);
-    }
-
-    if (filter.startDate) {
-        logs = logs.filter(log => new Date(log.timestamp) >= new Date(filter.startDate!));
-    }
-
-    if (filter.endDate) {
-        logs = logs.filter(log => new Date(log.timestamp) <= new Date(filter.endDate!));
-    }
-
-    if (typeof filter.success !== 'undefined') {
+    if (filter.success !== undefined) {
         logs = logs.filter(log => log.success === filter.success);
     }
 
-    logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    if (filter.startDate) {
+        logs = logs.filter(log => new Date(log.timestamp) >= new Date(filter.startDate));
+    }
 
-    const offset = filter.offset || 0;
-    const limit = filter.limit || logs.length;
-    logs = logs.slice(offset, offset + limit);
+    if (filter.endDate) {
+        logs = logs.filter(log => new Date(log.timestamp) <= new Date(filter.endDate));
+    }
 
     return logs;
 };
 
 export const getLogsByUser = (userId: string): ActivityLog[] => {
-    return filterLogs({ userId });
+    return getLogs().filter(log => log.userId === userId);
 };
 
 export const getLogsByAction = (action: ActivityAction): ActivityLog[] => {
-    return filterLogs({ action: [action] });
+    return getLogs().filter(log => log.action === action);
 };
 
-export const getLogsByDateRange = (startDate: string, endDate: string): ActivityLog[] => {
-    return filterLogs({ startDate, endDate });
+export const getLogsByDateRange = (startDate: Date, endDate: Date): ActivityLog[] => {
+    return getLogs().filter(
+        log => new Date(log.timestamp) >= startDate && new Date(log.timestamp) <= endDate
+    );
 };
 
 export const calculateActivityStatistics = (): ActivityStatistics => {
@@ -157,50 +134,31 @@ export const calculateActivityStatistics = (): ActivityStatistics => {
     const last7Days = new Date(now.getTime() - 604800000);
     const last30Days = new Date(now.getTime() - 2592000000);
 
-    const todayActivity = logs.filter(log => new Date(log.timestamp) >= today).length;
-    const last24hActivity = logs.filter(log => new Date(log.timestamp) >= yesterday).length;
-    const last7DaysActivity = logs.filter(log => new Date(log.timestamp) >= last7Days).length;
-    const last30DaysActivity = logs.filter(log => new Date(log.timestamp) >= last30Days).length;
-
-    const successfulLogs = logs.filter(log => log.success).length;
-    const failedLogs = logs.filter(log => !log.success).length;
-
-    const logsByAction = Object.values(ActivityAction).reduce<Record<ActivityAction, number>>((acc, action) => {
-        acc[action] = logs.filter(log => log.action === action).length;
-        return acc;
-    }, {} as Record<ActivityAction, number>);
-
-    const logsByUser: Record<string, number> = {};
-    logs.forEach(log => {
-        logsByUser[log.userId] = (logsByUser[log.userId] || 0) + 1;
-    });
-
-    const logsByResource: Record<string, number> = {};
-    logs.forEach(log => {
-        logsByResource[log.resource] = (logsByResource[log.resource] || 0) + 1;
-    });
-
-    const recentActivity = logs.slice(0, 10);
-
     return {
         totalLogs: logs.length,
-        successfulLogs,
-        failedLogs,
-        logsByAction,
-        logsByUser,
-        logsByResource,
-        recentActivity,
-        todayActivity,
-        last24hActivity,
-        last7DaysActivity,
-        last30DaysActivity,
+        successfulLogs: logs.filter(log => log.success).length,
+        failedLogs: logs.filter(log => !log.success).length,
+        todayActivity: logs.filter(log => new Date(log.timestamp) >= today).length,
+        last24hActivity: logs.filter(log => new Date(log.timestamp) >= yesterday).length,
+        last7DaysActivity: logs.filter(log => new Date(log.timestamp) >= last7Days).length,
+        last30DaysActivity: logs.filter(log => new Date(log.timestamp) >= last30Days).length,
+        logsByAction: logs.reduce<Record<ActivityAction, number>>((acc, log) => {
+            acc[log.action] = (acc[log.action] || 0) + 1;
+            return acc;
+        }, {} as Record<ActivityAction, number>),
+        logsByUser: logs.reduce<Record<string, number>>((acc, log) => {
+            acc[log.userId] = (acc[log.userId] || 0) + 1;
+            return acc;
+        }, {}),
+        logsByResource: logs.reduce<Record<string, number>>((acc, log) => {
+            acc[log.resource] = (acc[log.resource] || 0) + 1;
+            return acc;
+        }, {}),
     };
 };
 
 export const exportLogsToCSV = (logs: ActivityLog[]): string => {
-    if (logs.length === 0) return '';
-
-    const headers = ['ID', 'User ID', 'Action', 'Resource', 'Resource ID', 'Details', 'Timestamp', 'IP Address', 'User Agent', 'Success', 'Error Message'];
+    const headers = ['ID', 'User ID', 'Action', 'Resource', 'Resource ID', 'Details', 'Timestamp', 'IP Address', 'Success', 'Error Message'];
     const rows = logs.map(log => [
         log.id,
         log.userId,
@@ -210,46 +168,27 @@ export const exportLogsToCSV = (logs: ActivityLog[]): string => {
         JSON.stringify(log.details),
         log.timestamp,
         log.ipAddress,
-        log.userAgent,
-        log.success,
+        log.success ? 'Yes' : 'No',
         log.errorMessage || '',
     ]);
 
-    const csvContent = [
-        headers.join(','),
-        ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')),
-    ].join('\n');
-
-    return csvContent;
+    return [headers, ...rows].map(row => row.join(',')).join('\n');
 };
 
 export const exportLogsToJSON = (logs: ActivityLog[]): string => {
     return JSON.stringify(logs, null, 2);
 };
 
-export const downloadLogs = (logs: ActivityLog[], format: 'csv' | 'json', filename: string = 'activity_logs') => {
-    let content: string;
-    let mimeType: string;
-    let extension: string;
-
-    if (format === 'csv') {
-        content = exportLogsToCSV(logs);
-        mimeType = 'text/csv';
-        extension = 'csv';
-    } else {
-        content = exportLogsToJSON(logs);
-        mimeType = 'application/json';
-        extension = 'json';
-    }
-
-    const blob = new Blob([content], { type: mimeType });
+export const downloadLogs = (logs: ActivityLog[], format: 'csv' | 'json', filename: string): void => {
+    const content = format === 'csv' ? exportLogsToCSV(logs) : exportLogsToJSON(logs);
+    const blob = new Blob([content], { type: format === 'csv' ? 'text/csv' : 'application/json' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${filename}.${extension}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
 };
 
@@ -260,7 +199,6 @@ export const clearLogs = (beforeDate?: Date): number => {
         logs = logs.filter(log => new Date(log.timestamp) >= beforeDate);
 
         logsCache = logs;
-        localCacheVersion++;
 
         try {
             localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logs));
@@ -272,7 +210,6 @@ export const clearLogs = (beforeDate?: Date): number => {
     }
 
     logsCache = [];
-    localCacheVersion++;
 
     try {
         localStorage.setItem(LOG_STORAGE_KEY, '[]');
@@ -298,54 +235,35 @@ export const getAlertRules = (): AlertRule[] => {
     return [];
 };
 
-export const saveAlertRule = (rule: Omit<AlertRule, 'id'>): AlertRule => {
-    const existingRules = getAlertRules();
-    const newRule: AlertRule = {
-        ...rule,
-        id: `RULE-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-    };
-
-    const updatedRules = [...existingRules, newRule];
-
+export const saveAlertRule = (rule: AlertRule): void => {
     try {
-        localStorage.setItem(ALERT_RULES_STORAGE_KEY, JSON.stringify(updatedRules));
+        const rules = getAlertRules();
+        const index = rules.findIndex(r => r.id === rule.id);
+
+        if (index >= 0) {
+            rules[index] = rule;
+        } else {
+            rules.push(rule);
+        }
+
+        localStorage.setItem(ALERT_RULES_STORAGE_KEY, JSON.stringify(rules));
     } catch (error) {
         console.error('Failed to save alert rule:', error);
     }
-
-    return newRule;
 };
 
-export const updateAlertRule = (ruleId: string, updates: Partial<AlertRule>): AlertRule | null => {
-    const existingRules = getAlertRules();
-    const ruleIndex = existingRules.findIndex(rule => rule.id === ruleId);
-
-    if (ruleIndex === -1) return null;
-
-    const updatedRules = [...existingRules];
-    updatedRules[ruleIndex] = { ...updatedRules[ruleIndex], ...updates };
-
-    try {
-        localStorage.setItem(ALERT_RULES_STORAGE_KEY, JSON.stringify(updatedRules));
-        return updatedRules[ruleIndex];
-    } catch (error) {
-        console.error('Failed to update alert rule:', error);
-        return null;
-    }
+export const updateAlertRule = (rule: AlertRule): void => {
+    saveAlertRule(rule);
 };
 
-export const deleteAlertRule = (ruleId: string): boolean => {
-    const existingRules = getAlertRules();
-    const filteredRules = existingRules.filter(rule => rule.id !== ruleId);
-
-    if (filteredRules.length === existingRules.length) return false;
-
+export const deleteAlertRule = (ruleId: string): void => {
     try {
-        localStorage.setItem(ALERT_RULES_STORAGE_KEY, JSON.stringify(filteredRules));
-        return true;
+        const rules = getAlertRules();
+        const filtered = rules.filter(r => r.id !== ruleId);
+
+        localStorage.setItem(ALERT_RULES_STORAGE_KEY, JSON.stringify(filtered));
     } catch (error) {
         console.error('Failed to delete alert rule:', error);
-        return false;
     }
 };
 
@@ -364,74 +282,55 @@ export const getSuspiciousAlerts = (): SuspiciousActivityAlert[] => {
     return [];
 };
 
-export const checkForSuspiciousActivity = (log: ActivityLog): void => {
-    const alertRules = getAlertRules().filter(rule => rule.enabled);
+export const saveSuspiciousAlerts = (alerts: SuspiciousActivityAlert[]): void => {
+    try {
+        localStorage.setItem(ALERT_STORAGE_KEY, JSON.stringify(alerts));
+    } catch (error) {
+        console.error('Failed to save suspicious alerts:', error);
+    }
+};
+
+const checkForSuspiciousActivity = (log: ActivityLog): void => {
+    const alertRules = getAlertRules();
 
     for (const rule of alertRules) {
-        if (rule.action === log.action) {
+        if (rule.action === log.action && rule.enabled) {
             const timeWindow = rule.timeWindow * 60000;
             const cutoffTime = new Date(new Date(log.timestamp).getTime() - timeWindow);
-            const recentLogs = getLogs().filter(
-                l => l.action === log.action && l.userId === log.userId && new Date(l.timestamp) >= cutoffTime
+
+            const recentLogs = getLogsByDateRange(cutoffTime, new Date(log.timestamp));
+            const matchingLogs = recentLogs.filter(
+                recentLog =>
+                    recentLog.userId === log.userId &&
+                    recentLog.action === log.action
             );
 
-            if (recentLogs.length >= rule.threshold) {
-                createSuspiciousAlert(rule, log, recentLogs);
+            if (matchingLogs.length >= rule.threshold) {
+                const alert: SuspiciousActivityAlert = {
+                    id: `ALERT-${Date.now()}`,
+                    ruleId: rule.id,
+                    logId: log.id,
+                    userId: log.userId,
+                    action: log.action,
+                    detectionTime: new Date().toISOString(),
+                    description: `${rule.description} - ${matchingLogs.length} occurrences detected in ${rule.timeWindow} minutes`,
+                };
+
+                const alerts = getSuspiciousAlerts();
+                alerts.push(alert);
+                saveSuspiciousAlerts(alerts);
             }
         }
     }
 };
 
-const createSuspiciousAlert = (
-    rule: AlertRule,
-    triggeringLog: ActivityLog,
-    relatedLogs: ActivityLog[]
-): SuspiciousActivityAlert => {
-    const existingAlerts = getSuspiciousAlerts();
-
-    const alert: SuspiciousActivityAlert = {
-        id: `ALERT-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        ruleId: rule.id,
-        ruleName: rule.name,
-        triggeredAt: new Date().toISOString(),
-        userId: triggeringLog.userId,
-        action: triggeringLog.action,
-        count: relatedLogs.length,
-        threshold: rule.threshold,
-        activities: relatedLogs,
-        resolved: false,
-    };
-
-    const updatedAlerts = [alert, ...existingAlerts];
-
+export const resolveAlert = (alertId: string): void => {
     try {
-        localStorage.setItem(ALERT_STORAGE_KEY, JSON.stringify(updatedAlerts));
-    } catch (error) {
-        console.error('Failed to save suspicious alert:', error);
-    }
+        const alerts = getSuspiciousAlerts();
+        const updated = alerts.filter(alert => alert.id !== alertId);
 
-    return alert;
-};
-
-export const resolveAlert = (alertId: string, resolvedBy: string): boolean => {
-    const existingAlerts = getSuspiciousAlerts();
-    const alertIndex = existingAlerts.findIndex(alert => alert.id === alertId);
-
-    if (alertIndex === -1) return false;
-
-    const updatedAlerts = [...existingAlerts];
-    updatedAlerts[alertIndex] = {
-        ...updatedAlerts[alertIndex],
-        resolved: true,
-        resolvedAt: new Date().toISOString(),
-        resolvedBy,
-    };
-
-    try {
-        localStorage.setItem(ALERT_STORAGE_KEY, JSON.stringify(updatedAlerts));
-        return true;
+        localStorage.setItem(ALERT_STORAGE_KEY, JSON.stringify(updated));
     } catch (error) {
         console.error('Failed to resolve alert:', error);
-        return false;
     }
 };

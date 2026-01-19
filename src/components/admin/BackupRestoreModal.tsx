@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
-import Button from '@/components/ui/Button'
 import { RestoreResult, BackupMetadata } from '@/types/backup'
 import { restoreBackup } from '@/utils/backupEngine'
 

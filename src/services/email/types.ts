@@ -1,5 +1,4 @@
 import type { ServiceResult } from '@/types/common';
-import type { EmailTemplate } from '@/types/data';
 
 export interface IEmailService {
      sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>>;

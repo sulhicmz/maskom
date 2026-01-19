@@ -29,7 +29,6 @@ describe('BackupScheduler', () => {
 
   const mockCreateFullBackup = jest.fn()
   const mockCreateIncrementalBackup = jest.fn()
-  const mockGetBackupMetadata = jest.fn()
 
   beforeEach(() => {
     mockLocalStorage.clear()

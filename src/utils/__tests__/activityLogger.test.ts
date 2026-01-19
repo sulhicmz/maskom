@@ -18,7 +18,6 @@ import {
   updateAlertRule,
   deleteAlertRule,
   getSuspiciousAlerts,
-  checkForSuspiciousActivity,
   resolveAlert,
 } from '../activityLogger'
 

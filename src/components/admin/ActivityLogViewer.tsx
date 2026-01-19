@@ -1,14 +1,11 @@
 "use client"
 
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useCallback } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import { useRouter } from 'next/navigation'
 import {
     getLogs,
-    filterLogs,
-    exportLogsToCSV,
-    exportLogsToJSON,
     downloadLogs,
 } from '@/utils/activityLogger'
 import { ActivityLog, ActivityAction, ActivityDetails } from '@/types/audit'
@@ -73,7 +70,7 @@ const ActionBadge = memo(({ action }: { action: ActivityAction }) => {
 
 ActionBadge.displayName = 'ActionBadge'
 
-const LogRow = memo(({ log, index }: { log: ActivityLog; index: number }) => {
+const LogRow = memo(({ log }: { log: ActivityLog }) => {
     const { theme } = useTheme()
     const formatTimestamp = (timestamp: string): string => {
         const date = new Date(timestamp)
@@ -120,8 +117,8 @@ LogRow.displayName = 'LogRow'
 
 const ActivityLogViewer: React.FC = () => {
     const { theme } = useTheme()
-    const { user } = useAuthService()
-    const router = useRouter()
+    useAuthService()
+    useRouter()
     const [isClient, setIsClient] = useState(false)
     const [logs, setLogs] = useState<ActivityLog[]>([])
     const [filteredLogs, setFilteredLogs] = useState<ActivityLog[]>([])
@@ -132,30 +129,7 @@ const ActivityLogViewer: React.FC = () => {
     const [selectedResource, setSelectedResource] = useState<string>('')
     const [successFilter, setSuccessFilter] = useState<string>('all')
 
-    useEffect(() => {
-        setIsClient(true)
-    }, [])
-
-    useEffect(() => {
-        if (isClient) {
-            const loadLogs = () => {
-                setLoading(true)
-                try {
-                    const allLogs = getLogs()
-                    setLogs(allLogs)
-                    applyFilters(allLogs)
-                } catch (error) {
-                    console.error('Failed to load logs:', error)
-                } finally {
-                    setLoading(false)
-                }
-            }
-
-            loadLogs()
-        }
-    }, [isClient])
-
-    const applyFilters = (logsToFilter: ActivityLog[]) => {
+    const applyFilters = useCallback((logsToFilter: ActivityLog[]) => {
         let result = logsToFilter
 
         if (searchTerm) {
@@ -189,7 +163,30 @@ const ActivityLogViewer: React.FC = () => {
         }
 
         setFilteredLogs(result)
-    }
+    }, [searchTerm, selectedAction, selectedUser, selectedResource, successFilter])
+
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
+
+    useEffect(() => {
+        if (isClient) {
+            const loadLogs = () => {
+                setLoading(true)
+                try {
+                    const allLogs = getLogs()
+                    setLogs(allLogs)
+                    applyFilters(allLogs)
+                } catch (error) {
+                    console.error('Failed to load logs:', error)
+                } finally {
+                    setLoading(false)
+                }
+            }
+
+            loadLogs()
+        }
+    }, [isClient, applyFilters])
 
     const handleExportCSV = () => {
         downloadLogs(filteredLogs, 'csv', 'activity_logs')
@@ -363,8 +360,8 @@ const ActivityLogViewer: React.FC = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {filteredLogs.slice(0, 50).map((log, index) => (
-                                                        <LogRow key={log.id} log={log} index={index} />
+                                                    {filteredLogs.slice(0, 50).map((log) => (
+                                                        <LogRow key={log.id} log={log} />
                                                     ))}
                                                 </tbody>
                                             </table>

@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useCallback } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { BackupMetadata, BackupType, BackupStatus } from '@/types/backup'
-import { getBackupMetadata } from '@/data/BackupData'
 import { BACKUP_METADATA_KEY } from '@/types/backup'
 import StatusBadge from '@/components/ui/StatusBadge'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
@@ -20,11 +19,10 @@ interface BackupRowProps {
   onRestore: (id: string) => void
   onDelete: (id: string) => void
   onExport: (id: string) => void
-  index: number
 }
 
-const BackupRow = memo(({ backup, onRestore, onDelete, onExport, index }: BackupRowProps) => {
-  const { theme } = useTheme()
+const BackupRow = memo(({ backup, onRestore, onDelete, onExport }: BackupRowProps) => {
+  useTheme()
   const date = new Date(backup.timestamp)
   const formattedDate = date.toLocaleDateString('id-ID', {
     year: 'numeric',
@@ -38,7 +36,7 @@ const BackupRow = memo(({ backup, onRestore, onDelete, onExport, index }: Backup
   const formattedSize = formatBytes(backup.size)
 
   return (
-    <tr key={index}>
+    <tr>
       <td>{backup.id}</td>
       <td>
         <span className={`badge ${
@@ -107,15 +105,7 @@ const BackupList: React.FC<BackupListProps> = ({
   const [filterStatus, setFilterStatus] = useState<BackupStatus | 'all'>('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    loadBackups()
-  }, [])
-
-  useEffect(() => {
-    applyFilters()
-  }, [backups, filterType, filterStatus, searchTerm])
-
-  const loadBackups = () => {
+  const loadBackups = useCallback(() => {
     try {
       const metadataList = localStorage.getItem(BACKUP_METADATA_KEY)
 
@@ -134,9 +124,9 @@ const BackupList: React.FC<BackupListProps> = ({
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...backups]
 
     if (filterType !== 'all') {
@@ -157,7 +147,15 @@ const BackupList: React.FC<BackupListProps> = ({
     }
 
     setFilteredBackups(filtered)
-  }
+  }, [backups, filterType, filterStatus, searchTerm])
+
+  useEffect(() => {
+    loadBackups()
+  }, [loadBackups])
+
+  useEffect(() => {
+    applyFilters()
+  }, [applyFilters])
 
   if (loading) {
     return <LoadingSpinner minHeight={300} color="primary" />
@@ -223,14 +221,13 @@ const BackupList: React.FC<BackupListProps> = ({
             </thead>
             <tbody>
               {filteredBackups.length > 0 ? (
-                filteredBackups.map((backup, index) => (
+                filteredBackups.map((backup) => (
                   <BackupRow
-                    key={index}
+                    key={backup.id}
                     backup={backup}
                     onRestore={onRestore}
                     onDelete={onDelete}
                     onExport={onExport}
-                    index={index}
                   />
                 ))
               ) : (
