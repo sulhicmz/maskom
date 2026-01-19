@@ -33,9 +33,16 @@ describe('BackupEngine', () => {
 
   beforeEach(() => {
     mockLocalStorage.clear()
-    global.localStorage = mockLocalStorage as any
-
+    
+    global.window = {
+      localStorage: mockLocalStorage as any,
+      navigator: { userAgent: 'Test Agent' }
+    } as any
+    
     jest.clearAllMocks()
+    jest.resetModules()
+    
+    jest.resetModules()
   })
 
   afterEach(() => {

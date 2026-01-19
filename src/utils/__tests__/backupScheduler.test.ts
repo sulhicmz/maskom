@@ -170,13 +170,13 @@ describe('BackupScheduler', () => {
 
     it('should handle scheduling errors gracefully', async () => {
       const config = createMockBackupConfig()
-
-      jest.spyOn(localStorage, 'setItem').mockImplementation(() => {
+      
+      jest.spyOn(mockLocalStorage, 'setItem').mockImplementation(() => {
         throw new Error('Storage error')
       })
-
+      
       const result = await scheduleBackup('daily', '00:00', config)
-
+      
       expect(result).toBe(false)
     })
   })

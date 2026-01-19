@@ -13,6 +13,7 @@ import {
   exportLogsToJSON,
   downloadLogs,
   clearLogs,
+  clearCache,
   getAlertRules,
   saveAlertRule,
   updateAlertRule,
@@ -58,17 +59,22 @@ describe('ActivityLogger', () => {
   }
 
   beforeEach(() => {
+    clearCache()
     jest.resetModules()
     mockLocalStorage.clear()
     global.localStorage = mockLocalStorage as any
-
+    
     mockDocument.createElement.mockClear()
     global.document = mockDocument as any
-
+    
     jest.clearAllMocks()
     jest.useFakeTimers()
-
-    if (global.window && global.window.navigator) {
+    
+    if (!global.window) {
+      global.window = {
+        navigator: { userAgent: 'Test Agent' }
+      } as any
+    } else {
       Object.defineProperty(global.window.navigator, 'userAgent', {
         value: 'Test Agent',
         writable: true
