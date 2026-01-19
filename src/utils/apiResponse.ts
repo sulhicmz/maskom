@@ -67,6 +67,7 @@ export interface ServiceErrorResponseConfig {
     status?: number;
     headers?: HeadersInit;
     metadata?: Record<string, unknown>;
+    retryAfter?: number;
 }
 
 export function createServiceErrorResponse({
@@ -74,12 +75,17 @@ export function createServiceErrorResponse({
     errorCode,
     status = 500,
     headers,
-    metadata
+    metadata,
+    retryAfter
 }: ServiceErrorResponseConfig): NextResponse<ServiceResult<void>> {
     const defaultHeaders: HeadersInit = {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate'
     };
+
+    if (retryAfter !== undefined && retryAfter > 0) {
+        (defaultHeaders as Record<string, string>)['Retry-After'] = retryAfter.toString();
+    }
 
     const mergedHeaders = headers
         ? { ...defaultHeaders, ...headers }

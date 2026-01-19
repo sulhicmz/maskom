@@ -11,6 +11,8 @@ export interface IEmailService {
      getCircuitBreakerState(): CircuitBreakerState;
      resetCircuitBreaker(): void;
      getMetrics(): ServiceMetrics | undefined;
+     processQueue(): Promise<ServiceResult<{ processed: number; failed: number }>>;
+     getQueueStatus(): { queueSize: number; expired: number };
 }
 
 export interface EmailSendParams {

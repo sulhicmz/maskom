@@ -5,6 +5,10 @@ class APMManager {
   private provider: IAPMProvider;
   private providerType: APMProviderType;
   private config: APMConfig;
+  private fallbackProvider: IAPMProvider;
+  private consecutiveFailures: number;
+  private maxFailuresBeforeFallback: number;
+  private lastFailureTime: number;
 
   constructor() {
     this.config = {
@@ -15,6 +19,10 @@ class APMManager {
 
     this.providerType = 'console';
     this.provider = new ConsoleAPMProvider();
+    this.fallbackProvider = new ConsoleAPMProvider();
+    this.consecutiveFailures = 0;
+    this.maxFailuresBeforeFallback = 5;
+    this.lastFailureTime = 0;
     this.initialize();
   }
 
@@ -69,44 +77,114 @@ class APMManager {
     }
   }
 
+  private handleError(method: string, error: unknown): void {
+    const now = Date.now();
+    const timeSinceLastFailure = now - this.lastFailureTime;
+
+    if (timeSinceLastFailure < 60000) {
+      this.consecutiveFailures++;
+    } else {
+      this.consecutiveFailures = 1;
+    }
+
+    this.lastFailureTime = now;
+
+    if (this.consecutiveFailures >= this.maxFailuresBeforeFallback && this.providerType !== 'console') {
+      console.warn(`[APM] Provider ${this.providerType} failing consistently (${this.consecutiveFailures} failures), switching to console fallback`);
+      this.switchToFallback();
+    }
+
+    console.error(`[APM] ${method} failed:`, error);
+  }
+
+  private switchToFallback(): void {
+    const previousProvider = this.providerType;
+    this.provider = this.fallbackProvider;
+    this.providerType = 'console';
+    this.consecutiveFailures = 0;
+    this.provider.initialize(this.config);
+    console.warn(`[APM] Switched from ${previousProvider} to console fallback due to persistent failures`);
+  }
+
   captureError(error: APMError): void {
-    this.provider.captureError(error);
+    try {
+      this.provider.captureError(error);
+    } catch (err) {
+      this.handleError('captureError', err);
+    }
   }
 
   captureException(error: Error): void {
-    this.provider.captureException(error);
+    try {
+      this.provider.captureException(error);
+    } catch (err) {
+      this.handleError('captureException', err);
+    }
   }
 
   startTransaction(name: string, op?: string): APMTransaction | undefined {
-    return this.provider.startTransaction(name, op);
+    try {
+      return this.provider.startTransaction(name, op);
+    } catch (err) {
+      this.handleError('startTransaction', err);
+      return undefined;
+    }
   }
 
   finishTransaction(transaction: APMTransaction): void {
-    this.provider.finishTransaction(transaction);
+    try {
+      this.provider.finishTransaction(transaction);
+    } catch (err) {
+      this.handleError('finishTransaction', err);
+    }
   }
 
   setUser(user: APMUser): void {
-    this.provider.setUser(user);
+    try {
+      this.provider.setUser(user);
+    } catch (err) {
+      this.handleError('setUser', err);
+    }
   }
 
   setTag(key: string, value: string): void {
-    this.provider.setTag(key, value);
+    try {
+      this.provider.setTag(key, value);
+    } catch (err) {
+      this.handleError('setTag', err);
+    }
   }
 
   setContext(key: string, context: Record<string, unknown>): void {
-    this.provider.setContext(key, context);
+    try {
+      this.provider.setContext(key, context);
+    } catch (err) {
+      this.handleError('setContext', err);
+    }
   }
 
   addBreadcrumb(message: string, category?: string, level?: 'info' | 'warning' | 'error'): void {
-    this.provider.addBreadcrumb(message, category, level);
+    try {
+      this.provider.addBreadcrumb(message, category, level);
+    } catch (err) {
+      this.handleError('addBreadcrumb', err);
+    }
   }
 
   trackPerformance(metric: APMPerformanceMetrics): void {
-    this.provider.trackPerformance(metric);
+    try {
+      this.provider.trackPerformance(metric);
+    } catch (err) {
+      this.handleError('trackPerformance', err);
+    }
   }
 
   async flush(): Promise<void> {
-    await this.provider.flush();
+    try {
+      await this.provider.flush();
+    } catch (err) {
+      this.handleError('flush', err);
+    }
   }
 
   isEnabled(): boolean {
@@ -119,6 +197,26 @@ class APMManager {
 
   getConfig(): APMConfig {
     return { ...this.config };
+  }
+
+  getFailureStats(): { consecutiveFailures: number; lastFailureTime: number } {
+    return {
+      consecutiveFailures: this.consecutiveFailures,
+      lastFailureTime: this.lastFailureTime
+    };
+  }
+
+  resetFailures(): void {
+    this.consecutiveFailures = 0;
+    this.lastFailureTime = 0;
+  }
+
+  restoreOriginalProvider(): void {
+    if (this.config.provider !== 'console') {
+      this.initialize();
+      this.consecutiveFailures = 0;
+      console.log(`[APM] Restored to original provider: ${this.config.provider}`);
+    }
   }
 }
 
