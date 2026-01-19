@@ -1,4 +1,4 @@
-import type { EmailCampaign, CampaignMetrics, CampaignABTest, CampaignStatus } from '@/types/campaign';
+import type { EmailCampaign, CampaignMetrics, CampaignStatus } from '@/types/campaign';
 import campaign_data from '@/data/CampaignData';
 import emailService from '@/services/email/EmailService';
 
@@ -187,6 +187,7 @@ class CampaignManager {
 
         if (!campaign) return null;
 
+        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
         const totalRecipients = campaign.recipientLists.reduce(
             (sum, list) => sum + list.totalRecipients,
             0

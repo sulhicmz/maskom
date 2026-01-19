@@ -142,7 +142,7 @@ class BackupEngine {
         version: BACKUP_VERSION,
       }
 
-      await this.saveBackupToStorage(backupId, serializedData, metadata)
+      await this.saveBackupToStorage(backupId, serializedData)
 
       await this.updateBackupMetadataList(metadata)
 
@@ -191,7 +191,7 @@ class BackupEngine {
         message: 'Calculating changes since last backup...',
       })
 
-      const changes = await this.calculateChangesSinceBackup(lastFullBackup.timestamp)
+      const changes = await this.calculateChangesSinceBackup()
 
       onProgress?.({
         current: 2,
@@ -258,7 +258,7 @@ class BackupEngine {
         version: BACKUP_VERSION,
       }
 
-      await this.saveBackupToStorage(backupId, serializedData, metadata)
+      await this.saveBackupToStorage(backupId, serializedData)
 
       await this.updateBackupMetadataList(metadata)
 

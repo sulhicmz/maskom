@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useAuthService } from '@/hooks/useAuthService';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { Permission } from '@/types/permission';
 import { CampaignStatus, type EmailCampaign } from '@/types/campaign';
@@ -180,6 +179,7 @@ const CampaignList: React.FC = () => {
 
             loadCampaigns();
         }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
     }, [isClient]);
 
     const applyFilters = (campaignsToFilter: EmailCampaign[]) => {

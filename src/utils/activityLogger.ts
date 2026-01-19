@@ -17,7 +17,6 @@ import {
 import { calculateActivityStatistics } from './logStatistics';
 import { exportLogsToCSV, exportLogsToJSON, downloadLogs as downloadLogsExporter } from './logExporter';
 
-const LOG_STORAGE_KEY = 'activity_logs';
 const MAX_LOGS = 10000;
 
 export const generateLogId = (): string => {
