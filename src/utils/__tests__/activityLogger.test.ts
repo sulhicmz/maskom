@@ -67,6 +67,13 @@ describe('ActivityLogger', () => {
 
     jest.clearAllMocks()
     jest.useFakeTimers()
+
+    if (global.window && global.window.navigator) {
+      Object.defineProperty(global.window.navigator, 'userAgent', {
+        value: 'Test Agent',
+        writable: true
+      })
+    }
   })
 
   afterEach(() => {
@@ -101,8 +108,6 @@ describe('ActivityLogger', () => {
 
   describe('getUserAgent', () => {
     it('should return user agent when window exists', () => {
-      global.window = { navigator: { userAgent: 'Test Agent' } } as any
-
       const userAgent = getUserAgent()
 
       expect(userAgent).toBe('Test Agent')
