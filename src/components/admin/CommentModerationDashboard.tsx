@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { BlogCommentItem, CommentModerationStatus } from '@/types/data';
 import { calculateModerationStats, bulkModerateComments, filterCommentsByStatus } from '@/utils/moderation';
 import Button from '@/components/ui/Button';
@@ -229,11 +230,13 @@ const CommentModerationDashboard = () => {
                     <td>
                       <div className="d-flex align-items-center">
                         {comment.avatar && (
-                          <img
+                          <Image
                             src={comment.avatar.src}
                             alt={comment.name}
-                            className="avatar-sm me-2"
-                            style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                            width={32}
+                            height={32}
+                            className="rounded-circle me-2"
+                            style={{ objectFit: 'cover' }}
                           />
                         )}
                         <span>{comment.name}</span>

@@ -1,7 +1,6 @@
 import DrillEngine from '../drillEngine'
 
 import {
-  BackupDrill,
   DrillType,
   DrillStatus,
   DrillConfig,

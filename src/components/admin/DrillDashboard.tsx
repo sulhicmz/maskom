@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import {
   DrillStatistics,
   DrillTypeStats,
   DrillHealthStatus
 } from '@/types/drill'
-import drillData from '@/data/DrillData'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import DrillEngine from '@/utils/drillEngine'
 

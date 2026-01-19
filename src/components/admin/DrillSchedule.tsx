@@ -17,34 +17,6 @@ interface DrillScheduleProps {
   onScheduleCreated: () => void
 }
 
-const getDrillTypeLabel = (type: DrillType): string => {
-  switch (type) {
-    case DrillType.FULL_RESTORE:
-      return 'Pemulihan Penuh'
-    case DrillType.PARTIAL_RESTORE:
-      return 'Pemulihan Sebagian'
-    case DrillType.INTEGRITY_CHECK:
-      return 'Pemeriksaan Integritas'
-    default:
-      return type
-  }
-}
-
-const getScheduleLabel = (schedule: DrillSchedule): string => {
-  switch (schedule) {
-    case DrillSchedule.DAILY:
-      return 'Harian'
-    case DrillSchedule.WEEKLY:
-      return 'Mingguan'
-    case DrillSchedule.MONTHLY:
-      return 'Bulanan'
-    case DrillSchedule.MANUAL:
-      return 'Manual'
-    default:
-      return schedule
-  }
-}
-
 const DrillSchedule: React.FC<DrillScheduleProps> = ({ onScheduleCreated }) => {
   const { theme } = useTheme()
   const [loading, setLoading] = useState(false)

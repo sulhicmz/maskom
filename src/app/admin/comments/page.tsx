@@ -1,7 +1,6 @@
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import CommentModerationDashboard from '@/components/admin/CommentModerationDashboard';
 import { Permission } from '@/types/permission';
-import authService from '@/services/auth/AuthService';
 
 export default function CommentsPage() {
   return (

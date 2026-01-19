@@ -17,7 +17,6 @@ import {
 } from '@/types/drill'
 
 import { BackupEngine } from '@/utils/backupEngine'
-import { BackupMetadata } from '@/types/backup'
 import apmManager from '@/utils/apm'
 
 interface DrillProgress {
