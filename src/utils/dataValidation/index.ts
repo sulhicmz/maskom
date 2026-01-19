@@ -97,6 +97,16 @@ import {
   validateEmailTemplates,
 } from "./emailTemplateValidation"
 
+import {
+  validateEmailCampaign,
+  validateCampaigns,
+  validateCampaignMetrics,
+  validateCampaignABTest,
+  validateRecipientCriteria,
+  validateRecipientSegment,
+  validateRecipientList,
+} from "./campaignValidation"
+
 export type {
   ValidationResult,
   ValidationRule,
@@ -139,10 +149,17 @@ export type {
        validateBlogCategoryData,
        validateMediaItem,
         validateMediaAssets,
-       validateEmailTemplate,
-       validateTemplateVariable,
-       validateEmailTemplates,
-       validateViewCount,
+        validateEmailTemplate,
+        validateTemplateVariable,
+        validateEmailTemplates,
+        validateEmailCampaign,
+        validateCampaigns,
+        validateCampaignMetrics,
+        validateCampaignABTest,
+        validateRecipientCriteria,
+        validateRecipientSegment,
+        validateRecipientList,
+        validateViewCount,
       validateEngagementScore,
       validateAvgReadTime,
       validateShareCount,
