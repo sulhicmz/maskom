@@ -1,5 +1,149 @@
 # Architecture Task Tracking
 
+## Task 335: [DATA ARCHITECT] Campaign Validation Layer & Data Relationships (Jan 19, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Data Model & Validation
+**Effort**: Medium (2-3 hours)
+
+### Purpose
+
+Add data validation layer and relationships for the Email Campaign Management System (Task 325) to ensure data integrity, referential integrity, and comprehensive test coverage.
+
+### Problem Identified
+
+**Missing Campaign Validation**:
+- Campaign data model exists but no validation layer
+- No validators for EmailCampaign, RecipientList, RecipientSegment types
+- No data relationships defined for Campaign → EmailTemplate
+- Build-time validation doesn't cover campaign data integrity
+- No duplicate ID detection for campaigns
+- No referential integrity checks between campaigns and templates
+
+**Why This Matters**:
+1. **Data Integrity**: Validation ensures campaign data is correct and consistent
+2. **Referential Integrity**: Relationships ensure campaigns reference valid templates
+3. **Error Prevention**: Early detection of data issues at build time
+4. **Type Safety**: Comprehensive validation catches type errors before runtime
+5. **Test Coverage**: Tests ensure validation logic works correctly
+
+### Solution
+
+**Validation Layer**:
+- Created `campaignValidation.ts` with validators for:
+  - `validateRecipientCriteria()` - Recipient criteria validation
+  - `validateRecipientSegment()` - Segment validation
+  - `validateRecipientList()` - Recipient list validation
+  - `validateEmailCampaign()` - Campaign validation with custom rules
+  - `validateCampaigns()` - Array validation with duplicate ID detection
+  - `validateCampaignMetrics()` - Metrics validation (rates 0-100)
+  - `validateCampaignABTest()` - A/B test variant validation
+
+**Data Relationships**:
+- Added CampaignData → EmailTemplateData relationship (many-to-one)
+- Source field: `templateId` → Target field: `id`
+- Ensures campaigns reference valid email templates
+
+**Validation Rules**:
+- Status validation (draft, scheduled, sending, sent, cancelled)
+- Date validation (ISO 8601 format)
+- Number field validation (min: 0 for counts/rates)
+- Custom rules:
+  - Sent campaigns must have `sentAt` date
+  - Scheduled campaigns must have `scheduledFor` date
+  - Total recipients must equal sum of segment counts
+  - Campaign metrics rates must be 0-100%
+
+### Implementation
+
+#### Phase 1: Create Campaign Validation ✅ COMPLETED
+- ✅ Created `src/utils/dataValidation/campaignValidation.ts` (278 lines)
+- ✅ Implemented `validateRecipientCriteria()` with role, tags, customCriteria validation
+- ✅ Implemented `validateRecipientSegment()` with ID, name, criteria, count validation
+- ✅ Implemented `validateRecipientList()` with segment array, totalRecipients validation
+- ✅ Implemented `validateEmailCampaign()` using `createValidator()` factory pattern
+- ✅ Added custom rules for status, dates, optional fields
+- ✅ Implemented `validateCampaigns()` with duplicate ID detection
+- ✅ Implemented `validateCampaignMetrics()` with rate validation (0-100%)
+- ✅ Implemented `validateCampaignABTest()` with variant (A/B) validation
+
+#### Phase 2: Create Comprehensive Tests ✅ COMPLETED
+- ✅ Created `src/utils/dataValidation/__tests__/campaignValidation.test.ts` (526 lines)
+- ✅ 40 comprehensive tests (100% passing)
+  - 6 tests for `validateRecipientCriteria` (valid, empty, invalid fields)
+  - 5 tests for `validateRecipientSegment` (valid, empty id/name, invalid criteria, negative count)
+  - 7 tests for `validateRecipientList` (valid, empty id, empty segments, mismatched total, negative total, missing dates)
+  - 9 tests for `validateEmailCampaign` (valid draft/scheduled/sent, invalid status, negative counts, missing dates for status)
+  - 2 tests for `validateCampaigns` (valid array, duplicate IDs)
+  - 5 tests for `validateCampaignMetrics` (valid, negative counts, out-of-range rates)
+  - 6 tests for `validateCampaignABTest` (valid A/B, empty id, invalid variant/winner, negative counts)
+
+#### Phase 3: Add Data Relationships ✅ COMPLETED
+- ✅ Added CampaignData → EmailTemplateData relationship to `src/data/relationships.ts`
+- ✅ Relationship type: many-to-one
+- ✅ Source field: `templateId` → Target field: `id`
+- ✅ Optional: false (templateId is required)
+
+#### Phase 4: Update Validation Index ✅ COMPLETED
+- ✅ Updated `src/utils/dataValidation/index.ts` to export campaign validators
+- ✅ Added imports for all campaign validation functions
+- ✅ Added exports for 7 campaign validators
+
+#### Phase 5: Verification ✅ COMPLETED
+- ✅ All 40 campaign validation tests passing (100%)
+- ✅ All 93 relationship tests passing (100%)
+- ✅ No lint errors in campaign validation files
+- ✅ Zero regressions in existing functionality
+
+### Success Criteria
+
+- [x] Campaign validation layer created with all validators
+- [x] 40 comprehensive tests for campaign validation (100% passing)
+- [x] Campaign → EmailTemplate relationship defined
+- [x] Validation utilities exported from index.ts
+- [x] All tests passing with zero regressions
+- [x] Lint passes with no errors
+- [x] Code committed and pushed to agent branch
+
+### Related Files
+
+- ✅ Added: `src/utils/dataValidation/campaignValidation.ts` - Campaign validators (278 lines)
+- ✅ Added: `src/utils/dataValidation/__tests__/campaignValidation.test.ts` - Validation tests (526 lines)
+- ✅ Modified: `src/data/relationships.ts` - Added Campaign → EmailTemplate relationship
+- ✅ Modified: `src/utils/dataValidation/index.ts` - Exported campaign validators
+
+### Implementation Summary
+
+**Files Created**: 2 files
+**Files Modified**: 2 files
+**Lines Added**: ~814 lines (validators + tests)
+**Tests Added**: 40 comprehensive tests (100% passing)
+**Validators Created**: 7 validators
+
+**Key Features**:
+1. **Campaign Validation**: Full EmailCampaign validation with status, date, and count rules
+2. **Recipient List Validation**: Segment, list, and criteria validation
+3. **Duplicate Detection**: Custom duplicate ID detection for string IDs
+4. **Metrics Validation**: Rate validation (0-100%) for campaign metrics
+5. **A/B Test Validation**: Variant validation (A/B) with winner handling
+6. **Data Relationships**: Campaign → EmailTemplate referential integrity
+7. **Factory Pattern**: Uses `createValidator()` for consistent validation
+
+### Notes
+
+- Follows Data Architect principles:
+  - **Data Integrity**: Comprehensive validation for all campaign types
+  - **Schema Design**: Proper relationships between Campaign and EmailTemplate
+  - **Validation**: Runtime validation for data integrity (Phase 1 of Task 40)
+  - **Single Source of Truth**: Centralized validation in campaignValidation.ts
+  - **Test Coverage**: 40 tests covering all validation paths
+- Zero breaking changes - only new validation added
+- All existing functionality preserved
+- Ready for Campaign Management UI integration (Task 325)
+
+---
+
 ## Task 334: [CODE SANITIZER] Critical Build Error Fix (Jan 19, 2026)
 
 **Status**: ✅ Completed

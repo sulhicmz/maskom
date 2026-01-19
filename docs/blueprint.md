@@ -142,6 +142,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 | FeatureHomeOneData.ts | FeatureHomeOneItem | No | Yes | No | No | Feature cards (home-one) |
 | MediaAssetData.ts | MediaAsset | No | Yes | No | No | Media assets for content library (Task 285) |
 | EmailTemplateData.ts | EmailTemplate | No | Yes | No | Yes | Email templates with variable substitution (Task 315) |
+| CampaignData.ts | EmailCampaign | No | Yes | No | No | Email campaigns with recipient lists and metrics (Task 325) |
 
 ### Data Validation (✅ COMPLETED - Task 40 Phase 1) & Indexing (✅ COMPLETED - Task 40 Phase 2)
 
@@ -168,6 +169,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - `contactValidation.ts` - ContactInfoItem validator
 - `mediaValidation.ts` - MediaAsset validator with URL and ISO date validation (Task 285)
 - `emailTemplateValidation.ts` - EmailTemplate, TemplateVariable validators with variable syntax validation (Task 315)
+- `campaignValidation.ts` - EmailCampaign, RecipientList, RecipientSegment, RecipientCriteria, CampaignMetrics, CampaignABTest validators (Task 335)
 - `index.ts` - Central export point (backward compatible with dataValidation.ts)
 - ✅ `createValidator<T>()` - Factory pattern for creating validators
 - ✅ `validateBaseDataItem()` - Validate BaseDataItem structure
@@ -200,11 +202,19 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateEmailTemplate` - EmailTemplate validator with TemplateVariable validation (Task 315)
 - ✅ `validateTemplateVariable` - TemplateVariable validator with variable syntax validation (Task 315)
 - ✅ `validateEmailTemplates` - Array validation for email templates (Task 315)
+- ✅ `validateEmailCampaign` - EmailCampaign validator with status and date rules (Task 335)
+- ✅ `validateCampaigns` - Array validation for campaigns with duplicate ID detection (Task 335)
+- ✅ `validateCampaignMetrics` - CampaignMetrics validator with rate validation (Task 335)
+- ✅ `validateCampaignABTest` - CampaignABTest validator with variant validation (Task 335)
+- ✅ `validateRecipientCriteria` - RecipientCriteria validator for segmentation (Task 335)
+- ✅ `validateRecipientSegment` - RecipientSegment validator with count validation (Task 335)
+- ✅ `validateRecipientList` - RecipientList validator with segment validation (Task 335)
 - ✅ 27 tests for email template validation (100% passing) (Task 315)
 - ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
 - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
 - ✅ 32 tests for validateBlogCommentItem (100% passing) (Task 270)
 - ✅ 20 tests for validateMediaItem (100% passing) (Task 285)
+- ✅ 40 tests for campaign validation (100% passing) (Task 335)
 - ✅ All validators tested with valid and invalid inputs
 - ✅ Base validation utilities tested directly:
   - `validateBaseDataItem()` - 11 tests
@@ -273,6 +283,7 @@ export interface DataRelationship {
 - ✅ BlogCommentData → BlogCommentData (self-referential many-to-one via parentId foreign key for comment threading)
 - ✅ InnerBlogData → BlogTagData (many-to-one via tagId foreign key)
 - ✅ InnerBlogData → BlogCategoryData (many-to-one via categoryId foreign key) (Task 240)
+- ✅ CampaignData → EmailTemplateData (many-to-one via templateId foreign key) (Task 335)
 - ✅ Type-safe relationship definitions with DataRelationship interface
 - ✅ Supports validation of all relationships at build time
 - ✅ Self-referential relationship support for hierarchical data (comment threads)
