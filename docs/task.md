@@ -1,5 +1,78 @@
 # Architecture Task Tracking
 
+## Task 334: [CODE SANITIZER] Critical Build Error Fix (Jan 19, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Code Sanitizer - Build Fix
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Fix critical parsing error in src/app/admin/backup-drills/page.tsx that was preventing build from progressing past compilation stage.
+
+### Problem Identified
+
+**Critical Build Blocker**:
+- **Parsing Error**: Line 109 had mismatched JSX structure - `)` expected
+- **Missing Client Directive**: Component uses `useState`, `useTheme` hooks but was marked as Server Component
+- **Type Errors**: 2 lint errors
+  - Empty interface `BackupDrillsPageProps {}`
+  - `any` type in DrillList.tsx handleFilterChange
+- **Additional Lint Warnings**: Unused imports and variables
+
+**Impact**:
+- Build command (`npm run build`) failed to compile TypeScript code
+- Compilation blocked before `next build` phase could even start
+- All build progress halted by parsing error
+
+### Solution
+
+**Fixes Applied**:
+1. **Fixed JSX Structure**:
+   - Removed extra closing `</div>` tag
+   - Properly closed `return (` statement with `)`
+   - Corrected nesting: `<ProtectedRoute> <div> ... </div> </ProtectedRoute>`
+
+2. **Added Client Directive**:
+   - Added `'use client'` at top of file
+   - Required for components using React hooks (useState, useTheme)
+
+3. **Removed Unused Code**:
+   - Removed empty `BackupDrillsPageProps` interface
+   - Removed unused `DrillType` import
+   - Removed unused `LoadingSpinner` import
+   - Removed unused `drillType` parameter
+
+4. **Fixed Type Errors**:
+   - Replaced `value: any` with proper union type in DrillList.tsx
+   - Changed `'secondary'` StatusType to `'info'` (valid StatusType value)
+
+### Implementation
+
+**Files Modified**:
+- `src/app/admin/backup-drills/page.tsx` - Fixed JSX, added 'use client', removed unused code
+- `src/components/admin/DrillList.tsx` - Fixed type errors
+
+### Success Criteria
+
+- [x] Parsing error resolved (line 109 `)` expected error fixed)
+- [x] JSX structure corrected (proper nesting and closing)
+- [x] Client directive added for hooks support
+- [x] All lint errors resolved (2 errors → 0 errors)
+- [x] TypeScript compilation passes for backup-drills page
+- [x] Build progresses past compilation stage
+- [x] Changes committed to agent branch
+
+### Notes
+
+- **Pre-existing Test Failures**: Build still shows test failures, but these are from Task 333 (drillEngine.test.ts BackupEngine.getInstance issues)
+- **Code Sanitizer Protocol**: Fix ONLY critical build blockers, not pre-existing test issues
+- **Protocol Compliance**: Parsing error was blocking build → only priority task completed
+- **Zero Regressions**: All fixes preserve existing functionality
+
+---
+
 ## Task 333: [QA ENGINEER] Test Fixing for activityLogger, backupEngine, backupScheduler (Jan 19, 2026)
 
 **Status**: ✅ Completed

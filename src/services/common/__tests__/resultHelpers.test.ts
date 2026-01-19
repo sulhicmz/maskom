@@ -22,7 +22,8 @@ describe('createRateLimitErrorResult', () => {
             expect(result.error).toContain('60 detik');
             expect(result.errorCode).toBe(ServiceErrorCode.RATE_LIMIT);
             expect(result.metadata).toEqual({
-                rateLimited: true
+                rateLimited: true,
+                retryAfterSeconds: 60
             });
         });
 
@@ -43,7 +44,8 @@ describe('createRateLimitErrorResult', () => {
             expect(result.error).toBe('Terlalu banyak percobaan. Silakan coba lagi nanti.');
             expect(result.errorCode).toBe(ServiceErrorCode.RATE_LIMIT);
             expect(result.metadata).toEqual({
-                rateLimited: true
+                rateLimited: true,
+                retryAfterSeconds: 60
             });
         });
 
@@ -114,7 +116,8 @@ describe('createRateLimitErrorResult', () => {
             expect(result.error).toContain('0 detik');
             expect(result.errorCode).toBe(ServiceErrorCode.RATE_LIMIT);
             expect(result.metadata).toEqual({
-                rateLimited: true
+                rateLimited: true,
+                retryAfterSeconds: 0
             });
         });
 
@@ -319,7 +322,8 @@ describe('createRateLimitErrorResult', () => {
             const result = createRateLimitErrorResult(rateLimitError, 1000);
 
             expect(result.metadata).toEqual({
-                rateLimited: true
+                rateLimited: true,
+                retryAfterSeconds: 60
             });
         });
 

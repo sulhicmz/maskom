@@ -33,9 +33,9 @@ export const validateBlogCommentItem = (item: BlogCommentItem): { isValid: boole
 
   const errors: string[] = [...baseValidation.errors];
 
-  const validStatuses = ['pending', 'approved', 'rejected'] as const;
+  const validStatuses = ['pending', 'approved', 'rejected', 'spam'] as const;
   if (!validStatuses.includes(item.status)) {
-    errors.push(`status must be one of: pending, approved, rejected, got: ${item.status}`);
+    errors.push(`status must be one of: pending, approved, rejected, spam, got: ${item.status}`);
   }
 
   if (errors.length > 0) {

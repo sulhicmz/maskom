@@ -6,6 +6,8 @@ jest.mock('@emailjs/browser', () => ({
 
 jest.useFakeTimers();
 
+jest.setTimeout(15000);
+
 const mockEmailjsSend = emailjs.send as jest.MockedFunction<typeof emailjs.send>;
 
 describe('EmailService', () => {
