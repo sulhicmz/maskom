@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useCallback } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { RestoreResult, BackupMetadata } from '@/types/backup'
 import { restoreBackup } from '@/utils/backupEngine'
@@ -71,9 +71,15 @@ const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
     }
   }
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onClose()
-  }
+  }, [onClose])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && isOpen) {
+      handleClose()
+    }
+  }, [isOpen, handleClose])
 
   if (!isOpen || !backup) {
     return null
@@ -95,9 +101,12 @@ const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
     <div
       className={`modal fade ${isOpen ? 'show' : ''}`}
       tabIndex={-1}
+      onKeyDown={handleKeyDown}
       role="dialog"
       aria-labelledby="restoreModalLabel"
-      aria-hidden="true"
+      aria-describedby="restoreModalBody"
+      aria-modal="true"
+      aria-hidden={!isOpen}
       style={{ display: isOpen ? 'block' : 'none' }}
     >
       <div className="modal-dialog">
@@ -118,7 +127,7 @@ const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
             ></button>
           </div>
 
-          <div className="modal-body">
+          <div className="modal-body" id="restoreModalBody">
             {!restoreResult ? (
               <>
                 <div className="mb-3">
@@ -261,6 +270,7 @@ const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
                   className="btn btn-secondary"
                   onClick={handleClose}
                   disabled={isRestoring}
+                  aria-label="Batalkan operasi pemulihan"
                 >
                   Batal
                 </button>
@@ -269,6 +279,7 @@ const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
                   className="btn btn-primary"
                   onClick={handleRestore}
                   disabled={isRestoring}
+                  aria-label={isRestoring ? "Sedang memulihkan" : "Mulai pemulihan backup"}
                 >
                   {isRestoring ? (
                     <>
@@ -289,6 +300,7 @@ const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
                 type="button"
                 className="btn btn-primary"
                 onClick={handleClose}
+                aria-label="Tutup modal pemulihan"
               >
                 Tutup
               </button>

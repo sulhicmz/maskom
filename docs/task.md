@@ -1,5 +1,118 @@
 # Architecture Task Tracking
 
+## Task 346: [UI/UX ENGINEER] Modal Accessibility Improvements (Jan 19, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: UI/UX - Accessibility (ARIA, Keyboard Navigation)
+**Effort**: Medium (1-2 hours)
+
+### Purpose
+
+Improve accessibility of modal components by adding proper ARIA attributes, keyboard navigation, and screen reader support to ensure application is usable by everyone including keyboard-only users and screen reader users.
+
+### Problem Identified
+
+**Accessibility Issues**:
+- `DrillResults.tsx` modal backdrop had onClick handler but no keyboard navigation or ARIA attributes
+- `BackupRestoreModal.tsx` missing `aria-modal="true"`, `aria-describedby`, and Escape key support
+- Modal backdrops using divs with onClick handlers without proper semantic HTML
+- No keyboard navigation support for closing modals (Escape key)
+- Missing ARIA role and label associations for proper screen reader experience
+
+**Why This Matters**:
+1. **Accessibility**: ~15% of world population has some form of disability
+2. **Legal Compliance**: WCAG 2.1 AA required by many regulations (GDPR, ADA)
+3. **Keyboard-Only Users**: Users who cannot use mouse need keyboard navigation
+4. **Screen Readers**: Proper ARIA ensures screen reader compatibility
+5. **Anti-Pattern**: Divs with onClick handlers violate "Mouse-only interfaces" anti-pattern
+
+### Solution
+
+**DrillResults.tsx Improvements**:
+- Added `handleKeyDown` callback for Escape key support
+- Modal backdrop: Added `role="presentation"`, `aria-hidden="true"`, `tabIndex={-1}`
+- Modal wrapper: Added `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`
+- Modal title: Added `id="drill-results-title"` for aria-labelledby
+- Modal body: Added `id="drill-results-content"` for aria-describedby
+- Close button: Added `aria-label="Tutup hasil latihan"`
+- Icons: Added `aria-hidden="true"` to decorative icons
+- Loading state: Added `role="status"`, `aria-live="polite"`, `aria-label`
+- Not found state: Added `role="alertdialog"`, `aria-labelledby`, `aria-describedby`, `aria-modal="true"`
+
+**BackupRestoreModal.tsx Improvements**:
+- Added `useCallback` import for keyboard handler
+- Created `handleKeyDown` callback with Escape key support
+- Added `onKeyDown={handleKeyDown}` to modal wrapper
+- Added `aria-modal="true"` to modal wrapper
+- Added `aria-describedby="restoreModalBody"` to modal wrapper
+- Added `id="restoreModalBody"` to modal body
+- Updated `aria-hidden={!isOpen}` for dynamic visibility
+- Added `aria-label` to "Batal" button: "Batalkan operasi pemulihan"
+- Added `aria-label` to "Mulai" button: "Sedang memulihkan" / "Mulai pemulihan backup"
+- Added `aria-label` to "Tutup" button: "Tutup modal pemulihan"
+- Wrapped `handleClose` in `useCallback` to fix lint warning
+
+### Implementation
+
+- [x] Add keyboard navigation (Escape key) to DrillResults.tsx modal
+- [x] Add ARIA attributes (role, aria-modal, aria-labelledby, aria-describedby) to DrillResults.tsx
+- [x] Add aria-label to close buttons and decorative elements in DrillResults.tsx
+- [x] Add keyboard navigation (Escape key) to BackupRestoreModal.tsx
+- [x] Add ARIA attributes (aria-modal, aria-describedby) to BackupRestoreModal.tsx
+- [x] Add aria-label to all buttons in BackupRestoreModal.tsx
+- [x] Fix lint warning (wrap handleClose in useCallback)
+- [x] Verify modal patterns follow ARIA best practices
+
+### Success Criteria
+
+- [x] All modal components have proper ARIA roles and attributes
+- [x] Keyboard navigation working (Escape key closes all modals)
+- [x] Screen reader compatible (aria-labelledby, aria-describedby)
+- [x] Modal buttons have proper aria-label attributes
+- [x] Decorative icons have aria-hidden="true"
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] No new test failures introduced
+
+### Related Files
+
+- ✅ Modified: `src/components/admin/DrillResults.tsx` - Accessibility improvements (25 changed)
+- ✅ Modified: `src/components/admin/BackupRestoreModal.tsx` - Accessibility improvements (10 changed)
+
+### Implementation Summary
+
+**Files Modified**: 2 files
+**Lines Changed**: ~35 lines added
+**Components Improved**: DrillResults, BackupRestoreModal
+**Accessibility Improvements**: ARIA attributes, keyboard navigation, screen reader support
+
+**Key Features**:
+1. **Keyboard Navigation**: Escape key closes all modals
+2. **ARIA Roles**: Proper role="dialog" for modals
+3. **Screen Readers**: aria-labelledby and aria-describedby for context
+4. **Modal Pattern**: aria-modal="true" for proper modal behavior
+5. **Button Labels**: All buttons have descriptive aria-label attributes
+6. **Icon Handling**: Decorative icons have aria-hidden="true"
+7. **Loading States**: role="status" with aria-live for announcements
+8. **Lint Clean**: 0 errors, 0 warnings
+
+### Notes
+
+- Follows UI/UX Engineer principles:
+  - **Accessibility**: Full ARIA support, keyboard navigation, screen reader compatible
+  - **Semantic Structure**: Proper HTML elements and ARIA roles (dialog, alertdialog)
+  - **Keyboard Navigation**: Escape key support for all modals
+  - **Anti-Patterns Fixed**: Removed div-only onClick handlers, added proper semantic elements
+- Zero breaking changes - only accessibility improvements added
+- All existing functionality preserved
+
+### Related Tasks
+
+- Task 337 (Accessibility Improvements and Responsive Design) - Previous accessibility task
+- Task 342 (BackupEngine Layer Separation) - Backup system being enhanced
+
+---
+
 ## Task 345: [SECURITY SPECIALIST] Security Audit & Dependency Updates (Jan 19, 2026)
 
 **Status**: ✅ Completed

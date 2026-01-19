@@ -14,29 +14,29 @@ interface DrillResultsProps {
   onClose: () => void
 }
 
-const formatDuration = (ms: number): string => {
-  const seconds = Math.floor(ms / 1000)
-  const minutes = Math.floor(seconds / 60)
+  const formatDuration = (ms: number): string => {
+    const seconds = Math.floor(ms / 1000)
+    const minutes = Math.floor(seconds / 60)
 
-  if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`
+    if (minutes > 0) {
+      return `${minutes}m ${seconds % 60}s`
+    }
+
+    return `${seconds}s`
   }
 
-  return `${seconds}s`
-}
-
-const getDrillTypeLabel = (type: DrillType): string => {
-  switch (type) {
-    case DrillType.FULL_RESTORE:
-      return 'Pemulihan Penuh'
-    case DrillType.PARTIAL_RESTORE:
-      return 'Pemulihan Sebagian'
-    case DrillType.INTEGRITY_CHECK:
-      return 'Pemeriksaan Integritas'
-    default:
-      return type
+  const getDrillTypeLabel = (type: DrillType): string => {
+    switch (type) {
+      case DrillType.FULL_RESTORE:
+        return 'Pemulihan Penuh'
+      case DrillType.PARTIAL_RESTORE:
+        return 'Pemulihan Sebagian'
+      case DrillType.INTEGRITY_CHECK:
+        return 'Pemeriksaan Integritas'
+      default:
+        return type
+    }
   }
-}
 
 const DrillResultsComponent: React.FC<DrillResultsProps> = ({ drillId, onClose }) => {
   const { theme } = useTheme()
@@ -59,9 +59,20 @@ const DrillResultsComponent: React.FC<DrillResultsProps> = ({ drillId, onClose }
     loadDrill()
   }, [loadDrill])
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose()
+    }
+  }, [onClose])
+
   if (loading) {
     return (
-      <div className="modal-backdrop show">
+      <div
+        className="modal-backdrop show"
+        role="status"
+        aria-live="polite"
+        aria-label="Memuat hasil latihan"
+      >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body text-center py-5">
@@ -76,14 +87,29 @@ const DrillResultsComponent: React.FC<DrillResultsProps> = ({ drillId, onClose }
 
   if (!drill) {
     return (
-      <div className="modal-backdrop show">
-        <div className="modal-dialog modal-dialog-centered">
+      <div
+        className="modal-backdrop show"
+        onClick={onClose}
+        onKeyDown={handleKeyDown}
+        role="alertdialog"
+        aria-labelledby="drill-not-found-title"
+        aria-describedby="drill-not-found-desc"
+        aria-modal="true"
+      >
+        <div
+          className="modal-dialog modal-dialog-centered"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="modal-content">
             <div className="modal-body text-center py-5">
-              <i className="bi bi-exclamation-triangle fs-1 text-warning mb-3"></i>
-              <h5>Latihan Tidak Ditemukan</h5>
-              <p className="text-muted">ID latihan tidak valid atau telah dihapus</p>
-              <button className="btn btn-primary" onClick={onClose}>
+              <i className="bi bi-exclamation-triangle fs-1 text-warning mb-3" aria-hidden="true"></i>
+              <h5 id="drill-not-found-title">Latihan Tidak Ditemukan</h5>
+              <p id="drill-not-found-desc" className="text-muted">ID latihan tidak valid atau telah dihapus</p>
+              <button
+                className="btn btn-primary"
+                onClick={onClose}
+                aria-label="Tutup modal"
+              >
                 Tutup
               </button>
             </div>
@@ -94,21 +120,36 @@ const DrillResultsComponent: React.FC<DrillResultsProps> = ({ drillId, onClose }
   }
 
   return (
-    <div className="modal-backdrop show" onClick={onClose}>
-      <div className="modal-dialog modal-lg modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-backdrop show"
+      onClick={onClose}
+      onKeyDown={handleKeyDown}
+      role="presentation"
+      aria-hidden="true"
+      tabIndex={-1}
+    >
+      <div
+        className="modal-dialog modal-lg modal-dialog-centered"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drill-results-title"
+        aria-describedby="drill-results-content"
+      >
         <div className={`modal-content ${theme}`}>
           <div className="modal-header bg-primary text-white">
-            <h5 className="modal-title">
-              <i className="bi bi-file-earmark-text me-2"></i>
+            <h5 className="modal-title" id="drill-results-title">
+              <i className="bi bi-file-earmark-text me-2" aria-hidden="true"></i>
               Hasil Latihan: {drill.id}
             </h5>
             <button
               type="button"
               className="btn-close btn-close-white"
               onClick={onClose}
+              aria-label="Tutup hasil latihan"
             />
           </div>
-          <div className="modal-body">
+          <div className="modal-body" id="drill-results-content">
             <div className="row mb-4">
               <div className="col-md-6">
                 <div className="card shadow-sm">
