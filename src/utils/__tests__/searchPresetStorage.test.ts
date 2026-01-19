@@ -173,13 +173,13 @@ describe('searchPresetStorage', () => {
     });
 
     it('should return all presets sorted by creation date (newest first)', () => {
-      const preset1 = addPreset({
+      addPreset({
         name: 'First',
         search: 'first'
       });
 
       setTimeout(() => {
-        const preset2 = addPreset({
+        addPreset({
           name: 'Second',
           search: 'second'
         });
