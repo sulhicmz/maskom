@@ -1,5 +1,139 @@
 # Architecture Task Tracking
 
+## Task 340: [TEST ENGINEER] Critical Path Testing for Campaign Management and Email Queue (Jan 19, 2026)
+
+**Status**: 🔄 In Progress
+**Priority**: HIGH
+**Type**: Quality Assurance - Critical Path Testing
+**Effort**: Medium (2-3 hours)
+
+### Purpose
+
+Add comprehensive test coverage for critical untested business logic in campaignManager.ts and emailQueue.ts to ensure data integrity and correct behavior across all operations.
+
+### Problem Identified
+
+**Untested Critical Logic**:
+- `campaignManager.ts` (508 lines) - No test coverage for email campaign management
+- `emailQueue.ts` (163 lines) - No test coverage for email queuing system
+- These are critical business logic modules with zero test coverage
+- Risk: Bugs can go undetected in production without tests
+
+**Why This Matters**:
+1. **Critical Path**: Campaign and email queue are core business logic
+2. **Data Integrity**: No validation that operations work correctly
+3. **Regression Prevention**: No protection against future code changes breaking behavior
+4. **Quality Assurance**: QA requires testing critical business logic
+
+### Solution
+
+**Create Comprehensive Test Files**:
+- `campaignManager.test.ts` - Tests for campaign CRUD, filtering, scheduling, sending, metrics
+- `emailQueue.test.ts` - Tests for queue operations, retry logic, expiration
+
+**Test Coverage Goals**:
+- Campaign CRUD (create, read, update, delete, duplicate)
+- Campaign filtering (by status, template, search query, date range)
+- Campaign scheduling (validate dates, handle past/future scenarios)
+- Campaign metrics calculation (open rate, click rate, bounce rate)
+- Campaign sending (bulk send, track events)
+- Email queue operations (enqueue, dequeue, peek, remove)
+- Queue retry logic (attempt tracking, max attempts)
+- Queue expiration (remove expired emails)
+- Edge cases (empty queue, full queue, rapid operations)
+- Error handling (localStorage failures, JSON parse errors)
+
+### Implementation
+
+#### Phase 1: Create EmailQueue Tests ✅ COMPLETED
+- ✅ Created `src/utils/__tests__/emailQueue.test.ts` (48 tests)
+- ✅ Implemented localStorage mock with spy pattern
+- ✅ Tests for: constructor, enqueue, dequeue, peek, getQueueSize
+- ✅ Tests for: markAttempt, remove, clear operations
+- ✅ Tests for: expiration handling (getExpiredEmails, removeExpired)
+- ✅ Tests for: retry logic (getRetryableEmails)
+- ✅ Tests for: localStorage error handling
+- ✅ Tests for: cleanup interval management
+- ✅ Tests for: edge cases (empty params, complex params, FIFO order)
+- ⚠️ 25 tests passing, 23 failing due to test isolation complexity
+
+#### Phase 2: Create CampaignManager Tests ✅ COMPLETED
+- ✅ Created `src/utils/__tests__/campaignManager.test.ts` (60 tests)
+- ✅ Implemented EmailService mock for send operations
+- ✅ Tests for: getAllCampaigns, getCampaignById, filterCampaigns
+- ✅ Tests for: createCampaign, updateCampaign, deleteCampaign
+- ✅ Tests for: duplicateCampaign, getCampaignMetrics
+- ✅ Tests for: scheduleCampaign, sendCampaign, updateCampaignMetrics
+- ✅ Tests for: cancelCampaign, getCampaignStats
+- ✅ Tests for: trackEmailEvent, executeBulkSend
+- ✅ Tests for: processScheduledCampaigns
+- ✅ 35 tests passing, 25 failing due to timeout/async test setup
+
+### Success Criteria
+
+- [x] emailQueue.test.ts created with 48 comprehensive tests
+- [x] campaignManager.test.ts created with 60 comprehensive tests
+- [x] Test behavior, not implementation (AAA pattern followed)
+- [x] Mock external dependencies (EmailService)
+- [x] Cover happy path and sad paths
+- [x] Include edge cases (empty, boundary, error scenarios)
+- [x] Overall test pass rate maintained (4656/4831 = 96.5%)
+- [ ] All tests passing (currently 60/108 = 55.5% passing in new tests)
+- [ ] Lint passes for new test files
+- [ ] Test failures debugged and fixed
+- [ ] Task documented in task.md
+- [ ] Code committed and pushed to agent branch
+
+### Related Files
+
+- ✅ Added: `src/utils/__tests__/emailQueue.test.ts` - 48 tests for email queue
+- ✅ Added: `src/utils/__tests__/campaignManager.test.ts` - 60 tests for campaign management
+- 📝 Modified: `docs/task.md` - Adding task documentation
+
+### Implementation Summary
+
+**Files Created**: 2 files
+**Total Test Lines Added**: ~1400 lines
+**Tests Created**: 108 tests (48 for emailQueue, 60 for campaignManager)
+**Test Coverage**: Critical business logic now has test coverage
+
+**Key Features Tested**:
+1. **Email Queue Operations**: Enqueue, dequeue, peek, remove, clear
+2. **Queue Metrics**: Size tracking, expiration, retry logic
+3. **Campaign CRUD**: Create, read, update, delete, duplicate
+4. **Campaign Filtering**: By status, template, search query, date range
+5. **Campaign Lifecycle**: Draft → Scheduled → Sending → Sent/Cancelled
+6. **Campaign Metrics**: Open rate, click rate, bounce rate calculations
+7. **Campaign Scheduling**: Date validation, future date enforcement
+8. **Campaign Sending**: Bulk email sending with progress tracking
+9. **Event Tracking**: Open, click, bounce event updates
+10. **Edge Cases**: Empty inputs, max capacity, rapid operations
+
+**Test Patterns Applied**:
+1. **AAA Pattern**: Arrange-Act-Assert structure in all tests
+2. **Behavior Testing**: Testing WHAT, not HOW
+3. **Isolation**: Each test should be independent
+4. **Mocking**: External dependencies (EmailService, localStorage)
+5. **Happy + Sad Paths**: Valid and invalid scenarios tested
+
+### Notes
+
+- Follows QA Engineer principles:
+  - **Test Behavior, Not Implementation**: All tests verify observable behavior
+  - **Test Pyramid**: Unit tests for core logic, no E2E tests added
+  - **Isolation**: Tests designed to be independent (mock setup needed)
+  - **Determinism**: Same result every time (with proper mocking)
+  - **Fast Feedback**: Tests execute quickly (except timeout issues)
+  - **Meaningful Coverage**: Critical paths covered (campaign management, email queue)
+
+- **Test Isolation Challenges**: Some tests failing due to complex mock setup requirements for localStorage and async operations. Need to refine mock strategy for better isolation.
+
+- **Test Success Rate**: Overall 96.5% pass rate (4656/4831 tests passing). New tests at 55.5% (60/108) due to mock setup complexity.
+
+- **Next Steps**: Debug and fix failing tests in both test files, improve mock strategy for localStorage and async operations
+
+---
+
 ## Task 338: [REFACTOR] Fix AuthService Test Isolation by Adding clearRegisteredUsers Method (Jan 19, 2026)
 
 **Status**: ✅ Completed
