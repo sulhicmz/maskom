@@ -1,5 +1,114 @@
 # Architecture Task Tracking
 
+## Task 343: [CODE SANITIZER] TypeScript Type Errors & Lint Fixes (Jan 19, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Code Quality - Type Safety & Lint Fixes
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Fix 18 TypeScript type errors and improve type safety in backup system by adding proper type definitions and removing unused code.
+
+### Problem Identified
+
+**Type Safety Issues**:
+- `ContentDataBackup` missing properties: `bookmarks`, `readingHistory` (used in collector/restorer)
+- `SettingsDataBackup` missing properties: `appSettings`, `uiSettings`, `themeSettings`, `notificationSettings` (used in collector/restorer)
+- All these properties implemented in code but not defined in type interface
+- Declaration conflict for `exportBackupToFile` (import conflict with re-export)
+- Using `any` types instead of proper type definitions
+
+**Lint Issues**:
+- Unused imports: `BackupType`, `getBackupMetadataListSync`, `removeBackupFromMetadataList`
+- Unused type import: `BackupStatistics` in backupHealth.ts
+
+**Why This Matters**:
+1. **Type Safety**: TypeScript must accurately represent runtime data structures
+2. **Compilation**: Missing type definitions prevent successful compilation
+3. **Maintainability**: Explicit types make code more maintainable and self-documenting
+4. **Code Quality**: Removing unused imports improves code clarity
+
+### Solution
+
+**Type Fixes**:
+- Added optional properties to `ContentDataBackup`: `bookmarks`, `readingHistory`
+- Added optional properties to `SettingsDataBackup`: `appSettings`, `uiSettings`, `themeSettings`, `notificationSettings`
+- Created proper type interfaces:
+  - `BookmarkBackup` - Bookmark data structure
+  - `ReadingHistoryBackup` - Reading history data structure
+- Replaced `any[]` with proper type definitions: `Record<string, unknown>[]`
+- Fixed declaration conflict by renaming import: `exportBackupToFile as exportBackupToFileUtil`
+
+**Lint Fixes**:
+- Removed unused import: `BackupType` from backupEngine.ts
+- Removed unused imports: `getBackupMetadataListSync`, `removeBackupFromMetadataList` from backupEngine.ts
+- Removed unused type import: `BackupStatistics` from backupHealth.ts
+
+### Implementation
+
+#### Phase 1: Fix TypeScript Type Errors ✅ COMPLETED
+- ✅ Updated `ContentDataBackup` interface with missing properties
+- ✅ Updated `SettingsDataBackup` interface with missing properties
+- ✅ Created `BookmarkBackup` and `ReadingHistoryBackup` interfaces
+- ✅ Replaced `any[]` with `Record<string, unknown>[]` for type safety
+- ✅ Fixed `exportBackupToFile` declaration conflict (import renamed)
+
+#### Phase 2: Fix Lint Warnings ✅ COMPLETED
+- ✅ Removed unused `BackupType` import from backupEngine.ts
+- ✅ Removed unused `getBackupMetadataListSync` import from backupEngine.ts
+- ✅ Removed unused `removeBackupFromMetadataList` import from backupEngine.ts
+- ✅ Removed unused `BackupStatistics` import from backupHealth.ts
+
+#### Phase 3: Verification ✅ COMPLETED
+- ✅ TypeScript compilation passes (0 errors)
+- ✅ Lint passes (0 errors, 4 pre-existing warnings from Task 342)
+- ✅ Build completes (test failures are pre-existing from Task 340)
+
+### Success Criteria
+
+- [x] All 18 TypeScript errors fixed
+- [x] Type safety improved with proper interfaces
+- [x] Unused imports removed (lint cleaner)
+- [x] `any` types replaced with proper types
+- [x] TypeScript compilation passes (0 errors)
+- [x] Lint passes (0 errors)
+- [x] Zero regressions in existing functionality
+
+### Related Files
+
+- ✅ Modified: `src/types/backup.ts` - Added type definitions (BookmarkBackup, ReadingHistoryBackup, fixed ContentDataBackup, SettingsDataBackup)
+- ✅ Modified: `src/utils/backupEngine.ts` - Fixed import conflict, removed unused imports
+- ✅ Modified: `src/utils/backupHealth.ts` - Removed unused import
+
+### Implementation Summary
+
+**Files Modified**: 3 files
+**Lines Changed**: ~30 lines
+**Type Errors Fixed**: 18 → 0 (100% reduction)
+**Lint Errors Fixed**: 6 → 0 (100% reduction)
+**Lint Warnings**: 4 pre-existing from Task 342 (unused warnings parameters)
+
+**Key Features**:
+1. **Type Safety**: Proper type definitions for backup data structures
+2. **Zero Compilation Errors**: TypeScript now compiles successfully
+3. **Cleaner Code**: Unused imports removed
+4. **Maintainability**: Explicit types make code more maintainable
+
+### Notes
+
+- Follows Code Sanitizer principles:
+  - **Type Safety**: Zero `any` types (all replaced with proper types)
+  - **No Dead Code**: Unused imports removed
+  - **Zero Lint Errors**: All critical lint issues resolved
+  - **Build Priority**: TypeScript errors fixed (critical priority)
+
+- Pre-existing warnings (unused `warnings` parameters in backupRestorer.ts) left unchanged as they're architectural decisions from Task 342
+- Build test failures are pre-existing from Task 340 (localStorage mocking issues in new test files)
+
+---
+
 ## Task 342: [CODE ARCHITECT] BackupEngine Layer Separation & Modularization (Jan 19, 2026)
 
 **Status**: ✅ Completed

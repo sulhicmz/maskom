@@ -1,4 +1,4 @@
-import { BackupStatistics, BackupMetadata, BackupHealthStatus } from '@/types/backup'
+import { BackupMetadata, BackupHealthStatus } from '@/types/backup'
 
 export function calculateStorageUsage(): number {
   try {

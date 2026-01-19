@@ -63,10 +63,26 @@ export interface MFASettingsBackup {
   mfaEnabledAt?: string
 }
 
+export interface BookmarkBackup {
+  id: string
+  url: string
+  title: string
+  date: string
+}
+
+export interface ReadingHistoryBackup {
+  id: string
+  url: string
+  title: string
+  readAt: string
+}
+
 export interface ContentDataBackup {
-  blogPosts: BlogPostBackup[]
-  blogComments: BlogCommentBackup[]
-  mediaAssets: MediaAssetBackup[]
+  bookmarks?: BookmarkBackup[]
+  readingHistory?: ReadingHistoryBackup[]
+  blogPosts?: BlogPostBackup[]
+  blogComments?: BlogCommentBackup[]
+  mediaAssets?: MediaAssetBackup[]
 }
 
 export interface BlogPostBackup {
@@ -107,10 +123,14 @@ export interface MediaAssetBackup {
 }
 
 export interface SettingsDataBackup {
-  cacheConfig: CacheConfigBackup
-  apmConfig: APMConfigBackup
-  rbacConfig: RBACConfigBackup
-  backupConfig: BackupConfigBackup
+  appSettings?: Record<string, unknown>[]
+  uiSettings?: Record<string, unknown>[]
+  themeSettings?: Record<string, unknown>[]
+  notificationSettings?: Record<string, unknown>[]
+  cacheConfig?: CacheConfigBackup
+  apmConfig?: APMConfigBackup
+  rbacConfig?: RBACConfigBackup
+  backupConfig?: BackupConfigBackup
 }
 
 export interface CacheConfigBackup {

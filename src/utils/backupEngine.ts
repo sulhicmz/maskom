@@ -1,7 +1,6 @@
 import {
   BackupData,
   BackupMetadata,
-  BackupType,
   BackupInfo,
   RestoreResult,
   BackupStatistics,
@@ -34,11 +33,9 @@ import {
   saveBackupToStorage,
   loadBackupFromStorage,
   getBackupMetadataList,
-  getBackupMetadataListSync,
   updateBackupMetadataList,
-  removeBackupFromMetadataList,
   deleteBackupFromStorage,
-  exportBackupToFile,
+  exportBackupToFile as exportBackupToFileUtil,
 } from './backupStorage'
 
 import {
@@ -415,8 +412,8 @@ export class BackupEngine {
       const itemsRestored =
         backupData.userData.authState.length +
         backupData.userData.preferences.length +
-        backupData.contentData.blogPosts.length +
-        backupData.contentData.blogComments.length
+        (backupData.contentData.blogPosts?.length || 0) +
+        (backupData.contentData.blogComments?.length || 0)
 
       onProgress?.({
         current: 5,
@@ -553,7 +550,7 @@ export class BackupEngine {
   async exportBackupToFile(
     backupId: string,
   ): Promise<Blob | null> {
-    return exportBackupToFile(backupId)
+    return exportBackupToFileUtil(backupId)
   }
 
   public async getBackupMetadataList(): Promise<BackupMetadata[]> {
