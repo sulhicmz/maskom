@@ -8,7 +8,6 @@ import {
 export async function restoreUserData(
   userData: UserDataBackup,
   errors: string[],
-  warnings: string[],
 ): Promise<void> {
   try {
     if (typeof window === 'undefined') {
@@ -35,7 +34,6 @@ export async function restoreUserData(
 export async function restoreContentData(
   contentData: ContentDataBackup,
   errors: string[],
-  warnings: string[],
 ): Promise<void> {
   try {
     if (typeof window === 'undefined') {
@@ -66,7 +64,6 @@ export async function restoreContentData(
 export async function restoreSettingsData(
   settingsData: SettingsDataBackup,
   errors: string[],
-  warnings: string[],
 ): Promise<void> {
   try {
     if (typeof window === 'undefined') {
@@ -97,7 +94,6 @@ export async function restoreSettingsData(
 export async function restoreActivityLogs(
   activityLogs: ActivityLogBackup[],
   errors: string[],
-  warnings: string[],
 ): Promise<void> {
   try {
     if (typeof window === 'undefined') {

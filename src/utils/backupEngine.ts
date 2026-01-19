@@ -385,25 +385,25 @@ export class BackupEngine {
       const backupData: BackupData = JSON.parse(backupDataString)
 
       try {
-        await restoreUserData(backupData.userData, errors, warnings)
+        await restoreUserData(backupData.userData, errors)
       } catch (error) {
         errors.push(`Failed to restore user data: ${error}`)
       }
 
       try {
-        await restoreContentData(backupData.contentData, errors, warnings)
+        await restoreContentData(backupData.contentData, errors)
       } catch (error) {
         errors.push(`Failed to restore content data: ${error}`)
       }
 
       try {
-        await restoreSettingsData(backupData.settingsData, errors, warnings)
+        await restoreSettingsData(backupData.settingsData, errors)
       } catch (error) {
         errors.push(`Failed to restore settings data: ${error}`)
       }
 
       try {
-        await restoreActivityLogs(backupData.activityLogs, errors, warnings)
+        await restoreActivityLogs(backupData.activityLogs, errors)
       } catch (error) {
         errors.push(`Failed to restore activity logs: ${error}`)
       }

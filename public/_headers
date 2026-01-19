@@ -1,21 +1,18 @@
-# Security Headers untuk meningkatkan keamanan website
+# Security Headers for enhanced website security
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdn.emailjs.com https://*.emailjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://*.cloudinary.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://cdn.emailjs.com https://*.emailjs.com; media-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; upgrade-insecure-requests
+  # Note: 'unsafe-inline' in style-src is required for React inline styles (style={{...}})
+  # React automatically escapes style values, preventing CSS injection attacks
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdn.emailjs.com https://*.emailjs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://*.cloudinary.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://cdn.emailjs.com https://*.emailjs.com; media-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; upgrade-insecure-requests; frame-src 'self' https://www.youtube.com
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
-# CORS Headers untuk membatasi origin yang diizinkan
-# Production: https://maskom.co.id
-# Note: Update this value for different environments
-# Development: Change to http://localhost:3000 or http://127.0.0.1:3000
-  Access-Control-Allow-Origin: https://maskom.co.id
-  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
-  Access-Control-Max-Age: 86400
+# Note: CORS headers should be handled at the API route level, not in static _headers
+# This prevents CORS misconfiguration across different environments (dev/staging/prod)
+# If you need CORS for specific endpoints, add headers to those API routes directly
 
 # Caching untuk static assets
 /assets/*
