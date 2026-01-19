@@ -136,11 +136,16 @@ describe('ActivityLogger', () => {
     })
 
     it('should return "Unknown" when window does not exist', () => {
-      delete (global as any).window
+      jest.spyOn(window as any, 'navigator', 'get').mockReturnValue({ userAgent: 'Test Agent' });
 
-      const userAgent = getUserAgent()
+      const originalWindow = (global as any).window;
+      delete (global as any).window;
 
-      expect(userAgent).toBe('Unknown')
+      const userAgent = getUserAgent();
+
+      expect(userAgent).toBe('Unknown');
+
+      (global as any).window = originalWindow;
     })
   })
 
