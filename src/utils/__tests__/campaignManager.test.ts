@@ -35,6 +35,7 @@ describe('CampaignManager', () => {
         global.window = { localStorage: mockLocalStorage } as any;
         jest.clearAllMocks();
         jest.useFakeTimers();
+        localStorage.clear();
 
         (emailService.sendTemplatedEmail as jest.Mock).mockResolvedValue({
             success: true,

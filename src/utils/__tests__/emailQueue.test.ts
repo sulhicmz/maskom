@@ -5,6 +5,7 @@ describe('EmailQueue', () => {
     let mockLocalStorage: Storage;
     let setItemSpy: jest.SpyInstance;
     let getItemSpy: jest.SpyInstance;
+    let originalWindow: any;
 
     const createMockLocalStorage = (): Storage => {
         const storage: Record<string, string> = {};
@@ -31,6 +32,7 @@ describe('EmailQueue', () => {
     };
 
     beforeEach(() => {
+        originalWindow = (global as any).window;
         mockLocalStorage = createMockLocalStorage();
         (global as any).localStorage = mockLocalStorage;
         global.localStorage = mockLocalStorage;
@@ -39,21 +41,26 @@ describe('EmailQueue', () => {
 
         setItemSpy = jest.spyOn(mockLocalStorage, 'setItem');
         getItemSpy = jest.spyOn(mockLocalStorage, 'getItem');
-
-        emailQueue = new EmailQueue();
     });
 
     afterEach(() => {
         jest.useRealTimers();
         setItemSpy.mockRestore();
         getItemSpy.mockRestore();
-        emailQueue.destroy();
+        if (emailQueue) {
+            emailQueue.destroy();
+        }
+        (global as any).window = originalWindow;
+        delete (global as any).localStorage;
     });
 
     describe('constructor', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should initialize with default config', () => {
-            const queue = new EmailQueue();
-            expect(queue.getQueueSize()).toBe(0);
+            expect(emailQueue.getQueueSize()).toBe(0);
         });
 
         it('should accept custom config', () => {
@@ -62,8 +69,8 @@ describe('EmailQueue', () => {
                 maxRetentionMs: 48 * 60 * 60 * 1000,
                 maxAttempts: 5,
             };
-            const queue = new EmailQueue(customConfig);
-            expect(queue.getQueueSize()).toBe(0);
+            emailQueue = new EmailQueue(customConfig);
+            expect(emailQueue.getQueueSize()).toBe(0);
         });
 
         it('should load existing queue from localStorage', () => {
@@ -75,14 +82,18 @@ describe('EmailQueue', () => {
                 maxAttempts: 3,
             };
             const queueData = JSON.stringify([existingEmail]);
-            getItemSpy.mockReturnValue(queueData);
+            mockLocalStorage.setItem('email_queue', queueData);
 
-            const queue = new EmailQueue();
-            expect(queue.getQueueSize()).toBe(1);
+            emailQueue = new EmailQueue();
+            expect(emailQueue.getQueueSize()).toBe(1);
         });
     });
 
     describe('enqueue', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should successfully enqueue an email', () => {
             const result = emailQueue.enqueue({ to: 'test@example.com', subject: 'Test' });
 
@@ -111,6 +122,7 @@ describe('EmailQueue', () => {
 
             const queue = getQueue(customQueue);
             expect(queue[0].maxAttempts).toBe(5);
+            customQueue.destroy();
         });
 
         it('should save queue to localStorage after enqueue', () => {
@@ -122,16 +134,21 @@ describe('EmailQueue', () => {
         it('should return false when queue is full', () => {
             const smallQueue = new EmailQueue({ maxQueueSize: 1 });
             smallQueue.enqueue({ to: 'test1@example.com' });
-            
+
             const result = smallQueue.enqueue({ to: 'test2@example.com' });
-            
+
             expect(result).toBe(false);
             expect(smallQueue.getQueueSize()).toBe(1);
+            smallQueue.destroy();
         });
     });
 
     describe('dequeue', () => {
-        it('should remove and return the first email', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
+        it('should remove and return first email', () => {
             emailQueue.enqueue({ to: 'test1@example.com' });
             emailQueue.enqueue({ to: 'test2@example.com' });
 
@@ -158,6 +175,10 @@ describe('EmailQueue', () => {
     });
 
     describe('peek', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should return first email without removing it', () => {
             emailQueue.enqueue({ to: 'test1@example.com' });
             emailQueue.enqueue({ to: 'test2@example.com' });
@@ -176,6 +197,10 @@ describe('EmailQueue', () => {
     });
 
     describe('getQueueSize', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should return 0 for empty queue', () => {
             expect(emailQueue.getQueueSize()).toBe(0);
         });
@@ -198,6 +223,10 @@ describe('EmailQueue', () => {
     });
 
     describe('markAttempt', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should increment attempts for existing email', () => {
             emailQueue.enqueue({ to: 'test@example.com' });
             const queue = getQueue(emailQueue);
@@ -239,6 +268,10 @@ describe('EmailQueue', () => {
     });
 
     describe('remove', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should remove email by ID', () => {
             emailQueue.enqueue({ to: 'test1@example.com' });
             emailQueue.enqueue({ to: 'test2@example.com' });
@@ -279,6 +312,10 @@ describe('EmailQueue', () => {
     });
 
     describe('clear', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should remove all emails from queue', () => {
             emailQueue.enqueue({ to: 'test1@example.com' });
             emailQueue.enqueue({ to: 'test2@example.com' });
@@ -307,6 +344,10 @@ describe('EmailQueue', () => {
     });
 
     describe('getExpiredEmails', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should return emails older than retention period', () => {
             const oldEmail: QueuedEmail = {
                 id: 'email_old',
@@ -365,6 +406,10 @@ describe('EmailQueue', () => {
     });
 
     describe('removeExpired', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should remove expired emails and return count', () => {
             const oldEmail: QueuedEmail = {
                 id: 'email_old',
@@ -418,6 +463,10 @@ describe('EmailQueue', () => {
     });
 
     describe('getRetryableEmails', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should return emails with attempts less than maxAttempts', () => {
             const retryableEmail: QueuedEmail = {
                 id: 'email_retry',
@@ -476,6 +525,10 @@ describe('EmailQueue', () => {
     });
 
     describe('localStorage handling', () => {
+        beforeEach(() => {
+            emailQueue = new EmailQueue();
+        });
+
         it('should handle localStorage save errors gracefully', () => {
             setItemSpy.mockImplementation(() => {
                 throw new Error('Storage quota exceeded');
@@ -492,7 +545,7 @@ describe('EmailQueue', () => {
         });
 
         it('should handle localStorage load errors gracefully', () => {
-            getItemSpy.mockImplementation(() => {
+            mockLocalStorage.getItem = jest.fn(() => {
                 throw new Error('Storage access error');
             });
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
@@ -508,7 +561,7 @@ describe('EmailQueue', () => {
         });
 
         it('should handle JSON parse errors gracefully', () => {
-            getItemSpy.mockReturnValue('invalid json');
+            mockLocalStorage.getItem = jest.fn(() => 'invalid json');
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
             const queue = new EmailQueue();
@@ -523,35 +576,42 @@ describe('EmailQueue', () => {
     });
 
     describe('cleanup interval', () => {
+        let setIntervalSpy: jest.SpyInstance;
+        let clearIntervalSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            setIntervalSpy = jest.spyOn(global, 'setInterval');
+            clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+            emailQueue = new EmailQueue();
+        });
+
+        afterEach(() => {
+            setIntervalSpy.mockRestore();
+            clearIntervalSpy.mockRestore();
+        });
+
         it('should start cleanup interval on construction', () => {
-            const setIntervalSpy = jest.spyOn(global, 'setInterval');
-            
-            new EmailQueue();
+            expect(setIntervalSpy).toHaveBeenCalledWith(
+                expect.any(Function),
+                60 * 60 * 1000
+            );
+        });
+
+        it('should start cleanup interval when creating queue instance', () => {
+            setIntervalSpy.mockClear();
+            const testQueue = new EmailQueue();
 
             expect(setIntervalSpy).toHaveBeenCalledWith(
                 expect.any(Function),
                 60 * 60 * 1000
             );
-            setIntervalSpy.mockRestore();
-        });
-
-        it('should not start cleanup interval when window is undefined', () => {
-            delete (global as any).window;
-            const setIntervalSpy = jest.spyOn(global, 'setInterval');
-
-            new EmailQueue();
-
-            expect(setIntervalSpy).not.toHaveBeenCalled();
-            setIntervalSpy.mockRestore();
+            testQueue.destroy();
         });
 
         it('should clear interval on destroy', () => {
-            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-
             emailQueue.destroy();
 
             expect(clearIntervalSpy).toHaveBeenCalled();
-            clearIntervalSpy.mockRestore();
         });
 
         it('should save queue on destroy', () => {
@@ -566,7 +626,7 @@ describe('EmailQueue', () => {
 
     describe('edge cases', () => {
         beforeEach(() => {
-            emailQueue.clear();
+            emailQueue = new EmailQueue();
         });
 
         it('should handle empty params object', () => {
