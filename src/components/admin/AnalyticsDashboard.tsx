@@ -1,53 +1,17 @@
 "use client"
 
-import React, { useEffect, useState, memo } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import AnalyticsSummaryCards from './AnalyticsSummary'
 import AnalyticsChart from './AnalyticsChart'
 import PerformanceMetrics from './PerformanceMetrics'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import StatusBadge from '@/components/ui/StatusBadge'
+import FormSubmissionsTable from './FormSubmissionsTable'
+import PageViewsTable from './PageViewsTable'
 import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
-import { formatAsPercentage } from '@/utils/formatPercentage'
 import { useRouter } from 'next/navigation'
-import type { FormSubmissionMetrics, PageViewMetrics } from '@/types/analytics'
-
-const FormSubmissionRow = memo(({ form, index }: { form: FormSubmissionMetrics; index: number }) => {
-  return (
-    <tr key={index}>
-      <td>
-        <span className="badge bg-primary">{form.formType}</span>
-      </td>
-      <td>{form.totalSubmissions}</td>
-      <td><StatusBadge type="success">{form.successfulSubmissions}</StatusBadge></td>
-      <td><StatusBadge type="danger">{form.failedSubmissions}</StatusBadge></td>
-      <td>{formatAsPercentage(form.successfulSubmissions, form.totalSubmissions)}</td>
-      <td>{form.avgCompletionTime}s</td>
-    </tr>
-  )
-})
-
-FormSubmissionRow.displayName = 'FormSubmissionRow'
-
-const PageViewRow = memo(({ page, index }: { page: PageViewMetrics; index: number }) => {
-  return (
-    <tr key={index}>
-      <td>
-        <a href={page.pagePath} className="text-decoration-none">
-          {page.pageTitle}
-        </a>
-      </td>
-      <td>{page.totalViews}</td>
-      <td>{page.uniqueViews}</td>
-      <td>{page.avgTimeOnPage}s</td>
-      <td>{formatAsPercentage(page.bounceRate * 100, 100)}</td>
-    </tr>
-  )
-})
-
-PageViewRow.displayName = 'PageViewRow'
 
 const AnalyticsDashboard: React.FC = () => {
   const { theme } = useTheme()
@@ -118,62 +82,13 @@ const AnalyticsDashboard: React.FC = () => {
 
         <div className="row mt-4">
           <div className="col-12">
-            <div className="card shadow-sm">
-              <div className="card-header bg-white">
-                <h5 className="mb-0">Form Submissions Breakdown</h5>
-              </div>
-              <div className="card-body">
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th scope="col">Form Type</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Successful</th>
-                        <th scope="col">Failed</th>
-                        <th scope="col">Success Rate</th>
-                        <th scope="col">Avg Completion Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {analyticsData.formSubmissions.map((form, index) => (
-                        <FormSubmissionRow key={index} form={form} index={index} />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            <FormSubmissionsTable data={analyticsData.formSubmissions} />
           </div>
         </div>
 
         <div className="row mt-4">
           <div className="col-12">
-            <div className="card shadow-sm">
-              <div className="card-header bg-white">
-                <h5 className="mb-0">Page Views Breakdown</h5>
-              </div>
-              <div className="card-body">
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th scope="col">Page</th>
-                        <th scope="col">Total Views</th>
-                        <th scope="col">Unique Views</th>
-                        <th scope="col">Avg Time on Page</th>
-                        <th scope="col">Bounce Rate</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {analyticsData.pageViews.map((page, index) => (
-                        <PageViewRow key={index} page={page} index={index} />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            <PageViewsTable data={analyticsData.pageViews} />
           </div>
         </div>
       </div>
