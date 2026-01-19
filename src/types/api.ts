@@ -567,10 +567,12 @@ export function extractData<T>(result: ServiceResult<T>): T {
  * ============================================================================
  */
 
-export default {
+const api = {
     ServiceErrorCode,
     isRetryableError,
     isSuccess,
     isError,
     extractData,
 };
+
+export default api;

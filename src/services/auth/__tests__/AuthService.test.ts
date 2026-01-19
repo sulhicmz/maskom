@@ -11,6 +11,7 @@ describe('AuthService', () => {
         authService.clearRegisteredUsers();
         authService.resetAllRateLimits();
         authService.resetCircuitBreaker();
+        authService.resetRegisteredUsers();
     });
 
     describe('login', () => {

@@ -320,6 +320,10 @@ class AuthService implements IAuthService {
         this.registerRateLimiter.resetAll();
     }
 
+    resetRegisteredUsers(): void {
+        this.registeredUsers.clear();
+    }
+
     getMetrics() {
         const loginMetrics = metricsCollector.getMetrics('AuthService.login');
         const registerMetrics = metricsCollector.getMetrics('AuthService.register');
