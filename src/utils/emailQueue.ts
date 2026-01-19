@@ -121,6 +121,10 @@ export class EmailQueue {
     }
 
     private loadQueue(): void {
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+            return;
+        }
+
         try {
             const stored = localStorage.getItem(this.storageKey);
             if (stored) {
@@ -134,6 +138,10 @@ export class EmailQueue {
     }
 
     private saveQueue(): void {
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+            return;
+        }
+
         try {
             localStorage.setItem(this.storageKey, JSON.stringify(this.queue));
         } catch (error) {
