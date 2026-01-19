@@ -8,6 +8,7 @@ jest.mock('@/utils/uuid', () => ({
 describe('AuthService', () => {
     beforeEach(() => {
         authService.logout();
+        authService.clearRegisteredUsers();
         authService.resetAllRateLimits();
         authService.resetCircuitBreaker();
     });

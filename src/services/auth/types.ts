@@ -11,6 +11,7 @@ export interface IAuthService {
     hasRole(role: UserRole): Promise<boolean>;
     getCircuitBreakerState(): CircuitBreakerState;
     resetCircuitBreaker(): void;
+    clearRegisteredUsers(): void;
     enableMFA(totpCode: string): Promise<AuthResult>;
     disableMFA(password: string): Promise<AuthResult>;
     verifyMFA(totpCode: string, backupCode?: string): Promise<AuthResult>;

@@ -339,6 +339,10 @@ class AuthService implements IAuthService {
         this.circuitBreaker.reset();
     }
 
+    clearRegisteredUsers(): void {
+        this.registeredUsers.clear();
+    }
+
     private generateUserId(): string {
         return generateUUID();
     }
