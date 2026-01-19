@@ -43894,3 +43894,164 @@ Add ARIA live regions to error messages in MFA components so screen readers prop
 - Status: Ready for review
 
 ---
+
+## Task 325: [INTEGRATION ENGINEER] Integration Hardening - Per-Service Configs, Fallback Queues, Degraded Mode (Jan 19, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Integration - Resilience Patterns
+**Effort**: Large (6-8 hours)
+
+### Purpose
+
+Implement production-ready integration hardening with service-specific configurations, fallback mechanisms, rate limit enhancements, and service health monitoring following Integration Engineer principles.
+
+### Problem Identified
+
+**Resilience Configuration Issues**:
+- All services used the same `RETRY_CONFIG` regardless of their specific needs
+- No fallback mechanisms when external services are down
+- Rate limit responses don't include `Retry-After` header (non-compliant with RFC 7231)
+- No dedicated health check endpoints for queue monitoring
+- APM provider failures cascade to all monitoring operations
+
+**Why This Matters**:
+1. **Service-Specific Optimization**: Different services have different needs (email: non-critical, auth: critical-fast)
+2. **Graceful Degradation**: Users should be able to use app when email service is down
+3. **Client-Friendly**: Retry-After header enables smart retry logic instead of polling
+4. **Operational Visibility**: Health check endpoints provide real-time monitoring
+5. **Data Preservation**: Fallback queues prevent data loss when services fail
+6. **APM Reliability**: Fallback to console provider ensures event capture continues
+
+### Solution
+
+#### Phase 1: Per-Service Retry & Timeout Configurations ✅ COMPLETED
+- Added `SERVICE_RETRY_CONFIG` in `src/constants/timeouts.ts` with service-specific retry options
+- Enhanced `executeWithResilience` in `src/services/common/resilience.ts` to use service-specific options
+- EmailService: 3 attempts, 2s base delay, 15s max delay, includes 5xx errors
+- AuthService: 2 attempts, 1s base delay, 5s max delay
+- API Routes: 2 attempts, 500ms base delay, 3s max delay
+
+#### Phase 2: EmailService Fallback Queue ✅ COMPLETED
+- Created `EmailQueue` utility (`src/utils/emailQueue.ts`) with localStorage persistence
+- Queue features: FIFO ordering, retry tracking (max 3 attempts), 24h expiration, auto-cleanup
+- EmailService integration: Auto-queue emails when circuit breaker open or network error
+- New methods: `processQueue()`, `getQueueStatus()`
+- Graceful degradation: Users can continue using app when email service is down
+
+#### Phase 3: APM Provider Degraded Mode ✅ COMPLETED
+- Enhanced `APMManager` in `src/utils/apm/apmManager.ts` with automatic fallback
+- Failure tracking: 5 consecutive failures within 60s trigger fallback to console
+- Automatic switch to ConsoleAPMProvider when external provider fails
+- Error handling: All APM operations wrapped with try-catch
+- New methods: `getFailureStats()`, `resetFailures()`, `restoreOriginalProvider()`
+- No data loss: Console provider captures events during fallback
+
+#### Phase 4: Rate Limit Retry-After Header ✅ COMPLETED
+- Enhanced `createServiceErrorResponse` in `src/utils/apiResponse.ts` with `retryAfter` parameter
+- Added `Retry-After` header to 429 (rate limit), 503 (service unavailable), 504 (timeout) responses
+- Retry-After calculated from RateLimiter `resetTime` or service defaults
+- RFC 7231 compliant: Standard HTTP header format
+- Client-friendly: Enables smart retry logic instead of polling
+
+#### Phase 5: Service Health Check Endpoints ✅ COMPLETED
+- Created `/api/email-queue` endpoint (`src/app/api/email-queue/route.ts`) for queue monitoring
+- GET endpoint: Queue status (size, expired count, circuit breaker state, metrics)
+- POST endpoint: Process queued emails with failure tracking
+- Uses existing `executeApiRoute` resilience pattern
+
+#### Phase 6: Documentation ✅ COMPLETED
+- Added 400+ lines of integration hardening documentation to `docs/blueprint.md`
+- Comprehensive design rationale for all configurations
+- Usage examples for all new features
+- Architecture benefits and success criteria documented
+
+### Implementation
+
+**Files Created (2)**:
+- `src/utils/emailQueue.ts` - Email queue utility (142 lines)
+- `src/app/api/email-queue/route.ts` - Queue monitoring endpoint (72 lines)
+
+**Files Modified (9)**:
+- `src/constants/timeouts.ts` - Added SERVICE_RETRY_CONFIG (15 lines)
+- `src/services/common/resilience.ts` - Service-specific retry options (20 lines)
+- `src/services/common/resultHelpers.ts` - Rate limit response fix (15 lines)
+- `src/services/email/EmailService.ts` - Queue fallback integration (45 lines)
+- `src/services/email/types.ts` - IEmailService interface updates (6 lines)
+- `src/utils/apiResponse.ts` - Retry-After header support (10 lines)
+- `src/utils/apiRouteHandler.ts` - Retry-After implementation (25 lines)
+- `src/utils/apm/apmManager.ts` - Degraded mode enhancement (60 lines)
+- `docs/blueprint.md` - Integration hardening documentation (400+ lines)
+
+**Total**: ~810 lines added across 11 files
+
+### Success Criteria
+
+- [x] Per-service retry and timeout configurations implemented
+- [x] EmailService fallback queue with localStorage persistence
+- [x] APM provider degraded mode with automatic fallback
+- [x] Rate limit responses include Retry-After header
+- [x] Service health check endpoints created
+- [x] Comprehensive documentation in blueprint.md
+- [x] Lint passes (0 errors, 39 pre-existing warnings)
+- [x] Type check passes (0 TypeScript errors)
+- [x] All existing tests continue to pass (no regressions)
+- [x] Zero breaking changes - backward compatible
+
+### Architecture Benefits
+
+1. **Service-Specific Configurations**: Each service has optimal retry/timeout values
+2. **Graceful Degradation**: Fallback queues and provider switching prevent data loss
+3. **HTTP Standards**: Retry-After header follows RFC 7231
+4. **Monitoring**: Health check endpoints provide operational visibility
+5. **Zero Breaking Changes**: All enhancements are backward compatible
+6. **Type Safety**: Full TypeScript support for all new features
+7. **Documentation**: Complete design rationale and usage examples
+8. **Client-Friendly**: Smart retry logic instead of polling
+
+### Testing
+
+- ✅ Lint: 0 errors, 39 warnings (pre-existing unused variables)
+- ✅ Type Check: 0 TypeScript errors
+- ✅ Build: Successful (all pages generated)
+- ✅ Tests: All existing tests continue to pass (no regressions)
+
+### Impact
+
+- Configuration: +15 lines of service-specific retry configs
+- Email Queue: +142 lines of queue utility
+- Email Service: +45 lines for fallback integration
+- APM Manager: +60 lines for degraded mode
+- API Responses: +10 lines for Retry-After header
+- API Handler: +25 lines for Retry-After implementation
+- Documentation: +400+ lines of integration hardening documentation
+- Zero Regressions: All existing functionality preserved
+- Backward Compatible: No breaking changes to existing APIs
+
+### Notes
+
+- Follows Integration Engineer principles:
+  - **Contract First**: IEmailService interface updated with new methods
+  - **Resilience**: External failures handled gracefully (queue, fallback, retry-after)
+  - **Consistency**: All patterns follow existing architecture
+  - **Backward Compatibility**: No breaking changes to existing APIs
+  - **Self-Documenting**: Comprehensive documentation with examples
+  - **Idempotency**: Queue operations are idempotent
+  - Graceful degradation: App continues working when services are down
+  - Data preservation: Failed emails queued, APM falls back to console
+  - Client-friendly: Retry-After header enables smart retry logic
+  - Operational visibility: Health check endpoints for monitoring
+  - Zero breaking changes: All existing functionality preserved
+
+### Related Tasks
+
+- Task 113 (API Documentation) - Service API documentation
+- Task 177 (API Standardization) - OpenAPI spec and Postman collection
+- Task 251 (API Routes Documentation) - Monitoring endpoints documentation
+- Task 116 (Shared Service Resilience Utility) - executeWithResilience implementation
+- Task 260 (Integration Architecture) - Resilience patterns documentation
+
+### Verification Date
+
+2026-01-19
+
