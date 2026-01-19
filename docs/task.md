@@ -1,5 +1,167 @@
 # Architecture Task Tracking
 
+## Task 336: [INTEGRATION ENGINEER] API Documentation (Jan 19, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Integration - API Documentation
+**Effort**: Medium (3-4 hours)
+
+### Purpose
+
+Create comprehensive API documentation with OpenAPI 3.0 specification, service contracts, error response documentation, and TypeScript types for API consumers.
+
+### Problem Identified
+
+**No API Documentation**:
+- No OpenAPI/Swagger specification for API routes
+- No service contracts documented
+- No error response documentation with retry behavior
+- No TypeScript types for API consumers
+- No client handling guidelines
+
+**Why This Matters**:
+1. **Integration Clarity**: API consumers need clear contracts to integrate successfully
+2. **Error Handling**: Clients need to know how to handle errors and retry appropriately
+3. **Type Safety**: TypeScript types prevent integration errors at compile time
+4. **Self-Documenting**: OpenAPI spec enables auto-generated documentation
+5. **Onboarding**: Reduces time to integrate with API
+
+### Solution
+
+**OpenAPI 3.0 Specification**:
+- Created `docs/openapi.yaml` with complete API specification
+- Documented all API routes: /health, /metrics, /services/status, /email-queue
+- Defined all request/response schemas
+- Documented error responses with Retry-After headers
+- Included circuit breaker, timeout, and retry configuration
+- Added security schemes (JWT Bearer token)
+
+**Service Contracts Documentation**:
+- Created `docs/service-contracts.md` with detailed service interfaces
+- Documented EmailService: sendEmail, sendTemplatedEmail, processQueue, getQueueStatus
+- Documented AuthService: login, register, logout, MFA operations
+- Defined all input/output types and error responses
+- Included resilience patterns (timeout, retry, circuit breaker, rate limiting)
+- Provided code examples for all operations
+
+**Error Response Documentation**:
+- Created `docs/error-responses.md` with comprehensive error handling guide
+- Documented all 7 error codes with descriptions and retry behavior
+- Mapped error codes to HTTP status codes (400, 429, 500, 503, 504)
+- Provided metadata schemas for each error type
+- Included client handling guidelines and anti-patterns
+- Added complete error flow examples (rate limit, circuit breaker, timeout)
+- Documented retry behavior with exponential backoff algorithm
+
+**TypeScript API Types**:
+- Created `src/types/api.ts` with type-safe API contracts
+- Defined ServiceResult<T> base type
+- Defined all response data types (Health, Metrics, ServicesStatus, EmailQueue)
+- Defined all error metadata types (RateLimit, Timeout, CircuitBreaker, Network, Validation)
+- Provided helper functions: isRetryableError, isSuccess, isError, extractData
+- Exported default object with all utility functions
+
+### Implementation
+
+#### Phase 1: Create OpenAPI 3.0 Specification ✅ COMPLETED
+- ✅ Created `docs/openapi.yaml` (550+ lines)
+- ✅ Documented all 4 API routes (GET /health, GET /metrics, GET /services/status, GET/POST /email-queue)
+- ✅ Defined 15+ request/response schemas
+- ✅ Added circuit breaker, timeout, and retry configuration in descriptions
+- ✅ Included security schemes (BearerAuth with JWT)
+- ✅ Added server definitions (dev, production)
+
+#### Phase 2: Create Service Contracts Documentation ✅ COMPLETED
+- ✅ Created `docs/service-contracts.md` (600+ lines)
+- ✅ Documented EmailService interface with all 5 methods
+- ✅ Documented AuthService interface with all 13 methods
+- ✅ Defined all types (EmailSendParams, LoginCredentials, User, MFASetupData, etc.)
+- ✅ Included error responses for each method
+- ✅ Documented resilience patterns (timeout, retry, circuit breaker, rate limiting, queue)
+- ✅ Provided code examples in TypeScript
+
+#### Phase 3: Create Error Response Documentation ✅ COMPLETED
+- ✅ Created `docs/error-responses.md` (700+ lines)
+- ✅ Documented all 7 error codes with descriptions
+- ✅ Mapped error codes to HTTP status codes with retry behavior table
+- ✅ Defined 8+ error metadata schemas
+- ✅ Included client handling guidelines (best practices, anti-patterns)
+- ✅ Added 3 complete error flow examples (rate limit, circuit breaker, timeout)
+- ✅ Documented exponential backoff algorithm
+- ✅ Provided monitoring and debugging guidelines
+
+#### Phase 4: Create TypeScript API Types ✅ COMPLETED
+- ✅ Created `src/types/api.ts` (350+ lines)
+- ✅ Defined ServiceResult<T> base type
+- ✅ Defined 20+ API response data types
+- ✅ Defined 7+ error metadata types
+- ✅ Provided 4+ helper functions (isRetryableError, isSuccess, isError, extractData)
+- ✅ Added JSDoc comments for all types and functions
+- ✅ Exported default object for easy import
+
+#### Phase 5: Verification ✅ COMPLETED
+- ✅ Lint passes for all documentation files (0 errors)
+- ✅ TypeScript compilation passes for src/types/api.ts (0 errors)
+- ✅ YAML syntax valid for openapi.yaml
+- ✅ All documentation files successfully created
+
+### Success Criteria
+
+- [x] OpenAPI 3.0 specification created for all API routes
+- [x] Service contracts documented for EmailService and AuthService
+- [x] Error response documentation with all error codes
+- [x] TypeScript types for API contracts created
+- [x] Client handling guidelines provided
+- [x] Retry behavior documented with exponential backoff
+- [x] Circuit breaker patterns documented
+- [x] Code examples provided for all operations
+- [x] All files created and linted successfully
+
+### Related Files
+
+- ✅ Added: `docs/openapi.yaml` - OpenAPI 3.0 specification (550+ lines)
+- ✅ Added: `docs/service-contracts.md` - Service contracts documentation (600+ lines)
+- ✅ Added: `docs/error-responses.md` - Error response documentation (700+ lines)
+- ✅ Added: `src/types/api.ts` - TypeScript API types (350+ lines)
+
+### Implementation Summary
+
+**Files Created**: 4 files
+**Total Lines Added**: ~2200 lines of documentation and type definitions
+**API Routes Documented**: 4 routes (GET /health, GET /metrics, GET /services/status, GET/POST /email-queue)
+**Schemas Defined**: 20+ request/response schemas
+**Error Codes Documented**: 7 error codes with detailed explanations
+**Service Methods Documented**: 18 methods (5 for EmailService, 13 for AuthService)
+**Helper Functions Created**: 4 utility functions for type safety
+
+**Key Features**:
+1. **OpenAPI 3.0 Spec**: Complete API specification with security, servers, tags
+2. **Service Contracts**: Detailed documentation of all service interfaces and methods
+3. **Error Documentation**: Comprehensive error handling guide with client guidelines
+4. **TypeScript Types**: Type-safe API contracts with helper functions
+5. **Retry Behavior**: Documented exponential backoff algorithm with examples
+6. **Circuit Breaker**: Detailed circuit breaker state and behavior documentation
+7. **Rate Limiting**: Rate limit configurations and client handling documented
+8. **Code Examples**: TypeScript examples for all major operations
+9. **Metadata Types**: Detailed schemas for all error metadata types
+10. **Monitoring Guidelines**: Request ID tracking, service health checks, circuit breaker monitoring
+
+### Notes
+
+- **Follows Integration Engineer Principles**:
+  - **Contract First**: API contracts defined before implementation (OpenAPI spec)
+  - **Self-Documenting**: Comprehensive documentation enables self-service integration
+  - **Backward Compatibility**: All types and contracts designed for backward compatibility
+  - **Idempotency**: Retry behavior documented for idempotent operations
+  - **Resilience**: All resilience patterns (timeout, retry, circuit breaker) documented
+  - **Consistency**: Standardized error codes across all services
+- Zero breaking changes - documentation only, no code modifications
+- All existing functionality preserved
+- Ready for Swagger UI integration (future enhancement)
+
+---
+
 ## Task 335: [DATA ARCHITECT] Campaign Validation Layer & Data Relationships (Jan 19, 2026)
 
 **Status**: ✅ Completed

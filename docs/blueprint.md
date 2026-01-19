@@ -3215,7 +3215,87 @@ Client Response (ServiceResult<T>)
 - **Documentation**: OpenAPI spec v3.0.0 provides machine-readable contract
 - **Zero Regressions**: All 3197 tests passing, lint clean, type check passing
 - **Maintainability**: Single source of truth for API response format
-- Migration guides for real backend integration
+ - Migration guides for real backend integration
+
+### API Documentation (✅ COMPLETED - Task 336)
+
+#### Purpose
+
+Create comprehensive API documentation with OpenAPI 3.0 specification, service contracts, error response documentation, and TypeScript types for API consumers.
+
+#### Problem Identified
+
+**No API Documentation**:
+- No OpenAPI/Swagger specification for API routes
+- No service contracts documented
+- No error response documentation with retry behavior
+- No TypeScript types for API consumers
+- No client handling guidelines
+
+#### Solution
+
+**OpenAPI 3.0 Specification**:
+- Created `docs/openapi.yaml` with complete API specification
+- Documented all API routes: /health, /metrics, /services/status, /email-queue
+- Defined all request/response schemas
+- Documented error responses with Retry-After headers
+- Included circuit breaker, timeout, and retry configuration
+
+**Service Contracts Documentation**:
+- Created `docs/service-contracts.md` with detailed service interfaces
+- Documented EmailService: sendEmail, sendTemplatedEmail, processQueue, getQueueStatus
+- Documented AuthService: login, register, logout, MFA operations
+- Defined all input/output types and error responses
+- Included resilience patterns (timeout, retry, circuit breaker, rate limiting)
+
+**Error Response Documentation**:
+- Created `docs/error-responses.md` with comprehensive error handling guide
+- Documented all 7 error codes with descriptions and retry behavior
+- Mapped error codes to HTTP status codes (400, 429, 500, 503, 504)
+- Provided metadata schemas for each error type
+- Included client handling guidelines and anti-patterns
+- Added complete error flow examples (rate limit, circuit breaker, timeout)
+
+**TypeScript API Types**:
+- Created `src/types/api.ts` with type-safe API contracts
+- Defined ServiceResult<T> base type
+- Defined all response data types (Health, Metrics, ServicesStatus, EmailQueue)
+- Defined all error metadata types (RateLimit, Timeout, CircuitBreaker, Network, Validation)
+- Provided helper functions: isRetryableError, isSuccess, isError, extractData
+
+#### Architecture Benefits
+
+1. **Self-Documenting**: OpenAPI spec provides machine-readable API contract
+2. **Type Safety**: TypeScript types prevent integration errors at compile time
+3. **Error Handling**: Comprehensive error documentation enables proper client handling
+4. **Integration Clarity**: Service contracts provide clear API interfaces
+5. **Best Practices**: Client handling guidelines and anti-patterns documented
+6. **Retry Behavior**: Exponential backoff algorithm documented with examples
+
+#### Documentation Files
+
+- ✅ Added: `docs/openapi.yaml` - OpenAPI 3.0 specification (550+ lines)
+- ✅ Added: `docs/service-contracts.md` - Service contracts documentation (600+ lines)
+- ✅ Added: `docs/error-responses.md` - Error response documentation (700+ lines)
+- ✅ Added: `src/types/api.ts` - TypeScript API types (350+ lines)
+
+#### Key Features
+
+1. **OpenAPI 3.0 Spec**: Complete API specification with security, servers, tags
+2. **Service Contracts**: Detailed documentation of all service interfaces and methods
+3. **Error Documentation**: Comprehensive error handling guide with client guidelines
+4. **TypeScript Types**: Type-safe API contracts with helper functions
+5. **Retry Behavior**: Documented exponential backoff algorithm with examples
+6. **Circuit Breaker**: Detailed circuit breaker state and behavior documentation
+7. **Rate Limiting**: Rate limit configurations and client handling documented
+8. **Code Examples**: TypeScript examples for all major operations
+
+#### Related Tasks
+
+- Task 112 (Email Service Documentation) - Email service API documentation
+- Task 113 (Auth Service Documentation) - Auth service API documentation
+- Task 169 (API Response Standardization) - ServiceResult<T> pattern
+- Task 229 (API Route Standardization) - ServiceResult<T> for API routes
 
 ## Security Configuration
 
