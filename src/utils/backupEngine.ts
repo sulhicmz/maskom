@@ -6,14 +6,55 @@ import {
   RestoreResult,
   BackupStatistics,
   BackupConfig,
-  BackupHealthStatus,
-  UserDataBackup,
-  ContentDataBackup,
-  SettingsDataBackup,
-  ActivityLogBackup,
 } from '@/types/backup'
 
-import { BACKUP_METADATA_KEY, BACKUP_DATA_KEY_PREFIX } from '@/types/backup'
+import {
+  generateBackupId,
+  calculateChecksum,
+  getBackupMetadataById,
+  calculateRetentionCompliance,
+} from './backupMetadata'
+
+import {
+  collectUserData,
+  collectContentData,
+  collectSettingsData,
+  collectActivityLogs,
+  calculateChangesSinceBackup,
+} from './backupDataCollector'
+
+import {
+  restoreUserData,
+  restoreContentData,
+  restoreSettingsData,
+  restoreActivityLogs,
+} from './backupRestorer'
+
+import {
+  saveBackupToStorage,
+  loadBackupFromStorage,
+  getBackupMetadataList,
+  getBackupMetadataListSync,
+  updateBackupMetadataList,
+  removeBackupFromMetadataList,
+  deleteBackupFromStorage,
+  exportBackupToFile,
+} from './backupStorage'
+
+import {
+  encryptData,
+  decryptData,
+} from './backupCrypto'
+
+import {
+  compressData,
+  decompressData,
+} from './backupCompression'
+
+import {
+  calculateStorageUsage,
+  calculateHealthStatus,
+} from './backupHealth'
 
 interface BackupProgress {
   current: number
@@ -25,9 +66,6 @@ type BackupProgressCallback = (progress: BackupProgress) => void
 
 const APPLICATION_VERSION = '1.0.0'
 const BACKUP_VERSION = '1.0.0'
-
-const STORAGE_QUOTA_WARNING_THRESHOLD = 0.8
-const STORAGE_QUOTA_ERROR_THRESHOLD = 0.95
 
 export class BackupEngine {
   private static instance: BackupEngine
@@ -50,7 +88,7 @@ export class BackupEngine {
         throw new Error('Backup operations require browser environment')
       }
 
-      const backupId = this.generateBackupId('full')
+      const backupId = generateBackupId('full')
       const timestamp = new Date().toISOString()
 
       onProgress?.({
@@ -59,7 +97,7 @@ export class BackupEngine {
         message: 'Collecting user data...',
       })
 
-      const userData = await this.collectUserData()
+      const userData = await collectUserData()
 
       onProgress?.({
         current: 2,
@@ -67,7 +105,7 @@ export class BackupEngine {
         message: 'Collecting content data...',
       })
 
-      const contentData = await this.collectContentData()
+      const contentData = await collectContentData()
 
       onProgress?.({
         current: 3,
@@ -75,7 +113,7 @@ export class BackupEngine {
         message: 'Collecting settings data...',
       })
 
-      const settingsData = await this.collectSettingsData()
+      const settingsData = await collectSettingsData()
 
       onProgress?.({
         current: 4,
@@ -83,7 +121,7 @@ export class BackupEngine {
         message: 'Collecting activity logs...',
       })
 
-      const activityLogs = await this.collectActivityLogs()
+      const activityLogs = await collectActivityLogs()
 
       const backupInfo: BackupInfo = {
         backupId,
@@ -114,15 +152,15 @@ export class BackupEngine {
       let serializedData = JSON.stringify(backupData)
 
       if (config.compressionEnabled) {
-        serializedData = await this.compressData(serializedData)
+        serializedData = await compressData(serializedData)
       }
 
-      let checksum = this.calculateChecksum(serializedData)
+      let checksum = calculateChecksum(serializedData)
 
       if (config.encryptionEnabled) {
-        const encrypted = await this.encryptData(serializedData)
+        const encrypted = await encryptData(serializedData)
         serializedData = encrypted
-        checksum = this.calculateChecksum(serializedData)
+        checksum = calculateChecksum(serializedData)
       }
 
       const backupSize = new Blob([serializedData]).size
@@ -142,15 +180,14 @@ export class BackupEngine {
         version: BACKUP_VERSION,
       }
 
-      await this.saveBackupToStorage(backupId, serializedData)
-
-      await this.updateBackupMetadataList(metadata)
+      await saveBackupToStorage(backupId, serializedData)
+      await updateBackupMetadataList(metadata)
 
       return metadata
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       const failedMetadata: BackupMetadata = {
-        id: this.generateBackupId('full'),
+        id: generateBackupId('full'),
         timestamp: new Date().toISOString(),
         type: 'full',
         size: 0,
@@ -162,7 +199,7 @@ export class BackupEngine {
         version: BACKUP_VERSION,
       }
 
-      await this.updateBackupMetadataList(failedMetadata)
+      await updateBackupMetadataList(failedMetadata)
 
       throw error
     }
@@ -182,7 +219,7 @@ export class BackupEngine {
         throw new Error('Cannot create incremental backup without a full backup')
       }
 
-      const backupId = this.generateBackupId('incremental')
+      const backupId = generateBackupId('incremental')
       const timestamp = new Date().toISOString()
 
       onProgress?.({
@@ -191,7 +228,7 @@ export class BackupEngine {
         message: 'Calculating changes since last backup...',
       })
 
-      const changes = await this.calculateChangesSinceBackup()
+      const changes = await calculateChangesSinceBackup()
 
       onProgress?.({
         current: 2,
@@ -230,15 +267,15 @@ export class BackupEngine {
       let serializedData = JSON.stringify(backupData)
 
       if (config.compressionEnabled) {
-        serializedData = await this.compressData(serializedData)
+        serializedData = await compressData(serializedData)
       }
 
-      let checksum = this.calculateChecksum(serializedData)
+      let checksum = calculateChecksum(serializedData)
 
       if (config.encryptionEnabled) {
-        const encrypted = await this.encryptData(serializedData)
+        const encrypted = await encryptData(serializedData)
         serializedData = encrypted
-        checksum = this.calculateChecksum(serializedData)
+        checksum = calculateChecksum(serializedData)
       }
 
       const backupSize = new Blob([serializedData]).size
@@ -258,9 +295,8 @@ export class BackupEngine {
         version: BACKUP_VERSION,
       }
 
-      await this.saveBackupToStorage(backupId, serializedData)
-
-      await this.updateBackupMetadataList(metadata)
+      await saveBackupToStorage(backupId, serializedData)
+      await updateBackupMetadataList(metadata)
 
       onProgress?.({
         current: 4,
@@ -272,7 +308,7 @@ export class BackupEngine {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       const failedMetadata: BackupMetadata = {
-        id: this.generateBackupId('incremental'),
+        id: generateBackupId('incremental'),
         timestamp: new Date().toISOString(),
         type: 'incremental',
         size: 0,
@@ -284,7 +320,7 @@ export class BackupEngine {
         version: BACKUP_VERSION,
       }
 
-      await this.updateBackupMetadataList(failedMetadata)
+      await updateBackupMetadataList(failedMetadata)
 
       throw error
     }
@@ -305,7 +341,7 @@ export class BackupEngine {
         message: 'Loading backup metadata...',
       })
 
-      const metadata = await this.getBackupMetadataById(backupId)
+      const metadata = await getBackupMetadataById(backupId)
 
       if (!metadata) {
         throw new Error(`Backup ${backupId} not found`)
@@ -321,7 +357,7 @@ export class BackupEngine {
         message: 'Loading backup data...',
       })
 
-      const backupDataString = await this.loadBackupFromStorage(backupId)
+      const backupDataString = await loadBackupFromStorage(backupId)
 
       if (!backupDataString) {
         throw new Error(`Backup data for ${backupId} not found`)
@@ -352,25 +388,25 @@ export class BackupEngine {
       const backupData: BackupData = JSON.parse(backupDataString)
 
       try {
-        await this.restoreUserData(backupData.userData, errors, warnings)
+        await restoreUserData(backupData.userData, errors, warnings)
       } catch (error) {
         errors.push(`Failed to restore user data: ${error}`)
       }
 
       try {
-        await this.restoreContentData(backupData.contentData, errors, warnings)
+        await restoreContentData(backupData.contentData, errors, warnings)
       } catch (error) {
         errors.push(`Failed to restore content data: ${error}`)
       }
 
       try {
-        await this.restoreSettingsData(backupData.settingsData, errors, warnings)
+        await restoreSettingsData(backupData.settingsData, errors, warnings)
       } catch (error) {
         errors.push(`Failed to restore settings data: ${error}`)
       }
 
       try {
-        await this.restoreActivityLogs(backupData.activityLogs, errors, warnings)
+        await restoreActivityLogs(backupData.activityLogs, errors, warnings)
       } catch (error) {
         errors.push(`Failed to restore activity logs: ${error}`)
       }
@@ -420,19 +456,19 @@ export class BackupEngine {
         return false
       }
 
-      const metadata = await this.getBackupMetadataById(backupId)
+      const metadata = await getBackupMetadataById(backupId)
 
       if (!metadata) {
         return false
       }
 
-      const backupData = await this.loadBackupFromStorage(backupId)
+      const backupData = await loadBackupFromStorage(backupId)
 
       if (!backupData) {
         return false
       }
 
-      const checksum = this.calculateChecksum(backupData)
+      const checksum = calculateChecksum(backupData)
 
       return checksum === metadata.checksum
     } catch {
@@ -441,184 +477,24 @@ export class BackupEngine {
   }
 
   async encryptData(data: string): Promise<string> {
-    try {
-      const encoder = new TextEncoder()
-      const dataBuffer = encoder.encode(data)
-
-      const key = await crypto.subtle.generateKey(
-        {
-          name: 'AES-GCM',
-          length: 256,
-        },
-        true,
-        ['encrypt', 'decrypt'],
-      )
-
-      const iv = crypto.getRandomValues(new Uint8Array(12))
-      const encryptedData = await crypto.subtle.encrypt(
-        {
-          name: 'AES-GCM',
-          iv,
-        },
-        key,
-        dataBuffer,
-      )
-
-      const keyBuffer = await crypto.subtle.exportKey('raw', key)
-      const encryptedDataUint8Array = new Uint8Array(encryptedData)
-      const combined = new Uint8Array(
-        iv.length + keyBuffer.byteLength + encryptedData.byteLength,
-      )
-      combined.set(iv, 0)
-      combined.set(new Uint8Array(keyBuffer), iv.length)
-      combined.set(encryptedDataUint8Array, iv.length + keyBuffer.byteLength)
-
-      const base64 = btoa(String.fromCharCode(...combined))
-
-      return `ENCRYPTED::${base64}`
-    } catch (error) {
-      console.error('Encryption failed:', error)
-      throw new Error('Failed to encrypt backup data')
-    }
+    return encryptData(data)
   }
 
   async decryptData(encryptedData: string): Promise<string> {
-    try {
-      if (!encryptedData.startsWith('ENCRYPTED::')) {
-        return encryptedData
-      }
-
-      const base64 = encryptedData.replace('ENCRYPTED::', '')
-      const binaryString = atob(base64)
-      const combined = new Uint8Array(binaryString.length)
-
-      for (let i = 0; i < binaryString.length; i++) {
-        combined[i] = binaryString.charCodeAt(i)
-      }
-
-      const iv = combined.slice(0, 12)
-      const keyBuffer = combined.slice(12, 44)
-      const dataBuffer = combined.slice(44)
-
-      const key = await crypto.subtle.importKey(
-        'raw',
-        keyBuffer,
-        {
-          name: 'AES-GCM',
-          length: 256,
-        },
-        true,
-        ['decrypt'],
-      )
-
-      const decryptedData = await crypto.subtle.decrypt(
-        {
-          name: 'AES-GCM',
-          iv,
-        },
-        key,
-        dataBuffer,
-      )
-
-      const decoder = new TextDecoder()
-      return decoder.decode(decryptedData)
-    } catch (error) {
-      console.error('Decryption failed:', error)
-      throw new Error('Failed to decrypt backup data')
-    }
+    return decryptData(encryptedData)
   }
 
   async compressData(data: string): Promise<string> {
-    try {
-      const encoder = new TextEncoder()
-      const dataBuffer = encoder.encode(data)
-
-      const compressedStream = new CompressionStream('gzip')
-      const writer = compressedStream.writable.getWriter()
-
-      await writer.write(dataBuffer)
-      await writer.close()
-
-      const reader = compressedStream.readable.getReader()
-      const chunks: Uint8Array[] = []
-
-      let result = await reader.read()
-      while (!result.done) {
-        if (result.value) {
-          chunks.push(result.value)
-        }
-        result = await reader.read()
-      }
-
-      const combined = new Uint8Array(
-        chunks.reduce((total, chunk) => total + chunk.length, 0),
-      )
-      let offset = 0
-      for (const chunk of chunks) {
-        combined.set(chunk, offset)
-        offset += chunk.length
-      }
-
-      const base64 = btoa(String.fromCharCode(...combined))
-
-      return `COMPRESSED::${base64}`
-    } catch (error) {
-      console.error('Compression failed:', error)
-      throw new Error('Failed to compress backup data')
-    }
+    return compressData(data)
   }
 
   async decompressData(compressedData: string): Promise<string> {
-    try {
-      if (!compressedData.startsWith('COMPRESSED::')) {
-        return compressedData
-      }
-
-      const base64 = compressedData.replace('COMPRESSED::', '')
-      const binaryString = atob(base64)
-      const compressed = new Uint8Array(binaryString.length)
-
-      for (let i = 0; i < binaryString.length; i++) {
-        compressed[i] = binaryString.charCodeAt(i)
-      }
-
-      const decompressedStream = new DecompressionStream('gzip')
-      const writer = decompressedStream.writable.getWriter()
-
-      await writer.write(compressed)
-      await writer.close()
-
-      const reader = decompressedStream.readable.getReader()
-      const chunks: Uint8Array[] = []
-
-      let result = await reader.read()
-      while (!result.done) {
-        if (result.value) {
-          chunks.push(result.value)
-        }
-        result = await reader.read()
-      }
-
-      const combined = new Uint8Array(
-        chunks.reduce((total, chunk) => total + chunk.length, 0),
-      )
-      let offset = 0
-      for (const chunk of chunks) {
-        combined.set(chunk, offset)
-        offset += chunk.length
-      }
-
-      const decoder = new TextDecoder()
-      return decoder.decode(combined)
-    } catch (error) {
-      console.error('Decompression failed:', error)
-      throw new Error('Failed to decompress backup data')
-    }
+    return decompressData(compressedData)
   }
 
   async getBackupStatistics(): Promise<BackupStatistics> {
     try {
-      const metadataList = await this.getBackupMetadataList()
+      const metadataList = await getBackupMetadataList()
 
       const totalBackups = metadataList.length
       const completedBackups = metadataList.filter(
@@ -639,8 +515,8 @@ export class BackupEngine {
             )[0]
           : null
 
-      const storageUsage = this.calculateStorageUsage()
-      const healthStatus = this.calculateHealthStatus(
+      const storageUsage = calculateStorageUsage()
+      const healthStatus = calculateHealthStatus(
         storageUsage,
         failedBackups.length,
       )
@@ -652,7 +528,7 @@ export class BackupEngine {
         totalBackupSize,
         lastBackupDate: lastBackup ? lastBackup.timestamp : null,
         lastBackupStatus: lastBackup ? lastBackup.status : 'pending',
-        retentionCompliance: this.calculateRetentionCompliance(completedBackups),
+        retentionCompliance: calculateRetentionCompliance(completedBackups),
         healthStatus,
       }
     } catch (error) {
@@ -671,401 +547,23 @@ export class BackupEngine {
   }
 
   async deleteBackup(backupId: string): Promise<boolean> {
-    try {
-      if (typeof window === 'undefined') {
-        return false
-      }
-
-      const storageKey = `${BACKUP_DATA_KEY_PREFIX}${backupId}`
-
-      await this.removeBackupFromMetadataList(backupId)
-      localStorage.removeItem(storageKey)
-
-      return true
-    } catch (error) {
-      console.error('Failed to delete backup:', error)
-      return false
-    }
+    return deleteBackupFromStorage(backupId)
   }
 
   async exportBackupToFile(
     backupId: string,
   ): Promise<Blob | null> {
-    try {
-      if (typeof window === 'undefined') {
-        return null
-      }
-
-      const backupData = await this.loadBackupFromStorage(backupId)
-
-      if (!backupData) {
-        return null
-      }
-
-      const blob = new Blob([backupData], { type: 'application/json' })
-
-      return blob
-    } catch (error) {
-      console.error('Failed to export backup:', error)
-      return null
-    }
-  }
-
-  private generateBackupId(type: BackupType): string {
-    const date = new Date().toISOString().split('T')[0]
-    const random = Math.random().toString(36).substring(2, 8)
-    return `backup-${date}-${type}-${random}`
-  }
-
-  private calculateChecksum(data: string): string {
-    let hash = 0
-
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash
-    }
-
-    return Math.abs(hash).toString(16).padStart(32, '0')
-  }
-
-  private calculateStorageUsage(): number {
-    try {
-      if (typeof window === 'undefined') {
-        return 0
-      }
-
-      const metadataList = this.getBackupMetadataListSync()
-      const totalSize = metadataList.reduce((sum, backup) => sum + backup.size, 0)
-
-      const quotaEstimate = 5 * 1024 * 1024 * 1024
-
-      return totalSize / quotaEstimate
-    } catch {
-      return 0
-    }
-  }
-
-  private calculateHealthStatus(
-    storageUsage: number,
-    failedCount: number,
-  ): BackupHealthStatus {
-    if (storageUsage > STORAGE_QUOTA_ERROR_THRESHOLD || failedCount > 5) {
-      return 'critical'
-    }
-
-    if (
-      storageUsage > STORAGE_QUOTA_WARNING_THRESHOLD ||
-      failedCount > 2
-    ) {
-      return 'warning'
-    }
-
-    return 'healthy'
-  }
-
-  private calculateRetentionCompliance(backups: BackupMetadata[]): number {
-    if (backups.length === 0) {
-      return 100
-    }
-
-    const now = new Date()
-    const expiredCount = backups.filter((backup) => {
-      const backupDate = new Date(backup.timestamp)
-      const retentionDays = parseInt(backup.retention.split(' ')[0])
-      const expiryDate = new Date(
-        backupDate.getTime() + retentionDays * 24 * 60 * 60 * 1000,
-      )
-      return now > expiryDate
-    }).length
-
-    return ((backups.length - expiredCount) / backups.length) * 100
-  }
-
-  private async collectUserData(): Promise<UserDataBackup> {
-    return {
-      authState: [],
-      preferences: [],
-      mfaSettings: [],
-    }
-  }
-
-  private async collectContentData(): Promise<ContentDataBackup> {
-    return {
-      blogPosts: [],
-      blogComments: [],
-      mediaAssets: [],
-    }
-  }
-
-  private async collectSettingsData(): Promise<SettingsDataBackup> {
-    return {
-      cacheConfig: {
-        cacheFirstExtensions: [],
-        networkFirstPatterns: [],
-        cacheTTL: {
-          staticAssets: 0,
-          apiResponses: 0,
-          images: 0,
-          fonts: 0,
-        },
-        cacheSizeLimit: 0,
-        cleanupPolicy: {
-          enabled: false,
-          maxAge: 0,
-          maxEntries: 0,
-          autoCleanupInterval: 0,
-        },
-      },
-      apmConfig: {
-        provider: 'none',
-        enabled: false,
-        environment: 'development',
-        sampleRate: 0,
-      },
-      rbacConfig: {
-        roles: {
-          admin: [],
-          editor: [],
-          user: [],
-        },
-        permissions: {
-          view_analytics: [],
-          manage_users: [],
-          manage_roles: [],
-          manage_content: [],
-          publish_content: [],
-          edit_content: [],
-          delete_content: [],
-          view_admin_dashboard: [],
-          manage_settings: [],
-        },
-      },
-      backupConfig: {
-        enabled: false,
-        schedule: 'manual',
-        time: '00:00',
-        retentionDays: 0,
-        storageType: 'none',
-        encryptionEnabled: false,
-        compressionEnabled: false,
-        retentionPolicy: {
-          keepLastCount: 0,
-          keepDailyFor: 0,
-          keepWeeklyFor: 0,
-          keepMonthlyFor: 0,
-          maxSizeGB: 0,
-        },
-      },
-    }
-  }
-
-  private async collectActivityLogs() {
-    return []
-  }
-
-  private async calculateChangesSinceBackup(): Promise<Omit<BackupData, 'backupInfo'>> {
-    return {
-      userData: {
-        authState: [],
-        preferences: [],
-        mfaSettings: [],
-      },
-      contentData: {
-        blogPosts: [],
-        blogComments: [],
-        mediaAssets: [],
-      },
-      settingsData: {
-        cacheConfig: {
-          cacheFirstExtensions: [],
-          networkFirstPatterns: [],
-          cacheTTL: {
-            staticAssets: 0,
-            apiResponses: 0,
-            images: 0,
-            fonts: 0,
-          },
-          cacheSizeLimit: 0,
-          cleanupPolicy: {
-            enabled: false,
-            maxAge: 0,
-            maxEntries: 0,
-            autoCleanupInterval: 0,
-          },
-        },
-        apmConfig: {
-          provider: 'none',
-          enabled: false,
-          environment: 'development',
-          sampleRate: 0,
-        },
-        rbacConfig: {
-          roles: {
-            admin: [],
-            editor: [],
-            user: [],
-          },
-          permissions: {
-            view_analytics: [],
-            manage_users: [],
-            manage_roles: [],
-            manage_content: [],
-            publish_content: [],
-            edit_content: [],
-            delete_content: [],
-            view_admin_dashboard: [],
-            manage_settings: [],
-          },
-        },
-        backupConfig: {
-          enabled: false,
-          schedule: 'manual',
-          time: '00:00',
-          retentionDays: 0,
-          storageType: 'none',
-          encryptionEnabled: false,
-          compressionEnabled: false,
-          retentionPolicy: {
-            keepLastCount: 0,
-            keepDailyFor: 0,
-            keepWeeklyFor: 0,
-            keepMonthlyFor: 0,
-            maxSizeGB: 0,
-          },
-        },
-      },
-      activityLogs: [],
-    }
-  }
-
-  private async restoreUserData(userData: UserDataBackup, errors: string[], warnings: string[]) {
-    warnings.push('User data restoration not yet implemented')
-  }
-
-  private async restoreContentData(contentData: ContentDataBackup, errors: string[], warnings: string[]) {
-    warnings.push('Content data restoration not yet implemented')
-  }
-
-  private async restoreSettingsData(settingsData: SettingsDataBackup, errors: string[], warnings: string[]) {
-    warnings.push('Settings data restoration not yet implemented')
-  }
-
-  private async restoreActivityLogs(activityLogs: ActivityLogBackup[], errors: string[], warnings: string[]) {
-    warnings.push('Activity logs restoration not yet implemented')
-  }
-
-  private async saveBackupToStorage(
-    backupId: string,
-    data: string,
-  ): Promise<void> {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const storageKey = `${BACKUP_DATA_KEY_PREFIX}${backupId}`
-
-    try {
-      localStorage.setItem(storageKey, data)
-    } catch (error) {
-      console.error('Failed to save backup to storage:', error)
-      throw new Error('Storage quota exceeded or error saving backup')
-    }
-  }
-
-  private async loadBackupFromStorage(
-    backupId: string,
-  ): Promise<string | null> {
-    if (typeof window === 'undefined') {
-      return null
-    }
-
-    const storageKey = `${BACKUP_DATA_KEY_PREFIX}${backupId}`
-
-    try {
-      const data = localStorage.getItem(storageKey)
-      return data
-    } catch {
-      return null
-    }
+    return exportBackupToFile(backupId)
   }
 
   public async getBackupMetadataList(): Promise<BackupMetadata[]> {
-    try {
-      if (typeof window === 'undefined') {
-        return []
-      }
-
-      const metadataList = localStorage.getItem(BACKUP_METADATA_KEY)
-
-      if (!metadataList) {
-        return []
-      }
-
-      const parsed: BackupMetadata[] = JSON.parse(metadataList)
-      return parsed
-    } catch {
-      return []
-    }
-  }
-
-  private getBackupMetadataListSync(): BackupMetadata[] {
-    try {
-      if (typeof window === 'undefined') {
-        return []
-      }
-
-      const metadataList = localStorage.getItem(BACKUP_METADATA_KEY)
-
-      if (!metadataList) {
-        return []
-      }
-
-      const parsed: BackupMetadata[] = JSON.parse(metadataList)
-      return parsed
-    } catch {
-      return []
-    }
-  }
-
-  private async updateBackupMetadataList(
-    metadata: BackupMetadata,
-  ): Promise<void> {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    try {
-      const currentList = await this.getBackupMetadataList()
-      const updatedList = [metadata, ...currentList]
-      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(updatedList))
-    } catch (error) {
-      console.error('Failed to update backup metadata list:', error)
-    }
-  }
-
-  private async removeBackupFromMetadataList(
-    backupId: string,
-  ): Promise<void> {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    try {
-      const currentList = await this.getBackupMetadataList()
-      const updatedList = currentList.filter((m) => m.id !== backupId)
-      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(updatedList))
-    } catch (error) {
-      console.error('Failed to remove backup from metadata list:', error)
-    }
+    return getBackupMetadataList()
   }
 
   public async getBackupMetadataById(
     backupId: string,
   ): Promise<BackupMetadata | null> {
-    const metadataList = await this.getBackupMetadataList()
-
-    return metadataList.find((m) => m.id === backupId) || null
+    return getBackupMetadataById(backupId)
   }
 }
 
