@@ -44846,3 +44846,385 @@ Implement production-ready integration hardening with service-specific configura
 
 2026-01-19
 
+
+---
+
+## Task 308: [CONTENT MODERATOR] Blog Comment Moderation Dashboard (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Content Management - Feature Foundation
+**Effort**: Medium (4-5 hours)
+
+### Purpose
+
+Implement centralized comment moderation dashboard to enable FEATURE-047 (Blog Comment Moderation Dashboard) and efficient content quality management.
+
+### Implementation
+
+#### Phase 1: Moderation Dashboard Data Model
+- [ ] Extend BlogCommentItem with moderation fields
+  - moderationStatus: 'pending' | 'approved' | 'rejected' | 'spam'
+  - moderatedAt: ISO 8601 date string
+  - moderatedBy: userId (who approved/rejected)
+
+#### Phase 2: Moderation Dashboard UI
+- [ ] Create src/app/admin/comments/page.tsx
+  - Comments table with status indicators
+  - Bulk action buttons (approve, reject, mark as spam)
+  - Comment content preview on hover/expand
+  - Status filter dropdown (pending, approved, rejected, spam)
+  - Pagination for large comment volumes
+
+#### Phase 3: Moderation Actions
+- [ ] Create moderation utilities in src/utils/moderation.ts
+  - approveComment() - Change status to 'approved'
+  - rejectComment() - Change status to 'rejected'
+  - markAsSpam() - Change status to 'spam'
+  - bulkModerateComments() - Batch moderation operations
+
+#### Phase 4: Email Notifications (Optional)
+- [ ] Email notification for new comments
+  - Email template for new comment alerts
+  - Daily digest option for moderation queue
+  - Integration with EmailService
+
+#### Phase 5: Statistics Dashboard
+- [ ] Comment statistics component
+  - Total comments count
+  - Pending comments count
+  - Approved comments count
+  - Rejected/Spam comments count
+  - Moderation rate calculation
+
+#### Phase 6: Testing
+- [ ] Create comprehensive tests
+  - Moderation status transitions
+  - Bulk moderation operations
+  - Filtering and pagination
+  - Email notification triggers
+
+### Success Criteria
+
+- [ ] BlogCommentItem extended with moderation fields
+- [ ] Moderation dashboard UI created at /admin/comments
+- [ ] Moderation utilities implemented
+- [ ] Bulk actions functional
+- [ ] Email notifications configured (optional)
+- [ ] Statistics dashboard implemented
+- [ ] Comprehensive test coverage
+- [ ] All tests passing with zero regressions
+
+### Related Files
+
+- ✅ Extend: `src/types/data/blog.ts` - BlogCommentItem interface
+- ✅ Add: `src/app/admin/comments/page.tsx` - Moderation dashboard
+- ✅ Add: `src/components/admin/CommentModerationDashboard.tsx` - Dashboard component
+- ✅ Add: `src/utils/moderation.ts` - Moderation utilities
+- ✅ Add: `src/utils/__tests__/moderation.test.ts` - Tests
+
+---
+
+## Task 309: [DATA EXPORTER] Content Performance Analytics Export (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Analytics/Export - Feature Foundation
+**Effort**: Medium (3-4 hours)
+
+### Purpose
+
+Implement content performance analytics export functionality to enable FEATURE-048 (Content Performance Analytics Export) and offline data analysis.
+
+### Implementation
+
+#### Phase 1: Export Data Preparation
+- [ ] Create src/utils/performanceExport.ts
+  - preparePerformanceDataForPDF() - Format data for jsPDF
+  - preparePerformanceDataForCSV() - Format data for CSV
+  - addExportMetadata() - Add export date, filters, creator name
+
+#### Phase 2: PDF Export
+- [ ] Create PDF export functionality
+  - Use jsPDF library (existing dependency)
+  - Generate charts in PDF (using Chart.js or simple drawing)
+  - Include performance metrics tables
+  - Add metadata page (export date, filters, creator name)
+
+#### Phase 3: CSV Export
+- [ ] Create CSV export functionality
+  - Use existing exportUtils.ts patterns
+  - Export raw data with column headers
+  - Include metadata rows
+  - Handle special characters and CSV escaping
+
+#### Phase 4: UI Integration
+- [ ] Add export controls to content performance dashboard
+  - Export button with format dropdown (PDF, CSV, JSON)
+  - Date range selector
+  - Email export option (send to stakeholders)
+  - Export progress indicator
+
+#### Phase 5: Testing
+- [ ] Create comprehensive tests
+  - PDF generation with charts and tables
+  - CSV generation with proper formatting
+  - Metadata inclusion
+  - Export progress tracking
+
+### Success Criteria
+
+- [ ] performanceExport.ts utility created with all functions
+- [ ] PDF export functional with charts and tables
+- [ ] CSV export functional with proper formatting
+- [ ] Export UI controls added to content performance dashboard
+- [ ] Date range selector working
+- [ ] Email export option functional
+- [ ] Comprehensive test coverage
+- [ ] All tests passing with zero regressions
+
+### Related Files
+
+- ✅ Add: `src/utils/performanceExport.ts` - Export utilities
+- ✅ Modify: `src/components/admin/ContentPerformanceDashboard.tsx` - Export controls
+- ✅ Add: `src/components/admin/ExportControls.tsx` - Export UI component
+- ✅ Add: `src/utils/__tests__/performanceExport.test.ts` - Tests
+
+---
+
+## Task 310: [AI/UX ENGINEER] Recommendation Feedback System (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: AI/UX - Feature Foundation
+**Effort**: Medium (4-5 hours)
+
+### Purpose
+
+Implement recommendation feedback system to enable FEATURE-049 (Recommendation Feedback System) and improve personalization algorithm.
+
+### Implementation
+
+#### Phase 1: Feedback Data Model
+- [ ] Create src/types/recommendation.ts
+  - RecommendationFeedback interface (postId, rating, timestamp)
+  - FeedbackRating type: 'helpful' | 'not-helpful' | 'not-interested'
+
+#### Phase 2: Feedback Storage
+- [ ] Create src/utils/recommendationFeedback.ts
+  - recordFeedback() - Store feedback with timestamp
+  - getFeedbackHistory() - Retrieve feedback history
+  - getFeedbackForPost() - Get feedback for specific post
+  - clearFeedbackHistory() - User privacy option
+  - localStorage persistence (90-day expiration)
+
+#### Phase 3: Feedback Aggregation
+- [ ] Create aggregation utilities
+  - calculateAggregateScore() - Weighted score calculation
+  - getTopRatedPosts() - Sort by aggregate feedback
+  - updateRecommendationWeights() - Adjust algorithm based on feedback
+
+#### Phase 4: UI Components
+- [ ] Create feedback buttons component
+  - Helpful/Not Helpful buttons on recommended posts
+  - "Show less like this" option
+  - Feedback confirmation toast
+  - Visual indicators for posts with feedback
+
+#### Phase 5: Integration with Recommendation Engine
+- [ ] Update src/utils/contentRecommender.ts
+  - Incorporate feedback into scoring algorithm
+  - Downweight posts with negative feedback
+  - Prioritize posts with positive feedback
+  - Fallback to trending posts for new users (no feedback)
+
+#### Phase 6: Privacy Features
+- [ ] Add privacy controls
+  - "Reset recommendations" button
+  - Clear feedback history option
+  - Data export for GDPR compliance
+  - No tracking beyond localStorage
+
+#### Phase 7: Testing
+- [ ] Create comprehensive tests
+  - Feedback recording and retrieval
+  - Aggregation score calculation
+  - Recommendation weight updates
+  - Privacy controls functionality
+
+### Success Criteria
+
+- [ ] RecommendationFeedback types defined
+- [ ] recommendationFeedback.ts utility created
+- [ ] Feedback aggregation implemented
+- [ ] Feedback UI components created
+- [ ] Recommendation engine updated with feedback
+- [ ] Privacy controls implemented
+- [ ] Comprehensive test coverage
+- [ ] All tests passing with zero regressions
+
+### Related Files
+
+- ✅ Add: `src/types/recommendation.ts` - Feedback types
+- ✅ Add: `src/utils/recommendationFeedback.ts` - Feedback utilities
+- ✅ Modify: `src/utils/contentRecommender.ts` - Feedback integration
+- ✅ Add: `src/components/blogs/RecommendationFeedback.tsx` - Feedback UI
+- ✅ Add: `src/utils/__tests__/recommendationFeedback.test.ts` - Tests
+
+---
+
+## Task 311: [COLLABORATION ENGINEER] Collaborative Draft Preview (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Collaboration/UX - Feature Foundation
+**Effort**: Medium (5-6 hours)
+
+### Purpose
+
+Implement real-time collaborative draft preview to enable FEATURE-050 (Collaborative Draft Preview) and improve multi-user editing experience.
+
+### Implementation
+
+#### Phase 1: Preview State Management
+- [ ] Create src/utils/collaborativePreview.ts
+  - getPreviewState() - Get current draft content
+  - subscribeToPreviewUpdates() - WebSocket/polling for real-time updates
+  - unsubscribeFromPreview() - Cleanup subscription
+  - compareWithSavedVersion() - Diff unsaved vs saved
+
+#### Phase 2: Preview Modal Component
+- [ ] Create src/components/blogs/CollaborativePreviewModal.tsx
+  - Live preview modal with real-time updates
+  - Active editor indicators (avatars, names)
+  - Cursor position tracking for collaborators
+  - "Publish from Preview" button
+  - "Close" button to return to editor
+
+#### Phase 3: Version Comparison in Preview
+- [ ] Add version comparison features
+  - Diff view: unsaved vs last saved
+  - Highlight added content (green)
+  - Highlight removed content (red)
+  - Line-by-line comparison
+  - "Accept Changes" button
+
+#### Phase 4: Mobile Support
+- [ ] Make preview mobile-responsive
+  - Responsive layout for small screens
+  - Touch-friendly controls
+  - Collapse/expand editor list on mobile
+  - Optimize preview rendering for mobile
+
+#### Phase 5: Integration with Collaborative Editing
+- [ ] Integrate with existing collaboration infrastructure (Task 305)
+  - Subscribe to draft updates
+  - Display active editors from CollaborationService
+  - Sync preview with real-time edits
+  - Handle connection state changes
+
+#### Phase 6: Testing
+- [ ] Create comprehensive tests
+  - Preview state management
+  - Real-time updates subscription
+  - Version comparison
+  - Mobile responsiveness
+  - Integration with CollaborationService
+
+### Success Criteria
+
+- [ ] collaborativePreview.ts utility created
+- [ ] CollaborativePreviewModal component created
+- [ ] Version comparison implemented
+- [ ] Mobile support working
+- [ ] Integration with CollaborationService complete
+- [ ] Comprehensive test coverage
+- [ ] All tests passing with zero regressions
+
+### Related Files
+
+- ✅ Add: `src/utils/collaborativePreview.ts` - Preview utilities
+- ✅ Add: `src/components/blogs/CollaborativePreviewModal.tsx` - Preview modal
+- ✅ Modify: `src/components/blogs/BlogForm.tsx` - Preview button integration
+- ✅ Add: `src/utils/__tests__/collaborativePreview.test.ts` - Tests
+
+---
+
+## Task 312: [AI/ML ENGINEER] Content Insights Historical Comparison (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: AI/Analytics - Feature Foundation
+**Effort**: Medium (4-5 hours)
+
+### Purpose
+
+Implement historical comparison for content insights to enable FEATURE-051 (Content Insights Historical Comparison) and track improvement trends.
+
+### Implementation
+
+#### Phase 1: Version Insights Data Model
+- [ ] Create src/types/versionInsights.ts
+  - VersionInsight interface (versionId, readabilityScore, seoScore, qualityScore, timestamp)
+  - InsightComparison interface (before, after, changes)
+
+#### Phase 2: Historical Insights Storage
+- [ ] Create src/utils/versionInsights.ts
+  - saveVersionInsights() - Store insights for version
+  - getVersionInsights() - Retrieve insights for version
+  - getInsightsHistory() - Get insights across multiple versions
+  - compareVersions() - Calculate changes between versions
+
+#### Phase 3: Comparison Algorithm
+- [ ] Create comparison utilities
+  - calculateScoreDelta() - Calculate score changes
+  - identifyImprovements() - Detect positive changes
+  - identifyDegradations() - Detect negative changes
+  - generateTrendData() - Create trend visualization data
+
+#### Phase 4: UI Components
+- [ ] Create VersionInsightsComparison component
+  - Version selector dropdown (up to 5 versions)
+  - Side-by-side insights display
+  - Score comparison with highlighting (green for improvement, red for degradation)
+  - Trend visualization (line chart for score over time)
+  - Before/after statistics display
+  - "Export comparison" as PDF button
+
+#### Phase 5: Integration with Content Insights
+- [ ] Integrate with existing content insights (Task 306)
+  - Read insights from readability.ts, seo.ts, quality.ts
+  - Store version insights when draft is saved
+  - Update comparison when new version is created
+  - Display trends in ContentInsightsPanel
+
+#### Phase 6: Testing
+- [ ] Create comprehensive tests
+  - Version insights storage and retrieval
+  - Comparison algorithm accuracy
+  - Score delta calculations
+  - Trend data generation
+  - UI component rendering
+
+### Success Criteria
+
+- [ ] VersionInsight types defined
+- [ ] versionInsights.ts utility created
+- [ ] Comparison algorithm implemented
+- [ ] VersionInsightsComparison component created
+- [ ] Integration with ContentInsightsPanel complete
+- [ ] PDF export for comparison working
+- [ ] Comprehensive test coverage
+- [ ] All tests passing with zero regressions
+
+### Related Files
+
+- ✅ Add: `src/types/versionInsights.ts` - Insights types
+- ✅ Add: `src/utils/versionInsights.ts` - Historical insights utilities
+- ✅ Modify: `src/components/blogs/insights/ContentInsightsPanel.tsx` - Integration
+- ✅ Add: `src/components/blogs/insights/VersionInsightsComparison.tsx` - Comparison UI
+- ✅ Add: `src/utils/__tests__/versionInsights.test.ts` - Tests
+
+---
+
+**Last Updated**: 2026-01-19

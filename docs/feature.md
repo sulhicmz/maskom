@@ -1883,3 +1883,171 @@ As a Site Administrator, I want to create and manage custom user groups with spe
 - Integrates with AuthService for group membership checks
 - Leverages existing validation layer for group data
 - GDPR compliant with group membership tracking
+
+---
+
+## [FEATURE-047] Blog Comment Moderation Dashboard
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management/Admin
+
+### User Story
+
+As a Content Moderator/Admin, I want to view and moderate blog comments in a centralized dashboard, so that I can efficiently manage comment quality and approve/reject inappropriate content without visiting individual posts.
+
+### Acceptance Criteria
+
+- [ ] Create moderation dashboard route (/admin/comments)
+- [ ] Display all pending comments in a table view
+- [ ] Add bulk actions (approve, reject, mark as spam)
+- [ ] Implement comment content preview on hover or expand
+- [ ] Add filtering by status (pending, approved, rejected, spam)
+- [ ] Add comment statistics (total, pending, approved, rejected)
+- [ ] Email notifications for new comments (optional)
+- [ ] Add tests for moderation functionality
+- [ ] Update docs/blueprint.md with moderation architecture
+
+**Implementation Notes**:
+- Leverages existing BlogCommentData (src/data/BlogCommentData.ts) with moderationStatus field
+- Extends FEATURE-030 (Advanced Blog Comment System) with centralized moderation
+- Integrates with RBAC system (FEATURE-013) - Admins and editors can moderate
+- Uses existing validation layer for comment content checks
+- Applies real-time data updates via polling or WebSocket
+- Ready for future AI-powered spam detection integration
+
+---
+
+## [FEATURE-048] Content Performance Analytics Export
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Analytics/Content Management
+
+### User Story
+
+As a Content Creator, I want to export content performance analytics as PDF/CSV, so that I can create reports for stakeholders and analyze trends offline.
+
+### Acceptance Criteria
+
+- [ ] Add export button to content performance dashboard
+- [ ] Implement PDF export with charts and graphs
+- [ ] Implement CSV export for raw data analysis
+- [ ] Add date range selector for exports
+- [ ] Include metadata in exported files (export date, filters applied, creator name)
+- [ ] Add export format selection (PDF, CSV, JSON)
+- [ ] Implement email export option (send to stakeholders)
+- [ ] Add tests for export functionality
+- [ ] Update docs/blueprint.md with export architecture
+
+**Implementation Notes**:
+- Extends FEATURE-042 (Content Performance Analytics) with export capabilities
+- Leverages existing export utilities (exportUtils.ts) from FEATURE-020
+- Reuses jsPDF library from blog content export implementation
+- Integrates with ThemeContext for dark mode support in PDF exports
+- Applies data validation for export parameters
+- RBAC integration for creator-level export permissions
+
+---
+
+## [FEATURE-049] Recommendation Feedback System
+
+**Status**: Pending
+**Priority**: P3
+**Type**: UX/Engagement
+
+### User Story
+
+As a Blog Reader, I want to provide feedback on recommended content (helpful/not helpful), so that recommendation algorithm can improve personalization based on my preferences.
+
+### Acceptance Criteria
+
+- [ ] Add feedback buttons to recommended blog posts (helpful, not helpful)
+- [ ] Store feedback in localStorage with timestamp
+- [ ] Implement feedback aggregation for algorithm improvement
+- [ ] Add "Show less like this" option for disinterest signals
+- [ ] Display feedback confirmation to user
+- [ ] Update recommendations based on feedback signals
+- [ ] Add "Reset recommendations" option for privacy
+- [ ] Add tests for feedback system
+- [ ] Update docs/blueprint.md with feedback architecture
+
+**Implementation Notes**:
+- Extends FEATURE-043 (Smart Content Recommendations) with feedback loop
+- Leverages existing readingHistory.ts for user engagement tracking
+- Uses localStorage for privacy-first feedback storage
+- Applies weighted scoring algorithm (positive feedback +2, negative feedback -1)
+- Integrates with existing validation layer for feedback data
+- Privacy-focused: No user tracking, local storage only
+- Ready for future collaborative filtering integration
+
+---
+
+## [FEATURE-050] Collaborative Draft Preview
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Content Management/Collaboration
+
+### User Story
+
+As a Content Creator, I want to preview draft blog posts while collaborators are editing, so that I can see latest changes in real-time without publishing or saving.
+
+### Acceptance Criteria
+
+- [ ] Add "Live Preview" button to collaborative editing mode
+- [ ] Create preview modal that reflects real-time changes
+- [ ] Sync preview content with collaborative editor via WebSocket/polling
+- [ ] Display active editor indicators in preview
+- [ ] Add "Publish from Preview" option
+- [ ] Implement version comparison in preview (show unsaved vs last saved)
+- [ ] Add mobile-responsive preview view
+- [ ] Add tests for preview functionality
+- [ ] Update docs/blueprint.md with preview architecture
+
+**Implementation Notes**:
+- Extends FEATURE-044 (Collaborative Editing with Real-Time Sync) with live preview
+- Leverages existing VersionHistoryPanel (FEATURE-034) for version comparison
+- Integrates with existing ThemeContext for dark mode preview
+- Uses existing BlogForm preview patterns from FEATURE-029
+- Applies real-time sync patterns from collaborative editing infrastructure
+- RBAC integration: Only editors/admins can access collaborative preview
+- Ready for future A/B testing integration (preview variations)
+
+---
+
+## [FEATURE-051] Content Insights Historical Comparison
+
+**Status**: Pending
+**Priority**: P3
+**Type**: AI/Content Management
+
+### User Story
+
+As a Content Creator, I want to compare content insights across multiple versions of a post, so that I can track how my improvements have affected readability and SEO scores over time.
+
+### Acceptance Criteria
+
+- [ ] Add version comparison selector to content insights panel
+- [ ] Display insights for up to 5 versions side-by-side
+- [ ] Highlight improvements (green) and degradations (red)
+- [ ] Show insight score trends (readability, SEO, quality) over time
+- [ ] Add "Export comparison" as PDF feature
+- [ ] Implement improvement recommendations based on trends
+- [ ] Display before/after statistics (word count, reading time, score changes)
+- [ ] Add tests for comparison functionality
+- [ ] Update docs/blueprint.md with comparison architecture
+
+**Implementation Notes**:
+- Extends FEATURE-034 (Content Version Control & History) with insights comparison
+- Extends FEATURE-045 (Automated Content Insights) with historical analysis
+- Leverages existing versionStorage.ts for version data retrieval
+- Uses existing readability, SEO, and quality algorithms
+- Applies diff visualization patterns from VersionHistoryPanel
+- Integrates with ThemeContext for dark mode support
+- RBAC integration: Editors can view their content comparisons
+- Privacy-focused: Only compares own content versions
+
+---
+
+**Last Updated**: 2026-01-19
