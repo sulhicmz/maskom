@@ -1,5 +1,288 @@
 # Architecture Task Tracking
 
+## Task 348: [REFACTOR] Extract Common Drill Execution Pattern in DrillEngine (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Code Refactoring (Extract Method)
+**Effort**: Medium (2-3 hours)
+
+### Purpose
+
+Extract common drill execution pattern from `runFullRestoreDrill`, `runPartialRestoreDrill`, and `runIntegrityCheckDrill` methods to eliminate code duplication and improve maintainability.
+
+### Problem Identified
+
+**Duplicate Drill Execution Pattern**:
+- `runFullRestoreDrill` (lines 45-189): ~145 lines
+- `runPartialRestoreDrill` (lines 195-347): ~153 lines
+- `runIntegrityCheckDrill` (lines 358-465): ~108 lines
+- All three methods follow similar pattern:
+  1. Generate drill ID
+  2. Create drill object with startedAt timestamp
+  3. Execute drill-specific logic (restore/integrity check)
+  4. Calculate duration
+  5. Create drill results object
+  6. Handle errors with similar pattern
+  7. Save drill and trigger notifications
+
+**Code Duplication Examples**:
+```typescript
+// runFullRestoreDrill (lines 53-54)
+const drillId = this.generateDrillId(DrillType.FULL_RESTORE, backupId)
+const startedAt = new Date().toISOString()
+
+// runPartialRestoreDrill (lines 206-207) - IDENTICAL except DrillType
+const drillId = this.generateDrillId(DrillType.PARTIAL_RESTORE, backupId)
+const startedAt = new Date().toISOString()
+
+// runIntegrityCheckDrill (lines 358-359) - IDENTICAL except DrillType
+const drillId = this.generateDrillId(DrillType.INTEGRITY_CHECK, backupId)
+const startedAt = new Date().toISOString()
+```
+
+**Why This Matters**:
+1. **Code Duplication**: ~406 lines total across 3 methods with similar patterns
+2. **Maintainability**: Changes to drill execution logic require updating 3 methods
+3. **Bug Risk**: Inconsistent fixes across drill types
+4. **Testability**: Harder to test common drill execution logic when scattered
+5. **Extensibility**: Adding new drill types requires copying entire pattern
+
+### Solution
+
+**Extract Common Drill Execution Pattern**:
+
+**1. Create Generic Drill Executor Function**:
+```typescript
+interface DrillExecutionContext {
+  drillType: DrillType
+  backupId: string
+  executeDrill: () => Promise<void>
+  createResults: (duration: number, error?: Error) => DrillResults
+}
+
+async function executeDrill(context: DrillExecutionContext): Promise<DrillExecutionResult>
+```
+
+**2. Create Drill Object Factory**:
+```typescript
+function createDrillObject(type: DrillType, backupId: string): BackupDrill
+```
+
+**3. Refactor Drill Methods**:
+- Each drill method calls `executeDrill` with drill-specific context
+- Pass type-specific execution logic via callback
+- Pass type-specific results creation via callback
+- Common logic (duration calculation, error handling) centralized
+
+### Implementation
+
+- [ ] Create `executeDrill` generic function in drillEngine.ts
+- [ ] Create `createDrillObject` factory function
+- [ ] Refactor `runFullRestoreDrill` to use `executeDrill`
+- [ ] Refactor `runPartialRestoreDrill` to use `executeDrill`
+- [ ] Refactor `runIntegrityCheckDrill` to use `executeDrill`
+- [ ] Update tests to use refactored methods
+- [ ] Verify all drill tests pass (no regressions)
+
+### Success Criteria
+
+- [ ] Common drill execution logic extracted to single function
+- [ ] All three drill methods reduced to ~50 lines each (from 145/153/108)
+- [ ] Code reduction of 200+ lines achieved
+- [ ] All existing drill tests pass (no regressions)
+- [ ] Lint passes (0 errors, 0 warnings)
+
+### Related Files
+
+- 📝 To Modify: `src/utils/drillEngine.ts` - Extract common execution pattern
+- 📝 To Update: `src/utils/__tests__/drillEngine.test.ts` - Update tests if needed
+
+### Notes
+
+- Follows Single Responsibility Principle - drill execution logic in one place
+- Uses Template Method pattern - common algorithm with customizable steps
+- Type-safe - DrillExecutionContext interface ensures proper parameter passing
+- Maintains backward compatibility - public API unchanged
+- Reduces code duplication by ~50% (200+ lines)
+
+---
+
+## Task 349: [REFACTOR] Extract Drill Duration Calculation in DrillEngine (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Code Refactoring (Extract Function)
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Extract duplicate drill duration calculation logic into a reusable utility function to eliminate code duplication.
+
+### Problem Identified
+
+**Duplicate Duration Calculation**:
+- `runFullRestoreDrill` (line 125): `const duration = Date.now() - startTime`
+- `runFullRestoreDrill` (line 165): `const duration = Date.now() - new Date(startedAt).getTime()`
+- `runPartialRestoreDrill` (line 278): `const duration = Date.now() - startTime`
+- `runPartialRestoreDrill` (line 318): `const duration = Date.now() - new Date(startedAt).getTime()`
+- `runIntegrityCheckDrill` (line 404): `const duration = Date.now() - startTime`
+- `runIntegrityCheckDrill` (line 438): `const duration = Date.now() - new Date(startedAt).getTime()`
+
+**Two Calculation Patterns**:
+1. **Success Case**: `Date.now() - startTime` (when drill completes successfully)
+2. **Error Case**: `Date.now() - new Date(startedAt).getTime()` (when drill fails)
+
+**Why This Matters**:
+1. **Code Duplication**: Duration calculation repeated 6 times
+2. **Inconsistency Risk**: Easy to make mistakes in one location
+3. **Readability**: Calculation logic mixed with business logic
+4. **Testability**: Harder to test duration calculation independently
+
+### Solution
+
+**Create Duration Calculation Utility**:
+
+```typescript
+function calculateDrillDuration(
+  startTime: number,
+  startedAt: string
+): number {
+  const endTime = Date.now()
+  const actualStartTime = startTime || new Date(startedAt).getTime()
+  return endTime - actualStartTime
+}
+```
+
+**Usage**:
+```typescript
+// Success case
+const duration = calculateDrillDuration(startTime, drill.startedAt)
+
+// Error case
+const duration = calculateDrillDuration(undefined, drill.startedAt)
+```
+
+### Implementation
+
+- [ ] Create `calculateDrillDuration` function in drillEngine.ts
+- [ ] Replace all duration calculations in `runFullRestoreDrill`
+- [ ] Replace all duration calculations in `runPartialRestoreDrill`
+- [ ] Replace all duration calculations in `runIntegrityCheckDrill`
+- [ ] Add tests for `calculateDrillDuration` function
+- [ ] Verify all drill tests pass
+
+### Success Criteria
+
+- [ ] Duration calculation extracted to single function
+- [ ] All 6 duration calculation sites use new function
+- [ ] Tests added for duration calculation logic
+- [ ] All existing drill tests pass (no regressions)
+
+### Related Files
+
+- 📝 To Modify: `src/utils/drillEngine.ts` - Add calculateDrillDuration function
+- 📝 To Add: `src/utils/__tests__/drillUtils.test.ts` - Tests for drill utilities
+
+---
+
+## Task 350: [REFACTOR] Extract Drill Error Handling in DrillEngine (Jan 19, 2026)
+
+**Status**: Pending
+**Priority**: LOW
+**Type**: Code Refactoring (Extract Function)
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Extract duplicate drill error handling logic into a reusable utility function to eliminate code duplication and standardize error messages.
+
+### Problem Identified
+
+**Duplicate Error Handling Pattern**:
+- `runFullRestoreDrill` (lines 163-167):
+```typescript
+const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+const duration = Date.now() - new Date(startedAt).getTime()
+const drill: BackupDrill = {
+  status: DrillStatus.FAILED,
+  error: errorMessage,
+  duration,
+  // ... rest of drill object
+}
+```
+- `runPartialRestoreDrill` (lines 317-321): IDENTICAL pattern
+- `runIntegrityCheckDrill` (lines 437-441): IDENTICAL pattern
+
+**Issues**:
+1. **Code Duplication**: Error handling repeated 3 times (12 lines each, 36 total)
+2. **Mixed Concerns**: Error handling mixed with drill object creation
+3. **Inconsistency Risk**: Different error messages or handling in each method
+4. **Testability**: Error handling logic cannot be tested in isolation
+
+### Solution
+
+**Create Error Handling Utility**:
+
+```typescript
+function createFailedDrill(
+  drillType: DrillType,
+  backupId: string,
+  startedAt: string,
+  error: Error | unknown
+): BackupDrill {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+  const duration = Date.now() - new Date(startedAt).getTime()
+  const drillId = generateDrillId(drillType, backupId)
+
+  return {
+    drillId,
+    drillType,
+    backupId,
+    startedAt,
+    status: DrillStatus.FAILED,
+    completedAt: new Date().toISOString(),
+    duration,
+    error: errorMessage
+  }
+}
+```
+
+**Usage**:
+```typescript
+try {
+  // ... drill execution
+} catch (error) {
+  const drill = createFailedDrill(DrillType.FULL_RESTORE, backupId, startedAt, error)
+  await this.saveDrill(drill)
+  // ... error notifications
+}
+```
+
+### Implementation
+
+- [ ] Create `createFailedDrill` function in drillEngine.ts
+- [ ] Replace error handling in `runFullRestoreDrill`
+- [ ] Replace error handling in `runPartialRestoreDrill`
+- [ ] Replace error handling in `runIntegrityCheckDrill`
+- [ ] Add tests for `createFailedDrill` function
+- [ ] Verify all drill tests pass
+
+### Success Criteria
+
+- [ ] Error handling logic extracted to single function
+- [ ] All 3 error handling sites use new function
+- [ ] Tests added for error handling logic
+- [ ] All existing drill tests pass (no regressions)
+- [ ] Code reduction of ~24 lines achieved
+
+### Related Files
+
+- 📝 To Modify: `src/utils/drillEngine.ts` - Add createFailedDrill function
+- 📝 To Update: `src/utils/__tests__/drillEngine.test.ts` - Update tests if needed
+
+---
+
 ## Task 347: [DEVOPS ENGINEER] CI Health Improvement - Test Isolation Fixes (Jan 19, 2026)
 
 **Status**: ✅ Completed
