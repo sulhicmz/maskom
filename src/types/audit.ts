@@ -91,6 +91,7 @@ export interface SuspiciousActivityAlert {
     action: ActivityAction;
     count: number;
     threshold: number;
+    timeWindow: number;
     activities: ActivityLog[];
     resolved: boolean;
     resolvedAt?: string;

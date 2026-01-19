@@ -134,14 +134,8 @@ export const AuditReportDashboard: React.FC<AuditReportDashboardProps> = ({
     };
 
     const calculateTrends = (logs: ActivityLog[]): Record<string, number> => {
-        const trends: Record<string, number> = {};
-        
         const last7Days = logs.filter(
             log => new Date(log.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        );
-        
-        const last30Days = logs.filter(
-            log => new Date(log.timestamp) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         );
 
         const byDay: Record<string, number> = {};
@@ -151,10 +145,6 @@ export const AuditReportDashboard: React.FC<AuditReportDashboardProps> = ({
         }
 
         return byDay;
-    };
-
-    const handleActionFilterChange = (action: string) => {
-        setSelectedAction(action);
     };
 
     if (!summary) {

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { SuspiciousActivityAlert } from '@/types/audit';
 import { getSuspiciousAlerts, resolveAlert } from '@/utils/activityLogger';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 
 export const SuspiciousChangeAlerts: React.FC = () => {
     const [alerts, setAlerts] = useState<SuspiciousActivityAlert[]>([]);
@@ -191,7 +191,7 @@ export const SuspiciousChangeAlerts: React.FC = () => {
                                         <strong>Statistik:</strong>
                                         <p>
                                             {selectedAlert.count} kejadian terdeteksi 
-                                            (threshold: {selectedAlert.threshold} per {selectedAlert.rule.timeWindow} menit)
+                                            (threshold: {selectedAlert.threshold} per {selectedAlert.timeWindow} menit)
                                         </p>
                                     </div>
 

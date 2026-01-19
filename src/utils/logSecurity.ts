@@ -72,6 +72,7 @@ const createSuspiciousAlert = (
         action: triggeringLog.action,
         count: relatedLogs.length,
         threshold: rule.threshold,
+        timeWindow: rule.timeWindow,
         activities: relatedLogs,
         resolved: false,
     };

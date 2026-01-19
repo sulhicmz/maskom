@@ -38,7 +38,7 @@ export const generatePermissionAuditReport = (
         mapLogToPermissionChange(log)
     );
 
-    const summary = calculateAuditSummary(permissionChanges, permissionLogs);
+    const summary = calculateAuditSummary(permissionChanges);
 
     return {
         id: generateAuditReportId(),
@@ -129,7 +129,7 @@ export const calculateAuditSummary = (
 };
 
 export const detectSuspiciousChanges = (changes: PermissionChange[]): number => {
-    const suspiciousCount = 0;
+    let suspiciousCount = 0;
     const userChangeCount: Record<string, number> = {};
 
     for (const change of changes) {
