@@ -9,8 +9,14 @@ jest.mock('@/utils/mfa/totp', () => {
   return {
     ...actualModule,
     verifyTOTP: jest.fn().mockImplementation(async (options) => {
+      if (options.code === '123456') {
+        return true;
+      }
+      if (options.code === '000000') {
+        return false;
+      }
       const result = await actualModule.verifyTOTP(options);
-      return result || options.code === '123456';
+      return result;
     }),
   };
 });
@@ -221,6 +227,15 @@ describe('AuthService MFA Methods', () => {
     });
 
     test('should verify MFA for authenticated user', async () => {
+      await authService.register({
+        name: 'Test User',
+        email: 'test2@example.com',
+        password: 'Password123',
+        role: 'user',
+      });
+      await authService.initiateMFASetup();
+      await authService.enableMFA('123456');
+
       const result = await authService.verifyMFA('123456');
 
       expect(result.success).toBe(true);
@@ -466,7 +481,7 @@ describe('AuthService MFA Methods', () => {
       expect(result.success).toBe(false);
       expect(result.error).toContain('MFA diperlukan');
       expect(result.user).toBeDefined();
-      expect(result.user?.mfaEnabled).toBe(false);
+      expect(result.user?.mfaEnabled).toBe(true);
     });
 
     test('should login successfully with valid MFA code', async () => {
