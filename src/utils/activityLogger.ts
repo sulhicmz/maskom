@@ -5,7 +5,9 @@ import {
     clearLogs as clearLogsStorage,
     getAlertRules,
     getSuspiciousAlerts,
-    clearCache
+    clearCache,
+    clearAlertRules,
+    clearSuspiciousAlerts
 } from './logStorage';
 import {
     saveAlertRule,
@@ -98,12 +100,12 @@ export const filterLogs = (filter: ActivityLogFilter): ActivityLog[] => {
         logs = logs.filter(log => new Date(log.timestamp) <= new Date(filter.endDate!));
     }
 
-    if (filter.limit) {
-        logs = logs.slice(0, filter.limit);
-    }
-
     if (filter.offset) {
         logs = logs.slice(filter.offset);
+    }
+
+    if (filter.limit) {
+        logs = logs.slice(0, filter.limit);
     }
 
     return logs;
@@ -142,4 +144,6 @@ export {
     getSuspiciousAlerts,
     checkForSuspiciousActivity,
     clearCache,
+    clearAlertRules,
+    clearSuspiciousAlerts,
 };

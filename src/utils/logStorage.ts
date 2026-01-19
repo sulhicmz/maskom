@@ -47,19 +47,23 @@ export const saveLogs = (logs: ActivityLog[]): void => {
 export const clearLogs = (beforeDate?: Date): number => {
     if (beforeDate) {
         let logs = getLogs();
+        const originalCount = logs.length;
 
         logs = logs.filter(log => new Date(log.timestamp) >= beforeDate);
 
         saveLogs(logs);
 
-        return logs.length;
+        return originalCount - logs.length;
     }
+
+    const logs = getLogs();
+    const count = logs.length;
 
     logsCache = [];
 
     try {
         localStorage.setItem(LOG_STORAGE_KEY, '[]');
-        return 0;
+        return count;
     } catch (error) {
         console.error('Failed to clear activity logs:', error);
         return 0;
@@ -109,5 +113,21 @@ export const saveSuspiciousAlerts = (alerts: SuspiciousActivityAlert[]): void =>
         localStorage.setItem(ALERT_STORAGE_KEY, JSON.stringify(alerts));
     } catch (error) {
         console.error('Failed to save suspicious alerts:', error);
+    }
+}
+
+export const clearAlertRules = (): void => {
+    try {
+        localStorage.removeItem(ALERT_RULES_STORAGE_KEY);
+    } catch (error) {
+        console.error('Failed to clear alert rules:', error);
+    }
+}
+
+export const clearSuspiciousAlerts = (): void => {
+    try {
+        localStorage.removeItem(ALERT_STORAGE_KEY);
+    } catch (error) {
+        console.error('Failed to clear suspicious alerts:', error);
     }
 }
