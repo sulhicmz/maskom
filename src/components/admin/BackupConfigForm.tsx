@@ -69,6 +69,20 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
         },
       })
     }
+    if (errors[field as string]) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field as string]
+        return newErrors
+      })
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      action()
+    }
   }
 
   return (
@@ -79,51 +93,75 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
       <div className="card-body">
         <div className="row">
           <div className="col-md-6 mb-3">
-            <label className="form-label">Status Backup</label>
+            <label htmlFor="backup-enabled" className="form-label">Status Backup</label>
             <select
+              id="backup-enabled"
               className={`form-select ${errors.enabled ? 'is-invalid' : ''}`}
               value={localConfig.enabled ? 'true' : 'false'}
               onChange={(e) => handleChange('enabled', e.target.value === 'true')}
+              aria-invalid={!!errors.enabled}
+              aria-describedby={errors.enabled ? 'backup-enabled-error' : undefined}
             >
               <option value="true">Aktif</option>
               <option value="false">Nonaktif</option>
             </select>
+            {errors.enabled && (
+              <div id="backup-enabled-error" className="invalid-feedback" role="alert" aria-live="polite">
+                {errors.enabled}
+              </div>
+            )}
           </div>
 
           <div className="col-md-6 mb-3">
-            <label className="form-label">Jadwal Backup</label>
+            <label htmlFor="backup-schedule" className="form-label">Jadwal Backup</label>
             <select
+              id="backup-schedule"
               className={`form-select ${errors.schedule ? 'is-invalid' : ''}`}
               value={localConfig.schedule}
               onChange={(e) => handleChange('schedule', e.target.value)}
+              aria-invalid={!!errors.schedule}
+              aria-describedby={errors.schedule ? 'backup-schedule-error' : undefined}
             >
               <option value="manual">Manual</option>
               <option value="daily">Harian</option>
               <option value="weekly">Mingguan</option>
               <option value="monthly">Bulanan</option>
             </select>
+            {errors.schedule && (
+              <div id="backup-schedule-error" className="invalid-feedback" role="alert" aria-live="polite">
+                {errors.schedule}
+              </div>
+            )}
           </div>
         </div>
 
         <div className="row">
           <div className="col-md-6 mb-3">
-            <label className="form-label">Waktu Backup</label>
+            <label htmlFor="backup-time" className="form-label">Waktu Backup</label>
             <input
+              id="backup-time"
               type="time"
               className={`form-control ${errors.time ? 'is-invalid' : ''}`}
               value={localConfig.time}
               onChange={(e) => handleChange('time', e.target.value)}
+              aria-invalid={!!errors.time}
+              aria-describedby={errors.time ? 'backup-time-error' : 'backup-time-hint'}
+              aria-required="true"
             />
+            <small id="backup-time-hint" className="form-text text-muted">Format HH:MM (contoh: 02:00)</small>
             {errors.time && (
-              <div className="invalid-feedback">{errors.time}</div>
+              <div id="backup-time-error" className="invalid-feedback" role="alert" aria-live="polite">
+                {errors.time}
+              </div>
             )}
           </div>
 
           <div className="col-md-6 mb-3">
-            <label className="form-label">
+            <label htmlFor="backup-retention-days" className="form-label">
               Retensi Hari ({localConfig.retentionDays} hari)
             </label>
             <input
+              id="backup-retention-days"
               type="number"
               className={`form-control ${errors.retentionDays ? 'is-invalid' : ''}`}
               value={localConfig.retentionDays}
@@ -132,20 +170,28 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
               }
               min="1"
               max="365"
+              aria-invalid={!!errors.retentionDays}
+              aria-describedby={errors.retentionDays ? 'backup-retention-days-error' : 'backup-retention-days-hint'}
+              aria-required="true"
             />
+            <small id="backup-retention-days-hint" className="form-text text-muted">Nilai antara 1 dan 365 hari</small>
             {errors.retentionDays && (
-              <div className="invalid-feedback">{errors.retentionDays}</div>
+              <div id="backup-retention-days-error" className="invalid-feedback" role="alert" aria-live="polite">
+                {errors.retentionDays}
+              </div>
             )}
           </div>
         </div>
 
         <div className="row">
           <div className="col-md-6 mb-3">
-            <label className="form-label">Tipe Penyimpanan</label>
+            <label htmlFor="backup-storage-type" className="form-label">Tipe Penyimpanan</label>
             <select
+              id="backup-storage-type"
               className="form-select"
               value={localConfig.storageType}
               onChange={(e) => handleChange('storageType', e.target.value)}
+              aria-describedby="backup-storage-type-hint"
             >
               <option value="localStorage">LocalStorage (Klien)</option>
               <option value="s3" disabled>
@@ -158,11 +204,13 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
                 Azure Storage (Segera Hadir)
               </option>
             </select>
+            <small id="backup-storage-type-hint" className="form-text text-muted">Pilih lokasi penyimpanan backup</small>
           </div>
 
           <div className="col-md-6 mb-3">
-            <label className="form-label">Ukuran Maksimum (GB)</label>
+            <label htmlFor="backup-max-size" className="form-label">Ukuran Maksimum (GB)</label>
             <input
+              id="backup-max-size"
               type="number"
               className="form-control"
               value={localConfig.retentionPolicy.maxSizeGB}
@@ -174,7 +222,9 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
               }
               min="1"
               max="100"
+              aria-describedby="backup-max-size-hint"
             />
+            <small id="backup-max-size-hint" className="form-text text-muted">Nilai antara 1 dan 100 GB</small>
           </div>
         </div>
 
@@ -189,10 +239,12 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
                 onChange={(e) =>
                   handleChange('encryptionEnabled', e.target.checked)
                 }
+                onKeyDown={(e) => handleKeyDown(e, () => handleChange('encryptionEnabled', !localConfig.encryptionEnabled))}
               />
               <label className="form-check-label" htmlFor="encryptionEnabled">
                 Enkripsi AES-256
               </label>
+              <small className="form-text text-muted d-block">Amankan data backup dengan enkripsi standar industri</small>
             </div>
           </div>
 
@@ -206,10 +258,12 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
                 onChange={(e) =>
                   handleChange('compressionEnabled', e.target.checked)
                 }
+                onKeyDown={(e) => handleKeyDown(e, () => handleChange('compressionEnabled', !localConfig.compressionEnabled))}
               />
               <label className="form-check-label" htmlFor="compressionEnabled">
                 Kompresi Data
               </label>
+              <small className="form-text text-muted d-block">Mengurangi ukuran backup dengan kompresi</small>
             </div>
           </div>
         </div>
@@ -218,10 +272,11 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
           <h6 className="mb-3">Kebijakan Retensi</h6>
           <div className="row">
             <div className="col-md-4 mb-3">
-              <label className="form-label">
+              <label htmlFor="keep-last-count" className="form-label">
                 Pertahankan Backup Terakhir
               </label>
               <input
+                id="keep-last-count"
                 type="number"
                 className={`form-control ${errors.keepLastCount ? 'is-invalid' : ''}`}
                 value={localConfig.retentionPolicy.keepLastCount}
@@ -233,15 +288,22 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
                 }
                 min="1"
                 max="100"
+                aria-invalid={!!errors.keepLastCount}
+                aria-describedby={errors.keepLastCount ? 'keep-last-count-error' : 'keep-last-count-hint'}
+                aria-required="true"
               />
+              <small id="keep-last-count-hint" className="form-text text-muted">Nilai antara 1 dan 100</small>
               {errors.keepLastCount && (
-                <div className="invalid-feedback">{errors.keepLastCount}</div>
+                <div id="keep-last-count-error" className="invalid-feedback" role="alert" aria-live="polite">
+                  {errors.keepLastCount}
+                </div>
               )}
             </div>
 
             <div className="col-md-4 mb-3">
-              <label className="form-label">Pertahankan Harian (Hari)</label>
+              <label htmlFor="keep-daily-for" className="form-label">Pertahankan Harian (Hari)</label>
               <input
+                id="keep-daily-for"
                 type="number"
                 className="form-control"
                 value={localConfig.retentionPolicy.keepDailyFor}
@@ -253,12 +315,15 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
                 }
                 min="1"
                 max="30"
+                aria-describedby="keep-daily-for-hint"
               />
+              <small id="keep-daily-for-hint" className="form-text text-muted">Nilai antara 1 dan 30 hari</small>
             </div>
 
             <div className="col-md-4 mb-3">
-              <label className="form-label">Pertahankan Mingguan (Minggu)</label>
+              <label htmlFor="keep-weekly-for" className="form-label">Pertahankan Mingguan (Minggu)</label>
               <input
+                id="keep-weekly-for"
                 type="number"
                 className="form-control"
                 value={localConfig.retentionPolicy.keepWeeklyFor}
@@ -270,7 +335,9 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
                 }
                 min="1"
                 max="52"
+                aria-describedby="keep-weekly-for-hint"
               />
+              <small id="keep-weekly-for-hint" className="form-text text-muted">Nilai antara 1 dan 52 minggu</small>
             </div>
           </div>
         </div>
@@ -280,6 +347,7 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
             type="button"
             className="btn btn-secondary"
             onClick={onCancel}
+            aria-label="Batal perubahan konfigurasi"
           >
             Batal
           </button>
@@ -287,6 +355,7 @@ const BackupConfigForm: React.FC<BackupConfigFormProps> = ({
             type="button"
             className="btn btn-primary"
             onClick={handleSave}
+            aria-label="Simpan konfigurasi backup"
           >
             Simpan Konfigurasi
           </button>
