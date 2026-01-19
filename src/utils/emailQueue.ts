@@ -123,7 +123,7 @@ export class EmailQueue {
     private loadQueue(): void {
         try {
             const globalStorage = (global as typeof globalThis & { localStorage?: Storage }).localStorage;
-            const windowStorage = (window as Window & { localStorage?: Storage }).localStorage;
+            const windowStorage = typeof window !== 'undefined' ? (window as Window & { localStorage?: Storage }).localStorage : null;
             if (!globalStorage && !windowStorage) {
                 return;
             }
@@ -142,7 +142,7 @@ export class EmailQueue {
     private saveQueue(): void {
         try {
             const globalStorage = (global as typeof globalThis & { localStorage?: Storage }).localStorage;
-            const windowStorage = (window as Window & { localStorage?: Storage }).localStorage;
+            const windowStorage = typeof window !== 'undefined' ? (window as Window & { localStorage?: Storage }).localStorage : null;
             if (!globalStorage && !windowStorage) {
                 return;
             }
@@ -154,7 +154,7 @@ export class EmailQueue {
     }
 
     private startCleanup(): void {
-        if (window || global) {
+        if (typeof window !== 'undefined' || global) {
             this.cleanupInterval = setInterval(() => {
                 this.removeExpired();
             }, 60 * 60 * 1000);
