@@ -121,12 +121,12 @@ export class EmailQueue {
     }
 
     private loadQueue(): void {
-        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-            return;
-        }
-
         try {
-            const stored = localStorage.getItem(this.storageKey);
+            if (typeof (global as any).localStorage === 'undefined' && typeof (window as any).localStorage === 'undefined') {
+                return;
+            }
+            const storage = (global as any).localStorage || (window as any).localStorage;
+            const stored = storage.getItem(this.storageKey);
             if (stored) {
                 this.queue = JSON.parse(stored);
                 this.removeExpired();
@@ -138,19 +138,19 @@ export class EmailQueue {
     }
 
     private saveQueue(): void {
-        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-            return;
-        }
-
         try {
-            localStorage.setItem(this.storageKey, JSON.stringify(this.queue));
+            if (typeof (global as any).localStorage === 'undefined' && typeof (window as any).localStorage === 'undefined') {
+                return;
+            }
+            const storage = (global as any).localStorage || (window as any).localStorage;
+            storage.setItem(this.storageKey, JSON.stringify(this.queue));
         } catch (error) {
             console.warn('[EmailQueue] Failed to save queue to localStorage:', error);
         }
     }
 
     private startCleanup(): void {
-        if (typeof window !== 'undefined') {
+        if (window || global) {
             this.cleanupInterval = setInterval(() => {
                 this.removeExpired();
             }, 60 * 60 * 1000);
