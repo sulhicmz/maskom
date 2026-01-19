@@ -60,6 +60,7 @@ npm run start
 - [**Component Guide**](docs/component-development-guide.md) - How to create and maintain components
 - [**Data File Guide**](docs/data-file-creation-guide.md) - How to create and manage static data
 - [**API Documentation**](docs/api.md) - Service documentation (EmailService, AuthService)
+- [**Troubleshooting Guide**](docs/troubleshooting-guide.md) - Common issues and solutions
 - [**Feature Guides**](docs/features/) - Feature usage guides (Dark Mode, Blog, SEO)
 - [**Roadmap**](docs/roadmap.md) - Feature development roadmap
 

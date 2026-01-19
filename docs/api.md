@@ -6,12 +6,105 @@ This document provides comprehensive API specifications for all external service
 
 ## Quick Start
 
-**OpenAPI Specification**: [docs/openapi-spec.yaml](openapi-spec.yaml)
+### Quick Start Guide (5 Minutes)
+
+Get started with Maskom service APIs in 5 minutes with these practical examples.
+
+#### 1. Send an Email (EmailService)
+
+```typescript
+import emailService from '@/services/email';
+
+try {
+    const result = await emailService.sendEmail({
+        templateParams: {
+            user_name: 'John Doe',
+            user_email: 'john@example.com',
+            message: 'I would like to inquire about your services.'
+        }
+    });
+
+    if (result.success) {
+        console.log('Email sent successfully:', result.data);
+    } else {
+        console.error('Failed to send email:', result.error);
+    }
+} catch (error) {
+    console.error('Unexpected error:', error);
+}
+```
+
+#### 2. User Login (AuthService)
+
+```typescript
+import authService from '@/services/auth/AuthService';
+
+try {
+    const result = await authService.login({
+        email: 'user@example.com',
+        password: 'password123'
+    });
+
+    if (result.success && result.user) {
+        console.log('Login successful:', result.user);
+        console.log('Auth token:', result.token);
+    } else {
+        console.error('Login failed:', result.error);
+    }
+} catch (error) {
+    console.error('Unexpected error:', error);
+}
+```
+
+#### 3. Register a New User (AuthService)
+
+```typescript
+import authService from '@/services/auth/AuthService';
+
+try {
+    const result = await authService.register({
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        password: 'securePassword123'
+    });
+
+    if (result.success && result.user) {
+        console.log('Registration successful:', result.user);
+    } else {
+        console.error('Registration failed:', result.error);
+    }
+} catch (error) {
+    console.error('Unexpected error:', error);
+}
+```
+
+#### 4. Check Service Health
+
+```typescript
+import emailService from '@/services/email';
+import authService from '@/services/auth/AuthService';
+
+// Check EmailService circuit breaker state
+const emailState = emailService.getCircuitBreakerState();
+console.log('EmailService state:', emailState);
+
+// Check AuthService circuit breaker state
+const authState = authService.getCircuitBreakerState();
+console.log('AuthService state:', authState);
+```
+
+---
+
+### OpenAPI Specification
+
+**File**: [docs/openapi-spec.yaml](openapi-spec.yaml)
 - Machine-readable API specification (OpenAPI 3.0.3)
 - Import into tools like Swagger UI, Postman, or API clients
 - Standard format for automated testing and code generation
 
-**Postman Collection**: [docs/postman-collection.json](postman-collection.json)
+### Postman Collection
+
+**File**: [docs/postman-collection.json](postman-collection.json)
 - Ready-to-use Postman collection with all API endpoints
 - Pre-configured request examples and tests
 - Authentication flow automation (login → register → logout)
@@ -1587,6 +1680,317 @@ The collection includes an automated auth flow:
 3. Run "Logout" (token cleared from collection variables)
 
 Login/Logout requests include test scripts to automatically manage the `token` variable.
+
+---
+
+## Real-World Usage Examples
+
+### Example 1: Contact Form with Error Handling
+
+Complete example showing robust error handling for a contact form submission:
+
+```typescript
+import emailService from '@/services/email';
+import { toast } from 'react-toastify';
+
+async function handleContactFormSubmit(formData: {
+    name: string;
+    email: string;
+    message: string;
+}) {
+    try {
+        const result = await emailService.sendEmail({
+            templateParams: {
+                user_name: formData.name,
+                user_email: formData.email,
+                message: formData.message
+            }
+        });
+
+        if (result.success) {
+            toast.success('Email sent successfully!');
+            return { success: true };
+        } else {
+            // Handle specific error types
+            switch (result.errorCode) {
+                case 'VALIDATION_ERROR':
+                    toast.error('Please check your input and try again.');
+                    break;
+                case 'RATE_LIMIT_EXCEEDED':
+                    toast.error('Too many attempts. Please try again later.');
+                    break;
+                case 'TIMEOUT':
+                    toast.error('Request timed out. Please try again.');
+                    break;
+                case 'CREDENTIALS_MISSING':
+                    toast.error('Email service not configured. Please contact admin.');
+                    break;
+                default:
+                    toast.error('Failed to send email. Please try again.');
+            }
+            return { success: false };
+        }
+    } catch (error) {
+        console.error('Unexpected error sending email:', error);
+        toast.error('An unexpected error occurred.');
+        return { success: false };
+    }
+}
+```
+
+### Example 2: Authentication Flow with User Session
+
+Complete example showing login flow and session management:
+
+```typescript
+import authService, { type User } from '@/services/auth/AuthService';
+
+async function performLogin(email: string, password: string): Promise<{
+    success: boolean;
+    user?: User;
+    error?: string;
+}> {
+    try {
+        const result = await authService.login({ email, password });
+
+        if (result.success && result.user) {
+            // Store user session
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem('token', result.token || '');
+
+            // Redirect to dashboard or update UI
+            window.location.href = '/dashboard';
+
+            return { success: true, user: result.user };
+        } else {
+            // Handle specific error types
+            switch (result.errorCode) {
+                case 'VALIDATION_ERROR':
+                    return { success: false, error: 'Invalid email or password format.' };
+                case 'RATE_LIMIT_EXCEEDED':
+                    const cooldown = result.metadata?.cooldownSeconds || 300;
+                    return { success: false, error: `Too many attempts. Try again in ${cooldown} seconds.` };
+                case 'TIMEOUT':
+                    return { success: false, error: 'Request timed out. Please try again.' };
+                case 'CIRCUIT_BREAKER_OPEN':
+                    return { success: false, error: 'Service temporarily unavailable. Please try again later.' };
+                default:
+                    return { success: false, error: 'Login failed. Please check your credentials.' };
+            }
+        }
+    } catch (error) {
+        console.error('Unexpected error during login:', error);
+        return { success: false, error: 'An unexpected error occurred.' };
+    }
+}
+
+// Usage
+performLogin('user@example.com', 'password123')
+    .then(({ success, user, error }) => {
+        if (success) {
+            console.log('Logged in as:', user);
+        } else {
+            console.error('Login failed:', error);
+        }
+    });
+```
+
+### Example 3: Registration with Validation
+
+Complete example showing user registration with comprehensive validation:
+
+```typescript
+import authService from '@/services/auth/AuthService';
+import { validateEmail, validatePassword } from '@/utils/validation';
+
+async function handleRegistration(formData: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}): Promise<{ success: boolean; error?: string }> {
+    // Client-side validation first
+    if (!formData.name || formData.name.trim().length === 0) {
+        return { success: false, error: 'Name is required.' };
+    }
+
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+        return { success: false, error: emailValidation.message };
+    }
+
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+        return { success: false, error: passwordValidation.message };
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+        return { success: false, error: 'Passwords do not match.' };
+    }
+
+    try {
+        const result = await authService.register({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+        });
+
+        if (result.success && result.user) {
+            // Auto-login after registration
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem('token', result.token || '');
+
+            return { success: true };
+        } else {
+            // Handle specific error types
+            switch (result.errorCode) {
+                case 'VALIDATION_ERROR':
+                    return { success: false, error: result.error || 'Invalid input data.' };
+                case 'RATE_LIMIT_EXCEEDED':
+                    return { success: false, error: 'Too many registration attempts. Please try again later.' };
+                case 'TIMEOUT':
+                    return { success: false, error: 'Request timed out. Please try again.' };
+                case 'CIRCUIT_BREAKER_OPEN':
+                    return { success: false, error: 'Service temporarily unavailable. Please try again later.' };
+                default:
+                    return { success: false, error: 'Registration failed. Please try again.' };
+            }
+        }
+    } catch (error) {
+        console.error('Unexpected error during registration:', error);
+        return { success: false, error: 'An unexpected error occurred.' };
+    }
+}
+```
+
+### Example 4: Service Health Monitoring
+
+Example showing how to monitor service health in production:
+
+```typescript
+import emailService from '@/services/email';
+import authService from '@/services/auth/AuthService';
+
+function checkServiceHealth() {
+    const emailState = emailService.getCircuitBreakerState();
+    const authState = authService.getCircuitBreakerState();
+
+    const healthStatus = {
+        emailService: {
+            status: emailState.isOpen ? 'unhealthy' : 'healthy',
+            failures: emailState.failureCount,
+            lastFailure: emailState.lastFailureTime
+                ? new Date(emailState.lastFailureTime).toLocaleString()
+                : 'none',
+            lastSuccess: emailState.lastSuccessTime
+                ? new Date(emailState.lastSuccessTime).toLocaleString()
+                : 'none'
+        },
+        authService: {
+            status: authState.isOpen ? 'unhealthy' : 'healthy',
+            failures: authState.failureCount,
+            lastFailure: authState.lastFailureTime
+                ? new Date(authState.lastFailureTime).toLocaleString()
+                : 'none',
+            lastSuccess: authState.lastSuccessTime
+                ? new Date(authState.lastSuccessTime).toLocaleString()
+                : 'none'
+        }
+    };
+
+    console.log('Service Health Status:', healthStatus);
+
+    // Alert if any service is unhealthy
+    const unhealthyServices = Object.entries(healthStatus)
+        .filter(([_, data]) => (data as any).status === 'unhealthy')
+        .map(([service]) => service);
+
+    if (unhealthyServices.length > 0) {
+        console.warn(`Unhealthy services: ${unhealthyServices.join(', ')}`);
+        // Send alert to monitoring system
+        alertAdmin(`Service health warning: ${unhealthyServices.join(', ')}`);
+    }
+
+    return healthStatus;
+}
+
+// Run health check periodically
+setInterval(() => {
+    checkServiceHealth();
+}, 60000); // Every minute
+```
+
+### Example 5: Retry Logic for Failed Operations
+
+Example showing custom retry logic for transient failures:
+
+```typescript
+import emailService from '@/services/email';
+
+async function sendEmailWithRetry(
+    emailParams: Parameters<typeof emailService.sendEmail>[0],
+    maxRetries: number = 3
+): Promise<ReturnType<typeof emailService.sendEmail>> {
+    let lastError: any;
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+            const result = await emailService.sendEmail(emailParams);
+
+            if (result.success) {
+                // Success on attempt ${attempt + 1}
+                console.log(`Email sent successfully on attempt ${attempt + 1}`);
+                return result;
+            } else {
+                lastError = result.error;
+
+                // Check if error is retryable
+                const isRetryable = ['TIMEOUT', 'NETWORK_ERROR'].includes(
+                    result.errorCode || ''
+                );
+
+                if (!isRetryable) {
+                    // Non-retryable error, return immediately
+                    console.error('Non-retryable error:', result.error);
+                    return result;
+                }
+
+                // Wait before retry
+                console.log(`Attempt ${attempt + 1} failed, retrying...`);
+                await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+            }
+        } catch (error) {
+            lastError = error;
+            console.error(`Attempt ${attempt + 1} threw error:`, error);
+
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        }
+    }
+
+    // All retries exhausted
+    console.error(`Failed to send email after ${maxRetries} attempts:`, lastError);
+    return {
+        success: false,
+        error: 'Failed to send email after multiple attempts.'
+    };
+}
+
+// Usage
+sendEmailWithRetry({
+    templateParams: {
+        user_name: 'John Doe',
+        user_email: 'john@example.com',
+        message: 'Test message'
+    }
+}).then(result => {
+    if (result.success) {
+        console.log('Email sent!');
+    } else {
+        console.error('Failed to send email:', result.error);
+    }
+});
+```
 
 ---
 
