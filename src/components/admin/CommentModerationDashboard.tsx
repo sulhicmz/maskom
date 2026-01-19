@@ -55,7 +55,8 @@ const CommentModerationDashboard = () => {
       setComments(updatedComments);
       setSelectedComments([]);
 
-      const statusMessage = {
+      const statusMessage: Record<CommentModerationStatus, string> = {
+        pending: 'Komentar berhasil diperbarui',
         approved: 'Komentar berhasil disetujui',
         rejected: 'Komentar berhasil ditolak',
         spam: 'Komentar ditandai sebagai spam',
@@ -70,14 +71,14 @@ const CommentModerationDashboard = () => {
     }
   };
 
-  const getStatusColor = (status: CommentModerationStatus): string => {
-    const colorMap = {
+  const getStatusColor = (status: CommentModerationStatus): 'success' | 'danger' | 'warning' | 'info' => {
+    const colorMap: Record<CommentModerationStatus, 'success' | 'danger' | 'warning' | 'info'> = {
       pending: 'warning',
       approved: 'success',
       rejected: 'danger',
-      spam: 'secondary',
+      spam: 'info',
     };
-    return colorMap[status] || 'primary';
+    return colorMap[status] || 'info';
   };
 
   const getStatusLabel = (status: CommentModerationStatus): string => {
@@ -164,7 +165,7 @@ const CommentModerationDashboard = () => {
               <span className="me-2">{selectedComments.length} komentar dipilih</span>
               <Button
                 onClick={() => handleBulkModerate('approved')}
-                variant="success"
+                variant="primary"
                 disabled={loading}
                 className="me-2"
               >
@@ -280,8 +281,8 @@ const CommentModerationDashboard = () => {
                         {comment.status === 'pending' && (
                           <>
                             <Button
-                              variant="success"
-                              size="sm"
+                              variant="primary"
+                              size="small"
                               onClick={() => {
                                 setSelectedComments([comment.id]);
                                 handleBulkModerate('approved');
@@ -292,7 +293,7 @@ const CommentModerationDashboard = () => {
                             </Button>
                             <Button
                               variant="danger"
-                              size="sm"
+                              size="small"
                               onClick={() => {
                                 setSelectedComments([comment.id]);
                                 handleBulkModerate('rejected');
@@ -303,7 +304,7 @@ const CommentModerationDashboard = () => {
                             </Button>
                             <Button
                               variant="secondary"
-                              size="sm"
+                              size="small"
                               onClick={() => {
                                 setSelectedComments([comment.id]);
                                 handleBulkModerate('spam');
@@ -316,8 +317,8 @@ const CommentModerationDashboard = () => {
                         )}
                         {comment.status === 'approved' && (
                           <Button
-                            variant="warning"
-                            size="sm"
+                            variant="text"
+                            size="small"
                             onClick={() => {
                               setSelectedComments([comment.id]);
                               handleBulkModerate('rejected');
@@ -330,7 +331,7 @@ const CommentModerationDashboard = () => {
                         {comment.status !== 'pending' && (
                           <Button
                             variant="primary"
-                            size="sm"
+                            size="small"
                             onClick={() => {
                               setSelectedComments([comment.id]);
                               handleBulkModerate('approved');

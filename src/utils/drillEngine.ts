@@ -151,8 +151,8 @@ class DrillEngine {
 
       apmManager.finishTransaction({
         name: 'executeFullRestoreDrill',
-        operation: 'drill',
-        duration,
+        op: 'drill',
+        data: { duration },
         tags: { backupId, drillType: DrillType.FULL_RESTORE }
       })
 
@@ -304,8 +304,8 @@ class DrillEngine {
 
       apmManager.finishTransaction({
         name: 'executePartialRestoreDrill',
-        operation: 'drill',
-        duration,
+        op: 'drill',
+        data: { duration },
         tags: { backupId, drillType: DrillType.PARTIAL_RESTORE }
       })
 
@@ -424,8 +424,8 @@ class DrillEngine {
 
       apmManager.finishTransaction({
         name: 'executeIntegrityCheckDrill',
-        operation: 'drill',
-        duration,
+        op: 'drill',
+        data: { duration },
         tags: { backupId, drillType: DrillType.INTEGRITY_CHECK }
       })
 

@@ -4,13 +4,13 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import {
   DrillType,
-  DrillSchedule,
+  DrillSchedule as DrillScheduleType,
   DrillConfig,
   DEFAULT_DRILL_CONFIG
 } from '@/types/drill'
 import DrillEngine from '@/utils/drillEngine'
 import { BackupMetadata } from '@/types/backup'
-import BackupEngine from '@/utils/backupEngine'
+import { BackupEngine } from '@/utils/backupEngine'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 interface DrillScheduleProps {
@@ -26,7 +26,7 @@ const DrillSchedule: React.FC<DrillScheduleProps> = ({ onScheduleCreated }) => {
   const [selectedDrillType, setSelectedDrillType] = useState<DrillType>(DrillType.INTEGRITY_CHECK)
   const [selectedBackupId, setSelectedBackupId] = useState<string>('')
   const [scheduleTime, setScheduleTime] = useState<string>('')
-  const [recurrence, setRecurrence] = useState<DrillSchedule>(DrillSchedule.WEEKLY)
+  const [recurrence, setRecurrence] = useState<DrillScheduleType>(DrillScheduleType.WEEKLY)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const loadBackups = useCallback(async () => {
@@ -222,12 +222,12 @@ const DrillSchedule: React.FC<DrillScheduleProps> = ({ onScheduleCreated }) => {
                       <select
                         className="form-select"
                         value={recurrence}
-                        onChange={(e) => setRecurrence(e.target.value as DrillSchedule)}
+                        onChange={(e) => setRecurrence(e.target.value as DrillScheduleType)}
                       >
-                        <option value={DrillSchedule.DAILY}>Harian</option>
-                        <option value={DrillSchedule.WEEKLY}>Mingguan</option>
-                        <option value={DrillSchedule.MONTHLY}>Bulanan</option>
-                        <option value={DrillSchedule.MANUAL}>Manual</option>
+                        <option value={DrillScheduleType.DAILY}>Harian</option>
+                        <option value={DrillScheduleType.WEEKLY}>Mingguan</option>
+                        <option value={DrillScheduleType.MONTHLY}>Bulanan</option>
+                        <option value={DrillScheduleType.MANUAL}>Manual</option>
                       </select>
                     </div>
                   </div>

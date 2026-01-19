@@ -29,7 +29,7 @@ const BACKUP_VERSION = '1.0.0'
 const STORAGE_QUOTA_WARNING_THRESHOLD = 0.8
 const STORAGE_QUOTA_ERROR_THRESHOLD = 0.95
 
-class BackupEngine {
+export class BackupEngine {
   private static instance: BackupEngine
 
   private constructor() {}
@@ -990,7 +990,7 @@ class BackupEngine {
     }
   }
 
-  private async getBackupMetadataList(): Promise<BackupMetadata[]> {
+  public async getBackupMetadataList(): Promise<BackupMetadata[]> {
     try {
       if (typeof window === 'undefined') {
         return []
@@ -1060,7 +1060,7 @@ class BackupEngine {
     }
   }
 
-  private async getBackupMetadataById(
+  public async getBackupMetadataById(
     backupId: string,
   ): Promise<BackupMetadata | null> {
     const metadataList = await this.getBackupMetadataList()

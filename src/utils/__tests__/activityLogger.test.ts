@@ -22,8 +22,6 @@ import {
   resolveAlert,
 } from '../activityLogger'
 
-import { checkForSuspiciousActivity as checkForSuspiciousActivityOriginal } from '../logSecurity'
-
 import {
   ActivityLog,
   ActivityAction,

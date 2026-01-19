@@ -2,6 +2,7 @@ import {
   BackupDrill,
   DrillType,
   DrillStatus,
+  DrillSchedule,
   DrillScheduleDetails
 } from '@/types/drill'
 
