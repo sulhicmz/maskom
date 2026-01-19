@@ -1,5 +1,5 @@
 import { ActivityLog, AlertRule, SuspiciousActivityAlert } from '@/types/audit';
-import { getLogs, getSuspiciousAlerts, saveSuspiciousAlerts, getAlertRules } from './logStorage';
+import { getLogs, getSuspiciousAlerts, saveSuspiciousAlerts, getAlertRules, saveAlertRules } from './logStorage';
 
 export const checkForSuspiciousActivity = (log: ActivityLog): void => {
     const alertRules = getAlertRules();

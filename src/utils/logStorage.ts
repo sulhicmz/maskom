@@ -7,6 +7,10 @@ const MAX_LOGS = 10000;
 
 let logsCache: ActivityLog[] | null = null;
 
+export const clearCache = (): void => {
+    logsCache = null;
+};
+
 export const getLogs = (): ActivityLog[] => {
     if (typeof window === 'undefined') return [];
 
