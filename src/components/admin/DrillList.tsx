@@ -95,7 +95,7 @@ const DrillRow = memo(({ drill, onRunDrill, onCancelDrill, onViewResults }: Dril
         <StatusBadge
           type={drill.status === DrillStatus.PASSED ? 'success' :
                 drill.status === DrillStatus.FAILED ? 'danger' :
-                drill.status === DrillStatus.RUNNING ? 'warning' : 'secondary'}
+                drill.status === DrillStatus.RUNNING ? 'warning' : 'info'}
         >
           {drill.status === DrillStatus.PASSED ? 'Berhasil' :
            drill.status === DrillStatus.FAILED ? 'Gagal' :
@@ -194,7 +194,7 @@ const DrillList: React.FC<DrillListProps> = ({
     )
   }, [drills, filters])
 
-  const handleFilterChange = useCallback((key: keyof DrillFilters, value: any) => {
+  const handleFilterChange = useCallback((key: keyof DrillFilters, value: string | DrillType[] | DrillStatus[] | { startDate: string; endDate: string }) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }, [])
 

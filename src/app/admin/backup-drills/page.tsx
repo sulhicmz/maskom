@@ -1,15 +1,13 @@
+'use client'
+
 import React, { useState } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import DrillDashboard from '@/components/admin/DrillDashboard'
 import DrillList from '@/components/admin/DrillList'
 import DrillSchedule from '@/components/admin/DrillSchedule'
 import DrillResultsComponent from '@/components/admin/DrillResults'
-import { DrillType } from '@/types/drill'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import ProtectedRoute from '@/components/common/ProtectedRoute'
 import { Permission } from '@/types/permission'
-
-interface BackupDrillsPageProps {}
 
 type TabType = 'dashboard' | 'list' | 'schedule'
 
@@ -21,7 +19,7 @@ export default function AdminBackupDrillsPage() {
   const [selectedDrillId, setSelectedDrillId] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const handleRunDrill = (drillId: string, backupId: string, drillType: DrillType) => {
+  const handleRunDrill = (drillId: string, backupId: string) => {
     console.log('Running drill:', drillId, 'on backup:', backupId)
     alert(`Menjalankan latihan ulang untuk drill ${drillId}`)
     setRefreshKey(prev => prev + 1)
@@ -104,8 +102,7 @@ export default function AdminBackupDrillsPage() {
           onClose={handleCloseResults}
         />
       )}
-        </div>
+      </div>
       </ProtectedRoute>
-    </div>
-  )
+    )
 }
