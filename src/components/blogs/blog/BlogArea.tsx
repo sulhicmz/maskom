@@ -29,6 +29,8 @@ const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
 })
 
 const ExportButton = dynamic(() => import("@/components/common/ExportButton"))
+const SavePresetButton = dynamic(() => import("@/components/common/SavePresetButton"))
+const PresetSelector = dynamic(() => import("@/components/common/PresetSelector"))
 
 const BlogArea = React.memo(() => {
    const router = useRouter()
@@ -67,7 +69,13 @@ const BlogArea = React.memo(() => {
      }, [])
 
    const handleTagClick = useCallback((tagId: number | null) => {
-      setSelectedTagId(tagId)
+       setSelectedTagId(tagId)
+    }, [])
+
+   const handlePresetSelect = useCallback((criteria: BlogFilterCriteria) => {
+      setSearchQuery(criteria.searchQuery || "")
+      setSelectedCategory(criteria.categoryId || null)
+      setSelectedTagId(criteria.tagId || null)
    }, [])
 
    return (
@@ -99,16 +107,27 @@ const BlogArea = React.memo(() => {
                                   </span>
                                )}
                             </div>
-                            <div className="filter-actions">
-                               <button onClick={handleClearAllFilters} className="clear-all-btn">
-                                  Hapus Semua Filter
-                               </button>
-                               <ExportButton
-                                 posts={filteredPosts}
-                                 filterCriteria={filterCriteria}
-                                 buttonClassName="export-btn"
-                               />
-                            </div>
+                             <div className="filter-actions">
+                                <button onClick={handleClearAllFilters} className="clear-all-btn">
+                                   Hapus Semua Filter
+                                </button>
+                                <PresetSelector
+                                  onPresetSelect={handlePresetSelect}
+                                  buttonClassName="preset-btn"
+                                />
+                                <SavePresetButton
+                                  filterCriteria={filterCriteria}
+                                  onPresetSaved={(presetName) => {
+                                    console.log(`Preset "${presetName}" saved`);
+                                  }}
+                                  buttonClassName="save-preset-btn"
+                                />
+                                <ExportButton
+                                  posts={filteredPosts}
+                                  filterCriteria={filterCriteria}
+                                  buttonClassName="export-btn"
+                                />
+                             </div>
                          </div>
                       )}
 

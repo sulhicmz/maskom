@@ -22,6 +22,9 @@ export * from './cache';
 // Filter types (FilterCriteria, PaginationFilter)
 export * from './filter';
 
+// Search types (SearchPreset, SearchPresetStorage, etc.)
+export * from './search';
+
 // MFA types (MFAStatus, MFASetupData, etc.)
 export * from './mfa';
 
