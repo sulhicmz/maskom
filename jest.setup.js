@@ -53,3 +53,10 @@ global.crypto.subtle = {
     return signature.buffer;
   }),
 };
+
+global.crypto.getRandomValues = jest.fn().mockImplementation((array) => {
+  for (let i = 0; i < array.length; i++) {
+    array[i] = Math.floor(Math.random() * 256);
+  }
+  return array;
+});
