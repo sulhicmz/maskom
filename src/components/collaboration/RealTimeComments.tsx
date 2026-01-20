@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { RealTimeComment, CursorPosition } from '@/types/collaboration'
 
 interface RealTimeCommentsProps {
@@ -12,7 +12,6 @@ interface RealTimeCommentsProps {
 }
 
 export default function RealTimeComments({
-  postId,
   comments,
   currentUserId,
   onResolveComment,

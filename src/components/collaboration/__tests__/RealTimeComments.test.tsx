@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import RealTimeComments from '@/components/collaboration/RealTimeComments'
-import { RealTimeComment, CursorPosition } from '@/types/collaboration'
+import { RealTimeComment } from '@/types/collaboration'
 
 const mockOnResolveComment = jest.fn()
 const mockOnPositionClick = jest.fn()

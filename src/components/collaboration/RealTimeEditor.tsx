@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { DraftContent, CursorPosition, CollaborativeEvent } from '@/types/collaboration'
+import { DraftContent, CursorPosition, CollaborativeEvent, RealTimeComment, ActiveEditor } from '@/types/collaboration'
 import { CollaborationClient, createCollaborationClient } from '@/utils/collaboration/collaborationClient'
-import { OperationalTransformation } from '@/utils/collaboration/operationalTransformation'
 import ActiveEditorsIndicator from './ActiveEditorsIndicator'
 import RealTimeComments from './RealTimeComments'
 import HistoryVisualization from './HistoryVisualization'
@@ -36,18 +35,17 @@ export default function RealTimeEditor({
   const [client, setClient] = useState<CollaborationClient | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
-  const [sessionId, setSessionId] = useState<string>('')
+  const [, setSessionId] = useState<string>('')
   const [version, setVersion] = useState(0)
   const [conflictInfo, setConflictInfo] = useState<ConflictInfo | null>(null)
   const [showComments, setShowComments] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
-  const [comments, setComments] = useState<any[]>([])
+  const [comments, setComments] = useState<RealTimeComment[]>([])
+  const [editors, setEditors] = useState<ActiveEditor[]>([])
 
   const titleRef = useRef<HTMLTextAreaElement>(null)
   const descriptionRef = useRef<HTMLTextAreaElement>(null)
   const contentRef = useRef<HTMLTextAreaElement>(null)
-
-  const ot = new OperationalTransformation()
 
   const createSessionId = useCallback(() => {
     return `session_${postId}_${Date.now()}`
@@ -73,9 +71,11 @@ export default function RealTimeEditor({
         onEvent: handleEvent,
         onJoin: (editors) => {
           console.log('Users joined:', editors)
+          setEditors(editors)
         },
         onLeave: (editors) => {
           console.log('Users left:', editors)
+          setEditors(editors)
         },
         onDisconnect: handleDisconnect,
         onError: handleError
@@ -97,6 +97,7 @@ export default function RealTimeEditor({
     } finally {
       setIsConnecting(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasEditorRole, userId, username, createSessionId])
 
   const handleLeave = useCallback(async () => {
@@ -108,26 +109,6 @@ export default function RealTimeEditor({
     setClient(null)
     setSessionId('')
   }, [client])
-
-  const handleEvent = useCallback((event: CollaborativeEvent) => {
-    console.log('Received event:', event)
-
-    switch (event.type) {
-      case 'edit_applied':
-        handleIncomingEdit(event)
-        break
-
-      case 'comment_added':
-        handleIncomingComment(event)
-        break
-
-      case 'cursor_moved':
-        break
-
-      default:
-        console.log('Unhandled event type:', event.type)
-    }
-  }, [])
 
   const handleIncomingEdit = useCallback((event: CollaborativeEvent) => {
     if (!event.data) return
@@ -147,7 +128,7 @@ export default function RealTimeEditor({
 
     setConflictInfo(null)
 
-    let newContent = { ...content }
+    const newContent = { ...content }
 
     if (operation.position.line === 0) {
       if (operation.type === 'insert' && operation.content) {
@@ -182,7 +163,8 @@ export default function RealTimeEditor({
   const handleIncomingComment = useCallback((event: CollaborativeEvent) => {
     if (!event.data) return
 
-    setComments(prev => [...prev, event.data])
+    const comment = event.data as unknown as RealTimeComment
+    setComments(prev => [...prev, comment])
   }, [])
 
   const handleDisconnect = useCallback(() => {
@@ -198,6 +180,26 @@ export default function RealTimeEditor({
       canResolve: false
     })
   }, [])
+
+  const handleEvent = useCallback((event: CollaborativeEvent) => {
+    console.log('Received event:', event)
+
+    switch (event.type) {
+      case 'edit_applied':
+        handleIncomingEdit(event)
+        break
+
+      case 'comment_added':
+        handleIncomingComment(event)
+        break
+
+      case 'cursor_moved':
+        break
+
+      default:
+        console.log('Unhandled event type:', event.type)
+    }
+  }, [handleIncomingEdit, handleIncomingComment])
 
   const handleContentChange = useCallback((
     field: 'title' | 'description' | 'content',
@@ -262,12 +264,6 @@ export default function RealTimeEditor({
     setVersion(version + 1)
   }, [client, isConnected, version])
 
-  const handleSendComment = useCallback((comment: string, position: CursorPosition) => {
-    if (!client || !isConnected) return
-
-    client.sendComment({ content: comment, position })
-  }, [client, isConnected])
-
   const handleResolveComment = useCallback((commentId: string) => {
     console.log('Resolve comment:', commentId)
   }, [])
@@ -285,7 +281,7 @@ export default function RealTimeEditor({
     }
   }, [])
 
-  const handleRollback = useCallback((rollbackContent: DraftContent, entry: any) => {
+  const handleRollback = useCallback((rollbackContent: DraftContent) => {
     setContent(rollbackContent)
     onSave(rollbackContent)
   }, [onSave])
@@ -363,7 +359,7 @@ export default function RealTimeEditor({
 
       {isConnected && (
         <ActiveEditorsIndicator
-          sessionId={sessionId}
+          editors={editors}
           currentUserId={userId}
           onEditorClick={(editorId) => console.log('Editor clicked:', editorId)}
         />
@@ -401,7 +397,7 @@ export default function RealTimeEditor({
               }}
               onSelect={() => {
                 if (titleRef.current) {
-                  const { selectionStart, selectionEnd } = titleRef.current
+                  const { selectionStart } = titleRef.current
                   handleSendCursorUpdate(0, selectionStart || 0)
                 }
               }}
@@ -422,7 +418,7 @@ export default function RealTimeEditor({
               }}
               onSelect={() => {
                 if (descriptionRef.current) {
-                  const { selectionStart, selectionEnd } = descriptionRef.current
+                  const { selectionStart } = descriptionRef.current
                   handleSendCursorUpdate(1, selectionStart || 0)
                 }
               }}
@@ -443,7 +439,7 @@ export default function RealTimeEditor({
               }}
               onSelect={() => {
                 if (contentRef.current) {
-                  const { selectionStart, selectionEnd } = contentRef.current
+                  const { selectionStart } = contentRef.current
                   handleSendCursorUpdate(2, selectionStart || 0)
                 }
               }}
