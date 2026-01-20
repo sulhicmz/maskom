@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import HistoryVisualization from '@/components/collaboration/HistoryVisualization'
-import { DraftContent, CollaborativeHistoryEntry } from '@/types/collaboration'
+import { DraftContent } from '@/types/collaboration'
 import {
   addToHistory,
   clearHistory
@@ -16,22 +16,6 @@ const mockContent: DraftContent = {
   tags: [1, 2],
   categoryId: 1,
   imageUrl: 'https://example.com/image.jpg'
-}
-
-const mockHistoryEntry: CollaborativeHistoryEntry = {
-  id: 'history_1',
-  postId: 123,
-  content: {
-    title: 'Previous Version',
-    description: 'Previous Description',
-    content: 'Previous content',
-    tags: [1],
-    categoryId: 1
-  },
-  authorId: 1,
-  authorName: 'User1',
-  timestamp: Date.now() - 3600000,
-  description: 'Initial draft'
 }
 
 describe('HistoryVisualization', () => {

@@ -260,7 +260,7 @@ describe('collaborativeHistory', () => {
     it('should return oldest and newest entry timestamps', () => {
       const entry1 = addToHistory(postId, mockContent, 1, 'User1')
       jest.advanceTimersByTime(1000)
-      const entry2 = addToHistory(postId, { ...mockContent }, 2, 'User2')
+      addToHistory(postId, { ...mockContent }, 2, 'User2')
       jest.advanceTimersByTime(1000)
       const entry3 = addToHistory(postId, { ...mockContent }, 3, 'User3')
 
