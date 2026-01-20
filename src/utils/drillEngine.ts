@@ -17,6 +17,7 @@ import {
 } from '@/types/drill'
 
 import { BackupEngine } from '@/utils/backupEngine'
+import { BackupMetadata } from '@/types/backup'
 import apmManager from '@/utils/apm'
 
 interface DrillProgress {
@@ -111,7 +112,6 @@ class DrillEngine {
 
   private async executeDrill(context: DrillExecutionContext): Promise<BackupDrill> {
     const { drillType, backupId, executeDrill, onProgress, initialProgressMessage, totalSteps } = context
-    const drillId = generateDrillId(drillType, backupId)
     const startedAt = new Date().toISOString()
 
     const transactionName = `execute${this.getDrillTypeName(drillType)}`
@@ -215,7 +215,7 @@ class DrillEngine {
 
   private async validateBackupType(
     drillType: DrillType,
-    metadata: any,
+    metadata: BackupMetadata,
     backupId: string
   ): Promise<void> {
     if (drillType === DrillType.FULL_RESTORE && metadata.type !== 'full') {
@@ -355,7 +355,7 @@ class DrillEngine {
     recurrence: DrillSchedule
   ): Promise<DrillScheduleDetails> {
     const drillSchedule: DrillScheduleDetails = {
-      drillId: this.generateDrillId(drillType, backupId),
+      drillId: generateDrillId(drillType, backupId),
       drillType,
       backupId,
       scheduledFor,
