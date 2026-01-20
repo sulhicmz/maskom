@@ -1,9 +1,8 @@
 import type { EmailCampaign, CampaignMetrics, CampaignStatus } from '@/types/campaign';
 import campaign_data from '@/data/CampaignData';
 import emailService from '@/services/email/EmailService';
-
-const CAMPAIGN_STORAGE_KEY = 'email_campaigns';
-const CAMPAIGN_QUEUE_KEY = 'campaign_send_queue';
+import type { ICampaignStorage } from './campaignStorage';
+import campaignLocalStorage from './campaignStorage';
 
 export interface BulkSendProgress {
     campaignId: string;
@@ -39,23 +38,16 @@ export interface CampaignSendResult {
 class CampaignManager {
     private campaigns: EmailCampaign[];
     private idCounter = 1;
+    private storage: ICampaignStorage;
 
-    constructor() {
+    constructor(storage: ICampaignStorage = campaignLocalStorage) {
+        this.storage = storage;
         this.campaigns = [...campaign_data];
         this.loadCampaignsFromStorage();
     }
 
     private loadCampaignsFromStorage(): void {
-        if (typeof window === 'undefined') return;
-
-        try {
-            const stored = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
-            if (stored) {
-                this.campaigns = JSON.parse(stored);
-            }
-        } catch (error) {
-            console.error('Failed to load campaigns from storage:', error);
-        }
+        this.campaigns = this.storage.loadCampaigns();
     }
 
     reset(): void {
@@ -65,13 +57,7 @@ class CampaignManager {
     }
 
     private saveCampaignsToStorage(): void {
-        if (typeof window === 'undefined') return;
-
-        try {
-            localStorage.setItem(CAMPAIGN_STORAGE_KEY, JSON.stringify(this.campaigns));
-        } catch (error) {
-            console.error('Failed to save campaigns to storage:', error);
-        }
+        this.storage.saveCampaigns(this.campaigns);
     }
 
     getAllCampaigns(): EmailCampaign[] {
@@ -328,27 +314,13 @@ class CampaignManager {
     }
 
     private queueCampaignSend(id: string): void {
-        if (typeof window === 'undefined') return;
-
-        try {
-            const queue = this.getSendQueue();
-            queue.push({ id, timestamp: new Date().toISOString() });
-            localStorage.setItem(CAMPAIGN_QUEUE_KEY, JSON.stringify(queue));
-        } catch (error) {
-            console.error('Failed to queue campaign send:', error);
-        }
+        const queue = this.storage.loadSendQueue();
+        queue.push({ id, timestamp: new Date().toISOString() });
+        this.storage.saveSendQueue(queue);
     }
 
     private getSendQueue(): Array<{ id: string; timestamp: string }> {
-        if (typeof window === 'undefined') return [];
-
-        try {
-            const stored = localStorage.getItem(CAMPAIGN_QUEUE_KEY);
-            return stored ? JSON.parse(stored) : [];
-        } catch (error) {
-            console.error('Failed to load send queue:', error);
-            return [];
-        }
+        return this.storage.loadSendQueue();
     }
 
     updateCampaignMetrics(
