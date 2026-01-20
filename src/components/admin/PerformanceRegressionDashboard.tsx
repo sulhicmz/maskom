@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface RegressionAlert {
   id: string;
@@ -26,7 +26,7 @@ interface PerformanceDashboardProps {
   onResolve: (id: string) => void;
 }
 
-export default function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: PerformanceDashboardProps) {
+function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: PerformanceDashboardProps) {
   const [filter, setFilter] = useState<'all' | 'active' | 'acknowledged' | 'resolved'>('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
 
@@ -138,7 +138,7 @@ export default function PerformanceRegressionDashboard({ alerts, onAcknowledge, 
                   <select
                     className="form-select"
                     value={filter}
-                    onChange={(e) => setFilter(e.target.value as any)}
+                    onChange={(e) => setFilter(e.target.value as 'all' | 'active' | 'acknowledged' | 'resolved')}
                   >
                     <option value="all">Semua</option>
                     <option value="active">Aktif</option>
@@ -151,7 +151,7 @@ export default function PerformanceRegressionDashboard({ alerts, onAcknowledge, 
                   <select
                     className="form-select"
                     value={severityFilter}
-                    onChange={(e) => setSeverityFilter(e.target.value as any)}
+                    onChange={(e) => setSeverityFilter(e.target.value as 'all' | 'low' | 'medium' | 'high')}
                   >
                     <option value="all">Semua</option>
                     <option value="high">Tinggi</option>
@@ -227,3 +227,5 @@ export default function PerformanceRegressionDashboard({ alerts, onAcknowledge, 
     </div>
   );
 }
+
+export default PerformanceRegressionDashboard;

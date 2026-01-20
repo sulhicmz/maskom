@@ -7,7 +7,6 @@
 import {
   WebVitalMetric,
   PerformanceBaseline,
-  RegressionAlert,
   MetricSample,
   calculateRollingAverage,
   calculateStandardDeviation,
