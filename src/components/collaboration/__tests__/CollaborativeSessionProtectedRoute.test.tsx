@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import CollaborativeSessionProtectedRoute from '@/components/collaboration/CollaborativeSessionProtectedRoute'
 import authService from '@/services/auth/AuthService'
-import { getUnauthorizedRedirectPath } from '@/utils/rbac'
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
