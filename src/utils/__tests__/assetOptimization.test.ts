@@ -1,6 +1,5 @@
 import {
   optimizeImage,
-  batchOptimizeImages,
   generateCacheHeaders,
   generateAssetPath,
   calculateCacheHitRate
