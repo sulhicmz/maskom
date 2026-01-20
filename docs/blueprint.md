@@ -5176,3 +5176,275 @@ CDN_ACCOUNT_ID=
 - Task 324 (Critical Path Testing) - CDN utilities need testing
 - All future performance tasks benefit from CDN foundation
 
+
+## Real-Time Collaboration Architecture (⚠️ IN PROGRESS - Task 352)
+
+### Purpose
+
+Implement WebSocket-based real-time collaborative editing system for blog posts, enabling multiple content creators to work simultaneously with automatic conflict resolution.
+
+### Architecture
+
+```
+WebSocket Server (Next.js API Route)
+    ↓
+Session Manager (In-Memory Storage)
+    ↓
+Operational Transformation (OT) Algorithm
+    ↓
+Real-Time Sync
+    ↓
+Client Components (ActiveEditorsIndicator, RealTimeEditor)
+```
+
+### Architecture Components
+
+**1. Type Definitions** (`src/types/collaboration.ts`):
+- `CursorPosition` - Line and column position in document
+- `SelectionRange` - Start and end cursor positions
+- `ActiveEditor` - User in session with cursor and last seen timestamp
+- `DraftContent` - Collaborative content structure (title, description, content, tags, category)
+- `CollaborativeSession` - Session with editors, content, version tracking
+- `EditOperation` - Edit operation with type, position, content, author, timestamp, version
+- `EditConflict` - Conflict detection with resolution
+- `RealTimeComment` - Real-time comment on content section
+- `CollaborativeEvent` - Session event types (user_joined, user_left, cursor_moved, edit_applied, comment_added)
+- `CollaborationEventType` - Type union for event types
+
+**2. Operational Transformation Algorithm** (`src/utils/collaboration/operationalTransformation.ts`):
+- `OperationalTransformation` class with 6 core methods:
+  - `transform(op1, op2)` - Transform two operations and detect conflict
+  - `transformOpAgainstOps(clientOp, serverOps)` - Transform client operation against server operations
+  - `applyOperation(content, operation)` - Apply insert/delete/replace operation to content
+  - `detectConflict(op1, op2)` - Detect operations at same position from different authors
+  - `resolveConflict(op1, op2)` - Resolve conflict using earlier timestamp
+  - Position-to-index conversion for multi-line content
+- Client state management utilities:
+  - `createClientState(initialRevision)` - Create client state with revision
+  - `addPendingOperation(state, operation)` - Add operation to pending queue
+  - `clearPendingOperations(state)` - Clear pending operations after acknowledgment
+  - `incrementRevision(state)` - Increment document version
+
+**3. Session Management** (`src/utils/collaboration/sessionManager.ts`):
+- `SessionManager` class with session lifecycle management:
+  - `createSession(postId, content, creator)` - Create new session, return session ID
+  - `getSession(sessionId)` - Retrieve session by ID
+  - `getSessionByPostId(postId)` - Retrieve session by post ID
+  - `updateSessionContent(sessionId, content)` - Update content and increment version
+  - `addEditor(sessionId, userId, username)` - Add editor to session
+  - `removeEditor(sessionId, userId)` - Remove editor, close session if last editor
+  - `updateEditorCursor(sessionId, userId, position, selection?)` - Update cursor position
+  - `getActiveEditors(sessionId)` - Get all active editors in session
+  - `getEditor(sessionId, userId)` - Get specific editor
+  - `closeSession(sessionId)` - Close and remove session
+  - `getActiveSessions()` - Get all active sessions
+  - `getSessionCount()` - Get total session count
+  - `getTotalEditorCount()` - Get total editors across all sessions
+- Heartbeat system:
+  - 30-second interval for stale editor detection
+  - 60-second timeout for automatic removal
+  - Automatic session closure when last editor removed
+
+**4. Active Editors Indicator** (`src/components/collaboration/ActiveEditorsIndicator.tsx`):
+- Displays list of active editors excluding current user
+- Avatar generation:
+  - Color-coded based on userId (8 colors in rotation)
+  - Initials extraction (first letter of first/last name, or first 2 letters if single name)
+- Editor information:
+  - Username display
+  - Last seen formatting (Aktif, Xm yang lalu, Xj yang lalu)
+  - Cursor position display (Baris {line + 1})
+- Interactive:
+  - Click handler for editor selection
+  - Hover states with background color transition
+- Fixed positioning:
+  - Top-right corner with z-index for visibility
+  - Compact card design with shadow and border
+- Dark mode support via ThemeContext
+- Indonesian UI text for accessibility
+
+### Architecture Benefits
+
+1. **Conflict-Free Collaboration**: Operational Transformation algorithm prevents data loss from simultaneous edits
+2. **Real-Time Synchronization**: Cursor positions and editor visibility in real-time
+3. **Session Scalability**: Multiple concurrent sessions supported with automatic cleanup
+4. **Connection Resilience**: Heartbeat system detects and removes stale connections
+5. **User Experience**: Real-time feedback with Indonesian language support
+6. **Type Safety**: Full TypeScript interfaces for all collaboration data structures
+7. **Testable Foundation**: Comprehensive test coverage for OT algorithm and session management
+
+### Testing
+
+**Operational Transformation Tests** (50+ tests):
+- Transform operations without conflict (different positions)
+- Detect conflict when same position, different authors
+- No conflict when same position, same author
+- Conflict resolution using earlier timestamp
+- Transform client operation against multiple server operations
+- Apply insert operation to content
+- Apply delete operation to content
+- Apply replace operation to content
+- Multi-line content handling with position-to-index conversion
+
+**Session Manager Tests** (80+ tests):
+- Create session and add creator as first editor
+- Initialize session with version 1
+- Retrieve session by ID
+- Retrieve session by post ID
+- Update session content and increment version
+- Add editor to session
+- Remove editor from session
+- Close session when last editor removed
+- Update editor cursor position
+- Update editor selection when provided
+- Get all active editors in session
+- Get specific editor from session
+- Get all active sessions
+- Get session count
+- Get total editor count across all sessions
+
+### Related Files
+
+- ✅ Added: `src/types/collaboration.ts` - Collaboration type definitions (58 lines)
+- ✅ Added: `src/utils/collaboration/operationalTransformation.ts` - OT algorithm (178 lines)
+- ✅ Added: `src/utils/collaboration/sessionManager.ts` - Session management (169 lines)
+- ✅ Added: `src/utils/collaboration/index.ts` - Central exports (4 lines)
+- ✅ Added: `src/components/collaboration/ActiveEditorsIndicator.tsx` - Active editors UI (94 lines)
+- ✅ Added: `src/utils/collaboration/__tests__/operationalTransformation.test.ts` - OT tests (300+ lines, 50+ tests)
+- ✅ Added: `src/utils/collaboration/__tests__/sessionManager.test.ts` - Session tests (450+ lines, 80+ tests)
+
+### Implementation Status
+
+**Completed Phases** (44%):
+- ✅ Phase 1: Type Definitions - Complete
+- ✅ Phase 2: Operational Transformation Algorithm - Complete
+- ✅ Phase 3: Session Management - Complete
+- ✅ Phase 4: ActiveEditorsIndicator Component - Complete
+
+**Remaining Phases** (56%):
+- ⏳ Phase 5: WebSocket Server Implementation
+- ⏳ Phase 6: Real-Time Comments System
+- ⏳ Phase 7: Auto-Save with Collaborative History
+- ⏳ Phase 8: Real-Time Editor Component
+- ⏳ Phase 9: RBAC Protection
+
+### Related Tasks
+
+- Task 352 (Real-Time Content Co-Authoring Implementation) - Current task (44% complete)
+- FEATURE-061 (Real-Time Content Co-Authoring) - Feature specification
+- FEATURE-034 (Content Version Control & History) - Integration for history
+- FEATURE-013 (User Roles & Permissions) - RBAC integration
+
+## Dependency Cleanup - Export Utilities (✅ COMPLETED - Jan 20, 2026)
+
+### Purpose
+
+Fix circular dependency between `exportUtils.ts` and `exportPDF.ts`, eliminating architectural violation and improving code maintainability following Dependency Inversion Principle.
+
+### Problem Identified
+
+**Circular Dependency**:
+- `exportUtils.ts` → (dynamic import) → `exportPDF.ts`
+- `exportPDF.ts` → imports types from → `exportUtils.ts`
+
+**Why This Matters**:
+1. **Circular Dependency**: Modules depend on each other, creating tight coupling
+2. **Maintainability**: Changes in one module require updating the other
+3. **Testing**: Difficult to test modules in isolation
+4. **Build Risk**: Circular dependencies can cause build failures
+5. **Architecture Violation**: Violates Dependency Inversion Principle
+
+### Architecture Solution
+
+**Extract Shared Types to Separate Module**:
+
+```
+Before (Circular Dependency):
+exportUtils.ts → exportPDF.ts → exportUtils.ts (circular)
+
+After (Clean Dependencies):
+exportUtils.ts → exportTypes.ts ← exportPDF.ts
+```
+
+**Types Layer** (`src/utils/exportTypes.ts`):
+- `ExportConfig` interface - Export configuration options
+- `ExportMetadata` interface - Export metadata with filters
+- `formatExportDate()` - Date formatting utility
+- `generateExportMetadata()` - Metadata generation
+- `getFilterMetadataText()` - Filter metadata text generation
+
+**Utils Layer** (`src/utils/exportUtils.ts`):
+- Exports own functions: `exportToCSV`, `exportBlogPosts`, `exportToPDF` (dynamic import)
+- Re-exports from exportTypes.ts: types and utilities
+- Maintains backward compatibility (imports still work from exportUtils)
+
+**PDF Layer** (`src/utils/exportPDF.ts`):
+- Imports types from exportTypes.ts (no dependency on exportUtils)
+- Implements `exportToPDF` function
+- Uses `getFilterMetadataText` from exportTypes.ts
+
+### Architecture Benefits
+
+1. **No Circular Dependencies**: Modules depend on shared types, not each other ✅
+2. **Dependency Inversion**: Both modules depend on abstraction (types) ✅
+3. **Single Responsibility**: Types module only contains shared contracts ✅
+4. **Maintainability**: Changes to types affect all consumers automatically ✅
+5. **Testability**: Modules can be tested independently ✅
+6. **Backward Compatibility**: Existing imports continue to work without changes ✅
+7. **Reusability**: Shared types can be used by other export modules ✅
+
+### Code Changes
+
+- Added: `src/utils/exportTypes.ts` - Shared types and utilities (61 lines)
+- Modified: `src/utils/exportUtils.ts` - Import and re-export from exportTypes.ts (5 lines changed)
+- Modified: `src/utils/exportPDF.ts` - Import types from exportTypes.ts, remove duplicate code (24 lines changed)
+
+### Success Criteria
+
+- [x] Circular dependency resolved (madge confirms no circular dependencies)
+- [x] Shared types extracted to exportTypes.ts
+- [x] Both modules import from exportTypes.ts (not each other)
+- [x] Backward compatibility maintained (re-exports preserve existing imports)
+- [x] All 12 exportUtils tests passing (100% success rate)
+- [x] TypeScript compilation passes (0 errors)
+- [x] No regressions in existing functionality
+
+### Related Files
+
+- ✅ Added: `src/utils/exportTypes.ts` - Shared types and utilities (61 lines)
+- ✅ Modified: `src/utils/exportUtils.ts` - Import and re-export from exportTypes.ts
+- ✅ Modified: `src/utils/exportPDF.ts` - Import types from exportTypes.ts
+
+### Implementation Summary
+
+**Files Added**: 1 file (exportTypes.ts)
+**Files Modified**: 2 files (exportUtils.ts, exportPDF.ts)
+**Lines Added**: 61 lines (exportTypes.ts)
+**Lines Changed**: ~30 lines (import updates, duplicate code removal)
+**Circular Dependencies Resolved**: 1 (exportUtils ↔ exportPDF)
+
+**Key Features**:
+1. **Dependency Inversion**: Both modules depend on shared types abstraction
+2. **No Circular Dependencies**: Verified with madge (0 circular dependencies)
+3. **Backward Compatibility**: Re-exports preserve all existing imports
+4. **Code Reuse**: Removed duplicate `getFilterMetadataText` function
+5. **Clean Separation**: Types, utilities, and implementation properly separated
+
+### Notes
+
+- Follows SOLID Principles:
+  - **Dependency Inversion**: High-level modules don't depend on low-level modules (both depend on types)
+  - **Single Responsibility**: exportTypes.ts only contains shared contracts
+  - **Open/Closed**: Easy to add new export formats without modifying existing code
+
+- Follows Clean Architecture:
+  - **Dependency Rule**: Dependencies point toward shared abstractions (types)
+  - **Layer Separation**: Clear separation between types, utilities, and implementations
+
+### Related Tasks
+
+- Task 351 (Code Sanitizer - Fix TypeScript & Lint Errors) - Prerequisite cleanup
+- Task 352 (Real-Time Content Co-Authoring) - Independent module, not affected
+- FEATURE-062 (Blog Post Export Functionality) - Uses export utilities
+
+---
