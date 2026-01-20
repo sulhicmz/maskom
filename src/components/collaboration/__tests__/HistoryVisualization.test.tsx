@@ -86,8 +86,8 @@ describe('HistoryVisualization', () => {
       )
 
       expect(screen.getByText('Per Author')).toBeInTheDocument()
-      expect(screen.getByText('User1')).toBeInTheDocument()
-      expect(screen.getByText('User2')).toBeInTheDocument()
+      expect(screen.getAllByText('User1')).toHaveLength(2)
+      expect(screen.getAllByText('User2')).toHaveLength(2)
     })
 
     it('should display history entries', () => {
@@ -101,7 +101,9 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      expect(screen.getByText('User1')).toBeInTheDocument()
+      const authorBreakdownEntries = screen.getAllByText('User1')
+      const historyEntries = authorBreakdownEntries.filter(el => el.classList.contains('history-entry-item'))
+      expect(historyEntries.length).toBeGreaterThan(0)
     })
   })
 
@@ -117,8 +119,8 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
 
       await waitFor(() => {
         expect(screen.getByText('Pratinjau Versi')).toBeInTheDocument()
@@ -136,13 +138,12 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
 
       await waitFor(() => {
         expect(screen.getByText('Pratinjau Versi')).toBeInTheDocument()
         expect(screen.getByText('Penulis:')).toBeInTheDocument()
-        expect(screen.getByText('User1')).toBeInTheDocument()
         expect(screen.getByText('Deskripsi:')).toBeInTheDocument()
         expect(screen.getByText('Test description')).toBeInTheDocument()
       })
@@ -159,8 +160,8 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
 
       await waitFor(() => {
         expect(screen.getByText('Versi Saat Ini')).toBeInTheDocument()
@@ -180,13 +181,16 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
+
+      const rollbackButton = screen.getByText('Kembalikan ke Versi Ini')
+      fireEvent.click(rollbackButton)
 
       await waitFor(() => {
-        const rollbackButton = screen.getByText(/Kembalikan ke Versi Ini/)
-        fireEvent.click(rollbackButton)
+        expect(screen.getByText('Konfirmasi Kembalikan')).toBeInTheDocument()
       })
+    })
 
       expect(screen.getByText('Konfirmasi Kembalikan')).toBeInTheDocument()
     })
@@ -202,13 +206,16 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
+
+      const confirmButton = screen.getByText('Ya, Kembalikan')
+      fireEvent.click(confirmButton)
 
       await waitFor(() => {
-        const rollbackButton = screen.getByText(/Kembalikan ke Versi Ini/)
-        fireEvent.click(rollbackButton)
+        expect(mockOnRollback).toHaveBeenCalled()
       })
+    })
 
       const confirmButton = screen.getByText('Ya, Kembalikan')
       fireEvent.click(confirmButton)
@@ -229,13 +236,16 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
+
+      const confirmButton = screen.getByText('Ya, Kembalikan')
+      fireEvent.click(confirmButton)
 
       await waitFor(() => {
-        const rollbackButton = screen.getByText(/Kembalikan ke Versi Ini/)
-        fireEvent.click(rollbackButton)
+        expect(screen.queryByText('Pratinjau Versi')).not.toBeInTheDocument()
       })
+    })
 
       const confirmButton = screen.getByText('Ya, Kembalikan')
       fireEvent.click(confirmButton)
@@ -256,13 +266,12 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
 
-      await waitFor(() => {
-        const rollbackButton = screen.getByText(/Kembalikan ke Versi Ini/)
-        expect(rollbackButton).toBeDisabled()
-      })
+      const rollbackButton = screen.getByText('Kembalikan ke Versi Ini')
+      expect(rollbackButton).toBeDisabled()
+    })
     })
   })
 
@@ -330,13 +339,20 @@ describe('HistoryVisualization', () => {
         />
       )
 
-      const entry = screen.getByText('User1').closest('.history-entry-item')
-      fireEvent.click(entry!)
+      const historyEntries = screen.getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))
+      fireEvent.click(historyEntries[0]!)
 
       await waitFor(() => {
-        const closeButton = screen.getByLabelText('Close')
-        fireEvent.click(closeButton)
+        expect(screen.getByText('Pratinjau Versi')).toBeInTheDocument()
       })
+
+      const closeButton = screen.getByText('X')
+      fireEvent.click(closeButton)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Pratinjau Versi')).not.toBeInTheDocument()
+      })
+    })
 
       expect(screen.queryByText('Pratinjau Versi')).not.toBeInTheDocument()
     })

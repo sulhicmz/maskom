@@ -316,15 +316,15 @@ describe('collaborativeHistory', () => {
       const formatted = formatHistoryDate(timestamp)
 
       expect(formatted).toMatch(/20 Jan 2026/)
-      expect(formatted).toContain('15:30')
+      expect(formatted).toContain(', 15:30')
     })
 
     it('should format date correctly for different months', () => {
       const timestamp = new Date('2026-12-15T10:20:30Z').getTime()
       const formatted = formatHistoryDate(timestamp)
 
-      expect(formatted).toContain('15 Des 2026')
-      expect(formatted).toContain('10:20')
+      expect(formatted).toMatch(/15 Des 2026/)
+      expect(formatted).toContain(', 10:20')
     })
   })
 })
