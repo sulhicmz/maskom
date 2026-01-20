@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sessionManager } from '@/utils/collaboration/sessionManager'
-import { CollaborativeEvent } from '@/types/collaboration'
+import { CollaborativeEvent, CollaborativeEventType } from '@/types/collaboration'
 
+const POLL_INTERVAL = 1000 // 1 second
 const MAX_EVENTS_PER_POLL = 50
+
+interface PollRequest {
+  sessionId: string
+  userId: number
+  username: string
+  lastEventId?: string
+}
 
 interface PollResponse {
   success: boolean
@@ -37,6 +45,7 @@ interface EditRequest {
     position: { line: number; column: number }
     content?: string
     length?: number
+    version: number
   }
 }
 
@@ -154,7 +163,7 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
     )
   }
 
-  const session = sessionManager.getSessionByPostId(postId)
+  let session = sessionManager.getSessionByPostId(postId)
 
   if (!session) {
     return NextResponse.json(

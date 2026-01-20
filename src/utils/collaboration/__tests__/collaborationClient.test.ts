@@ -1,4 +1,4 @@
-import { CollaborationClient, createCollaborationClient } from '../collaborationClient'
+import { CollaborationClient, createCollaborationClient } from '../collaboration/collaborationClient'
 import { CollaborativeEvent } from '@/types/collaboration'
 
 describe('CollaborationClient', () => {
@@ -11,7 +11,7 @@ describe('CollaborationClient', () => {
     global.fetch = mockFetch
 
     mockConfig = {
-      sessionId: 'session_1',
+      sessionId: 'session_test123',
       userId: 1,
       username: 'testuser',
       pollInterval: 100,
@@ -35,7 +35,7 @@ describe('CollaborationClient', () => {
     it('should successfully join a session', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       const result = await client.join()
@@ -68,7 +68,7 @@ describe('CollaborationClient', () => {
     it('should start polling after successful join', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -93,7 +93,7 @@ describe('CollaborationClient', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'leave',
-          sessionId: 'session_1',
+          sessionId: 'session_test123',
           userId: 1
         })
       })
@@ -102,21 +102,21 @@ describe('CollaborationClient', () => {
     it('should stop polling when leaving', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
-      jest.runAllTimers()
+      jest.advanceTimersByTime(100)
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionActive: false })
+        json: async () => ({ success: true })
       })
 
       await client.leave()
-      jest.runAllTimers()
+      jest.advanceTimersByTime(100)
 
-      expect(mockFetch).toHaveBeenCalledTimes(3)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
     })
 
     it('should handle leave failure', async () => {
@@ -135,7 +135,7 @@ describe('CollaborationClient', () => {
     it('should send cursor update to server', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -153,7 +153,7 @@ describe('CollaborationClient', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'cursor_update',
-          sessionId: 'session_1',
+          sessionId: 'session_test123',
           userId: 1,
           cursorPosition: { line: 5, column: 10 }
         })
@@ -163,7 +163,7 @@ describe('CollaborationClient', () => {
     it('should send cursor update with selection', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -196,7 +196,7 @@ describe('CollaborationClient', () => {
     it('should handle send cursor update failure', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -214,7 +214,7 @@ describe('CollaborationClient', () => {
     it('should send edit operation to server', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -237,7 +237,7 @@ describe('CollaborationClient', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'edit',
-          sessionId: 'session_1',
+          sessionId: 'session_test123',
           userId: 1,
           editOperation: {
             type: 'insert',
@@ -252,7 +252,7 @@ describe('CollaborationClient', () => {
     it('should send delete edit operation', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -275,7 +275,7 @@ describe('CollaborationClient', () => {
     it('should send replace edit operation', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -310,7 +310,7 @@ describe('CollaborationClient', () => {
     it('should handle send edit failure', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -332,7 +332,7 @@ describe('CollaborationClient', () => {
     it('should send comment to server', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -353,7 +353,7 @@ describe('CollaborationClient', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'comment',
-          sessionId: 'session_1',
+          sessionId: 'session_test123',
           userId: 1,
           username: 'testuser',
           comment: {
@@ -376,7 +376,7 @@ describe('CollaborationClient', () => {
     it('should handle send comment failure', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -393,10 +393,10 @@ describe('CollaborationClient', () => {
   })
 
   describe('polling', () => {
-    it.skip('should poll for events after joining - TODO: Jest fake timer + async polling complexity', async () => {
+    it('should poll for events after joining', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       mockFetch.mockResolvedValueOnce({
@@ -406,12 +406,12 @@ describe('CollaborationClient', () => {
           events: [
             {
               type: 'cursor_moved',
-              sessionId: 'session_1',
+              sessionId: 'session_test123',
               postId: 1,
               userId: 2,
               timestamp: Date.now(),
               data: {
-                eventId: 'session_1_1',
+                eventId: 'session_test123_1',
                 cursorPosition: { line: 5, column: 10 }
               }
             }
@@ -422,7 +422,6 @@ describe('CollaborationClient', () => {
 
       await client.join()
       jest.advanceTimersByTime(100)
-      await new Promise(resolve => process.nextTick(resolve))
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('/api/collaborate?'),
@@ -432,15 +431,15 @@ describe('CollaborationClient', () => {
       )
     })
 
-    it.skip('should call onEvent callback for received events - TODO: Jest fake timer + async polling complexity', async () => {
+    it('should call onEvent callback for received events', async () => {
       const mockEvent: CollaborativeEvent = {
         type: 'edit_applied',
-        sessionId: 'session_1',
+        sessionId: 'session_test123',
         postId: 1,
         userId: 2,
         timestamp: Date.now(),
         data: {
-          eventId: 'session_1_1',
+          eventId: 'session_test123_1',
           type: 'insert',
           position: { line: 5, column: 10 },
           content: 'test',
@@ -451,7 +450,7 @@ describe('CollaborationClient', () => {
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       mockFetch.mockResolvedValueOnce({
@@ -465,15 +464,14 @@ describe('CollaborationClient', () => {
 
       await client.join()
       jest.advanceTimersByTime(100)
-      await Promise.resolve()
 
       expect(mockConfig.onEvent).toHaveBeenCalledWith(mockEvent)
     })
 
-    it.skip('should handle session inactive - TODO: Jest fake timer + async polling complexity', async () => {
+    it('should handle session inactive', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       mockFetch.mockResolvedValueOnce({
@@ -487,15 +485,14 @@ describe('CollaborationClient', () => {
 
       await client.join()
       jest.advanceTimersByTime(100)
-      await Promise.resolve()
 
       expect(mockConfig.onDisconnect).toHaveBeenCalled()
     })
 
-    it.skip('should track lastEventId for incremental polling - TODO: Jest fake timer + async polling complexity', async () => {
+    it('should track lastEventId for incremental polling', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       mockFetch.mockResolvedValueOnce({
@@ -505,11 +502,11 @@ describe('CollaborationClient', () => {
           events: [
             {
               type: 'cursor_moved',
-              sessionId: 'session_1',
+              sessionId: 'session_test123',
               postId: 1,
               userId: 2,
               timestamp: Date.now(),
-              data: { eventId: 'session_1_1' }
+              data: { eventId: 'session_test123_1' }
             }
           ],
           sessionActive: true
@@ -517,6 +514,8 @@ describe('CollaborationClient', () => {
       })
 
       await client.join()
+      jest.advanceTimersByTime(100)
+
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -524,43 +523,34 @@ describe('CollaborationClient', () => {
           events: [
             {
               type: 'cursor_moved',
-              sessionId: 'session_1',
+              sessionId: 'session_test123',
               postId: 1,
               userId: 2,
               timestamp: Date.now(),
-              data: { eventId: 'session_1_2' }
+              data: { eventId: 'session_test123_2' }
             }
           ],
           sessionActive: true
         })
       })
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true, events: [], sessionActive: false })
-      })
-
       jest.advanceTimersByTime(100)
-      await Promise.resolve()
-      jest.advanceTimersByTime(100)
-      await Promise.resolve()
 
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('lastEventId=session_1_1')
+        expect.stringContaining('lastEventId=session_test123_1')
       )
     })
 
     it('should handle polling errors', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
       await client.join()
       jest.advanceTimersByTime(100)
-      await Promise.resolve()
 
       expect(mockConfig.onError).toHaveBeenCalledWith(expect.any(Error))
     })
@@ -574,7 +564,7 @@ describe('CollaborationClient', () => {
     it('should return true after joining', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -585,7 +575,7 @@ describe('CollaborationClient', () => {
     it('should return false after leaving', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ success: true, sessionId: 'session_1', postId: 1, userId: 1 })
+        json: async () => ({ success: true, sessionId: 'session_test123', postId: 1, userId: 1 })
       })
 
       await client.join()
@@ -603,7 +593,7 @@ describe('CollaborationClient', () => {
 
   describe('getSessionId', () => {
     it('should return session ID', () => {
-      expect(client.getSessionId()).toBe('session_1')
+      expect(client.getSessionId()).toBe('session_test123')
     })
   })
 })
@@ -611,7 +601,7 @@ describe('CollaborationClient', () => {
 describe('createCollaborationClient', () => {
   it('should create a new CollaborationClient instance', () => {
     const config: any = {
-      sessionId: 'session_1',
+      sessionId: 'session_test123',
       userId: 1,
       username: 'testuser',
       pollInterval: 1000,
@@ -629,7 +619,7 @@ describe('createCollaborationClient', () => {
 
   it('should use default poll interval if not provided', () => {
     const config: any = {
-      sessionId: 'session_1',
+      sessionId: 'session_test123',
       userId: 1,
       username: 'testuser',
       onEvent: jest.fn(),

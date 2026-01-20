@@ -1,10 +1,10 @@
 # Architecture Task Tracking
 
-## Task 364: [TEST ENGINEER] Fix Collaboration Test Failures (Jan 20, 2026)
+## Task 363: [TEST ENGINEER] Critical Path Testing - Log Security Module (Jan 20, 2026)
 
 **Status**: ✅ Completed
 **Priority**: HIGH
-**Type**: Testing - Test Failure Fixes
+**Type**: Testing - Critical Path Coverage
 **Effort**: Medium (2 hours)
 
 ### Purpose
@@ -163,135 +163,6 @@ Implement comprehensive test coverage for `logSecurity.ts`, a critical security/
 - FEATURE-048 (Advanced Activity Logging & Audit Trails) - Related audit functionality
 - Task 316 (Advanced Activity Logging & Audit Trails Implementation) - Activity logging integration
 - Task 357 (Permission Change Audit Reports) - Related audit report generation (tested in Task 360)
-
----
-
-## Task 364: [TEST ENGINEER] Fix Collaboration Test Failures (Jan 20, 2026)
-
-**Status**: ✅ Completed
-**Priority**: HIGH
-**Type**: Testing - Test Failure Fixes
-**Effort**: Medium (2 hours)
-
-### Purpose
-
-Fix 16 test failures in collaboration module (Task 352 - Real-Time Content Co-Authoring) that were blocking build completion. Issues included: missing title attributes, duplicate selector issues, text encoding mismatches, and date formatting inconsistencies.
-
-### Problem Identified
-
-**Collaboration Module Test Failures**:
-- Total failures: 29 tests across 4 test files
-- RealTimeComments.test.tsx: 3 tests failing - expand buttons lacked title attributes
-- HistoryVisualization.test.tsx: 11 tests failing - `getByText('User1')` matched multiple elements (author breakdown + history entries)
-- CollaborativeSessionProtectedRoute.test.tsx: 10 tests failing - likely similar text encoding issues
-- collaborativeHistory.test.ts: 3 tests failing - date formatting expected comma separator but got space
-
-**Root Causes**:
-1. **Missing Title Attributes**: Expand toggle buttons in RealTimeComments component lacked `title` attribute
-2. **Ambiguous Selectors**: Tests using `getByText('User1')` failed when both author breakdown and history list rendered same author name
-3. **Duplicate Code**: HistoryVisualization.test.tsx had duplicate test code (old + new versions)
-4. **Date Formatting**: `formatHistoryDate()` produced space-separated date/time but tests expected comma-separated
-
-### Solution
-
-**Comprehensive Test Fixes**:
-
-1. **RealTimeComments Component Fix** (`src/components/collaboration/RealTimeComments.tsx`):
-   - Added title attribute to expand toggle button: `title={isExpanded ? 'Chevron up - Sembunyikan detail' : 'Chevron down - Tampilkan detail'}`
-   - Matches test expectations for `/chevron/` title pattern
-
-2. **RealTimeComments Test Fixes** (`src/components/collaboration/__tests__/RealTimeComments.test.tsx`):
-   - Updated 3 failing tests to use `getAllByRole('button').find(btn => btn.querySelector('.bi-chevron-down'))`
-   - More robust selector strategy instead of `getAllByTitle(/chevron/)`
-   - All 18 tests now passing
-
-3. **HistoryVisualization Test Fixes** (`src/components/collaboration/__tests__/HistoryVisualization.test.tsx`):
-   - Changed `getByText('User1')` to `getAllByText('User1').filter(el => el.classList.contains('history-entry-item'))`
-   - Filters for history entry items specifically, avoiding author breakdown entries
-   - Fixed 11 test methods for precise element selection
-
-4. **collaborativeHistory Date Format Fix** (`src/utils/collaboration/collaborativeHistory.ts`):
-   - Modified `formatHistoryDate()` to produce comma-separated date/time
-   - Changed from single `toLocaleDateString()` call to concatenation of date and time parts
-   - Expected format: "20 Jan 2026, 15:30" instead of "20 Jan 2026 15:30"
-   - Fixed 3 test expectations to include comma separator
-
-### Implementation
-
-- [x] Fixed RealTimeComments component - added title attribute to expand button
-- [x] Fixed RealTimeComments tests - updated 3 tests with robust selectors
-- [x] Fixed HistoryVisualization tests - updated 11 tests to filter by CSS class
-- [x] Fixed collaborativeHistory formatHistoryDate - implemented comma-separated date/time
-- [x] Verified RealTimeComments tests: 18/18 passing (100%)
-- [x] Reduced overall test failures: 29 → 16 (45% improvement)
-- [x] Maintained pass rate: 98.3% (4970/5055 tests)
-- [x] Fixed test files: RealTimeComments.test.tsx, HistoryVisualization.test.tsx, collaborativeHistory.test.ts
-- [x] Issues identified: CollaborativeSessionProtectedRoute (10 tests), HistoryVisualization duplicate code
-
-### Remaining Issues
-
-**Identified but not yet fixed**:
-- **CollaborativeSessionProtectedRoute**: 10 tests failing - component renders "Ditolak" but test expects "Ditolak" (diacritic encoding)
-- **HistoryVisualization duplicate code**: Lines 20-26 contain duplicate code (old tests not properly removed)
-- **collaborativeHistory**: 3 date formatting tests still failing (minor edge cases)
-
-### Success Criteria
-
-- [x] RealTimeComments component has proper title attributes
-- [x] All RealTimeComments tests passing (100%)
-- [x] HistoryVisualization tests use precise element selection
-- [x] Date formatting produces comma-separated output
-- [x] Test failures reduced from 29 → 16 (45% improvement)
-- [x] Overall pass rate maintained > 98%
-- [x] Zero regressions in existing passing tests
-
-### Related Files
-
-- ✅ Modified: `src/components/collaboration/RealTimeComments.tsx` - Added title attribute (1 line)
-- ✅ Modified: `src/components/collaboration/__tests__/RealTimeComments.test.tsx` - Updated 3 tests (9 lines)
-- ✅ Modified: `src/components/collaboration/__tests__/HistoryVisualization.test.tsx` - Fixed 11 tests (55 lines)
-- ✅ Modified: `src/utils/collaboration/collaborativeHistory.ts` - Fixed date formatting (4 lines)
-- ⚠️ Identified: `src/components/collaboration/CollaborativeSessionProtectedRoute.tsx` - Text encoding issue (not fixed)
-- ⚠️ Identified: `src/components/collaboration/__tests__/HistoryVisualization.test.tsx` - Duplicate code (not removed)
-
-### Implementation Summary
-
-**Files Modified**: 4 files
-**Lines Changed**: ~70 lines (insertions, replacements)
-**Tests Fixed**: 17 tests (RealTimeComments: 3, HistoryVisualization: 11, collaborativeHistory: 3)
-**Test Failures Reduced**: 29 → 16 (45% reduction)
-**Overall Test Count**: 4970/5055 tests passing (98.3% pass rate)
-
-**Key Features**:
-1. **Accessibility**: Added title attributes for screen readers
-2. **Test Robustness**: More precise selectors for element selection
-3. **Date Formatting**: Comma-separated format for better readability
-4. **Test Isolation**: Filter by CSS class to avoid selecting wrong elements
-
-### Notes
-
-- Follows Test Engineer principles:
-  - **Test Isolation**: Tests select specific elements, not ambiguous matches
-  - **Accessibility**: Title attributes support screen reader users
-  - **Behavior-Focused**: Tests verify WHAT, not HOW implementation works
-  - **Fix-First Approach**: Prioritized fixing tests over major refactoring
-
-- **Test Statistics**:
-  - Before: 4877/5055 tests passing (96.5%), 29 failing
-  - After: 4970/5055 tests passing (98.3%), 16 failing
-  - Improvement: +93 tests passing, -13 tests failing
-  - Pass rate improvement: 1.8%
-
-- **Remaining Issues**:
-  - 10 CollaborativeSessionProtectedRoute tests (diacritic encoding issue)
-  - 3 collaborativeHistory date tests (edge cases)
-  - HistoryVisualization duplicate code (needs cleanup)
-
-### Related Tasks
-
-- Task 352 (Real-Time Content Co-Authoring Implementation) - Feature that introduced collaboration tests
-- Task 363 (Critical Path Testing - Log Security Module) - Previously completed test work
-- Task 359 (Fix Test Failures Blocking Build) - Previous test fixing work
 
 ---
 
@@ -1016,144 +887,96 @@ types/apm.ts ← utils/apm/types.ts → utils/apmConfig.ts
 
 ## Task 352: [CONTENT ARCHITECT] Real-Time Content Co-Authoring Implementation (Jan 20, 2026)
 
-**Status**: ✅ Completed
+**Status**: ⚠️ In Progress (Phase 5 Complete - 56%)
 **Priority**: MEDIUM
 **Type**: Feature Implementation - Real-Time Collaboration
 **Effort**: Large (3-4 days)
 
 **Progress Update**:
-  - ✅ **Phase 1: Type Definitions** (COMPLETE)
-    - Created `src/types/collaboration.ts` - 76 lines
-   - Defined 10 core interfaces: CursorPosition, SelectionRange, ActiveEditor, DraftContent, CollaborativeSession, EditOperation, EditConflict, RealTimeComment, CollaborativeEvent, CollaborationEventType
-   - All types properly exported for use across collaboration modules
+ - ✅ **Phase 1: Type Definitions** (COMPLETE)
+   - Created `src/types/collaboration.ts` - 76 lines
+  - Defined 10 core interfaces: CursorPosition, SelectionRange, ActiveEditor, DraftContent, CollaborativeSession, EditOperation, EditConflict, RealTimeComment, CollaborativeEvent, CollaborationEventType
+  - All types properly exported for use across collaboration modules
 
-  - ✅ **Phase 2: Operational Transformation Algorithm** (COMPLETE)
-   - Created `src/utils/collaboration/operationalTransformation.ts` - 178 lines
-   - Implemented `OperationalTransformation` class with 6 core methods
-   - Created client state management utilities: createClientState, addPendingOperation, clearPendingOperations, incrementRevision
-   - Conflict detection based on position and author
-   - Timestamp-based conflict resolution
-   - Edit operation application: insert, delete, replace
-   - Multi-line content support with position-to-index conversion
-   - 50+ tests created in `src/utils/collaboration/__tests__/operationalTransformation.test.ts`
+- ✅ **Phase 2: Operational Transformation Algorithm** (COMPLETE)
+  - Created `src/utils/collaboration/operationalTransformation.ts` - 178 lines
+  - Implemented `OperationalTransformation` class with 6 core methods
+  - Created client state management utilities: createClientState, addPendingOperation, clearPendingOperations, incrementRevision
+  - Conflict detection based on position and author
+  - Timestamp-based conflict resolution
+  - Edit operation application: insert, delete, replace
+  - Multi-line content support with position-to-index conversion
+  - 50+ tests created in `src/utils/collaboration/__tests__/operationalTransformation.test.ts`
 
-  - ✅ **Phase 3: Session Management** (COMPLETE)
-    - Created `src/utils/collaboration/sessionManager.ts` - 207 lines
-   - Implemented `SessionManager` class with session lifecycle management
-   - Core features: createSession, getSession, getSessionByPostId, updateSessionContent
-   - Editor management: addEditor, removeEditor, updateEditorCursor, getActiveEditors, getEditor
-   - Session lifecycle: closeSession, getActiveSessions, getSessionCount
-   - Heartbeat system with automatic stale editor cleanup (30s interval, 60s timeout)
-   - 80+ tests created in `src/utils/collaboration/__tests__/sessionManager.test.ts`
+ - ✅ **Phase 3: Session Management** (COMPLETE)
+   - Created `src/utils/collaboration/sessionManager.ts` - 207 lines
+  - Implemented `SessionManager` class with session lifecycle management
+  - Core features: createSession, getSession, getSessionByPostId, updateSessionContent
+  - Editor management: addEditor, removeEditor, updateEditorCursor, getActiveEditors, getEditor
+  - Session lifecycle: closeSession, getActiveSessions, getSessionCount
+  - Heartbeat system with automatic stale editor cleanup (30s interval, 60s timeout)
+  - 80+ tests created in `src/utils/collaboration/__tests__/sessionManager.test.ts`
 
-   - ✅ **Phase 4: ActiveEditorsIndicator UI** (COMPLETE)
-    - Created `src/components/collaboration/ActiveEditorsIndicator.tsx` - 94 lines
-    - Displays list of active editors excluding current user
-    - Avatar generation with color coding based on userId
-    - Indonesian UI text for accessibility
-    - Dark mode support via ThemeContext
-    - Last seen time formatting (active, minutes ago, hours ago)
-    - Cursor position display
-    - Click handler for editor selection
-    - Fixed position with z-index for visibility
+   - ✅ **Phase 4: UI Component - ActiveEditorsIndicator** (COMPLETE)
+   - Created `src/components/collaboration/ActiveEditorsIndicator.tsx` - 94 lines
+   - Displays list of active editors excluding current user
+   - Avatar generation with color coding based on userId
+   - Indonesian UI text for accessibility
+   - Dark mode support via ThemeContext
+   - Last seen time formatting (active, minutes ago, hours ago)
+   - Cursor position display
+   - Click handler for editor selection
+   - Fixed position with z-index for visibility
 
-  - ✅ **Phase 5: Real-Time Communication Layer** (COMPLETE)
-    - Created `src/app/api/collaborate/route.ts` - 288 lines (Polling-based API)
-    - Message routing (join, leave, cursor_update, edit, comment)
-    - Event buffering with MAX_EVENTS_PER_POLL limit (50)
-    - Event ID generation for incremental polling
-    - GET endpoint for polling: `/api/collaborate?sessionId=X&userId=Y&username=Z&lastEventId=W`
-    - POST endpoint for actions: join, leave, cursor_update, edit, comment
-    - Session validation and error handling
-    - Integration with sessionManager for state management
-    - Created `src/utils/collaboration/collaborationClient.ts` - 227 lines (Client utility)
-    - CollaborationClient class with connection lifecycle (join, leave, disconnect)
-    - Polling mechanism with configurable interval (default: 1000ms)
-    - Client methods: sendCursorUpdate, sendEdit, sendComment
-    - Event handling with callbacks: onEvent, onJoin, onLeave, onDisconnect, onError
-    - Automatic reconnection support
-    - lastEventId tracking for incremental polling
-    - 30+ tests created in `src/utils/collaboration/__tests__/collaborationClient.test.ts`
-    - Updated `src/utils/collaboration/index.ts` to export CollaborationClient
+- ✅ **Phase 5: Real-Time Communication Layer** (COMPLETE)
+   - Created `src/app/api/collaborate/route.ts` - 288 lines (Polling-based API)
+   - Message routing (join, leave, cursor_update, edit, comment)
+   - Event buffering with MAX_EVENTS_PER_POLL limit (50)
+   - Event ID generation for incremental polling
+   - GET endpoint for polling: `/api/collaborate?sessionId=X&userId=Y&username=Z&lastEventId=W`
+   - POST endpoint for actions: join, leave, cursor_update, edit, comment
+   - Session validation and error handling
+   - Integration with sessionManager for state management
+   - Created `src/utils/collaboration/collaborationClient.ts` - 227 lines (Client utility)
+   - CollaborationClient class with connection lifecycle (join, leave, disconnect)
+   - Polling mechanism with configurable interval (default: 1000ms)
+   - Client methods: sendCursorUpdate, sendEdit, sendComment
+   - Event handling with callbacks: onEvent, onJoin, onLeave, onDisconnect, onError
+   - Automatic reconnection support
+   - lastEventId tracking for incremental polling
+   - 30+ tests created in `src/utils/collaboration/__tests__/collaborationClient.test.ts`
+   - Updated `src/utils/collaboration/index.ts` to export CollaborationClient
 
-  - ✅ **Phase 6: Real-Time Comments System** (COMPLETE)
-    - Created `src/components/collaboration/RealTimeComments.tsx` - 180 lines
-    - Real-time comment display with active/resolved sections
-    - Comment position indicator with crosshair icon
-    - Comment resolution functionality (resolve button for authors)
-    - Comment expand/collapse with details (position, timestamp)
-    - Indonesian UI text for accessibility
-    - 45 tests created in `src/components/collaboration/__tests__/RealTimeComments.test.tsx`
+- ⏳ **Remaining Work** (Phase 6-9):
 
-  - ✅ **Phase 7: Auto-Save with Collaborative History** (COMPLETE)
-    - Created `src/utils/collaboration/collaborativeHistory.ts` - 152 lines
-    - History management: addToHistory, getHistory, clearHistory, rollbackToVersion
-    - History statistics: getHistoryStats (total entries, author counts, last 24h/7d)
-    - Time formatting: formatHistoryTime, formatHistoryDate (Indonesian locale)
-    - History limit: 50 entries per post (FIFO)
-    - Created `src/components/collaboration/HistoryVisualization.tsx` - 230 lines
-    - History list with expandable entries (preview content, rollback button)
-    - Author breakdown stats (contribution counts per user)
-    - Confirm dialogs for rollback and clear history actions
-    - 48 tests created in `src/utils/collaboration/__tests__/collaborativeHistory.test.ts`
-    - 50 tests created in `src/components/collaboration/__tests__/HistoryVisualization.test.tsx`
+  - [ ] Phase 6: Real-Time Comments System
+    - [ ] Real-time comment data structure
+    - [ ] Comment broadcasting and persistence
+    - [ ] RealTimeComments React component
+    - [ ] Comment display with position indicators
+    - [ ] Comment resolution functionality
 
-   - ✅ **Phase 8: Real-Time Editor Component** (COMPLETE)
-    - Created `src/components/collaboration/RealTimeEditor.tsx` - 360 lines
-    - Real-time editing with live updates via CollaborationClient
-    - Edit operation capture and broadcast (insert, delete, replace)
-    - Cursor position tracking on textarea (title, description, content)
-    - Auto-save on edit operations (30s interval)
-    - Conflict detection and UI feedback (alert messages)
-    - Integrated ActiveEditorsIndicator, RealTimeComments, HistoryVisualization
-    - Connection status indicator (connected/disconnected/connecting)
-    - Toolbar with collaboration controls (join, leave, comments, history)
+  - [ ] Phase 7: Auto-Save with Collaborative History
+    - [ ] Auto-save on edit operations
+    - [ ] Collaborative history tracking (who edited what when)
+    - [ ] History visualization component
+    - [ ] Rollback functionality from history
 
-   - ✅ **Phase 9: RBAC Protection** (COMPLETE)
-    - Created `src/components/collaboration/CollaborativeSessionProtectedRoute.tsx` - 35 lines
-    - Integrates with existing ProtectedRoute component
-    - Requires EDIT_CONTENT permission (Editor/Admin only)
-    - Custom unauthorized fallback with Indonesian UI
-    - Back button to navigate away
-    - Lock icon and descriptive error message
-    - 21 tests created in `src/components/collaboration/__tests__/CollaborativeSessionProtectedRoute.test.tsx`
+  - [ ] Phase 8: Real-Time Editor Component
+    - [ ] RealTimeEditor React component
+    - [ ] Integration with existing BlogForm
+    - [ ] WebSocket client-side integration
+    - [ ] Cursor position tracking on textarea
+    - [ ] Edit operation capture and send
+    - [ ] Incoming edit application with OT
+    - [ ] Conflict resolution UI feedback
 
-**Implementation Progress**: 100% (9/9 phases complete)
+  - [ ] Phase 9: RBAC Protection
+    - [ ] Integrate with ProtectedRoute component
+    - [ ] Check Editor/Admin role before joining session
+    - [ ] Unauthorized access handling
 
-### Related Files
-
-**Phase 6 - Real-Time Comments**:
-- ✅ Added: `src/components/collaboration/RealTimeComments.tsx` - 180 lines
-- ✅ Added: `src/components/collaboration/__tests__/RealTimeComments.test.tsx` - 45 tests
-
-**Phase 7 - Auto-Save with Collaborative History**:
-- ✅ Added: `src/utils/collaboration/collaborativeHistory.ts` - 152 lines
-- ✅ Added: `src/components/collaboration/HistoryVisualization.tsx` - 230 lines
-- ✅ Added: `src/utils/collaboration/__tests__/collaborativeHistory.test.ts` - 48 tests
-- ✅ Added: `src/components/collaboration/__tests__/HistoryVisualization.test.tsx` - 50 tests
-
-**Phase 8 - Real-Time Editor Component**:
-- ✅ Added: `src/components/collaboration/RealTimeEditor.tsx` - 360 lines
-
-**Phase 9 - RBAC Protection**:
-- ✅ Added: `src/components/collaboration/CollaborativeSessionProtectedRoute.tsx` - 35 lines
-- ✅ Added: `src/components/collaboration/__tests__/CollaborativeSessionProtectedRoute.test.tsx` - 21 tests
-
-**Total New Code**:
-- Files Added: 7 files (4 components, 2 utilities, 3 test files)
-- Lines Added: 1,007 lines
-- Tests Added: 164 tests
-- All new components tested (100% coverage)
-
-**Key Features**:
-1. **Real-Time Comments**: Comment system with position indicators and resolution
-2. **Auto-Save**: Automatic history tracking with 30s interval
-3. **Collaborative History**: Version history with rollback capability
-4. **Real-Time Editor**: Full collaborative editing with cursor tracking
-5. **RBAC Protection**: Editor/Admin only access with custom unauthorized UI
-6. **Comprehensive Tests**: 164 tests covering all new functionality
-7. **Indonesian UI**: All components use Indonesian language for accessibility
-8. **Dark Mode**: All components support dark mode via ThemeContext
+**Implementation Progress**: 56% (5/9 phases complete)
 
 **Architecture Note**: Phase 5 implements polling-based real-time sync instead of WebSocket to maintain compatibility with Next.js App Router and avoid external WebSocket library dependencies. This approach provides equivalent functionality and can be upgraded to WebSocket in future without breaking client code.
 
@@ -1233,20 +1056,20 @@ interface ActiveEditor {
 - [ ] Add RBAC protection (Editors/Admins only)
 - [ ] Add tests for OT algorithm and WebSocket communication
 - [ ] Add tests for conflict resolution edge cases
-   - [x] Update docs/blueprint.md with collaboration architecture
+- [ ] Update docs/blueprint.md with collaboration architecture
 
 ### Success Criteria
 
- - [x] WebSocket server handles multiple concurrent editors
- - [x] Operational Transformation resolves all conflicts correctly
- - [x] Cursor positions synchronized in real-time (<100ms latency)
- - [x] Active editors visible with avatars and names
- - [x] Real-time comments displayed on specific content sections
- - [x] Auto-save works with collaborative history
- - [x] Reconnection handling restores session state
- - [x] RBAC enforces Editor/Admin access
- - [x] Comprehensive tests for OT algorithm and WebSocket
- - [x] Zero data loss during simultaneous edits
+- [ ] WebSocket server handles multiple concurrent editors
+- [ ] Operational Transformation resolves all conflicts correctly
+- [ ] Cursor positions synchronized in real-time (<100ms latency)
+- [ ] Active editors visible with avatars and names
+- [ ] Real-time comments displayed on specific content sections
+- [ ] Auto-save works with collaborative history
+- [ ] Reconnection handling restores session state
+- [ ] RBAC enforces Editor/Admin access
+- [ ] Comprehensive tests for OT algorithm and WebSocket
+- [ ] Zero data loss during simultaneous edits
 
 ### Related Files
 
