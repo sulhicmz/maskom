@@ -13,10 +13,20 @@ import {
   TOTP_WINDOW,
 } from '../totp';
 import type { TOTPVerificationOptions } from '@/types/mfa';
+import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
+
+jest.mock('@/utils/resilience/circuitBreaker', () => ({
+  CircuitBreaker: jest.fn().mockImplementation(() => ({
+    execute: jest.fn(async (operation) => await operation())
+  }))
+}));
 
 jest.mock('@/utils/uuid', () => ({
   generateUUID: jest.fn(() => 'mock-uuid-12345'),
 }));
+
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 describe('TOTP Utilities', () => {
   describe('generateSecret', () => {
@@ -105,9 +115,17 @@ describe('TOTP Utilities', () => {
   });
 
   describe('generateTOTPQRCode', () => {
-    test('should generate valid QR code URL', () => {
+    beforeEach(() => {
+      mockFetch.mockClear();
+      mockFetch.mockResolvedValue({
+        ok: true,
+        url: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth%3A%2F%2Ftotp%2FTestIssuer%3Atest%40example.com'
+      });
+    });
+
+    test('should generate valid QR code URL', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret, 'TestIssuer', 'test@example.com');
+      const qrCodeUrl = await generateTOTPQRCode(secret, 'TestIssuer', 'test@example.com');
 
       expect(qrCodeUrl).toContain('https://api.qrserver.com/v1/create-qr-code/');
       expect(qrCodeUrl).toContain('size=200x200');
@@ -116,23 +134,23 @@ describe('TOTP Utilities', () => {
       expect(qrCodeUrl).toContain('issuer%3DTestIssuer');
     });
 
-    test('should generate QR code URL with default issuer', () => {
+    test('should generate QR code URL with default issuer', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret);
+      const qrCodeUrl = await generateTOTPQRCode(secret);
 
       expect(qrCodeUrl).toContain('issuer%3DMaskom');
     });
 
-    test('should generate QR code URL with default account name', () => {
+    test('should generate QR code URL with default account name', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret);
+      const qrCodeUrl = await generateTOTPQRCode(secret);
 
       expect(qrCodeUrl).toContain('Maskom%3Auser');
     });
 
-    test('should include TOTP digits and period in QR code', () => {
+    test('should include TOTP digits and period in QR code', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret);
+      const qrCodeUrl = await generateTOTPQRCode(secret);
       
       expect(qrCodeUrl).toContain(`digits%3D${TOTP_DIGITS}`);
       expect(qrCodeUrl).toContain(`period%3D${TOTP_PERIOD}`);
