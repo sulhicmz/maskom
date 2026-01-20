@@ -150,7 +150,7 @@ function CommentItem({
             type="button"
             className="btn btn-link btn-sm"
             onClick={onToggleExpand}
-            title={isExpanded ? 'Chevron up - Sembunyikan detail' : 'Chevron down - Tampilkan detail'}
+            title={isExpanded ? 'Tutup' : 'Buka'}
           >
             <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
           </button>

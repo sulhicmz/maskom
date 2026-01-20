@@ -184,9 +184,8 @@ describe('RealTimeComments', () => {
         />
       )
 
-      const expandButton = screen.getAllByRole('button').find(btn => btn.querySelector('.bi-chevron-down'))
-      expect(expandButton).toBeInTheDocument()
-      fireEvent.click(expandButton!)
+      const expandButtons = screen.getAllByTitle(/chevron/)
+      fireEvent.click(expandButtons[0])
 
       expect(screen.getByText(/Baris 0, Kolom 5/)).toBeInTheDocument()
     })
@@ -277,45 +276,39 @@ describe('RealTimeComments', () => {
 describe('CommentItem', () => {
   const comment = mockComments[0]
 
-    it('should expand comment details when expand button clicked', () => {
-      const comment = mockComments[0]
+  it('should expand comment details when expand button clicked', () => {
+    render(
+      <RealTimeComments
+        postId={123}
+        comments={[comment]}
+        currentUserId={1}
+        onResolveComment={mockOnResolveComment}
+        onPositionClick={mockOnPositionClick}
+      />
+    )
 
-      render(
-        <RealTimeComments
-          postId={123}
-          comments={[comment]}
-          currentUserId={1}
-          onResolveComment={mockOnResolveComment}
-          onPositionClick={mockOnPositionClick}
-        />
-      )
+    const expandButton = screen.getAllByTitle(/Buka|Tutup/)[0]
+    fireEvent.click(expandButton)
 
-      const expandButton = screen.getAllByRole('button').find(btn => btn.querySelector('.bi-chevron-down'))
-      expect(expandButton).toBeInTheDocument()
-      fireEvent.click(expandButton!)
+    expect(screen.getByText('Baris 0, Kolom 5')).toBeInTheDocument()
+  })
 
-      expect(screen.getByText('Baris 0, Kolom 5')).toBeInTheDocument()
-    })
+  it('should show position information when expanded', () => {
+    render(
+      <RealTimeComments
+        postId={123}
+        comments={[comment]}
+        currentUserId={1}
+        onResolveComment={mockOnResolveComment}
+        onPositionClick={mockOnPositionClick}
+      />
+    )
 
-    it('should show position information when expanded', () => {
-      const comment = mockComments[0]
+    const expandButton = screen.getAllByTitle(/Buka/)[0]
+    fireEvent.click(expandButton)
 
-      render(
-        <RealTimeComments
-          postId={123}
-          comments={[comment]}
-          currentUserId={1}
-          onResolveComment={mockOnResolveComment}
-          onPositionClick={mockOnPositionClick}
-        />
-      )
-
-      const expandButton = screen.getAllByRole('button').find(btn => btn.querySelector('.bi-chevron-down'))
-      expect(expandButton).toBeInTheDocument()
-      fireEvent.click(expandButton!)
-
-      expect(screen.getByText(/Baris 0, Kolom 5/)).toBeInTheDocument()
-    })
+    expect(screen.getByText(/Baris 0, Kolom 5/)).toBeInTheDocument()
+  })
 
   it('should not show resolve button for resolved comments', () => {
     const resolvedComment: RealTimeComment = {
