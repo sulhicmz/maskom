@@ -287,7 +287,7 @@ describe('CommentItem', () => {
       />
     )
 
-    const expandButton = screen.getAllByTitle(/chevron/)[0]
+    const expandButton = screen.getAllByTitle(/Buka|Tutup/)[0]
     fireEvent.click(expandButton)
 
     expect(screen.getByText('Baris 0, Kolom 5')).toBeInTheDocument()
@@ -304,7 +304,7 @@ describe('CommentItem', () => {
       />
     )
 
-    const expandButton = screen.getAllByTitle(/chevron/)[0]
+    const expandButton = screen.getAllByTitle(/Buka/)[0]
     fireEvent.click(expandButton)
 
     expect(screen.getByText(/Baris 0, Kolom 5/)).toBeInTheDocument()
