@@ -38,6 +38,7 @@ export interface CampaignSendResult {
 
 class CampaignManager {
     private campaigns: EmailCampaign[];
+    private idCounter = 1;
 
     constructor() {
         this.campaigns = [...campaign_data];
@@ -55,6 +56,12 @@ class CampaignManager {
         } catch (error) {
             console.error('Failed to load campaigns from storage:', error);
         }
+    }
+
+    reset(): void {
+        this.idCounter = 1;
+        this.campaigns = [...campaign_data];
+        this.loadCampaignsFromStorage();
     }
 
     private saveCampaignsToStorage(): void {
@@ -113,8 +120,9 @@ class CampaignManager {
     createCampaign(
         campaignData: Omit<EmailCampaign, 'id' | 'createdAt' | 'sentCount' | 'openCount' | 'clickCount' | 'bounceCount'>
     ): EmailCampaign {
+        const id = `CAMP-${this.idCounter++}`;
         const newCampaign: EmailCampaign = {
-            id: `CAMP-${Date.now()}`,
+            id,
             ...campaignData,
             createdAt: new Date().toISOString(),
             sentCount: 0,
@@ -348,7 +356,15 @@ class CampaignManager {
 
         if (!campaign) return false;
 
-        this.updateCampaign(id, metrics);
+        const index = this.campaigns.findIndex((c) => c.id === id);
+        if (index === -1) return false;
+
+        this.campaigns[index] = {
+            ...this.campaigns[index],
+            ...metrics,
+        };
+
+        this.saveCampaignsToStorage();
 
         return true;
     }

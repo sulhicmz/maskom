@@ -41,6 +41,14 @@ describe('CampaignManager', () => {
             success: true,
             data: { messageId: 'msg-123' },
         });
+
+        campaignManager.reset();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        jest.clearAllMocks();
+        localStorage.clear();
     });
 
     afterEach(() => {
@@ -637,6 +645,7 @@ describe('CampaignManager', () => {
 
     describe('executeBulkSend', () => {
         it('should send emails to all recipients', async () => {
+            jest.useRealTimers();
             const campaignId = campaignManager.createCampaign({
                 name: 'Bulk Send Test',
                 templateId: 1,
@@ -671,6 +680,7 @@ describe('CampaignManager', () => {
         });
 
         it('should handle send failures', async () => {
+            jest.useRealTimers();
             (emailService.sendTemplatedEmail as jest.Mock).mockRejectedValue(
                 new Error('Send failed')
             );
@@ -713,6 +723,7 @@ describe('CampaignManager', () => {
         });
 
         it('should update campaign status to sent after completion', async () => {
+            jest.useRealTimers();
             const campaignId = campaignManager.createCampaign({
                 name: 'Status Test',
                 templateId: 1,
@@ -744,6 +755,7 @@ describe('CampaignManager', () => {
         });
 
         it('should update metrics during send', async () => {
+            jest.useRealTimers();
             const campaignId = campaignManager.createCampaign({
                 name: 'Metrics Test',
                 templateId: 1,
@@ -768,7 +780,6 @@ describe('CampaignManager', () => {
             }).id;
 
             await campaignManager.executeBulkSend(campaignId);
-            jest.runAllTimers();
 
             const campaign = campaignManager.getCampaignById(campaignId);
             expect(campaign?.sentCount).toBe(1);

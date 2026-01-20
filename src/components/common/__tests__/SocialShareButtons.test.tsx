@@ -4,15 +4,20 @@ import SocialShareButtons from "../SocialShareButtons"
 
 describe("SocialShareButtons", () => {
     beforeEach(() => {
-       jest.spyOn(window, 'alert').mockImplementation(() => {});
-       window.open = jest.fn()
-       Object.defineProperty(navigator, "clipboard", {
-          value: {
-             writeText: jest.fn().mockResolvedValue(undefined),
-          },
-          writable: true,
-          configurable: true,
-       })
+        jest.spyOn(window, 'alert').mockImplementation(() => {});
+        window.open = jest.fn()
+        Object.defineProperty(window, 'location', {
+           value: { href: 'https://test.maskom.co.id' },
+           writable: true,
+           configurable: true,
+        })
+        Object.defineProperty(navigator, "clipboard", {
+           value: {
+              writeText: jest.fn().mockResolvedValue(undefined),
+           },
+           writable: true,
+           configurable: true,
+        })
     })
 
     afterEach(() => {
@@ -190,20 +195,25 @@ describe("SocialShareButtons", () => {
       })
    })
 
-    describe("Instagram Sharing", () => {
-       it("should copy link to clipboard when clicked", async () => {
-          const mockLocation = { href: "https://maskom.co.id/test" };
-          jest.spyOn(window, 'location', 'get').mockReturnValue(mockLocation as any);
+     describe("Instagram Sharing", () => {
+        it("should copy link to clipboard when clicked", async () => {
+           const mockLocation = { href: "https://maskom.co.id/test" };
+           delete (window as any).location;
+           Object.defineProperty(window, 'location', {
+              value: mockLocation,
+              writable: true,
+              configurable: true,
+           });
 
-          render(<SocialShareButtons />)
+           render(<SocialShareButtons />)
 
-          const button = screen.getByLabelText("Copy link for Instagram")
-          fireEvent.click(button)
+           const button = screen.getByLabelText("Copy link for Instagram")
+           fireEvent.click(button)
 
-          expect(navigator.clipboard.writeText).toHaveBeenCalledWith("https://maskom.co.id/test")
-          expect(window.open).not.toHaveBeenCalled()
-       })
-   })
+           expect(navigator.clipboard.writeText).toHaveBeenCalledWith("https://maskom.co.id/test")
+           expect(window.open).not.toHaveBeenCalled()
+        })
+    })
 
    describe("Custom Props", () => {
       it("should use custom title in share text", () => {
