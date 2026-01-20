@@ -301,7 +301,7 @@ describe('HistoryVisualization', () => {
       expect(screen.getByText('Konfirmasi Hapus Riwayat')).toBeInTheDocument()
     })
 
-    it('should clear history when confirmed', () => {
+    it('should clear history when confirmed', async () => {
       addToHistory(123, mockContent, 1, 'User1')
 
       render(
