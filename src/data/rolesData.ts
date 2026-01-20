@@ -1,5 +1,4 @@
-import { UserRole } from '@/types/role'
-import { Permission } from '@/types/permission'
+import { UserRole, Permission } from '@/types'
 
 export interface RolePermissions {
   role: UserRole

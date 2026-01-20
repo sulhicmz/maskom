@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BlogPostVersion, VersionDiff } from '@/types/blog';
 import { versionStorage } from '@/utils/versionStorage';
 import { formatTimestamp } from '@/utils/dateFormat';
@@ -35,27 +35,27 @@ const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
       }
    }, [isVisible, loadVersions]);
 
-   const handleRestore = (version: BlogPostVersion) => {
-      onRestore(version);
-      onClose();
-   };
+    const handleRestore = useCallback((version: BlogPostVersion) => {
+       onRestore(version);
+       onClose();
+    }, [onRestore, onClose]);
 
-   const handleCompare = (version: BlogPostVersion) => {
-      if (!selectedVersion || selectedVersion.id === version.id) return;
+    const handleCompare = useCallback((version: BlogPostVersion) => {
+       if (!selectedVersion || selectedVersion.id === version.id) return;
+ 
+       const diffs = versionStorage.compareVersions(selectedVersion, version);
+       setComparisonDiffs(diffs);
+       setShowCompare(true);
+    }, [selectedVersion]);
 
-      const diffs = versionStorage.compareVersions(selectedVersion, version);
-      setComparisonDiffs(diffs);
-      setShowCompare(true);
-   };
-
-   const handleDelete = (versionId: string) => {
-      versionStorage.deleteVersion(postId, versionId);
-      loadVersions();
-      if (selectedVersion?.id === versionId) {
-         setSelectedVersion(null);
-         setShowCompare(false);
-       }
-    };
+    const handleDelete = useCallback((versionId: string) => {
+       versionStorage.deleteVersion(postId, versionId);
+       loadVersions();
+       if (selectedVersion?.id === versionId) {
+          setSelectedVersion(null);
+          setShowCompare(false);
+        }
+     }, [postId, selectedVersion, loadVersions]);
 
     if (!isVisible) return null;
 
@@ -249,8 +249,10 @@ const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
                )}
             </div>
          </div>
-      </div>
-   );
-};
+       </div>
+    );
+ };
 
-export default VersionHistoryPanel;
+VersionHistoryPanel.displayName = 'VersionHistoryPanel';
+
+export default React.memo(VersionHistoryPanel);

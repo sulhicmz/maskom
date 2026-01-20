@@ -1,36 +1,26 @@
 import {
-   validateFeedbackItem,
-   validateFaqItem,
-   validatePriceItem,
-   validatePriceDetailItem,
-   validateFeatureItem,
-   validateProcessItem,
-   validateCauseItem,
-   validateMenuItem,
-   checkDuplicateIds,
-   validateDataArray,
-   validateWiFiDevice,
-   validateWebsiteTemplate,
-   validateAIStep,
-   validateBlogCommentItem,
-   validateTeamMember,
-   validateInnerBlogPost,
-   validateFaqDetail,
-   validateInnerFaqItem,
-   validateSocialLink,
-   validateNavigationItem,
-   validateNavigationSection,
-   validateContactInfoItem,
-   validateFeatureHomeOneItem,
- } from "@/utils/dataValidation";
+    validateFeedbackItem,
+    validateWiFiDevice,
+    validateWebsiteTemplate,
+    validateAIStep,
+    validateBlogCommentItem,
+    validateTeamMember,
+    validateInnerBlogPost,
+    validateFaqDetail,
+    validateInnerFaqItem,
+    validateSocialLink,
+    validateNavigationItem,
+    validateNavigationSection,
+    validateContactInfoItem,
+    validateFeatureHomeOneItem,
+    validateViewCount,
+    validateEngagementScore,
+    validateAvgReadTime,
+    validateShareCount,
+    validateContentMetrics,
+  } from "@/utils/dataValidation";
  import {
    FeedbackItem,
-   FaqItem,
-   PriceItem,
-   FeatureItem,
-   ProcessItem,
-   CauseItem,
-   MenuItem,
    WiFiDevice,
    WebsiteTemplate,
    AIStep,
@@ -114,7 +104,7 @@ describe("dataValidation", () => {
       };
       const result = validateFeedbackItem(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FeedbackItem[1]: name must be a non-empty string");
+      expect(result.errors).toContain("FeedbackItem: name must be a non-empty string");
     });
 
     it("should reject feedback item with invalid id", () => {
@@ -133,384 +123,6 @@ describe("dataValidation", () => {
     });
   });
 
-  describe("validateFaqItem", () => {
-    it("should validate a valid FAQ item", () => {
-      const item: FaqItem = {
-        id: 1,
-        page: "home_1",
-        question: "What is your service?",
-        answer: "We provide great service",
-      };
-      const result = validateFaqItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject FAQ item with empty question", () => {
-      const item: FaqItem = {
-        id: 1,
-        page: "home_1",
-        question: "",
-        answer: "We provide great service",
-      };
-      const result = validateFaqItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqItem[1]: question must be a non-empty string");
-    });
-
-    it("should reject FAQ item with missing answer", () => {
-      const item: FaqItem = {
-        id: 1,
-        page: "home_1",
-        question: "What is your service?",
-        answer: "",
-      };
-      const result = validateFaqItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqItem[1]: answer must be a non-empty string");
-    });
-  });
-
-  describe("validatePriceDetailItem", () => {
-    it("should validate a valid price detail item", () => {
-      const item = {
-        id: 1,
-        sub_title: "Basic",
-        price: 1000,
-        btn: "Buy",
-        feature: ["Feature 1", "Feature 2"],
-      };
-      const result = validatePriceDetailItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject price detail item with negative price", () => {
-      const item = {
-        id: 1,
-        sub_title: "Basic",
-        price: -1000,
-        btn: "Buy",
-        feature: ["Feature 1"],
-      };
-      const result = validatePriceDetailItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("PriceDetailItem[1]: price must be a non-negative number");
-    });
-
-    it("should reject price detail item with empty feature array", () => {
-      const item = {
-        id: 1,
-        sub_title: "Basic",
-        price: 1000,
-        btn: "Buy",
-        feature: [],
-      };
-      const result = validatePriceDetailItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("PriceDetailItem[1]: feature must be a non-empty array");
-    });
-
-    it("should reject price detail item with empty feature string", () => {
-      const item = {
-        id: 1,
-        sub_title: "Basic",
-        price: 1000,
-        btn: "Buy",
-        feature: ["Feature 1", ""],
-      };
-      const result = validatePriceDetailItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("PriceDetailItem[1]: feature[1] must be a non-empty string");
-    });
-  });
-
-  describe("validatePriceItem", () => {
-    it("should validate a valid price item", () => {
-      const item: PriceItem = {
-        id: 1,
-        page: "home_1",
-        price_details: [
-          {
-            id: 1,
-            sub_title: "Basic",
-            price: 1000,
-            btn: "Buy",
-            feature: ["Feature 1"],
-          },
-        ],
-      };
-      const result = validatePriceItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject price item with invalid price detail", () => {
-      const item: PriceItem = {
-        id: 1,
-        page: "home_1",
-        price_details: [
-          {
-            id: 1,
-            sub_title: "Basic",
-            price: -1000,
-            btn: "Buy",
-            feature: ["Feature 1"],
-          },
-        ],
-      };
-      const result = validatePriceItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("PriceDetailItem[1]: price must be a non-negative number");
-    });
-  });
-
-  describe("validateFeatureItem", () => {
-    it("should validate a valid feature item", () => {
-      const item: FeatureItem = {
-        id: 1,
-        page: "home_1",
-        icon: "icon-name",
-        title: "Feature Title",
-        desc: "Feature description",
-      };
-      const result = validateFeatureItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject feature item with empty icon", () => {
-      const item: FeatureItem = {
-        id: 1,
-        page: "home_1",
-        icon: "",
-        title: "Feature Title",
-        desc: "Feature description",
-      };
-      const result = validateFeatureItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FeatureItem[1]: icon must be a non-empty string");
-    });
-  });
-
-  describe("validateProcessItem", () => {
-    it("should validate a valid process item", () => {
-      const item: ProcessItem = {
-        id: 1,
-        page: "home_1",
-        img: mockStaticImageData,
-        count: "01",
-        title: "Process Title",
-        desc: "Process description",
-      };
-      const result = validateProcessItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject process item with empty count", () => {
-      const item: ProcessItem = {
-        id: 1,
-        page: "home_1",
-        img: mockStaticImageData,
-        count: "",
-        title: "Process Title",
-        desc: "Process description",
-      };
-      const result = validateProcessItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("ProcessItem[1]: count must be a non-empty string");
-    });
-  });
-
-  describe("validateCauseItem", () => {
-    it("should validate a valid cause item", () => {
-      const item: CauseItem = {
-        id: 1,
-        page: "home_1",
-        icon: "icon-name",
-        title: "Cause Title",
-        desc: "Cause description",
-      };
-      const result = validateCauseItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject cause item with empty icon", () => {
-      const item: CauseItem = {
-        id: 1,
-        page: "home_1",
-        icon: "",
-        title: "Cause Title",
-        desc: "Cause description",
-      };
-      const result = validateCauseItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("CauseItem[1]: icon must be a non-empty string");
-    });
-  });
-
-  describe("validateMenuItem", () => {
-    it("should validate a valid menu item without dropdown", () => {
-      const item: MenuItem = {
-        id: 1,
-        title: "Home",
-        link: "/",
-        has_dropdown: false,
-      };
-      const result = validateMenuItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should validate a valid menu item with dropdown", () => {
-      const item: MenuItem = {
-        id: 1,
-        title: "Services",
-        link: "/services",
-        has_dropdown: true,
-        sub_menus: [
-          { link: "/services/web", title: "Web" },
-          { link: "/services/mobile", title: "Mobile" },
-        ],
-      };
-      const result = validateMenuItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should reject menu item with has_dropdown=true but no sub_menus", () => {
-      const item: MenuItem = {
-        id: 1,
-        title: "Services",
-        link: "/services",
-        has_dropdown: true,
-      };
-      const result = validateMenuItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("MenuItem[1]: sub_menus must be a non-empty array when has_dropdown is true");
-    });
-
-    it("should reject menu item with empty sub_menu title", () => {
-      const item: MenuItem = {
-        id: 1,
-        title: "Services",
-        link: "/services",
-        has_dropdown: true,
-        sub_menus: [{ link: "/services/web", title: "" }],
-      };
-      const result = validateMenuItem(item);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("MenuItem[1]: sub_menus[0].title must be a non-empty string");
-    });
-
-    it("should reject menu item with has_dropdown=false but has sub_menus", () => {
-      const item: MenuItem = {
-        id: 1,
-        title: "Services",
-        link: "/services",
-        has_dropdown: false,
-        sub_menus: [{ link: "/services/web", title: "Web" }],
-      };
-      const result = validateMenuItem(item);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-  });
-
-  describe("checkDuplicateIds", () => {
-    it("should pass with unique IDs", () => {
-      const items: FaqItem[] = [
-        { id: 1, page: "home_1", question: "Q1", answer: "A1" },
-        { id: 2, page: "home_2", question: "Q2", answer: "A2" },
-        { id: 3, page: "home_3", question: "Q3", answer: "A3" },
-      ];
-      const result = checkDuplicateIds(items, "FaqItem");
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should detect duplicate IDs", () => {
-      const items: FaqItem[] = [
-        { id: 1, page: "home_1", question: "Q1", answer: "A1" },
-        { id: 1, page: "home_2", question: "Q2", answer: "A2" },
-        { id: 2, page: "home_1", question: "Q3", answer: "A3" },
-      ];
-      const result = checkDuplicateIds(items, "FaqItem");
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqItem: Duplicate id 1 found in pages: home_1, home_2");
-    });
-
-    it("should detect multiple duplicate IDs", () => {
-      const items: FaqItem[] = [
-        { id: 1, page: "home_1", question: "Q1", answer: "A1" },
-        { id: 1, page: "home_2", question: "Q2", answer: "A2" },
-        { id: 2, page: "home_1", question: "Q3", answer: "A3" },
-        { id: 2, page: "home_2", question: "Q4", answer: "A4" },
-      ];
-      const result = checkDuplicateIds(items, "FaqItem");
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqItem: Duplicate id 1 found in pages: home_1, home_2");
-      expect(result.errors).toContain("FaqItem: Duplicate id 2 found in pages: home_1, home_2");
-    });
-  });
-
-  describe("validateDataArray", () => {
-    it("should validate all items in array", () => {
-      const items: FeedbackItem[] = [
-        {
-          id: 1,
-          page: "home_1",
-          avatar: mockStaticImageData,
-          name: "John Doe",
-          designation: "CEO",
-          desc: "Great service",
-          rating: "5.0",
-        },
-        {
-          id: 2,
-          page: "home_2",
-          avatar: mockStaticImageData,
-          name: "Jane Doe",
-          designation: "CTO",
-          desc: "Excellent support",
-          rating: "4.8",
-        },
-      ];
-      const result = validateDataArray(items, validateFeedbackItem);
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it("should collect errors from all invalid items", () => {
-      const items: FeedbackItem[] = [
-        {
-          id: 1,
-          page: "home_1",
-          avatar: mockStaticImageData,
-          name: "",
-          designation: "CEO",
-          desc: "Great service",
-          rating: "5.0",
-        },
-        {
-          id: 2,
-          page: "home_2",
-          avatar: mockStaticImageData,
-          name: "Jane Doe",
-          designation: "CTO",
-          desc: "Excellent support",
-          rating: "6.0",
-        },
-      ];
-      const result = validateDataArray(items, validateFeedbackItem);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FeedbackItem[1]: name must be a non-empty string");
-      expect(result.errors).toContain("FeedbackItem[2]: rating must be a number between 0 and 5");
-    });
-  });
-
   describe("validateWiFiDevice", () => {
     it("should validate a valid WiFi device", () => {
       const item: WiFiDevice = { id: 1, name: "Device 1", ip: "192.168.1.10", status: "Online" };
@@ -523,14 +135,14 @@ describe("dataValidation", () => {
       const item: WiFiDevice = { id: 1, name: "Device 1", ip: "192.168.1.10", status: "Connected" as "Online" | "Offline" };
       const result = validateWiFiDevice(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("WiFiDevice[1]: status must be either \"Online\" or \"Offline\"");
+      expect(result.errors).toContain("WiFiDevice: status must be either \"Online\" or \"Offline\"");
     });
 
     it("should reject WiFi device with empty name", () => {
       const item: WiFiDevice = { id: 1, name: "", ip: "192.168.1.10", status: "Online" };
       const result = validateWiFiDevice(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("WiFiDevice[1]: name must be a non-empty string");
+      expect(result.errors).toContain("WiFiDevice: name must be a non-empty string");
     });
 
     it("should reject WiFi device with invalid id", () => {
@@ -553,14 +165,14 @@ describe("dataValidation", () => {
       const item: WebsiteTemplate = { id: 1, name: "", preview: "/assets/images/template1.jpg" };
       const result = validateWebsiteTemplate(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("WebsiteTemplate[1]: name must be a non-empty string");
+      expect(result.errors).toContain("WebsiteTemplate: name must be a non-empty string");
     });
 
     it("should reject website template with empty preview", () => {
       const item: WebsiteTemplate = { id: 1, name: "Business Template", preview: "" };
       const result = validateWebsiteTemplate(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("WebsiteTemplate[1]: preview must be a non-empty string");
+      expect(result.errors).toContain("WebsiteTemplate: preview must be a non-empty string");
     });
   });
 
@@ -576,14 +188,14 @@ describe("dataValidation", () => {
       const item: AIStep = { id: 1, title: "", content: "Select chatbot or recommendations" };
       const result = validateAIStep(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("AIStep[1]: title must be a non-empty string");
+      expect(result.errors).toContain("AIStep: title must be a non-empty string");
     });
 
     it("should reject AI step with empty content", () => {
       const item: AIStep = { id: 1, title: "Choose Type", content: "" };
       const result = validateAIStep(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("AIStep[1]: content must be a non-empty string");
+      expect(result.errors).toContain("AIStep: content must be a non-empty string");
     });
   });
 
@@ -621,7 +233,7 @@ describe("dataValidation", () => {
       };
       const result = validateBlogCommentItem(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("BlogCommentItem[1]: name must be a non-empty string");
+      expect(result.errors).toContain("BlogCommentItem: name must be a non-empty string");
     });
 
     it("should reject blog comment with empty content", () => {
@@ -639,7 +251,7 @@ describe("dataValidation", () => {
       };
       const result = validateBlogCommentItem(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("BlogCommentItem[1]: content must be a non-empty string");
+      expect(result.errors).toContain("BlogCommentItem: content must be a non-empty string");
     });
   });
 
@@ -665,7 +277,7 @@ describe("dataValidation", () => {
       };
       const result = validateTeamMember(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("TeamMember[1]: title must be a non-empty string");
+      expect(result.errors).toContain("TeamMember: title must be a non-empty string");
     });
 
     it("should reject team member with empty designation", () => {
@@ -677,7 +289,7 @@ describe("dataValidation", () => {
       };
       const result = validateTeamMember(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("TeamMember[1]: designation must be a non-empty string");
+      expect(result.errors).toContain("TeamMember: designation must be a non-empty string");
     });
   });
 
@@ -710,7 +322,7 @@ describe("dataValidation", () => {
       };
       const result = validateInnerBlogPost(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("InnerBlogPost[1]: user must be a non-empty string");
+      expect(result.errors).toContain("InnerBlogPost: user must be a non-empty string");
     });
   });
 
@@ -726,14 +338,14 @@ describe("dataValidation", () => {
       const item: FaqDetail = { id: 1, title: "", desc: "Answer" };
       const result = validateFaqDetail(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqDetail[1]: title must be a non-empty string");
+      expect(result.errors).toContain("FaqDetail: title must be a non-empty string");
     });
 
     it("should reject FAQ detail with empty desc", () => {
       const item: FaqDetail = { id: 1, title: "Question", desc: "" };
       const result = validateFaqDetail(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqDetail[1]: desc must be a non-empty string");
+      expect(result.errors).toContain("FaqDetail: desc must be a non-empty string");
     });
   });
 
@@ -755,7 +367,7 @@ describe("dataValidation", () => {
       const item: InnerFaqItem = { id: 1, faq_details: [] };
       const result = validateInnerFaqItem(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("InnerFaqItem[1]: faq_details must be a non-empty array");
+      expect(result.errors).toContain("InnerFaqItem: faq_details must be a non-empty array");
     });
 
     it("should reject inner FAQ item with invalid detail", () => {
@@ -765,7 +377,7 @@ describe("dataValidation", () => {
       };
       const result = validateInnerFaqItem(item);
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("FaqDetail[1]: title must be a non-empty string");
+      expect(result.errors).toContain("FaqDetail: title must be a non-empty string");
     });
   });
 
@@ -909,9 +521,9 @@ describe("dataValidation", () => {
          lines: ["Maskom Network"],
        };
        const result = validateContactInfoItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("ContactInfoItem[1]: icon must be a non-empty string");
-     });
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("ContactInfoItem: icon must be a non-empty string");
+      });
 
     it("should reject contact info item with empty title", () => {
        const item: ContactInfoItem = {
@@ -920,10 +532,10 @@ describe("dataValidation", () => {
          title: "",
          lines: ["Maskom Network"],
        };
-       const result = validateContactInfoItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("ContactInfoItem[1]: title must be a non-empty string");
-     });
+        const result = validateContactInfoItem(item);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("ContactInfoItem: title must be a non-empty string");
+      });
 
     it("should reject contact info item with zero id", () => {
        const item: ContactInfoItem = {
@@ -934,7 +546,7 @@ describe("dataValidation", () => {
        };
        const result = validateContactInfoItem(item);
        expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("ContactInfoItem: id must be a positive number");
+        expect(result.errors).toContain("ContactInfoItem[0]: id must be a positive number");
       });
 
     it("should reject contact info item with empty string in lines array", () => {
@@ -1021,10 +633,10 @@ describe("dataValidation", () => {
          title: "Konektivitas Tinggi",
          desc: "Solusi SD-WAN untuk koneksi stabil",
        };
-       const result = validateFeatureHomeOneItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("FeatureHomeOneItem[1]: icon must be a non-empty string");
-    });
+        const result = validateFeatureHomeOneItem(item);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("FeatureHomeOneItem: icon must be a non-empty string");
+     });
 
     it("should reject feature home one item with empty title", () => {
        const item: FeatureHomeOneItem = {
@@ -1033,10 +645,10 @@ describe("dataValidation", () => {
          title: "",
          desc: "Solusi SD-WAN untuk koneksi stabil",
        };
-       const result = validateFeatureHomeOneItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("FeatureHomeOneItem[1]: title must be a non-empty string");
-    });
+        const result = validateFeatureHomeOneItem(item);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("FeatureHomeOneItem: title must be a non-empty string");
+     });
 
     it("should reject feature home one item with empty desc", () => {
        const item: FeatureHomeOneItem = {
@@ -1045,10 +657,10 @@ describe("dataValidation", () => {
          title: "Konektivitas Tinggi",
          desc: "",
        };
-       const result = validateFeatureHomeOneItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("FeatureHomeOneItem[1]: desc must be a non-empty string");
-    });
+        const result = validateFeatureHomeOneItem(item);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("FeatureHomeOneItem: desc must be a non-empty string");
+     });
 
     it("should reject feature home one item with invalid id", () => {
        const item: FeatureHomeOneItem = {
@@ -1062,16 +674,265 @@ describe("dataValidation", () => {
        expect(result.errors).toContain("FeatureHomeOneItem[-1]: id must be a positive number");
     });
 
-    it("should reject feature home one item with zero id", () => {
-       const item: FeatureHomeOneItem = {
-         id: 0,
-         icon: "fas fa-network-wired",
-         title: "Konektivitas Tinggi",
-         desc: "Solusi SD-WAN untuk koneksi stabil",
-       };
-       const result = validateFeatureHomeOneItem(item);
-       expect(result.isValid).toBe(false);
-       expect(result.errors).toContain("FeatureHomeOneItem: id must be a positive number");
+     it("should reject feature home one item with zero id", () => {
+        const item: FeatureHomeOneItem = {
+          id: 0,
+          icon: "fas fa-network-wired",
+          title: "Konektivitas Tinggi",
+          desc: "Solusi SD-WAN untuk koneksi stabil",
+        };
+        const result = validateFeatureHomeOneItem(item);
+        expect(result.isValid).toBe(false);
+        expect(result.errors).toContain("FeatureHomeOneItem[0]: id must be a positive number");
+     });
+  });
+
+  describe("validateViewCount", () => {
+    it("should validate a valid view count", () => {
+      const result = validateViewCount(1000);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero view count", () => {
+      const result = validateViewCount(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number view count", () => {
+      const result = validateViewCount("1000" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be a number, got: string");
+    });
+
+    it("should reject float view count", () => {
+      const result = validateViewCount(1000.5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be an integer, got: 1000.5");
+    });
+
+    it("should reject negative view count", () => {
+      const result = validateViewCount(-10);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be non-negative, got: -10");
+    });
+
+    it("should reject view count exceeding MAX_SAFE_INTEGER", () => {
+      const result = validateViewCount(Number.MAX_SAFE_INTEGER + 1);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount exceeds maximum safe integer value, got: 9007199254740992");
     });
   });
- });
+
+  describe("validateEngagementScore", () => {
+    it("should validate a valid engagement score", () => {
+      const result = validateEngagementScore(85);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero engagement score", () => {
+      const result = validateEngagementScore(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate maximum engagement score (100)", () => {
+      const result = validateEngagementScore(100);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number engagement score", () => {
+      const result = validateEngagementScore("85" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be a number, got: string");
+    });
+
+    it("should reject float engagement score", () => {
+      const result = validateEngagementScore(85.5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be an integer, got: 85.5");
+    });
+
+    it("should reject negative engagement score", () => {
+      const result = validateEngagementScore(-10);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be non-negative, got: -10");
+    });
+
+    it("should reject engagement score exceeding 100", () => {
+      const result = validateEngagementScore(101);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be at most 100, got: 101");
+    });
+  });
+
+  describe("validateAvgReadTime", () => {
+    it("should validate a valid average read time", () => {
+      const result = validateAvgReadTime(300);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero average read time", () => {
+      const result = validateAvgReadTime(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number average read time", () => {
+      const result = validateAvgReadTime("300" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be a number, got: string");
+    });
+
+    it("should reject negative average read time", () => {
+      const result = validateAvgReadTime(-10);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be non-negative, got: -10");
+    });
+
+    it("should reject infinite average read time", () => {
+      const result = validateAvgReadTime(Infinity);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be a finite number, got: Infinity");
+    });
+
+    it("should reject NaN average read time", () => {
+      const result = validateAvgReadTime(NaN);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be a finite number, got: NaN");
+    });
+  });
+
+  describe("validateShareCount", () => {
+    it("should validate a valid share count", () => {
+      const result = validateShareCount(50);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate zero share count", () => {
+      const result = validateShareCount(0);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject non-number share count", () => {
+      const result = validateShareCount("50" as unknown);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be a number, got: string");
+    });
+
+    it("should reject float share count", () => {
+      const result = validateShareCount(50.5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be an integer, got: 50.5");
+    });
+
+    it("should reject negative share count", () => {
+      const result = validateShareCount(-5);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be non-negative, got: -5");
+    });
+  });
+
+  describe("validateContentMetrics", () => {
+    it("should validate all valid content metrics", () => {
+      const metrics = {
+        viewCount: 1000,
+        engagementScore: 85,
+        shareCount: 50,
+        avgReadTime: 300,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate metrics with some undefined values", () => {
+      const metrics = {
+        viewCount: 1000,
+        shareCount: 50,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should validate all zero metrics", () => {
+      const metrics = {
+        viewCount: 0,
+        engagementScore: 0,
+        shareCount: 0,
+        avgReadTime: 0,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("should reject invalid view count", () => {
+      const metrics = {
+        viewCount: -10,
+        engagementScore: 85,
+        shareCount: 50,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("viewCount must be non-negative, got: -10");
+    });
+
+    it("should reject invalid engagement score", () => {
+      const metrics = {
+        viewCount: 1000,
+        engagementScore: 150,
+        shareCount: 50,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("engagementScore must be at most 100, got: 150");
+    });
+
+    it("should reject invalid share count", () => {
+      const metrics = {
+        viewCount: 1000,
+        shareCount: -5,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("shareCount must be non-negative, got: -5");
+    });
+
+    it("should reject invalid average read time", () => {
+      const metrics = {
+        viewCount: 1000,
+        avgReadTime: -100,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors).toContain("avgReadTime must be non-negative, got: -100");
+    });
+
+    it("should reject multiple invalid metrics", () => {
+      const metrics = {
+        viewCount: -10,
+        engagementScore: 150,
+        shareCount: -5,
+        avgReadTime: -100,
+      };
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(false);
+      expect(result.errors.length).toBeGreaterThan(1);
+    });
+
+    it("should validate empty metrics object", () => {
+      const metrics = {};
+      const result = validateContentMetrics(metrics);
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+  });
+});

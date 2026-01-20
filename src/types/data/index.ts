@@ -107,19 +107,21 @@ export interface CategoryItem {
    name: string;
 }
 
-export type CommentModerationStatus = 'pending' | 'approved' | 'rejected';
+export type CommentModerationStatus = 'pending' | 'approved' | 'rejected' | 'spam';
 
 export interface BlogCommentItem {
-  id: number;
-  blogId: number;
-  parentId: number | null;
-  avatar: StaticImageData;
-  name: string;
-  date: string;
-  content: string;
-  status: CommentModerationStatus;
-  upvotes: number;
-  downvotes: number;
+   id: number;
+   blogId: number;
+   parentId: number | null;
+   avatar: StaticImageData;
+   name: string;
+   date: string;
+   content: string;
+   status: CommentModerationStatus;
+   upvotes: number;
+   downvotes: number;
+   moderatedAt?: string;
+   moderatedBy?: number;
 }
 
 export interface TeamMember {
@@ -143,6 +145,11 @@ export interface InnerBlogPost {
    category?: string;
    status?: BlogPostStatus;
    publishDate?: string;
+   viewCount?: number;
+   engagementScore?: number;
+   shareCount?: number;
+   avgReadTime?: number;
+   lastViewedAt?: string;
 }
 
 export interface FaqDetail {
@@ -231,5 +238,24 @@ export interface MediaAsset {
     tags: string[];
     createdAt: string;
     usageCount?: number;
+}
+
+export interface TemplateVariable {
+    key: string;
+    description: string;
+    required: boolean;
+}
+
+export interface EmailTemplate {
+    id: number;
+    name: string;
+    subject: string;
+    body: string;
+    category: string;
+    tags: string[];
+    variables: TemplateVariable[];
+    createdAt: string;
+    updatedAt: string;
+    sentCount?: number;
 }
 

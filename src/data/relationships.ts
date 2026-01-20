@@ -43,7 +43,15 @@ export const DATA_RELATIONSHIPS: DataRelationship[] = [
       type: "many-to-one",
       optional: false,
     },
-];
+    {
+      sourceCollection: "CampaignData",
+      targetCollection: "EmailTemplateData",
+      sourceField: "templateId",
+      targetField: "id",
+      type: "many-to-one",
+      optional: false,
+    },
+  ];
 
 export function isValidPage(page: string): page is ValidPage {
   return VALID_PAGES.includes(page as ValidPage);

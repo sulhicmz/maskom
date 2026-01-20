@@ -1,5 +1,4 @@
-import { UserRole } from '@/types/role'
-import { Permission } from '@/types/permission'
+import { UserRole, Permission } from '@/types'
 import { getPermissionsByRole, hasPermission as checkPermission } from '@/data/rolesData'
 
 export function canAccessRoute(userRole: UserRole, route: string): boolean {

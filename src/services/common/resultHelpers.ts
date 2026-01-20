@@ -92,6 +92,9 @@ export function createRateLimitErrorResult(
     return createErrorResult(
         errorMessage,
         ServiceErrorCode.RATE_LIMIT,
-        { rateLimited: true }
+        { 
+            rateLimited: true,
+            retryAfterSeconds: secondsRemaining
+        }
     );
 }

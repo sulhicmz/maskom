@@ -2,6 +2,7 @@ import type { NextResponse } from 'next/server';
 import { CircuitBreaker, withRetry, type RetryOptions } from '@/utils/resilience';
 import metricsCollector from '@/utils/metrics';
 import { logServiceError, logServiceSuccess } from '@/services/common/logger';
+import { RateLimitExceededError } from '@/services/common/resilience';
 import { createServiceErrorResponse } from '@/utils/apiResponse';
 import { CIRCUIT_BREAKER_CONFIG, RETRY_CONFIG } from '@/constants';
 
@@ -83,7 +84,8 @@ export async function executeApiRoute<T = unknown>({
             logServiceError(errorObj, { service: routeName, operation: operationName });
             return createServiceErrorResponse({
                 error: 'Service temporarily unavailable',
-                status: 503
+                status: 503,
+                retryAfter: 60
             }) as NextResponse<T>;
         }
 
@@ -91,7 +93,8 @@ export async function executeApiRoute<T = unknown>({
             logServiceError(errorObj, { service: routeName, operation: operationName });
             return createServiceErrorResponse({
                 error: 'Request timed out',
-                status: 504
+                status: 504,
+                retryAfter: 30
             }) as NextResponse<T>;
         }
 
@@ -99,7 +102,20 @@ export async function executeApiRoute<T = unknown>({
             logServiceError(errorObj, { service: routeName, operation: operationName });
             return createServiceErrorResponse({
                 error: 'Network error occurred',
-                status: 503
+                status: 503,
+                retryAfter: 10
+            }) as NextResponse<T>;
+        }
+
+        if (errorType === 'rate_limit') {
+            const retryAfter = error instanceof RateLimitExceededError && error.limitCheck?.resetTime
+                ? Math.max(0, Math.ceil((error.limitCheck.resetTime - Date.now()) / 1000))
+                : 60;
+
+            return createServiceErrorResponse({
+                error: errorObj.message,
+                status: 429,
+                retryAfter
             }) as NextResponse<T>;
         }
 

@@ -54,12 +54,17 @@ import {
   validateAIStep,
 } from "./dashboardValidation";
 
-import {
-   validateCategoryItem,
-   validateBlogTagItem,
-   validateBlogCommentItem,
-   validateInnerBlogPost,
-} from "./blogValidation";
+ import {
+    validateCategoryItem,
+    validateBlogTagItem,
+    validateBlogCommentItem,
+    validateInnerBlogPost,
+    validateViewCount,
+    validateEngagementScore,
+    validateAvgReadTime,
+    validateShareCount,
+    validateContentMetrics,
+ } from "./blogValidation";
 
 import {
   validateTeamMember,
@@ -84,7 +89,23 @@ import {
 import {
     validateMediaItem,
     validateMediaAssets,
-} from "./mediaValidation"
+ } from "./mediaValidation"
+
+import {
+  validateEmailTemplate,
+  validateTemplateVariable,
+  validateEmailTemplates,
+} from "./emailTemplateValidation"
+
+import {
+  validateEmailCampaign,
+  validateCampaigns,
+  validateCampaignMetrics,
+  validateCampaignABTest,
+  validateRecipientCriteria,
+  validateRecipientSegment,
+  validateRecipientList,
+} from "./campaignValidation"
 
 export type {
   ValidationResult,
@@ -96,36 +117,51 @@ export type {
   ValidationConfig,
 };
 
- export {
-    createValidator,
-    validateBaseDataItem,
-    checkDuplicateIds,
-    validateDataArray,
-    validateFeedbackItem,
-    validatePriceItem,
-    validatePriceDetailItem,
-    validateFaqItem,
-    validateFaqDetail,
-    validateInnerFaqItem,
-    validateFeatureItem,
-    validateFeatureHomeOneItem,
-    validateProcessItem,
-    validateCauseItem,
-    validateMenuItem,
-    validateNavigationItem,
-    validateNavigationSection,
-    validateWiFiDevice,
-    validateWebsiteTemplate,
-    validateAIStep,
-    validateCategoryItem,
-    validateBlogTagItem,
-    validateBlogCommentItem,
-     validateInnerBlogPost,
-     validateTeamMember,
-     validateSocialLink,
-     validateContactInfoItem,
-      validateUseCaseSidebarItem,
-      validateBlogCategoryData,
-      validateMediaItem,
-      validateMediaAssets,
- };
+  export {
+     createValidator,
+     validateBaseDataItem,
+     checkDuplicateIds,
+     validateDataArray,
+     validateFeedbackItem,
+     validatePriceItem,
+     validatePriceDetailItem,
+     validateFaqItem,
+     validateFaqDetail,
+     validateInnerFaqItem,
+     validateFeatureItem,
+     validateFeatureHomeOneItem,
+     validateProcessItem,
+     validateCauseItem,
+     validateMenuItem,
+     validateNavigationItem,
+     validateNavigationSection,
+     validateWiFiDevice,
+     validateWebsiteTemplate,
+     validateAIStep,
+     validateCategoryItem,
+     validateBlogTagItem,
+     validateBlogCommentItem,
+      validateInnerBlogPost,
+      validateTeamMember,
+      validateSocialLink,
+      validateContactInfoItem,
+       validateUseCaseSidebarItem,
+       validateBlogCategoryData,
+       validateMediaItem,
+        validateMediaAssets,
+        validateEmailTemplate,
+        validateTemplateVariable,
+        validateEmailTemplates,
+        validateEmailCampaign,
+        validateCampaigns,
+        validateCampaignMetrics,
+        validateCampaignABTest,
+        validateRecipientCriteria,
+        validateRecipientSegment,
+        validateRecipientList,
+        validateViewCount,
+      validateEngagementScore,
+      validateAvgReadTime,
+      validateShareCount,
+      validateContentMetrics,
+  };

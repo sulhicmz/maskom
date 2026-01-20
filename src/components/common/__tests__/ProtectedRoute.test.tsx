@@ -21,6 +21,7 @@ jest.mock('@/services/auth/AuthService', () => ({
     getCurrentUser: jest.fn(),
     hasRole: jest.fn(),
     hasPermission: jest.fn(),
+    getMFAStatus: jest.fn(),
   },
 }))
 
@@ -46,6 +47,7 @@ describe('ProtectedRoute', () => {
     email: 'test@example.com',
     name: 'Test User',
     role: 'user' as UserRole,
+    mfaEnabled: false,
   }
 
   const mockAdminUser = {
@@ -53,6 +55,7 @@ describe('ProtectedRoute', () => {
     email: 'admin@example.com',
     name: 'Admin User',
     role: 'admin' as UserRole,
+    mfaEnabled: false,
   }
 
   const mockEditorUser = {
@@ -60,12 +63,14 @@ describe('ProtectedRoute', () => {
     email: 'editor@example.com',
     name: 'Editor User',
     role: 'editor' as UserRole,
+    mfaEnabled: false,
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
     ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
     ;(usePathname as jest.Mock).mockReturnValue('/protected-page')
+    ;(authService.getMFAStatus as jest.Mock).mockResolvedValue('disabled')
     jest.useFakeTimers()
   })
 

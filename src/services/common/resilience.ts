@@ -24,6 +24,23 @@ const DEFAULT_RETRY_OPTIONS: Required<RetryOptions> = {
     retryableErrors: [/network/i, /timeout/i, /ECONN/i]
 };
 
+const SERVICE_RETRY_OPTIONS: Record<string, Required<RetryOptions>> = {
+    'EmailService': {
+        maxAttempts: 3,
+        baseDelayMs: 2000,
+        maxDelayMs: 15000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i, /5\d{2}/]
+    },
+    'AuthService': {
+        maxAttempts: 2,
+        baseDelayMs: 1000,
+        maxDelayMs: 5000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+    }
+};
+
 const DEFAULT_DEFAULTS = {
     skipRateLimit: false,
     recordRateLimitOnSuccess: true,
@@ -44,12 +61,13 @@ export async function executeWithResilience<T, TData = void>(
         recordRateLimitOnSuccess = DEFAULT_DEFAULTS.recordRateLimitOnSuccess,
         recordRateLimitOnFailure = DEFAULT_DEFAULTS.recordRateLimitOnFailure,
         timeoutMs,
-        retryOptions = DEFAULT_RETRY_OPTIONS
+        retryOptions
     } = context;
 
     const startTime = Date.now();
     const serviceName = operationName.split('.')[0] || 'Service';
     const methodName = operationName.split('.')[1] || 'operation';
+    const serviceRetryOptions = retryOptions || SERVICE_RETRY_OPTIONS[serviceName] || DEFAULT_RETRY_OPTIONS;
 
     if (!skipRateLimit && rateLimiter && identifier) {
         const limitCheck = rateLimiter.check(identifier);
@@ -70,7 +88,7 @@ export async function executeWithResilience<T, TData = void>(
                 operation = () => withTimeout(operationFn(data as TData), { timeoutMs, timeoutError });
             }
 
-            const retryResult = await withRetry(operation, retryOptions);
+            const retryResult = await withRetry(operation, serviceRetryOptions);
 
             if (!retryResult.success || !retryResult.data) {
                 const error = retryResult.error || new Error(`${methodName} failed after retries`);

@@ -12,6 +12,31 @@ export const RETRY_CONFIG = {
     BACKOFF_MULTIPLIER: 2,
 } as const;
 
+export const SERVICE_RETRY_CONFIG = {
+    EMAIL_SERVICE: {
+        maxAttempts: 3,
+        baseDelayMs: 2000,
+        maxDelayMs: 15000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i, /5\d{2}/]
+    },
+    AUTH_SERVICE: {
+        maxAttempts: 2,
+        baseDelayMs: 1000,
+        maxDelayMs: 5000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i]
+    },
+    API_ROUTE: {
+        maxAttempts: 2,
+        baseDelayMs: 500,
+        maxDelayMs: 3000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
+    }
+} as const;
+
 export const MS_TO_SECONDS = 1000;
 
 export type TimeoutConfig = typeof TIMEOUTS[keyof typeof TIMEOUTS];
+export type RetryConfigType = typeof SERVICE_RETRY_CONFIG[keyof typeof SERVICE_RETRY_CONFIG];

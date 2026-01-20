@@ -1,3 +1,5 @@
+import type { APMConfig, APMProviderType } from '@/types/apm';
+
 export interface APMError {
   message: string;
   stack?: string;
@@ -43,18 +45,6 @@ export interface APMPerformanceMetrics {
   tags?: Record<string, string>;
 }
 
-export interface APMConfig {
-  provider: APMProviderType;
-  enabled?: boolean;
-  environment?: string;
-  dsn?: string;
-  release?: string;
-  sampleRate?: number;
-  [key: string]: unknown;
-}
-
-export type APMProviderType = 'console' | 'sentry' | 'none';
-
 export interface IAPMProvider {
   initialize(config?: APMConfig): void;
   captureError(error: APMError): void;
@@ -69,3 +59,5 @@ export interface IAPMProvider {
   flush(): Promise<void>;
   isEnabled(): boolean;
 }
+
+export type { APMConfig, APMProviderType };

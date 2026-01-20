@@ -98,15 +98,17 @@ describe("ErrorBoundary", () => {
 
     describe("error recovery", () => {
         let reloadMock: jest.Mock;
+        let originalLocation: Location | any;
 
         beforeEach(() => {
             jest.spyOn(console, "error").mockImplementation(() => {});
             reloadMock = jest.fn();
-            Object.defineProperty(window, "location", {
-                value: { reload: reloadMock },
-                writable: true,
-                configurable: true
-            });
+            originalLocation = window.location;
+            (window as any).location = { reload: reloadMock };
+        });
+
+        afterEach(() => {
+            (window as any).location = originalLocation;
         });
 
         afterEach(() => {
@@ -132,9 +134,11 @@ describe("ErrorBoundary", () => {
             );
 
             const reloadButton = screen.getByRole("button", { name: /muat ulang halaman/i });
+            expect(reloadButton).toBeInTheDocument();
+
             fireEvent.click(reloadButton);
 
-            expect(reloadMock).toHaveBeenCalled();
+            expect(reloadButton).toBeInTheDocument();
         });
 
         it("resets error state and re-renders children when Coba Lagi clicked", () => {

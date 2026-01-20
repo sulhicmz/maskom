@@ -6,16 +6,28 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  // Konfigurasi Turbopack untuk Next.js 16
+  turbopack: {},
+
   // Konfigurasi untuk Cloudflare Pages
   output: 'standalone',
   distDir: '.next',
-  
+
+  // Konfigurasi CDN base URL untuk production
+  ...(process.env.CDN_URL ? {
+    assetPrefix: process.env.CDN_URL,
+    basePath: process.env.CDN_URL
+  } : {}),
+
   // Optimasi untuk Cloudflare Pages
   serverExternalPackages: ['@emailjs/browser'],
-  
+
   // Konfigurasi image optimization
   images: {
     unoptimized: true, // Cloudflare Pages menangani image optimization
+    ...(process.env.CDN_URL ? {
+      domains: [new URL(process.env.CDN_URL).hostname]
+    } : {})
   },
   
   // Konfigurasi kompresi

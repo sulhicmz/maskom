@@ -74,12 +74,12 @@ describe("validateBlogCommentItem", () => {
       expect(result.errors).toHaveLength(0);
     });
 
-    it("should reject invalid status", () => {
-      const comment = { ...validComment, status: "invalid" as unknown as "pending" | "approved" | "rejected" };
-      const result = validateBlogCommentItem(comment);
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("status must be one of: pending, approved, rejected, got: invalid");
-    });
+        it("should reject invalid status", () => {
+            const comment = { ...validComment, status: "invalid" as unknown as "pending" | "approved" | "rejected" };
+            const result = validateBlogCommentItem(comment);
+            expect(result.isValid).toBe(false);
+            expect(result.errors).toContain("status must be one of: pending, approved, rejected, spam, got: invalid");
+        });
   });
 
   describe("Parent ID Validation", () => {
