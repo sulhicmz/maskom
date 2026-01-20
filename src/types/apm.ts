@@ -81,5 +81,3 @@ function isValidSentryDSN(dsn: string): boolean {
 export function resetAPMConfig(): APMUIConfig {
   return { ...DEFAULT_APM_CONFIG };
 }
-
-export type { APMConfig, APMProviderType };
