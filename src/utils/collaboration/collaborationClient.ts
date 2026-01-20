@@ -174,14 +174,22 @@ export class CollaborationClient {
   }
 
   private startPolling(): void {
-    this.pollTimer = setInterval(() => {
-      this.poll()
-    }, this.config.pollInterval!)
+    const scheduleNextPoll = () => {
+      if (!this.isConnected) return
+      this.pollTimer = setTimeout(() => {
+        this.poll().then(() => {
+          if (this.isConnected) {
+            scheduleNextPoll()
+          }
+        })
+      }, this.config.pollInterval!)
+    }
+    scheduleNextPoll()
   }
 
   private stopPolling(): void {
     if (this.pollTimer) {
-      clearInterval(this.pollTimer)
+      clearTimeout(this.pollTimer)
       this.pollTimer = null
     }
   }
@@ -222,19 +230,7 @@ export class CollaborationClient {
   }
 
   private handleEvent(event: CollaborativeEvent): void {
-    switch (event.type) {
-      case 'user_joined':
-      case 'user_left':
-      case 'cursor_moved':
-        break
-      case 'edit_applied':
-      case 'comment_added':
-      case 'comment_resolved':
-        this.config.onEvent(event)
-        break
-      default:
-        this.config.onEvent(event)
-    }
+    this.config.onEvent(event)
   }
 
   private onSessionInactive(): void {
