@@ -5176,3 +5176,163 @@ CDN_ACCOUNT_ID=
 - Task 324 (Critical Path Testing) - CDN utilities need testing
 - All future performance tasks benefit from CDN foundation
 
+
+## Real-Time Collaboration Architecture (⚠️ IN PROGRESS - Task 352)
+
+### Purpose
+
+Implement WebSocket-based real-time collaborative editing system for blog posts, enabling multiple content creators to work simultaneously with automatic conflict resolution.
+
+### Architecture
+
+```
+WebSocket Server (Next.js API Route)
+    ↓
+Session Manager (In-Memory Storage)
+    ↓
+Operational Transformation (OT) Algorithm
+    ↓
+Real-Time Sync
+    ↓
+Client Components (ActiveEditorsIndicator, RealTimeEditor)
+```
+
+### Architecture Components
+
+**1. Type Definitions** (`src/types/collaboration.ts`):
+- `CursorPosition` - Line and column position in document
+- `SelectionRange` - Start and end cursor positions
+- `ActiveEditor` - User in session with cursor and last seen timestamp
+- `DraftContent` - Collaborative content structure (title, description, content, tags, category)
+- `CollaborativeSession` - Session with editors, content, version tracking
+- `EditOperation` - Edit operation with type, position, content, author, timestamp, version
+- `EditConflict` - Conflict detection with resolution
+- `RealTimeComment` - Real-time comment on content section
+- `CollaborativeEvent` - Session event types (user_joined, user_left, cursor_moved, edit_applied, comment_added)
+- `CollaborationEventType` - Type union for event types
+
+**2. Operational Transformation Algorithm** (`src/utils/collaboration/operationalTransformation.ts`):
+- `OperationalTransformation` class with 6 core methods:
+  - `transform(op1, op2)` - Transform two operations and detect conflict
+  - `transformOpAgainstOps(clientOp, serverOps)` - Transform client operation against server operations
+  - `applyOperation(content, operation)` - Apply insert/delete/replace operation to content
+  - `detectConflict(op1, op2)` - Detect operations at same position from different authors
+  - `resolveConflict(op1, op2)` - Resolve conflict using earlier timestamp
+  - Position-to-index conversion for multi-line content
+- Client state management utilities:
+  - `createClientState(initialRevision)` - Create client state with revision
+  - `addPendingOperation(state, operation)` - Add operation to pending queue
+  - `clearPendingOperations(state)` - Clear pending operations after acknowledgment
+  - `incrementRevision(state)` - Increment document version
+
+**3. Session Management** (`src/utils/collaboration/sessionManager.ts`):
+- `SessionManager` class with session lifecycle management:
+  - `createSession(postId, content, creator)` - Create new session, return session ID
+  - `getSession(sessionId)` - Retrieve session by ID
+  - `getSessionByPostId(postId)` - Retrieve session by post ID
+  - `updateSessionContent(sessionId, content)` - Update content and increment version
+  - `addEditor(sessionId, userId, username)` - Add editor to session
+  - `removeEditor(sessionId, userId)` - Remove editor, close session if last editor
+  - `updateEditorCursor(sessionId, userId, position, selection?)` - Update cursor position
+  - `getActiveEditors(sessionId)` - Get all active editors in session
+  - `getEditor(sessionId, userId)` - Get specific editor
+  - `closeSession(sessionId)` - Close and remove session
+  - `getActiveSessions()` - Get all active sessions
+  - `getSessionCount()` - Get total session count
+  - `getTotalEditorCount()` - Get total editors across all sessions
+- Heartbeat system:
+  - 30-second interval for stale editor detection
+  - 60-second timeout for automatic removal
+  - Automatic session closure when last editor removed
+
+**4. Active Editors Indicator** (`src/components/collaboration/ActiveEditorsIndicator.tsx`):
+- Displays list of active editors excluding current user
+- Avatar generation:
+  - Color-coded based on userId (8 colors in rotation)
+  - Initials extraction (first letter of first/last name, or first 2 letters if single name)
+- Editor information:
+  - Username display
+  - Last seen formatting (Aktif, Xm yang lalu, Xj yang lalu)
+  - Cursor position display (Baris {line + 1})
+- Interactive:
+  - Click handler for editor selection
+  - Hover states with background color transition
+- Fixed positioning:
+  - Top-right corner with z-index for visibility
+  - Compact card design with shadow and border
+- Dark mode support via ThemeContext
+- Indonesian UI text for accessibility
+
+### Architecture Benefits
+
+1. **Conflict-Free Collaboration**: Operational Transformation algorithm prevents data loss from simultaneous edits
+2. **Real-Time Synchronization**: Cursor positions and editor visibility in real-time
+3. **Session Scalability**: Multiple concurrent sessions supported with automatic cleanup
+4. **Connection Resilience**: Heartbeat system detects and removes stale connections
+5. **User Experience**: Real-time feedback with Indonesian language support
+6. **Type Safety**: Full TypeScript interfaces for all collaboration data structures
+7. **Testable Foundation**: Comprehensive test coverage for OT algorithm and session management
+
+### Testing
+
+**Operational Transformation Tests** (50+ tests):
+- Transform operations without conflict (different positions)
+- Detect conflict when same position, different authors
+- No conflict when same position, same author
+- Conflict resolution using earlier timestamp
+- Transform client operation against multiple server operations
+- Apply insert operation to content
+- Apply delete operation to content
+- Apply replace operation to content
+- Multi-line content handling with position-to-index conversion
+
+**Session Manager Tests** (80+ tests):
+- Create session and add creator as first editor
+- Initialize session with version 1
+- Retrieve session by ID
+- Retrieve session by post ID
+- Update session content and increment version
+- Add editor to session
+- Remove editor from session
+- Close session when last editor removed
+- Update editor cursor position
+- Update editor selection when provided
+- Get all active editors in session
+- Get specific editor from session
+- Get all active sessions
+- Get session count
+- Get total editor count across all sessions
+
+### Related Files
+
+- ✅ Added: `src/types/collaboration.ts` - Collaboration type definitions (58 lines)
+- ✅ Added: `src/utils/collaboration/operationalTransformation.ts` - OT algorithm (178 lines)
+- ✅ Added: `src/utils/collaboration/sessionManager.ts` - Session management (169 lines)
+- ✅ Added: `src/utils/collaboration/index.ts` - Central exports (4 lines)
+- ✅ Added: `src/components/collaboration/ActiveEditorsIndicator.tsx` - Active editors UI (94 lines)
+- ✅ Added: `src/utils/collaboration/__tests__/operationalTransformation.test.ts` - OT tests (300+ lines, 50+ tests)
+- ✅ Added: `src/utils/collaboration/__tests__/sessionManager.test.ts` - Session tests (450+ lines, 80+ tests)
+
+### Implementation Status
+
+**Completed Phases** (44%):
+- ✅ Phase 1: Type Definitions - Complete
+- ✅ Phase 2: Operational Transformation Algorithm - Complete
+- ✅ Phase 3: Session Management - Complete
+- ✅ Phase 4: ActiveEditorsIndicator Component - Complete
+
+**Remaining Phases** (56%):
+- ⏳ Phase 5: WebSocket Server Implementation
+- ⏳ Phase 6: Real-Time Comments System
+- ⏳ Phase 7: Auto-Save with Collaborative History
+- ⏳ Phase 8: Real-Time Editor Component
+- ⏳ Phase 9: RBAC Protection
+
+### Related Tasks
+
+- Task 352 (Real-Time Content Co-Authoring Implementation) - Current task (44% complete)
+- FEATURE-061 (Real-Time Content Co-Authoring) - Feature specification
+- FEATURE-034 (Content Version Control & History) - Integration for history
+- FEATURE-013 (User Roles & Permissions) - RBAC integration
+
+---
