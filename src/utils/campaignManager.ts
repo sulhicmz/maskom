@@ -181,8 +181,11 @@ class CampaignManager {
 
         if (!originalCampaign) return null;
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id: originalId, createdAt, sentCount, openCount, clickCount, bounceCount, ...campaignData } = originalCampaign;
+
         const duplicatedCampaign = this.createCampaign({
-            ...originalCampaign,
+            ...campaignData,
             name: `${originalCampaign.name} (Copy)`,
             status: 'draft',
         });
@@ -239,7 +242,7 @@ class CampaignManager {
         if (scheduledDateTime <= now) {
             return {
                 success: false,
-                message: 'Scheduled date must be in the future',
+                message: 'Scheduled date must be in future',
             };
         }
 
