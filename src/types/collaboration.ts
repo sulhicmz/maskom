@@ -63,13 +63,17 @@ export interface RealTimeComment {
   resolved: boolean
 }
 
+export interface EventDataBase {
+  eventId?: string
+}
+
 export interface CollaborativeEvent {
   type: 'user_joined' | 'user_left' | 'cursor_moved' | 'edit_applied' | 'comment_added' | 'comment_resolved'
   sessionId: string
   postId: number
   userId: number
   timestamp: number
-  data?: unknown
+  data?: EventDataBase & Record<string, unknown>
 }
 
 export type CollaborationEventType = CollaborativeEvent['type']

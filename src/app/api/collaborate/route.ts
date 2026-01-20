@@ -4,6 +4,42 @@ import { CollaborativeEvent } from '@/types/collaboration'
 
 const MAX_EVENTS_PER_POLL = 50
 
+interface PollResponse {
+  success: boolean
+  events: CollaborativeEvent[]
+  sessionActive: boolean
+  error?: string
+}
+
+interface JoinRequest {
+  postId: number
+  userId: number
+  username: string
+}
+
+interface LeaveRequest {
+  sessionId: string
+  userId: number
+}
+
+interface CursorUpdateRequest {
+  sessionId: string
+  userId: number
+  cursorPosition: { line: number; column: number }
+  selection?: { start: { line: number; column: number }; end: { line: number; column: number } }
+}
+
+interface EditRequest {
+  sessionId: string
+  userId: number
+  editOperation: {
+    type: 'insert' | 'delete' | 'replace'
+    position: { line: number; column: number }
+    content?: string
+    length?: number
+  }
+}
+
 interface CommentRequest {
   sessionId: string
   userId: number
