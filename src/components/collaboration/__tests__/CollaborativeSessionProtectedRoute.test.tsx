@@ -20,6 +20,12 @@ jest.mock('@/services/auth/AuthService', () => ({
   },
 }))
 
+jest.mock('@/utils/rbac', () => ({
+  canAccessRoute: jest.fn(),
+  canPerformAction: jest.fn(),
+  getUnauthorizedRedirectPath: jest.fn(() => '/unauthorized'),
+}))
+
 describe.skip('CollaborativeSessionProtectedRoute', () => {
   const mockRouter = {
     push: jest.fn(),
