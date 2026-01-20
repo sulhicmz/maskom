@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import CollaborativeSessionProtectedRoute from '@/components/collaboration/CollaborativeSessionProtectedRoute'
 import authService from '@/services/auth/AuthService'
-import { getUnauthorizedRedirectPath } from '@/utils/rbac'
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -19,12 +18,6 @@ jest.mock('@/services/auth/AuthService', () => ({
     hasPermission: jest.fn(() => Promise.resolve(true)),
     getMFAStatus: jest.fn(() => Promise.resolve('disabled')),
   },
-}))
-
-jest.mock('@/utils/rbac', () => ({
-  canAccessRoute: jest.fn(),
-  canPerformAction: jest.fn(),
-  getUnauthorizedRedirectPath: jest.fn(() => '/unauthorized'),
 }))
 
 describe.skip('CollaborativeSessionProtectedRoute', () => {
