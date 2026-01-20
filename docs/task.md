@@ -1,5 +1,106 @@
 # Architecture Task Tracking
 
+## Task 358: [PRINCIPAL ARCHITECT] Layer Separation - APM Configuration Fix (Jan 20, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Layer Separation - Clean Architecture Fix
+**Effort**: Small (1 hour)
+
+### Purpose
+
+Fix Clean Architecture violation where types layer imports from utils layer, ensuring dependencies flow in correct direction (inward) and eliminating circular dependency risk.
+
+### Problem Identified
+
+**Layer Violation**:
+- `src/types/apm.ts` imported `APMConfig` and `APMProviderType` from `@/utils/apm/types`
+- Dependencies flowed from types → utils (wrong direction)
+- Violated Clean Architecture principle: dependencies should flow inward
+- Created circular dependency risk
+
+**Why This Matters**:
+1. **Clean Architecture**: Dependencies should flow inward (presentation → types ← services/utils)
+2. **Circular Dependencies**: Types importing from utils creates potential circular dependency chains
+3. **Maintainability**: Type definitions should be independent of implementation details
+4. **Testability**: Types should have no dependencies on implementation layers
+
+### Solution
+
+**Move Type Definitions to Types Layer**:
+
+**1. Types Layer** (`src/types/apm.ts`):
+- Added `APMConfig` interface (core APM configuration)
+- Added `APMProviderType` union type ('console' | 'sentry' | 'none')
+- Added re-exports for backward compatibility
+
+**2. Utils Layer** (`src/utils/apm/types.ts`):
+- Removed duplicate `APMConfig` and `APMProviderType` definitions
+- Added import from `@/types/apm` (correct dependency direction)
+- Added re-exports for backward compatibility
+
+**Correct Dependency Flow**:
+```
+Before (Wrong Direction):
+types/apm.ts → utils/apm/types.ts → utils/apmConfig.ts
+
+After (Correct Direction):
+types/apm.ts ← utils/apm/types.ts → utils/apmConfig.ts
+```
+
+### Implementation
+
+- [x] Move APMConfig from utils/apm/types.ts to types/apm.ts
+- [x] Move APMProviderType from utils/apm/types.ts to types/apm.ts
+- [x] Update utils/apm/types.ts to import from types/apm
+- [x] Add re-exports in both files for backward compatibility
+- [x] Verify no breaking changes to consumers
+- [x] Update docs/blueprint.md with layer separation fix
+
+### Success Criteria
+
+- [x] APMConfig and APMProviderType in types layer
+- [x] Dependencies flow correctly (types ← utils)
+- [x] No circular dependencies
+- [x] Backward compatibility maintained
+- [x] Zero breaking changes to consumers
+
+### Related Files
+
+- ✅ Modified: `src/types/apm.ts` - Added APMConfig and APMProviderType
+- ✅ Modified: `src/utils/apm/types.ts` - Import from types layer, remove duplicates
+- ✅ Modified: `docs/blueprint.md` - Document layer separation fix
+
+### Implementation Summary
+
+**Files Modified**: 3 files
+**Lines Changed**: 91 insertions, 13 deletions
+**Layer Violation Fixed**: types → utils (wrong) → types ← utils (correct)
+
+**Key Features**:
+1. **Clean Architecture**: Dependencies flow correctly (types ← utils)
+2. **No Circular Dependencies**: Eliminates potential circular dependency risk
+3. **Single Source of Truth**: APMConfig defined once in types layer
+4. **Backward Compatibility**: Re-exports preserve existing import paths
+5. **Zero Breaking Changes**: All consumers continue working without modification
+
+### Notes
+
+- Follows SOLID Principles:
+  - **Dependency Inversion**: High-level modules (types) don't depend on low-level modules (utils)
+  - **Single Responsibility**: Type definitions independent of implementation details
+
+- Follows Clean Architecture:
+  - **Layer Separation**: Types layer is foundation, no dependencies on higher layers
+  - **Dependency Rule**: Dependencies point inward toward the domain
+
+### Related Tasks
+
+- Task 282 (Layer Separation Architecture) - Similar pattern established
+- FEATURE-022 (APM Integration & Production Monitoring) - APM system
+
+---
+
 ## Task 352: [CONTENT ARCHITECT] Real-Time Content Co-Authoring Implementation (Jan 20, 2026)
 
 **Status**: Pending
