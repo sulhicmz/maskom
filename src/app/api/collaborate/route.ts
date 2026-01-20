@@ -1,53 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sessionManager } from '@/utils/collaboration/sessionManager'
-import { CollaborativeEvent, CollaborativeEventType } from '@/types/collaboration'
+import { CollaborativeEvent } from '@/types/collaboration'
 
-const POLL_INTERVAL = 1000 // 1 second
 const MAX_EVENTS_PER_POLL = 50
-
-interface PollRequest {
-  sessionId: string
-  userId: number
-  username: string
-  lastEventId?: string
-}
-
-interface PollResponse {
-  success: boolean
-  events: CollaborativeEvent[]
-  sessionActive: boolean
-  error?: string
-}
-
-interface JoinRequest {
-  postId: number
-  userId: number
-  username: string
-}
-
-interface LeaveRequest {
-  sessionId: string
-  userId: number
-}
-
-interface CursorUpdateRequest {
-  sessionId: string
-  userId: number
-  cursorPosition: { line: number; column: number }
-  selection?: { start: { line: number; column: number }; end: { line: number; column: number } }
-}
-
-interface EditRequest {
-  sessionId: string
-  userId: number
-  editOperation: {
-    type: 'insert' | 'delete' | 'replace'
-    position: { line: number; column: number }
-    content?: string
-    length?: number
-    version: number
-  }
-}
 
 interface CommentRequest {
   sessionId: string
@@ -163,7 +118,7 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
     )
   }
 
-  let session = sessionManager.getSessionByPostId(postId)
+  const session = sessionManager.getSessionByPostId(postId)
 
   if (!session) {
     return NextResponse.json(
