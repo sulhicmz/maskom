@@ -27,6 +27,70 @@ interface DrillProgress {
 
 type DrillProgressCallback = (progress: DrillProgress) => void
 
+interface DrillExecutionContext {
+  drillType: DrillType
+  backupId: string
+  executeDrill: (onProgress?: DrillProgressCallback) => Promise<DrillResults>
+  onProgress?: DrillProgressCallback
+  initialProgressMessage: string
+  totalSteps: number
+}
+
+function createDrillObject(
+  drillType: DrillType,
+  backupId: string,
+  status: DrillStatus,
+  startedAt: string
+): BackupDrill {
+  return {
+    id: generateDrillId(drillType, backupId),
+    backupId,
+    drillType,
+    status,
+    timestamp: startedAt,
+    duration: 0,
+    startedAt,
+    remediationAttempted: false,
+    notificationSent: false
+  }
+}
+
+function createFailedDrill(
+  drillType: DrillType,
+  backupId: string,
+  startedAt: string,
+  errorMessage: string
+): BackupDrill {
+  return {
+    id: generateDrillId(drillType, backupId),
+    backupId,
+    drillType,
+    status: DrillStatus.FAILED,
+    timestamp: startedAt,
+    duration: calculateDrillDuration(undefined, startedAt),
+    errors: [errorMessage],
+    startedAt,
+    completedAt: new Date().toISOString(),
+    remediationAttempted: false,
+    notificationSent: false
+  }
+}
+
+function calculateDrillDuration(
+  startTime: number | undefined,
+  startedAt: string
+): number {
+  const endTime = Date.now()
+  const actualStartTime = startTime || new Date(startedAt).getTime()
+  return endTime - actualStartTime
+}
+
+function generateDrillId(drillType: DrillType, backupId: string): string {
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).substring(2, 9)
+  return `drill-${drillType}-${backupId}-${timestamp}-${random}`
+}
+
 class DrillEngine {
   private static instance: DrillEngine
   private backupEngine: BackupEngine
@@ -45,103 +109,52 @@ class DrillEngine {
     return DrillEngine.instance
   }
 
-  async executeFullRestoreDrill(
-    backupId: string,
-    onProgress?: DrillProgressCallback,
-    isolated: boolean = true
-  ): Promise<BackupDrill> {
-    const drillId = this.generateDrillId(DrillType.FULL_RESTORE, backupId)
+  private async executeDrill(context: DrillExecutionContext): Promise<BackupDrill> {
+    const { drillType, backupId, executeDrill, onProgress, initialProgressMessage, totalSteps } = context
+    const drillId = generateDrillId(drillType, backupId)
     const startedAt = new Date().toISOString()
 
-    apmManager.startTransaction('executeFullRestoreDrill', 'drill')
+    const transactionName = `execute${this.getDrillTypeName(drillType)}`
+    apmManager.startTransaction(transactionName, 'drill')
 
     onProgress?.({
       current: 1,
-      total: 5,
-      message: 'Initializing full restore drill...'
+      total: totalSteps,
+      message: initialProgressMessage
     })
 
     try {
-      const drill: BackupDrill = {
-        id: drillId,
-        backupId,
-        drillType: DrillType.FULL_RESTORE,
-        status: DrillStatus.RUNNING,
-        timestamp: startedAt,
-        duration: 0,
-        startedAt,
-        remediationAttempted: false,
-        notificationSent: false
-      }
-
+      const drill = createDrillObject(drillType, backupId, DrillStatus.RUNNING, startedAt)
       await this.saveDrill(drill)
 
       onProgress?.({
         current: 2,
-        total: 5,
+        total: totalSteps,
         message: 'Verifying backup integrity...'
       })
 
       const startTime = Date.now()
 
       const metadata = await this.backupEngine.getBackupMetadataById(backupId)
-
       if (!metadata) {
         throw new Error(`Backup ${backupId} not found`)
       }
 
-      if (metadata.type !== 'full') {
-        throw new Error(`Backup ${backupId} is not a full backup`)
-      }
+      await this.validateBackupType(drillType, metadata, backupId)
 
       const checksumValid = await this.backupEngine.verifyBackupIntegrity(backupId)
-
       if (!checksumValid) {
         throw new Error('Backup checksum validation failed')
       }
 
-      onProgress?.({
-        current: 3,
-        total: 5,
-        message: 'Executing restore operation...'
-      })
-
-      if (isolated) {
-        await this.executeIsolatedRestore(backupId, onProgress)
-      } else {
-        const restoreResult = await this.backupEngine.restoreBackup(backupId, (progress) => {
-          onProgress?.({
-            current: Math.floor((progress.current / progress.total) * 5),
-            total: 5,
-            message: `Restoring: ${progress.message}`
-          })
-        })
-
-        if (!restoreResult.success) {
-          throw new Error(`Restore failed: ${restoreResult.errors.join(', ')}`)
-        }
-      }
+      const results = await executeDrill(onProgress)
 
       const duration = Date.now() - startTime
 
       onProgress?.({
-        current: 4,
-        total: 5,
+        current: totalSteps - 1,
+        total: totalSteps,
         message: 'Validating drill results...'
-      })
-
-      const results: DrillResults = {
-        restoreDuration: duration,
-        integrityCheckPassed: true,
-        dataLossDetected: false,
-        itemsRestored: 0,
-        checksumValid: true
-      }
-
-      onProgress?.({
-        current: 5,
-        total: 5,
-        message: 'Full restore drill completed successfully'
       })
 
       drill.status = DrillStatus.PASSED
@@ -150,44 +163,35 @@ class DrillEngine {
       drill.completedAt = new Date().toISOString()
 
       apmManager.finishTransaction({
-        name: 'executeFullRestoreDrill',
+        name: transactionName,
         op: 'drill',
         data: { duration },
-        tags: { backupId, drillType: DrillType.FULL_RESTORE }
+        tags: { backupId, drillType }
       })
 
       await this.saveDrill(drill)
       await this.sendDrillNotification(drill)
 
+      onProgress?.({
+        current: totalSteps,
+        total: totalSteps,
+        message: `${this.getDrillTypeName(drillType)} drill completed successfully`
+      })
+
       return drill
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      const duration = Date.now() - new Date(startedAt).getTime()
-
-      const drill: BackupDrill = {
-        id: drillId,
-        backupId,
-        drillType: DrillType.FULL_RESTORE,
-        status: DrillStatus.FAILED,
-        timestamp: startedAt,
-        duration,
-        errors: [errorMessage],
-        startedAt,
-        completedAt: new Date().toISOString(),
-        remediationAttempted: false,
-        notificationSent: false
-      }
+      const drill = createFailedDrill(drillType, backupId, startedAt, errorMessage)
 
       apmManager.captureError({
-        message: `Full restore drill failed: ${errorMessage}`,
+        message: `${this.getDrillTypeName(drillType)} drill failed: ${errorMessage}`,
         level: 'error',
-        tags: { backupId, drillType: DrillType.FULL_RESTORE }
+        tags: { backupId, drillType }
       })
 
       await this.saveDrill(drill)
 
       const config = await this.getDrillConfig()
-
       if (config.autoRemediate) {
         await this.attemptRemediation(drill)
       }
@@ -196,6 +200,79 @@ class DrillEngine {
 
       throw error
     }
+  }
+
+  private getDrillTypeName(drillType: DrillType): string {
+    switch (drillType) {
+      case DrillType.FULL_RESTORE:
+        return 'FullRestore'
+      case DrillType.PARTIAL_RESTORE:
+        return 'PartialRestore'
+      case DrillType.INTEGRITY_CHECK:
+        return 'IntegrityCheck'
+    }
+  }
+
+  private async validateBackupType(
+    drillType: DrillType,
+    metadata: any,
+    backupId: string
+  ): Promise<void> {
+    if (drillType === DrillType.FULL_RESTORE && metadata.type !== 'full') {
+      throw new Error(`Backup ${backupId} is not a full backup`)
+    }
+    if (drillType === DrillType.PARTIAL_RESTORE && metadata.type !== 'incremental') {
+      throw new Error(`Backup ${backupId} is not an incremental backup`)
+    }
+  }
+
+  async executeFullRestoreDrill(
+    backupId: string,
+    onProgress?: DrillProgressCallback,
+    isolated: boolean = true
+  ): Promise<BackupDrill> {
+    return this.executeDrill({
+      drillType: DrillType.FULL_RESTORE,
+      backupId,
+      onProgress,
+      initialProgressMessage: 'Initializing full restore drill...',
+      totalSteps: 5,
+      executeDrill: async (progressCallback) => {
+        progressCallback?.({
+          current: 3,
+          total: 5,
+          message: 'Executing restore operation...'
+        })
+
+        const startTime = Date.now()
+
+        if (isolated) {
+          await this.executeIsolatedRestore(backupId, progressCallback)
+        } else {
+          const restoreResult = await this.backupEngine.restoreBackup(backupId, (progress) => {
+            progressCallback?.({
+              current: Math.floor((progress.current / progress.total) * 5),
+              total: 5,
+              message: `Restoring: ${progress.message}`
+            })
+          })
+
+          if (!restoreResult.success) {
+            throw new Error(`Restore failed: ${restoreResult.errors.join(', ')}`)
+          }
+        }
+
+        const duration = Date.now() - startTime
+
+        return {
+          restoreDuration: duration,
+          integrityCheckPassed: true,
+          dataLossDetected: false,
+          itemsRestored: 0,
+          checksumValid: true
+        }
+      }
+    })
   }
 
   async executePartialRestoreDrill(
@@ -203,272 +280,72 @@ class DrillEngine {
     onProgress?: DrillProgressCallback,
     isolated: boolean = true
   ): Promise<BackupDrill> {
-    const drillId = this.generateDrillId(DrillType.PARTIAL_RESTORE, backupId)
-    const startedAt = new Date().toISOString()
-
-    apmManager.startTransaction('executePartialRestoreDrill', 'drill')
-
-    onProgress?.({
-      current: 1,
-      total: 5,
-      message: 'Initializing partial restore drill...'
-    })
-
-    try {
-      const drill: BackupDrill = {
-        id: drillId,
-        backupId,
-        drillType: DrillType.PARTIAL_RESTORE,
-        status: DrillStatus.RUNNING,
-        timestamp: startedAt,
-        duration: 0,
-        startedAt,
-        remediationAttempted: false,
-        notificationSent: false
-      }
-
-      await this.saveDrill(drill)
-
-      onProgress?.({
-        current: 2,
-        total: 5,
-        message: 'Verifying backup integrity...'
-      })
-
-      const startTime = Date.now()
-
-      const metadata = await this.backupEngine.getBackupMetadataById(backupId)
-
-      if (!metadata) {
-        throw new Error(`Backup ${backupId} not found`)
-      }
-
-      if (metadata.type !== 'incremental') {
-        throw new Error(`Backup ${backupId} is not an incremental backup`)
-      }
-
-      const checksumValid = await this.backupEngine.verifyBackupIntegrity(backupId)
-
-      if (!checksumValid) {
-        throw new Error('Backup checksum validation failed')
-      }
-
-      onProgress?.({
-        current: 3,
-        total: 5,
-        message: 'Executing partial restore...'
-      })
-
-      if (isolated) {
-        await this.executeIsolatedRestore(backupId, onProgress, true)
-      } else {
-        const restoreResult = await this.backupEngine.restoreBackup(backupId, (progress) => {
-          onProgress?.({
-            current: Math.floor((progress.current / progress.total) * 5),
-            total: 5,
-            message: `Partial restore: ${progress.message}`
-          })
+    return this.executeDrill({
+      drillType: DrillType.PARTIAL_RESTORE,
+      backupId,
+      onProgress,
+      initialProgressMessage: 'Initializing partial restore drill...',
+      totalSteps: 5,
+      executeDrill: async (progressCallback) => {
+        progressCallback?.({
+          current: 3,
+          total: 5,
+          message: 'Executing partial restore...'
         })
 
-        if (!restoreResult.success) {
-          throw new Error(`Restore failed: ${restoreResult.errors.join(', ')}`)
+        const startTime = Date.now()
+
+        if (isolated) {
+          await this.executeIsolatedRestore(backupId, progressCallback, true)
+        } else {
+          const restoreResult = await this.backupEngine.restoreBackup(backupId, (progress) => {
+            progressCallback?.({
+              current: Math.floor((progress.current / progress.total) * 5),
+              total: 5,
+              message: `Partial restore: ${progress.message}`
+            })
+          })
+
+          if (!restoreResult.success) {
+            throw new Error(`Restore failed: ${restoreResult.errors.join(', ')}`)
+          }
+        }
+
+        const duration = Date.now() - startTime
+
+        return {
+          restoreDuration: duration,
+          integrityCheckPassed: true,
+          dataLossDetected: false,
+          itemsRestored: 0,
+          checksumValid: true
         }
       }
-
-      const duration = Date.now() - startTime
-
-      onProgress?.({
-        current: 4,
-        total: 5,
-        message: 'Validating drill results...'
-      })
-
-      const results: DrillResults = {
-        restoreDuration: duration,
-        integrityCheckPassed: true,
-        dataLossDetected: false,
-        itemsRestored: 0,
-        checksumValid: true
-      }
-
-      onProgress?.({
-        current: 5,
-        total: 5,
-        message: 'Partial restore drill completed successfully'
-      })
-
-      drill.status = DrillStatus.PASSED
-      drill.duration = duration
-      drill.results = results
-      drill.completedAt = new Date().toISOString()
-
-      apmManager.finishTransaction({
-        name: 'executePartialRestoreDrill',
-        op: 'drill',
-        data: { duration },
-        tags: { backupId, drillType: DrillType.PARTIAL_RESTORE }
-      })
-
-      await this.saveDrill(drill)
-      await this.sendDrillNotification(drill)
-
-      return drill
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      const duration = Date.now() - new Date(startedAt).getTime()
-
-      const drill: BackupDrill = {
-        id: drillId,
-        backupId,
-        drillType: DrillType.PARTIAL_RESTORE,
-        status: DrillStatus.FAILED,
-        timestamp: startedAt,
-        duration,
-        errors: [errorMessage],
-        startedAt,
-        completedAt: new Date().toISOString(),
-        remediationAttempted: false,
-        notificationSent: false
-      }
-
-      apmManager.captureError({
-        message: `Partial restore drill failed: ${errorMessage}`,
-        level: 'error',
-        tags: { backupId, drillType: DrillType.PARTIAL_RESTORE }
-      })
-
-      await this.saveDrill(drill)
-
-      const config = await this.getDrillConfig()
-
-      if (config.autoRemediate) {
-        await this.attemptRemediation(drill)
-      }
-
-      await this.sendDrillNotification(drill)
-
-      throw error
-    }
+    })
   }
 
   async executeIntegrityCheckDrill(
     backupId: string,
     onProgress?: DrillProgressCallback
   ): Promise<BackupDrill> {
-    const drillId = this.generateDrillId(DrillType.INTEGRITY_CHECK, backupId)
-    const startedAt = new Date().toISOString()
+    return this.executeDrill({
+      drillType: DrillType.INTEGRITY_CHECK,
+      backupId,
+      onProgress,
+      initialProgressMessage: 'Initializing integrity check drill...',
+      totalSteps: 3,
+      executeDrill: async () => {
+        const duration = 0
 
-    apmManager.startTransaction('executeIntegrityCheckDrill', 'drill')
-
-    onProgress?.({
-      current: 1,
-      total: 3,
-      message: 'Initializing integrity check drill...'
+        return {
+          restoreDuration: duration,
+          integrityCheckPassed: true,
+          dataLossDetected: false,
+          itemsRestored: 0,
+          checksumValid: true
+        }
+      }
     })
-
-    try {
-      const drill: BackupDrill = {
-        id: drillId,
-        backupId,
-        drillType: DrillType.INTEGRITY_CHECK,
-        status: DrillStatus.RUNNING,
-        timestamp: startedAt,
-        duration: 0,
-        startedAt,
-        remediationAttempted: false,
-        notificationSent: false
-      }
-
-      await this.saveDrill(drill)
-
-      onProgress?.({
-        current: 2,
-        total: 3,
-        message: 'Verifying backup integrity...'
-      })
-
-      const startTime = Date.now()
-
-      const metadata = await this.backupEngine.getBackupMetadataById(backupId)
-
-      if (!metadata) {
-        throw new Error(`Backup ${backupId} not found`)
-      }
-
-      const checksumValid = await this.backupEngine.verifyBackupIntegrity(backupId)
-
-      if (!checksumValid) {
-        throw new Error('Backup checksum validation failed')
-      }
-
-      const duration = Date.now() - startTime
-
-      onProgress?.({
-        current: 3,
-        total: 3,
-        message: 'Integrity check drill completed successfully'
-      })
-
-      const results: DrillResults = {
-        restoreDuration: 0,
-        integrityCheckPassed: true,
-        dataLossDetected: false,
-        itemsRestored: 0,
-        checksumValid: true
-      }
-
-      drill.status = DrillStatus.PASSED
-      drill.duration = duration
-      drill.results = results
-      drill.completedAt = new Date().toISOString()
-
-      apmManager.finishTransaction({
-        name: 'executeIntegrityCheckDrill',
-        op: 'drill',
-        data: { duration },
-        tags: { backupId, drillType: DrillType.INTEGRITY_CHECK }
-      })
-
-      await this.saveDrill(drill)
-      await this.sendDrillNotification(drill)
-
-      return drill
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      const duration = Date.now() - new Date(startedAt).getTime()
-
-      const drill: BackupDrill = {
-        id: drillId,
-        backupId,
-        drillType: DrillType.INTEGRITY_CHECK,
-        status: DrillStatus.FAILED,
-        timestamp: startedAt,
-        duration,
-        errors: [errorMessage],
-        startedAt,
-        completedAt: new Date().toISOString(),
-        remediationAttempted: false,
-        notificationSent: false
-      }
-
-      apmManager.captureError({
-        message: `Integrity check drill failed: ${errorMessage}`,
-        level: 'error',
-        tags: { backupId, drillType: DrillType.INTEGRITY_CHECK }
-      })
-
-      await this.saveDrill(drill)
-
-      const config = await this.getDrillConfig()
-
-      if (config.autoRemediate) {
-        await this.attemptRemediation(drill)
-      }
-
-      await this.sendDrillNotification(drill)
-
-      throw error
-    }
   }
 
   async scheduleDrill(
@@ -816,12 +693,6 @@ class DrillEngine {
     }
 
     global.localStorage?.setItem(DRILL_SCHEDULE_KEY, JSON.stringify(schedules))
-  }
-
-  private generateDrillId(drillType: DrillType, backupId: string): string {
-    const timestamp = Date.now()
-    const random = Math.random().toString(36).substring(2, 9)
-    return `drill-${drillType}-${backupId}-${timestamp}-${random}`
   }
 
   private calculateDrillTypeStats(drills: BackupDrill[], drillType: DrillType): DrillTypeStats {
