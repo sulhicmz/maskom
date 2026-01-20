@@ -1,33 +1,7 @@
 import type { InnerBlogPost } from '@/types/data'
-import type { ExportConfig, ExportMetadata } from './exportUtils'
-import type { BlogFilterCriteria } from './blogFilters'
+import type { ExportConfig, ExportMetadata } from './exportTypes'
+import { getFilterMetadataText } from './exportTypes'
 import { tagsById } from '@/data/BlogTagData'
-import { blogCategoryById } from '@/data/BlogCategoryData'
-
-function getFilterMetadataText(filters: Partial<BlogFilterCriteria>): string[] {
-  const metadataLines: string[] = []
-
-  if (filters.searchQuery) {
-    metadataLines.push(`Search: "${filters.searchQuery}"`)
-  }
-  if (filters.categoryId) {
-    const categoryName = blogCategoryById.get(filters.categoryId)?.name
-    if (categoryName) {
-      metadataLines.push(`Category: ${categoryName}`)
-    }
-  }
-  if (filters.tagId) {
-    const tagName = tagsById.get(filters.tagId)?.name
-    if (tagName) {
-      metadataLines.push(`Tag: ${tagName}`)
-    }
-  }
-  if (filters.status) {
-    metadataLines.push(`Status: ${filters.status}`)
-  }
-
-  return metadataLines
-}
 
 export async function exportToPDF(
   posts: InnerBlogPost[],

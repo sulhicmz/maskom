@@ -5335,4 +5335,116 @@ Client Components (ActiveEditorsIndicator, RealTimeEditor)
 - FEATURE-034 (Content Version Control & History) - Integration for history
 - FEATURE-013 (User Roles & Permissions) - RBAC integration
 
+## Dependency Cleanup - Export Utilities (✅ COMPLETED - Jan 20, 2026)
+
+### Purpose
+
+Fix circular dependency between `exportUtils.ts` and `exportPDF.ts`, eliminating architectural violation and improving code maintainability following Dependency Inversion Principle.
+
+### Problem Identified
+
+**Circular Dependency**:
+- `exportUtils.ts` → (dynamic import) → `exportPDF.ts`
+- `exportPDF.ts` → imports types from → `exportUtils.ts`
+
+**Why This Matters**:
+1. **Circular Dependency**: Modules depend on each other, creating tight coupling
+2. **Maintainability**: Changes in one module require updating the other
+3. **Testing**: Difficult to test modules in isolation
+4. **Build Risk**: Circular dependencies can cause build failures
+5. **Architecture Violation**: Violates Dependency Inversion Principle
+
+### Architecture Solution
+
+**Extract Shared Types to Separate Module**:
+
+```
+Before (Circular Dependency):
+exportUtils.ts → exportPDF.ts → exportUtils.ts (circular)
+
+After (Clean Dependencies):
+exportUtils.ts → exportTypes.ts ← exportPDF.ts
+```
+
+**Types Layer** (`src/utils/exportTypes.ts`):
+- `ExportConfig` interface - Export configuration options
+- `ExportMetadata` interface - Export metadata with filters
+- `formatExportDate()` - Date formatting utility
+- `generateExportMetadata()` - Metadata generation
+- `getFilterMetadataText()` - Filter metadata text generation
+
+**Utils Layer** (`src/utils/exportUtils.ts`):
+- Exports own functions: `exportToCSV`, `exportBlogPosts`, `exportToPDF` (dynamic import)
+- Re-exports from exportTypes.ts: types and utilities
+- Maintains backward compatibility (imports still work from exportUtils)
+
+**PDF Layer** (`src/utils/exportPDF.ts`):
+- Imports types from exportTypes.ts (no dependency on exportUtils)
+- Implements `exportToPDF` function
+- Uses `getFilterMetadataText` from exportTypes.ts
+
+### Architecture Benefits
+
+1. **No Circular Dependencies**: Modules depend on shared types, not each other ✅
+2. **Dependency Inversion**: Both modules depend on abstraction (types) ✅
+3. **Single Responsibility**: Types module only contains shared contracts ✅
+4. **Maintainability**: Changes to types affect all consumers automatically ✅
+5. **Testability**: Modules can be tested independently ✅
+6. **Backward Compatibility**: Existing imports continue to work without changes ✅
+7. **Reusability**: Shared types can be used by other export modules ✅
+
+### Code Changes
+
+- Added: `src/utils/exportTypes.ts` - Shared types and utilities (61 lines)
+- Modified: `src/utils/exportUtils.ts` - Import and re-export from exportTypes.ts (5 lines changed)
+- Modified: `src/utils/exportPDF.ts` - Import types from exportTypes.ts, remove duplicate code (24 lines changed)
+
+### Success Criteria
+
+- [x] Circular dependency resolved (madge confirms no circular dependencies)
+- [x] Shared types extracted to exportTypes.ts
+- [x] Both modules import from exportTypes.ts (not each other)
+- [x] Backward compatibility maintained (re-exports preserve existing imports)
+- [x] All 12 exportUtils tests passing (100% success rate)
+- [x] TypeScript compilation passes (0 errors)
+- [x] No regressions in existing functionality
+
+### Related Files
+
+- ✅ Added: `src/utils/exportTypes.ts` - Shared types and utilities (61 lines)
+- ✅ Modified: `src/utils/exportUtils.ts` - Import and re-export from exportTypes.ts
+- ✅ Modified: `src/utils/exportPDF.ts` - Import types from exportTypes.ts
+
+### Implementation Summary
+
+**Files Added**: 1 file (exportTypes.ts)
+**Files Modified**: 2 files (exportUtils.ts, exportPDF.ts)
+**Lines Added**: 61 lines (exportTypes.ts)
+**Lines Changed**: ~30 lines (import updates, duplicate code removal)
+**Circular Dependencies Resolved**: 1 (exportUtils ↔ exportPDF)
+
+**Key Features**:
+1. **Dependency Inversion**: Both modules depend on shared types abstraction
+2. **No Circular Dependencies**: Verified with madge (0 circular dependencies)
+3. **Backward Compatibility**: Re-exports preserve all existing imports
+4. **Code Reuse**: Removed duplicate `getFilterMetadataText` function
+5. **Clean Separation**: Types, utilities, and implementation properly separated
+
+### Notes
+
+- Follows SOLID Principles:
+  - **Dependency Inversion**: High-level modules don't depend on low-level modules (both depend on types)
+  - **Single Responsibility**: exportTypes.ts only contains shared contracts
+  - **Open/Closed**: Easy to add new export formats without modifying existing code
+
+- Follows Clean Architecture:
+  - **Dependency Rule**: Dependencies point toward shared abstractions (types)
+  - **Layer Separation**: Clear separation between types, utilities, and implementations
+
+### Related Tasks
+
+- Task 351 (Code Sanitizer - Fix TypeScript & Lint Errors) - Prerequisite cleanup
+- Task 352 (Real-Time Content Co-Authoring) - Independent module, not affected
+- FEATURE-062 (Blog Post Export Functionality) - Uses export utilities
+
 ---
