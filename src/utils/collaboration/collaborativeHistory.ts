@@ -147,7 +147,5 @@ export function formatHistoryDate(timestamp: number): string {
     hour: '2-digit',
     minute: '2-digit'
   }
-  const datePart = date.toLocaleDateString('id-ID', options)
-  const timePart = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-  return `${datePart}, ${timePart}`
+  return date.toLocaleDateString('id-ID', options)
 }

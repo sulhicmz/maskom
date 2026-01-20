@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { RealTimeComment, CursorPosition } from '@/types/collaboration'
 
 interface RealTimeCommentsProps {
@@ -12,6 +12,7 @@ interface RealTimeCommentsProps {
 }
 
 export default function RealTimeComments({
+  postId,
   comments,
   currentUserId,
   onResolveComment,
@@ -150,7 +151,6 @@ function CommentItem({
             type="button"
             className="btn btn-link btn-sm"
             onClick={onToggleExpand}
-            title={isExpanded ? 'Tutup' : 'Buka'}
           >
             <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
           </button>

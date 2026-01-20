@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import RealTimeComments from '@/components/collaboration/RealTimeComments'
-import { RealTimeComment } from '@/types/collaboration'
+import { RealTimeComment, CursorPosition } from '@/types/collaboration'
 
 const mockOnResolveComment = jest.fn()
 const mockOnPositionClick = jest.fn()
@@ -173,7 +173,7 @@ describe('RealTimeComments', () => {
       expect(mockOnResolveComment).toHaveBeenCalledWith('comment_1')
     })
 
-    it.skip('should toggle comment expansion when expand button clicked', () => {
+    it('should toggle comment expansion when expand button clicked', () => {
       render(
         <RealTimeComments
           postId={123}
@@ -287,7 +287,7 @@ describe('CommentItem', () => {
       />
     )
 
-    const expandButton = screen.getAllByTitle(/Buka|Tutup/)[0]
+    const expandButton = screen.getAllByTitle(/chevron/)[0]
     fireEvent.click(expandButton)
 
     expect(screen.getByText('Baris 0, Kolom 5')).toBeInTheDocument()
@@ -304,7 +304,7 @@ describe('CommentItem', () => {
       />
     )
 
-    const expandButton = screen.getAllByTitle(/Buka/)[0]
+    const expandButton = screen.getAllByTitle(/chevron/)[0]
     fireEvent.click(expandButton)
 
     expect(screen.getByText(/Baris 0, Kolom 5/)).toBeInTheDocument()

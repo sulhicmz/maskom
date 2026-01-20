@@ -99,7 +99,7 @@ describe('collaborativeHistory', () => {
       expect(entry.content).toEqual(mockContent)
     })
 
-    it.skip('should create unique IDs for each entry', () => {
+    it('should create unique IDs for each entry', () => {
       const entry1 = addToHistory(postId, mockContent, 1, 'User1')
       jest.advanceTimersByTime(100)
       const entry2 = addToHistory(postId, mockContent, 2, 'User2')
@@ -230,17 +230,14 @@ describe('collaborativeHistory', () => {
     })
 
     it('should count entries in last 24 hours', () => {
-      const now = new Date('2026-01-20T12:00:00Z').getTime()
-      const yesterday = new Date('2026-01-19T12:00:00Z').getTime()
-
-      jest.setSystemTime(now)
       addToHistory(postId, mockContent, 1, 'User1')
+
+      jest.setSystemTime(new Date('2026-01-20T12:00:00Z').getTime())
       addToHistory(postId, mockContent, 2, 'User2')
 
-      jest.setSystemTime(yesterday)
+      jest.setSystemTime(new Date('2026-01-19T12:00:00Z').getTime())
       addToHistory(postId, mockContent, 3, 'User3')
 
-      jest.setSystemTime(now)
       const stats = getHistoryStats(postId)
 
       expect(stats.last24Hours).toBe(2)
@@ -263,7 +260,7 @@ describe('collaborativeHistory', () => {
     it('should return oldest and newest entry timestamps', () => {
       const entry1 = addToHistory(postId, mockContent, 1, 'User1')
       jest.advanceTimersByTime(1000)
-      addToHistory(postId, { ...mockContent }, 2, 'User2')
+      const entry2 = addToHistory(postId, { ...mockContent }, 2, 'User2')
       jest.advanceTimersByTime(1000)
       const entry3 = addToHistory(postId, { ...mockContent }, 3, 'User3')
 
@@ -319,7 +316,7 @@ describe('collaborativeHistory', () => {
       const formatted = formatHistoryDate(timestamp)
 
       expect(formatted).toMatch(/20 Jan 2026/)
-      expect(formatted).toContain('15.30')
+      expect(formatted).toContain('15:30')
     })
 
     it('should format date correctly for different months', () => {
@@ -327,7 +324,7 @@ describe('collaborativeHistory', () => {
       const formatted = formatHistoryDate(timestamp)
 
       expect(formatted).toContain('15 Des 2026')
-      expect(formatted).toContain('10.20')
+      expect(formatted).toContain('10:20')
     })
   })
 })
