@@ -582,6 +582,80 @@ Components → Types ← Services (correct inward flow)
 
 - Task 282 (Layer Separation) - Architectural improvement completed
 
+## Layer Separation - APM Configuration Architecture (✅ COMPLETED - Jan 20, 2026)
+
+### Purpose
+
+Fix Clean Architecture violation where types layer imports from utils layer, ensuring dependencies flow in correct direction (inward) and eliminating circular dependency risk.
+
+### Problem Solved
+
+**Layer Violation Before Fix**:
+- `src/types/apm.ts` imported `APMConfig` and `APMProviderType` from `@/utils/apm/types`
+- Dependencies flowed from types → utils (wrong direction)
+- Violated Clean Architecture principle: dependencies should flow inward
+- Created circular dependency risk if utils layer imports from types layer
+
+**Why This Matters**:
+1. **Clean Architecture**: Dependencies should flow inward (presentation → types ← services/utils)
+2. **Circular Dependencies**: Types importing from utils creates potential circular dependency chains
+3. **Maintainability**: Type definitions should be independent of implementation details
+4. **Testability**: Types should have no dependencies on implementation layers
+5. **Separation of Concerns**: Types layer is the foundation, should not depend on higher layers
+
+### Architecture Solution
+
+```
+Before (Wrong Direction):
+types/apm.ts → utils/apm/types.ts → utils/apmConfig.ts
+
+After (Correct Direction):
+types/apm.ts ← utils/apm/types.ts → utils/apmConfig.ts
+```
+
+**Types Layer** (`src/types/apm.ts`):
+- `APMConfig` - Core APM configuration interface
+- `APMProviderType` - Union type for APM providers (console, sentry, none)
+- `APMUIConfig` - UI-specific configuration extending APMConfig
+- `validateAPMConfig()` - Configuration validation function
+- `DEFAULT_APM_CONFIG` - Default configuration values
+- `export type { APMConfig, APMProviderType }` - Re-exports for backward compatibility
+
+**Utils Layer** (`src/utils/apm/types.ts`):
+- `APMError`, `APMTransaction`, `APMUser`, `APMSession`, `APMEvent` - APM domain types
+- `APMPerformanceMetrics` - Performance metrics interface
+- `IAPMProvider` - Provider interface for APM implementations
+- `import type { APMConfig, APMProviderType } from '@/types/apm'` - Imports from types layer (correct direction)
+- `export type { APMConfig, APMProviderType }` - Re-exports for backward compatibility
+
+### Architecture Benefits
+
+1. **Clean Architecture**: Dependencies flow correctly (types ← utils) ✅
+2. **Single Source of Truth**: APMConfig and APMProviderType defined once in types layer ✅
+3. **Separation of Concerns**: Types independent of implementation details ✅
+4. **No Circular Dependencies**: Eliminates potential circular dependency risk ✅
+5. **Testability**: Clear type boundaries enable easier testing ✅
+6. **Maintainability**: Type changes don't require changes in utils layer ✅
+7. **Backward Compatibility**: Re-exports preserve existing import paths ✅
+
+### Code Changes
+
+- Modified: `src/types/apm.ts` - Added APMConfig and APMProviderType definitions
+- Modified: `src/utils/apm/types.ts` - Removed duplicate definitions, import from types layer
+- Both files maintain backward compatibility through re-exports
+
+### Success Criteria
+
+- [x] APMConfig and APMProviderType moved to `src/types/apm.ts`
+- [x] Layer separation fixed (dependencies flow inward: types ← utils)
+- [x] No circular dependencies between types and utils layers
+- [x] Backward compatibility maintained (re-exports preserve existing imports)
+- [x] Zero breaking changes to consumers
+
+### Related Tasks
+
+- Task 358 (Layer Separation - APM Configuration) - Architectural improvement completed
+
 ## RBAC Architecture (✅ COMPLETED - Task 223)
 
 ### Purpose

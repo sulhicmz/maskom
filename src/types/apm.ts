@@ -1,4 +1,14 @@
-import type { APMConfig } from '@/utils/apm/types';
+export type APMProviderType = 'console' | 'sentry' | 'none';
+
+export interface APMConfig {
+  provider: APMProviderType;
+  enabled?: boolean;
+  environment?: string;
+  dsn?: string;
+  release?: string;
+  sampleRate?: number;
+  [key: string]: unknown;
+}
 
 export interface APMUIConfig extends APMConfig {
   sampleRate?: number;
@@ -71,3 +81,5 @@ function isValidSentryDSN(dsn: string): boolean {
 export function resetAPMConfig(): APMUIConfig {
   return { ...DEFAULT_APM_CONFIG };
 }
+
+export type { APMConfig, APMProviderType };
