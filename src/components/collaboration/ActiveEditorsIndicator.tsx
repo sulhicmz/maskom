@@ -15,7 +15,8 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
   currentUserId,
   onEditorClick
 }) => {
-  const { isDark } = useTheme()
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const [localEditors, setLocalEditors] = useState<ActiveEditor[]>([])
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { CollaborativeSession, ActiveEditor, CursorPosition, RealTimeComment } from '@/types/collaboration'
+import { CollaborativeSession, ActiveEditor, CursorPosition, DraftContent } from '@/types/collaboration'
 
 interface SessionStorage {
   [sessionId: string]: CollaborativeSession
@@ -12,22 +12,28 @@ export class SessionManager {
     this.startHeartbeatCheck()
   }
 
-  createSession(postId: number, initialContent: any, creatorId: number, creatorName: string): string {
+  createSession(postId: number, initialContent: DraftContent, creatorId: number, creatorName: string): string {
     const sessionId = this.generateSessionId()
+ 
+    const editor: ActiveEditor = {
+      userId: creatorId,
+      username: creatorName,
+      cursorPosition: { line: 0, column: 0 },
+      lastSeen: Date.now()
+    }
 
     const session: CollaborativeSession = {
       postId,
       sessionId,
-      editors: new Map(),
+      editors: new Map([[creatorId, editor]]),
       content: initialContent,
       version: 1,
       createdAt: Date.now(),
       lastModified: Date.now()
     }
-
-    this.addEditor(session, creatorId, creatorName)
+ 
     this.sessions[sessionId] = session
-
+ 
     return sessionId
   }
 
@@ -39,7 +45,7 @@ export class SessionManager {
     return Object.values(this.sessions).find(session => session.postId === postId)
   }
 
-  updateSessionContent(sessionId: string, content: any): boolean {
+  updateSessionContent(sessionId: string, content: DraftContent): boolean {
     const session = this.getSession(sessionId)
 
     if (!session) {

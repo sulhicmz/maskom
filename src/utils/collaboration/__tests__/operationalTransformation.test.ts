@@ -1,5 +1,5 @@
 import { OperationalTransformation, createClientState, addPendingOperation, clearPendingOperations, incrementRevision } from '../operationalTransformation'
-import { EditOperation, CursorPosition, DraftContent } from '@/types/collaboration'
+import { EditOperation, DraftContent } from '@/types/collaboration'
 
 describe('OperationalTransformation', () => {
   describe('transform', () => {
