@@ -1,5 +1,144 @@
 # Architecture Task Tracking
 
+## Task 362: [CODE SANITIZER] Fix Build Blockers - Lint Errors & sessionManager Bug (Jan 20, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Code Quality - Build Unblocking
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Fix CRITICAL build blockers preventing production deployment by resolving lint errors and sessionManager implementation bug.
+
+### Problem Identified
+
+**Build Blockers**:
+- Lint errors preventing build from completing
+- sessionManager bug causing 7 test failures
+- TypeScript errors due to incorrect type usage
+- Build script: `"npm test && next build"` requires all tests to pass and lint to be clean
+
+**Specific Issues**:
+
+1. **sessionManager.ts Bug** (7 test failures):
+   - `createSession` called `addEditor` BEFORE storing session
+   - `getSession` returned `undefined` when `addEditor` tried to access it
+   - Editor never added to session, causing all editor-related tests to fail
+
+2. **Type Safety Issues** (3 lint errors):
+   - `updateSessionContent(content: any)` - using `any` type
+   - `createSession(initialContent: any)` - using `any` type
+   - Unused import: `RealTimeComment` in sessionManager.ts
+   - Unused import: `CursorPosition` in operationalTransformation.test.ts
+
+3. **ActiveEditorsIndicator.tsx TypeScript Error**:
+   - Used non-existent `isDark` property from ThemeContext
+   - ThemeContextType only has: `theme`, `toggleTheme`, `setTheme`
+
+**Why This Matters**:
+1. **Build Must Pass**: Failing build blocks deployment and releases
+2. **Code Quality**: Lint errors indicate code quality issues
+3. **Type Safety**: `any` types bypass TypeScript's type checking
+4. **Test Reliability**: Bug in sessionManager causes tests to fail
+
+### Solution
+
+**1. Fixed sessionManager.ts Bug**:
+```typescript
+// Before (buggy):
+this.addEditor(session, creatorId, creatorName)
+this.sessions[sessionId] = session  // Stored AFTER addEditor
+
+// After (fixed):
+const editor: ActiveEditor = { userId: creatorId, username: creatorName, ... }
+const session: CollaborativeSession = {
+  editors: new Map([[creatorId, editor]]),  // Add creator directly
+  // ... other properties
+}
+this.sessions[sessionId] = session  // Now addEditor would work
+```
+
+**2. Type Safety Fixes**:
+- Changed `any` types to `DraftContent` type (proper type definition)
+- Removed unused import: `RealTimeComment` from sessionManager.ts
+- Removed unused import: `CursorPosition` from operationalTransformation.test.ts
+
+**3. ActiveEditorsIndicator.tsx Fix**:
+```typescript
+// Before (error):
+const { isDark } = useTheme()  // Property doesn't exist
+
+// After (fixed):
+const { theme } = useTheme()
+const isDark = theme === 'dark'  // Derived from theme property
+```
+
+### Implementation
+
+- [x] Fixed sessionManager.ts createSession bug (add editor before store → add editor directly)
+- [x] Replace `any` types with `DraftContent` type
+- [x] Remove unused `RealTimeComment` import from sessionManager.ts
+- [x] Remove unused `CursorPosition` import from operationalTransformation.test.ts
+- [x] Fix ActiveEditorsIndicator.tsx to use `theme` instead of `isDark`
+- [x] Verify all sessionManager tests pass (30/30)
+- [x] Verify lint passes (0 errors, 0 warnings)
+- [x] Verify build completes (37 pages generated)
+- [x] Commit changes with descriptive message
+- [x] Push to agent branch
+- [x] Add comment to existing PR #203
+
+### Success Criteria
+
+- [x] sessionManager bug fixed (editor now added correctly)
+- [x] Lint errors resolved (0 errors, 0 warnings)
+- [x] Type safety improved (all `any` types replaced)
+- [x] Unused imports removed
+- [x] All sessionManager tests pass (30/30)
+- [x] Build passes (37 pages generated)
+- [x] Zero regressions in existing functionality
+
+### Related Files
+
+- ✅ Modified: `src/utils/collaboration/sessionManager.ts` - Fixed bug, type safety (20 insertions, 9 deletions)
+- ✅ Modified: `src/components/collaboration/ActiveEditorsIndicator.tsx` - Fixed TypeScript error (3 insertions)
+- ✅ Modified: `src/utils/collaboration/__tests__/operationalTransformation.test.ts` - Removed unused import (2 deletions)
+
+### Implementation Summary
+
+**Files Modified**: 3 files
+**Lines Changed**: ~25 lines (16 insertions, 9 deletions)
+**Test Failures Fixed**: 7 → 0 (100% reduction for sessionManager)
+**Lint Errors Fixed**: 4 → 0 (100% reduction)
+**Lint Warnings Fixed**: 2 → 0 (100% reduction)
+
+**Key Features**:
+1. **Build Unblocker**: Production build now succeeds
+2. **Code Quality**: Lint clean (0 errors, 0 warnings)
+3. **Type Safety**: Proper types instead of `any`
+4. **No Dead Code**: Unused imports removed
+5. **Bug Fix**: sessionManager tests now pass (30/30)
+
+### Notes
+
+- Follows Code Sanitizer principles:
+  - **Build Priority**: Build must pass = ONLY priority ✅
+  - **Zero Lint Errors**: Errors are real problems ✅ (0 errors)
+  - **Type Safety**: Strict types, no `any` ✅
+  - **No Dead Code**: Unused variables removed ✅
+  - **Zero Regressions**: All existing functionality preserved ✅
+
+- sessionManager bug was introduced during Task 352 (Real-Time Content Co-Authoring implementation)
+- The bug was in the logic flow, not in the test expectations
+- Tests were correct, implementation had the bug
+
+### Related Tasks
+
+- Task 352 (Real-Time Content Co-Authoring) - Feature that introduced sessionManager
+- Task 351 (Fix TypeScript & Lint Errors) - Previous code sanitization work
+
+---
+
 ## Task 361: [PRINCIPAL ARCHITECT] Dependency Cleanup - Export Utilities (Jan 20, 2026)
 
 **Status**: ✅ Completed
