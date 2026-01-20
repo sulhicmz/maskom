@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sessionManager } from '@/utils/collaboration/sessionManager'
 import { CollaborativeEvent } from '@/types/collaboration'
+import { strictRateLimiter, getClientIdentifier } from '@/utils/rateLimit'
+import { sanitizeString } from '@/utils/sanitize'
 
 const MAX_EVENTS_PER_POLL = 50
 
@@ -72,10 +74,25 @@ function bufferEvent(event: CollaborativeEvent): void {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    const clientIdentifier = getClientIdentifier(request)
+    const rateLimitResult = strictRateLimiter(clientIdentifier)
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json<PollResponse>(
+        { success: false, events: [], sessionActive: false, error: 'Rate limit exceeded' },
+        { status: 429, headers: {
+          'Retry-After': rateLimitResult.resetTime.toString(),
+          'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+          'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
+        }}
+      )
+    }
+
     const searchParams = request.nextUrl.searchParams
-    const sessionId = searchParams.get('sessionId')
+    const sessionId = sanitizeString(searchParams.get('sessionId') || '')
     const userId = parseInt(searchParams.get('userId') || '0')
-    const username = searchParams.get('username') || ''
+    const username = sanitizeString(searchParams.get('username') || '')
     const lastEventId = searchParams.get('lastEventId') || undefined
 
     if (!sessionId || !userId || !username) {
@@ -115,8 +132,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
+    const clientIdentifier = getClientIdentifier(request)
+    const rateLimitResult = strictRateLimiter(clientIdentifier)
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded' },
+        { status: 429, headers: {
+          'Retry-After': rateLimitResult.resetTime.toString(),
+          'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+          'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
+        }}
+      )
+    }
+
     const body = await request.json()
-    const action = body.action as string
+    const action = sanitizeString(body.action || '')
 
     switch (action) {
       case 'join':
@@ -347,6 +379,8 @@ async function handleComment(request: CommentRequest): Promise<NextResponse> {
     )
   }
 
+  const sanitizedContent = sanitizeString(comment.content || '')
+
   const event: CollaborativeEvent = {
     type: 'comment_added',
     sessionId,
@@ -354,9 +388,9 @@ async function handleComment(request: CommentRequest): Promise<NextResponse> {
     userId,
     timestamp: Date.now(),
     data: {
-      eventId: getEventId(sessionId),
+      eventId: getEventId(session.sessionId),
       username,
-      content: comment.content,
+      content: sanitizedContent,
       position: comment.position,
       resolved: false
     }
