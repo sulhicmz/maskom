@@ -1,5 +1,733 @@
 # Architecture Task Tracking
 
+## Task 352: [CONTENT ARCHITECT] Real-Time Content Co-Authoring Implementation (Jan 20, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Implementation - Real-Time Collaboration
+**Effort**: Large (3-4 days)
+
+### Purpose
+
+Implement real-time collaborative editing for blog posts, enabling multiple content creators to work simultaneously on drafts with automatic conflict resolution and real-time feedback.
+
+### Problem Identified
+
+**No Real-Time Collaboration**:
+- Content creators currently work in isolation
+- Simultaneous edits cause data loss or overwrite conflicts
+- No visibility into who is editing which content
+- No real-time feedback loops for collaborative content creation
+- Draft management disconnected from collaboration workflow
+
+**Why This Matters**:
+1. **Collaboration Efficiency**: Teams can work together in real-time instead of sequential editing
+2. **Conflict Prevention**: Automatic conflict resolution prevents data loss
+3. **Team Visibility**: See who is editing content and where their cursor is
+4. **Feedback Loop**: Real-time comments enable faster iteration cycles
+5. **Modern UX**: Users expect real-time collaboration (Google Docs, Notion)
+
+### Solution
+
+**WebSocket-Based Real-Time Collaboration**:
+
+**1. Real-Time Editing Infrastructure**:
+```typescript
+interface CollaborativeSession {
+  postId: number
+  sessionId: string
+  editors: ActiveEditor[]
+  content: DraftContent
+  version: number
+}
+
+interface ActiveEditor {
+  userId: number
+  username: string
+  cursorPosition: CursorPosition
+  selection: SelectionRange
+  lastSeen: number
+}
+```
+
+**2. Operational Transformation (OT) Algorithm**:
+- Apply incoming edits to document state
+- Resolve conflicts using OT algorithm
+- Broadcast updates to all connected editors
+- Version tracking for conflict-free merging
+
+**3. Real-Time Features**:
+- Cursor position synchronization across all editors
+- Active editor indicators (avatars with names)
+- Real-time comments on specific content sections
+- Auto-save with collaborative history
+- Conflict resolution notifications
+
+**4. WebSocket Integration**:
+- WebSocket server for real-time updates
+- Reconnection handling with automatic sync
+- Edit queue for offline editing
+- Heartbeat for connection health
+
+### Implementation
+
+- [ ] Create WebSocket server for collaborative editing (Next.js API route)
+- [ ] Implement Operational Transformation algorithm for conflict resolution
+- [ ] Create CollaborativeSession data structure and storage
+- [ ] Implement real-time cursor synchronization
+- [ ] Create ActiveEditor tracking component
+- [ ] Add real-time commenting system
+- [ ] Implement auto-save with collaborative history
+- [ ] Create RealTimeEditor React component
+- [ ] Integrate with existing BlogForm (enhance for collaboration)
+- [ ] Add RBAC protection (Editors/Admins only)
+- [ ] Add tests for OT algorithm and WebSocket communication
+- [ ] Add tests for conflict resolution edge cases
+- [ ] Update docs/blueprint.md with collaboration architecture
+
+### Success Criteria
+
+- [ ] WebSocket server handles multiple concurrent editors
+- [ ] Operational Transformation resolves all conflicts correctly
+- [ ] Cursor positions synchronized in real-time (<100ms latency)
+- [ ] Active editors visible with avatars and names
+- [ ] Real-time comments displayed on specific content sections
+- [ ] Auto-save works with collaborative history
+- [ ] Reconnection handling restores session state
+- [ ] RBAC enforces Editor/Admin access
+- [ ] Comprehensive tests for OT algorithm and WebSocket
+- [ ] Zero data loss during simultaneous edits
+
+### Related Files
+
+- Add: `src/utils/collaboration/operationalTransformation.ts` - OT algorithm
+- Add: `src/utils/collaboration/webSocketServer.ts` - WebSocket server
+- Add: `src/components/collaboration/RealTimeEditor.tsx` - Collaborative editor component
+- Add: `src/components/collaboration/ActiveEditorsIndicator.tsx` - Editor tracking
+- Add: `src/components/collaboration/RealTimeComments.tsx` - Real-time comments
+- Modify: `src/app/api/collaborate/route.ts` - WebSocket API route
+
+### Related Tasks
+
+- Task 304 (Smart Content Recommendations Algorithm) - Similar algorithm complexity
+- FEATURE-044 (Collaborative Editing with Real-Time Sync) - Feature specification
+- FEATURE-034 (Content Version Control & History) - Integration for history
+
+---
+
+## Task 353: [PERFORMANCE ENGINEER] Automated Performance Regression Detection (Jan 20, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Performance Monitoring & Analytics
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Implement automated detection of performance regressions in production using statistical analysis of Core Web Vitals metrics, enabling proactive identification of performance issues before they impact users.
+
+### Problem Identified
+
+**No Automated Regression Detection**:
+- Performance monitoring only shows current metrics
+- No comparison against historical baselines
+- Regressions detected only after user complaints
+- No statistical significance analysis
+- No automated alerting for performance degradation
+
+**Why This Matters**:
+1. **Proactive Issue Detection**: Identify regressions before users complain
+2. **User Experience**: Maintain fast page loads and smooth interactions
+3. **Data-Driven Decisions**: Statistical analysis eliminates false positives
+4. **Rapid Response**: Automated alerts enable quick fixes
+5. **Business Impact**: Performance directly affects conversion and retention
+
+### Solution
+
+**Automated Regression Detection System**:
+
+**1. Baseline Establishment**:
+```typescript
+interface PerformanceBaseline {
+  metric: WebVitalMetric
+  baseline: number
+  sampleSize: number
+  confidenceInterval: [number, number]
+  establishedAt: number
+}
+
+enum WebVitalMetric {
+  LCP = 'lcp',
+  FID = 'fid',
+  CLS = 'cls',
+  FCP = 'fcp',
+  TTFB = 'ttfb'
+}
+```
+
+**2. Statistical Analysis**:
+- Calculate rolling average (7-day window)
+- Compare current metrics against baseline
+- Use statistical significance tests (t-test)
+- Detect outliers (3 standard deviations from mean)
+- Calculate confidence intervals (95% confidence)
+
+**3. Regression Detection Algorithm**:
+```typescript
+interface RegressionAlert {
+  metric: WebVitalMetric
+  currentValue: number
+  baselineValue: number
+  degradation: number // percentage
+  statisticalSignificance: boolean
+  detectedAt: number
+  severity: 'low' | 'medium' | 'high'
+}
+```
+
+**4. Alert System**:
+- Send alerts via APM integration
+- Dashboard notifications for admin
+- Email alerts for high severity
+- Regression trend visualization
+- Historical regression tracking
+
+### Implementation
+
+- [ ] Create PerformanceBaseline data structure
+- [ ] Implement baseline establishment algorithm
+- [ ] Create statistical significance tests (t-test)
+- [ ] Implement rolling average calculation
+- [ ] Create regression detection algorithm
+- [ ] Implement alert system (APM, dashboard, email)
+- [ ] Create regression dashboard at /admin/performance-regressions
+- [ ] Add regression trend visualization (charts)
+- [ ] Integrate with existing Web Vitals API tracking (FEATURE-038)
+- [ ] Integrate with existing APM system (FEATURE-022)
+- [ ] Add tests for statistical algorithms
+- [ ] Add tests for regression detection edge cases
+- [ ] Update docs/blueprint.md with regression detection architecture
+
+### Success Criteria
+
+- [ ] Baseline established for all 5 Core Web Vitals metrics
+- [ ] Statistical significance tests accurately detect regressions (95% confidence)
+- [ ] False positive rate < 5%
+- [ ] Alert system sends notifications within 5 minutes of detection
+- [ ] Regression dashboard shows historical trends
+- [ ] All tests for statistical algorithms passing
+- [ ] Integration with existing Web Vitals API working
+- [ ] Integration with existing APM system working
+
+### Related Files
+
+- Add: `src/utils/performance/baselineEstablishment.ts` - Baseline calculation
+- Add: `src/utils/performance/statisticalAnalysis.ts` - Statistical tests
+- Add: `src/utils/performance/regressionDetection.ts` - Detection algorithm
+- Add: `src/app/admin/performance-regressions/page.tsx` - Regression dashboard
+- Modify: `src/utils/webVitals.ts` - Integration with existing tracking
+
+### Related Tasks
+
+- FEATURE-038 (Real-Time Core Web Vitals Monitoring) - Integration point
+- FEATURE-022 (APM Integration & Production Monitoring) - Alert integration
+- Task 286 (Web Vitals API Integration) - Existing implementation
+
+---
+
+## Task 354: [ANALYTICS ARCHITECT] Content Engagement Scoring System (Jan 20, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Analytics/Content Management
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Implement content engagement scoring algorithm that calculates engagement scores for blog posts based on multiple weighted metrics, enabling content creators to understand what resonates with readers.
+
+### Problem Identified
+
+**No Engagement Scoring**:
+- Content creators can't see which posts perform best
+- No unified engagement metric across multiple data points
+- Manual calculation required for performance analysis
+- No historical trend analysis of engagement
+- Difficulty identifying content patterns that drive engagement
+
+**Why This Matters**:
+1. **Data-Driven Content**: Creators can optimize content based on performance
+2. **Strategic Planning**: Identify content types that resonate with readers
+3. **Performance Analysis**: Unified metric simplifies performance comparison
+4. **Trend Analysis**: Track engagement over time to identify patterns
+5. **Content Strategy**: Focus resources on high-engagement content types
+
+### Solution
+
+**Multi-Metric Engagement Scoring**:
+
+**1. Engagement Score Algorithm**:
+```typescript
+interface EngagementScore {
+  postId: number
+  score: number // 0-100
+  factors: EngagementFactors
+  calculatedAt: number
+  trend: 'up' | 'down' | 'stable'
+}
+
+interface EngagementFactors {
+  views: { value: number, weight: 0.2 }
+  shares: { value: number, weight: 0.25 }
+  comments: { value: number, weight: 0.25 }
+  bookmarks: { value: number, weight: 0.15 }
+  timeOnPage: { value: number, weight: 0.15 }
+}
+```
+
+**2. Score Calculation**:
+- Normalize each factor to 0-100 scale
+- Apply weights based on importance
+- Calculate weighted sum for final score
+- Track historical scores for trend analysis
+- Adjust weights via admin configuration
+
+**3. Engagement Dashboard**:
+- Top-performing posts by score
+- Engagement trend visualization (line charts)
+- Score factors breakdown (which metrics contribute most)
+- Historical score comparison (week over week, month over month)
+- Filter by category, tag, author
+- Export data (CSV, PDF)
+
+**4. Real-Time Updates**:
+- Score recalculates on new engagement events
+- WebSocket or polling for live updates
+- Score change notifications
+- Score trend indicators (up arrow, down arrow)
+
+### Implementation
+
+- [ ] Create EngagementScore data structure
+- [ ] Implement normalization functions for each factor
+- [ ] Create weighted score calculation algorithm
+- [ ] Implement trend analysis (compare with historical scores)
+- [ ] Create engagement dashboard at /admin/content-engagement
+- [ ] Add top-performing posts section
+- [ ] Add score factors breakdown visualization
+- [ ] Add historical trend charts
+- [ ] Implement real-time score updates
+- [ ] Integrate with existing analytics dashboard (FEATURE-009)
+- [ ] Integrate with existing content performance analytics (FEATURE-042)
+- [ ] Add tests for score calculation algorithm
+- [ ] Add tests for trend analysis
+- [ ] Update docs/blueprint.md with engagement scoring architecture
+
+### Success Criteria
+
+- [ ] Engagement score accurately reflects content performance
+- [ ] Score factors breakdown shows metric contributions
+- [ ] Historical trend analysis identifies engagement patterns
+- [ ] Real-time updates reflect new engagement events
+- [ ] Dashboard displays top-performing posts
+- [ ] All tests for scoring algorithm passing
+- [ ] Integration with existing analytics working
+
+### Related Files
+
+- Add: `src/utils/analytics/engagementScoring.ts` - Score calculation
+- Add: `src/utils/analytics/trendAnalysis.ts` - Trend analysis
+- Add: `src/app/admin/content-engagement/page.tsx` - Engagement dashboard
+- Modify: `src/types/analytics.ts` - Add engagement score types
+- Modify: `src/data/InnerBlogData.ts` - Add score field to posts
+
+### Related Tasks
+
+- FEATURE-009 (Analytics Dashboard for Admin) - Integration point
+- FEATURE-042 (Content Performance Analytics) - Extension with scoring
+- Task 303 (Content Performance Analytics Data Model) - Related data model
+
+---
+
+## Task 355: [MACHINE LEARNING ENGINEER] Intelligent Content Recommendations Engine (Jan 20, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Personalization/Recommendation Algorithm
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Implement intelligent content recommendation engine that provides personalized blog post recommendations based on user reading history, preferences, and content similarity, enhancing content discovery for users.
+
+### Problem Identified
+
+**No Personalized Recommendations**:
+- Users must manually search for relevant content
+- No personalized content discovery
+- Reading history not utilized for recommendations
+- No preference learning from user behavior
+- Static content order reduces engagement
+
+**Why This Matters**:
+1. **User Engagement**: Personalized content increases time on site
+2. **Content Discovery**: Users discover relevant content they wouldn't find otherwise
+3. **Conversion Rates**: Personalized recommendations drive more page views
+4. **User Satisfaction**: Better content matching improves user experience
+5. **Data Utilization**: Reading history provides valuable signals for personalization
+
+### Solution
+
+**Hybrid Recommendation System**:
+
+**1. Content-Based Filtering**:
+```typescript
+interface ContentSimilarity {
+  postId: number
+  similarityScore: number // 0-1 Jaccard similarity
+  matchedTags: number[]
+  matchedCategory: boolean
+}
+
+function calculateContentSimilarity(
+  targetPost: InnerBlogPost,
+  candidatePost: InnerBlogPost
+): ContentSimilarity
+```
+
+**2. Collaborative Filtering**:
+- Track reading history (posts viewed, bookmarks, shares)
+- Find similar users based on reading patterns
+- Recommend posts liked by similar users
+- Implement item-item collaborative filtering
+
+**3. Hybrid Algorithm**:
+```typescript
+interface RecommendationScore {
+  postId: number
+  contentScore: number // 0-100
+  collaborativeScore: number // 0-100
+  finalScore: number // weighted combination
+  reasons: string[] // Why this post was recommended
+}
+```
+
+**4. User Preference Learning**:
+- Track categories and tags of read posts
+- Calculate preference weights per category/tag
+- Decay preferences over time (recent content weighted more)
+- Provide feedback mechanism (helpful/not helpful)
+
+**5. "Recommended For You" Section**:
+- Display top 10 personalized recommendations
+- Show recommendation reasons ("Because you liked X", "Popular in Y category")
+- Provide "Show less like this" for disinterest signals
+- Fallback to trending posts for new users
+
+### Implementation
+
+- [ ] Create ContentSimilarity calculation function (Jaccard similarity)
+- [ ] Implement reading history tracking (localStorage)
+- [ ] Create user preference learning algorithm
+- [ ] Implement collaborative filtering (item-item similarity)
+- [ ] Create hybrid recommendation scoring
+- [ ] Add "Recommended For You" section to BlogArea
+- [ ] Implement feedback mechanism (helpful/not helpful)
+- [ ] Add "Show less like this" for disinterest signals
+- [ ] Implement trending posts fallback for new users
+- [ ] Integrate with existing search and filter system (FEATURE-006)
+- [ ] Ensure privacy-first (localStorage only, no external tracking)
+- [ ] Add tests for recommendation algorithms
+- [ ] Add tests for preference learning
+- [ ] Update docs/blueprint.md with recommendation engine architecture
+
+### Success Criteria
+
+- [ ] Jaccard similarity accurately identifies similar content
+- [ ] User preferences learned from reading history
+- [ ] Hybrid algorithm combines content + collaborative scores
+- [ ] "Recommended For You" section displays personalized posts
+- [ ] Feedback mechanism improves recommendation quality
+- [ ] Trending posts fallback works for new users
+- [ ] Privacy preserved (localStorage only, no tracking)
+- [ ] All tests for recommendation algorithms passing
+
+### Related Files
+
+- Add: `src/utils/recommendations/contentSimilarity.ts` - Jaccard similarity
+- Add: `src/utils/recommendations/readingHistory.ts` - History tracking
+- Add: `src/utils/recommendations/preferenceLearning.ts` - Preference algorithm
+- Add: `src/utils/recommendations/collaborativeFiltering.ts` - Collaborative filtering
+- Add: `src/utils/recommendations/hybridScoring.ts` - Hybrid algorithm
+- Add: `src/components/recommendations/RecommendedPosts.tsx` - "Recommended For You" section
+- Modify: `src/components/pages/blog/BlogArea.tsx` - Add recommendations section
+- Modify: `src/components/blog/BlogCard.tsx` - Add feedback buttons
+
+### Related Tasks
+
+- FEATURE-006 (Advanced Blog Search & Filtering) - Integration for search results
+- FEATURE-043 (Smart Content Recommendations) - Original feature spec
+- Task 313 (Algorithmic Optimization) - O(n²) to O(n) optimization reference
+
+---
+
+## Task 356: [BACKUP ARCHITECT] Advanced Backup Verification Drills (Jan 20, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Infrastructure/Admin/Backup Testing
+**Effort**: Large (3-4 days)
+
+### Purpose
+
+Implement automated backup verification drills with multiple test scenarios (full restore, partial restore, integrity check), ensuring backups are restorable and reliable before a disaster occurs.
+
+### Problem Identified
+
+**No Backup Verification**:
+- Backups created but never tested for reliability
+- No verification that backups can be restored
+- No automated testing of backup integrity
+- Risk of discovering backup failures during disaster recovery
+- No compliance evidence for backup reliability
+
+**Why This Matters**:
+1. **Disaster Recovery**: Untested backups are unreliable backups
+2. **Compliance**: Regulations require regular backup testing
+3. **Risk Mitigation**: Identify backup issues before disaster occurs
+4. **Confidence**: Verified backups provide confidence in recovery plans
+5. **Audit Trail**: Drill reports provide compliance evidence
+
+### Solution
+
+**Automated Backup Verification Drills**:
+
+**1. Drill Types**:
+```typescript
+enum DrillType {
+  FULL_RESTORE = 'full_restore',
+  PARTIAL_RESTORE = 'partial_restore',
+  INTEGRITY_CHECK = 'integrity_check'
+}
+
+interface BackupDrill {
+  drillId: string
+  backupId: string
+  drillType: DrillType
+  status: DrillStatus
+  startedAt: string
+  completedAt?: string
+  duration?: number
+  results: DrillResults
+  error?: string
+}
+```
+
+**2. Drill Execution Engine**:
+- Full restore drill: Restore entire backup to isolated environment
+- Partial restore drill: Restore specific data types (e.g., user data only)
+- Integrity check drill: Verify backup integrity without restore
+- Isolated test environment (doesn't affect production data)
+
+**3. Drill Scheduling**:
+- Automated scheduling (daily, weekly, monthly)
+- Manual drill execution
+- Cron-like scheduling configuration
+- Email notifications for drill results
+
+**4. Drill Results Tracking**:
+```typescript
+interface DrillResults {
+  status: 'success' | 'partial_success' | 'failure'
+  restoredFiles: number
+  failedFiles: number
+  dataSizeRestored: number
+  integrityVerified: boolean
+  checksumMatch: boolean
+  logMessages: string[]
+}
+```
+
+**5. Drill Dashboard**:
+- Drill history with status indicators
+- Drill trend visualization (success rate over time)
+- Drill performance metrics (duration, data size)
+- Drill log viewer
+- Drill report generation (PDF, CSV)
+
+### Implementation
+
+- [ ] Create BackupDrill data structure
+- [ ] Implement full restore drill execution
+- [ ] Implement partial restore drill execution
+- [ ] Implement integrity check drill execution
+- [ ] Create isolated test environment for drills
+- [ ] Implement drill scheduling (cron-like)
+- [ ] Create drill execution engine
+- [ ] Implement drill results tracking
+- [ ] Create drill dashboard at /admin/backup-drills
+- [ ] Add drill history and trend visualization
+- [ ] Implement drill report generation (PDF, CSV)
+- [ ] Add drill notifications (success/failure via email/APM)
+- [ ] Integrate with existing backup engine (FEATURE-056)
+- [ ] Integrate with existing drill execution pattern (Task 348)
+- [ ] Add tests for drill execution
+- [ ] Add tests for drill scheduling
+- [ ] Update docs/blueprint.md with drill architecture
+
+### Success Criteria
+
+- [ ] All 3 drill types execute successfully
+- [ ] Isolated test environment doesn't affect production data
+- [ ] Drill scheduling works (daily, weekly, monthly)
+- [ ] Drill results accurately reflect execution status
+- [ ] Drill dashboard shows history and trends
+- [ ] Drill reports generated in PDF and CSV formats
+- [ ] Drill notifications sent via email and APM
+- [ ] All tests for drill execution passing
+- [ ] Integration with existing backup engine working
+
+### Related Files
+
+- Add: `src/utils/backupDrillEngine.ts` - Drill execution engine
+- Add: `src/utils/drillScheduler.ts` - Drill scheduling
+- Add: `src/utils/drillReporter.ts` - Report generation
+- Add: `src/app/admin/backup-drills/page.tsx` - Drill dashboard
+- Modify: `src/utils/backupEngine.ts` - Integration for drill execution
+- Modify: `src/types/backup.ts` - Add drill types
+
+### Related Tasks
+
+- FEATURE-056 (Advanced Backup Verification Drills) - Feature specification
+- Task 348 (Extract Common Drill Execution Pattern) - Leverage common pattern
+- Task 319 (Automated Backup & Disaster Recovery) - Backup system integration
+
+---
+
+## Task 357: [SECURITY ARCHITECT] Permission Change Audit Reports (Jan 20, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Security/Compliance/Audit
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Implement permission change audit reports with detailed diff visualization, automated scheduling, and approval workflow, enabling compliance officers to track access control modifications and ensure accountability.
+
+### Problem Identified
+
+**No Permission Change Auditing**:
+- Permission changes logged but not easily analyzed
+- No diff visualization for permission changes
+- No automated audit report scheduling
+- No approval workflow for sensitive permission changes
+- Difficult to track who modified access controls
+
+**Why This Matters**:
+1. **Compliance**: Regulations require audit trails for permission changes
+2. **Security**: Track suspicious permission escalations
+3. **Accountability**: Know who changed what permissions and when
+4. **Risk Assessment**: Identify patterns of permission misuse
+5. **Audit Efficiency**: Automated reports save manual review time
+
+### Solution
+
+**Permission Change Audit Reports**:
+
+**1. Enhanced Activity Logging**:
+```typescript
+interface PermissionChangeActivity extends ActivityLog {
+  activityType: 'PERMISSION_CHANGE'
+  targetType: 'user' | 'role' | 'resource'
+  targetId: number
+  before: PermissionSet
+  after: PermissionSet
+  changeReason: string
+  approvedBy?: number
+  approvalStatus?: 'pending' | 'approved' | 'rejected'
+}
+```
+
+**2. Diff Visualization**:
+- Side-by-side before/after comparison
+- Color-coded changes (green = added, red = removed)
+- Grouped changes by permission category
+- Change summary (e.g., "Added MANAGE_USERS permission")
+
+**3. Audit Report Generation**:
+- Filter by date range, user, resource type, permission type
+- Generate reports in PDF, CSV, JSON formats
+- Include change details, timestamps, approvers
+- Export for compliance evidence
+- Email reports automatically
+
+**4. Automated Scheduling**:
+- Weekly/monthly report generation
+- Configurable report recipients
+- Report history storage
+- Email delivery with attachments
+
+**5. Approval Workflow**:
+- Require approval for sensitive permission changes
+- Define sensitive permissions (e.g., MANAGE_USERS, MANAGE_SETTINGS)
+- Approval queue for compliance officers
+- Approval history tracking
+
+**6. Alert Rules**:
+- Detect suspicious permission changes (e.g., mass role escalation)
+- Alert via APM and email
+- Define thresholds (e.g., 3+ role changes in 15 minutes)
+- Alert history tracking
+
+### Implementation
+
+- [ ] Extend ActivityLog to include permission change details
+- [ ] Create PermissionSet data structure
+- [ ] Implement diff calculation (before/after comparison)
+- [ ] Create diff visualization component (side-by-side)
+- [ ] Implement audit report generation utilities
+- [ ] Create audit report dashboard at /admin/permission-audits
+- [ ] Add report filtering and search
+- [ ] Implement automated report scheduling
+- [ ] Create approval workflow for sensitive changes
+- [ ] Implement alert rules for suspicious changes
+- [ ] Add report export (PDF, CSV, JSON)
+- [ ] Integrate with existing activity logging (FEATURE-048 / Task 316)
+- [ ] Integrate with existing RBAC system
+- [ ] Add tests for diff calculation
+- [ ] Add tests for alert rules
+- [ ] Update docs/blueprint.md with audit report architecture
+
+### Success Criteria
+
+- [ ] Permission changes logged with before/after values
+- [ ] Diff visualization clearly shows permission changes
+- [ ] Audit reports generated in multiple formats
+- [ ] Automated scheduling works (weekly, monthly)
+- [ ] Approval workflow enforces approval for sensitive changes
+- [ ] Alert rules detect suspicious permission changes
+- [ ] All tests for diff calculation passing
+- [ ] All tests for alert rules passing
+- [ ] Integration with existing activity logging working
+
+### Related Files
+
+- Add: `src/utils/audit/permissionDiff.ts` - Diff calculation
+- Add: `src/utils/audit/reportGenerator.ts` - Report generation
+- Add: `src/utils/audit/scheduleManager.ts` - Report scheduling
+- Add: `src/app/admin/permission-audits/page.tsx` - Audit dashboard
+- Modify: `src/types/activity.ts` - Extend ActivityLog for permission changes
+- Modify: `src/utils/activityLogger.ts` - Add permission change logging
+
+### Related Tasks
+
+- FEATURE-048 (Advanced Activity Logging & Audit Trails) - Integration point
+- Task 316 (Advanced Activity Logging & Audit Trails Implementation) - Existing implementation
+- FEATURE-013 (User Roles & Permissions) - RBAC integration
+
+---
+
 ## Task 351: [CODE SANITIZER] Fix TypeScript & Lint Errors in drillEngine.ts (Jan 20, 2026)
 
 **Status**: ✅ Completed
