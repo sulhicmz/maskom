@@ -1,5 +1,108 @@
 # Architecture Task Tracking
 
+## Task 386: [UI/UX ENGINEER] ARIA Labels for Icon-Only Buttons (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Accessibility Fix - Screen Reader Support
+**Effort**: Small (1 hour)
+
+### Purpose
+
+Add proper ARIA labels to icon-only buttons in admin components to ensure screen reader users can understand button purposes without visual context.
+
+### Problem Identified
+
+**Missing Screen Reader Accessibility**:
+- 18 icon-only buttons across 4 admin components had no `aria-label` attributes
+- Screen readers would announce buttons as "button" with no context
+- Users relying on assistive technology couldn't understand button actions
+- Violated WCAG 2.1 Level A success criterion 2.4.4 (Link Purpose)
+
+**Components Affected**:
+1. **CampaignList.tsx** - 9 icon-only buttons (edit, send, schedule, cancel, duplicate, delete)
+2. **DrillList.tsx** - 3 icon-only buttons (cancel, view results, rerun)
+3. **BackupList.tsx** - 3 icon-only buttons (restore, export, delete)
+4. **SuspiciousActivityAlerts.tsx** - 3 icon-only buttons (resolve alert, edit rule, delete rule)
+
+### Solution
+
+**ARIA Labels for Icon-Only Buttons**:
+- Added `aria-label` attributes to all 18 icon-only buttons
+- Labels include contextual information (IDs, names) for better understanding
+- Added `role="group"` to button groups for semantic structure
+- Added `aria-hidden="true"` to all decorative icon elements
+
+### Implementation
+
+- [x] Added `aria-label` to 9 buttons in CampaignList.tsx
+- [x] Added `aria-label` to 3 buttons in DrillList.tsx
+- [x] Added `aria-label` to 3 buttons in BackupList.tsx
+- [x] Added `aria-label` to 3 buttons in SuspiciousActivityAlerts.tsx
+- [x] Added `role="group"` to button groups
+- [x] Added `aria-hidden="true"` to all icon elements
+- [x] Verified lint passes (0 errors)
+- [x] Zero breaking changes to existing functionality
+
+### Success Criteria
+
+- [x] All 18 icon-only buttons have descriptive `aria-label` attributes
+- [x] Button groups have `role="group"` for semantic structure
+- [x] Icons marked with `aria-hidden="true"` as decorative
+- [x] Lint passes (0 errors)
+- [x] Zero breaking changes to existing UI
+- [x] Screen reader users can now understand all button actions
+
+### Related Files
+
+- ✅ Modified: `src/components/admin/CampaignList.tsx` - Added ARIA labels (18 insertions, 6 deletions)
+- ✅ Modified: `src/components/admin/DrillList.tsx` - Added ARIA labels (5 insertions, 1 deletion)
+- ✅ Modified: `src/components/admin/BackupList.tsx` - Added ARIA labels (5 insertions, 1 deletion)
+- ✅ Modified: `src/components/admin/SuspiciousActivityAlerts.tsx` - Added ARIA labels (7 insertions, 1 deletion)
+
+### Implementation Summary
+
+**Files Modified**: 4 files
+**Lines Changed**: ~47 lines (insertions)
+**Icon-Only Buttons Fixed**: 18 buttons
+**ARIA Labels Added**: 18 descriptive labels
+
+**Key Features**:
+1. **Screen Reader Support**: All icon-only buttons now announce their purpose
+2. **Contextual Labels**: Labels include relevant IDs/names for better context
+3. **Semantic Structure**: Button groups use `role="group"`
+4. **Decorative Icons**: Icons properly marked with `aria-hidden="true"`
+
+### WCAG Compliance
+
+**WCAG 2.1 Level A**: Success Criterion 2.4.4 (Link Purpose)
+- ✅ Each link/button has a purpose that can be determined from the link text alone
+- ✅ Users of assistive technology can understand the purpose of each button
+
+**WCAG 2.1 Level AA**: Success Criterion 4.1.2 (Name, Role, Value)
+- ✅ All interactive elements have accessible names
+- ✅ Roles are properly defined for button groups
+
+### Notes
+
+- Follows UI/UX Engineer principles:
+  - **Accessibility First**: All icon-only buttons now screen reader accessible ✅
+  - **User-Centric**: Screen reader users can now understand all actions ✅
+  - **Zero Regressions**: All existing functionality preserved ✅
+  - **Progressive Enhancement**: No breaking changes to sighted users ✅
+
+- **Before vs After**:
+  - **Before**: Screen reader announced "button" with no context
+  - **After**: Screen reader announces "Edit campaign [campaign name]" or "Delete backup [backup id]"
+
+### Related Tasks
+
+- Task 385 (Activity Log Data Validation) - Related admin components
+- Task 384 (Additional React.memo for Admin) - Related admin component work
+- Task 380 (React.memo Optimization) - Related performance work
+
+---
+
 ## Task 385: [DATA ARCHITECT] Activity Log Data Validation (Jan 21, 2026)
 
 **Status**: ✅ Completed
