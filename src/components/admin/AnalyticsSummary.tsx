@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { memo } from 'react'
 import { AnalyticsSummary } from '@/types/analytics'
 import { formatNumber, formatPercentage, formatDuration } from '@/utils/analytics'
 
@@ -8,7 +8,7 @@ interface AnalyticsSummaryProps {
   summary: AnalyticsSummary
 }
 
-const AnalyticsSummaryCards: React.FC<AnalyticsSummaryProps> = ({ summary }) => {
+const AnalyticsSummaryCards: React.FC<AnalyticsSummaryProps> = memo(({ summary }) => {
   const cards = [
     {
       title: 'Total Submissions',
@@ -76,6 +76,8 @@ const AnalyticsSummaryCards: React.FC<AnalyticsSummaryProps> = ({ summary }) => 
       ))}
     </div>
   )
-}
+})
+
+AnalyticsSummaryCards.displayName = "AnalyticsSummaryCards"
 
 export default AnalyticsSummaryCards

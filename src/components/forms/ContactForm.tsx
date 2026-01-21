@@ -1,7 +1,7 @@
 "use client"
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import { emailService } from '@/services/email';
 import { createContactFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
@@ -15,7 +15,7 @@ interface FormData {
    message: string;
 }
 
-const ContactForm = () => {
+const ContactForm = memo(() => {
 
    const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<FormData>({ resolver: yupResolver(createContactFormSchema()), });
 
@@ -104,8 +104,10 @@ const ContactForm = () => {
                </div>
             </div>
          </div>
-      </form>
+       </form>
    )
-}
+})
+
+ContactForm.displayName = "ContactForm"
 
 export default ContactForm

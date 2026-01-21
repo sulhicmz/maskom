@@ -5,6 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { authService } from '@/services/auth';
 import { createEmailPasswordSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
+import { memo } from 'react';
 import FormField from './FormField';
 import LoadingButton from './LoadingButton';
 
@@ -13,7 +14,7 @@ interface FormData {
    password: string;
 }
 
-const LoginForm = () => {
+const LoginForm = memo(() => {
    const { register, handleSubmit, reset, formState: { errors }, trigger } = useForm<FormData>({ resolver: yupResolver(createEmailPasswordSchema()), });
 
    const { submit: onSubmit, isSubmitting } = useFormSubmission(
@@ -68,9 +69,11 @@ const LoginForm = () => {
          </div>
          <div className="form-text text-center">
             <span>Belum punya akun? <Link href="/sign-up">Daftar Maskom</Link></span>
-         </div>
-      </form>
-   )
-}
+          </div>
+       </form>
+    )
+})
+
+LoginForm.displayName = "LoginForm"
 
 export default LoginForm
