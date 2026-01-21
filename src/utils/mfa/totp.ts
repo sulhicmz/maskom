@@ -1,4 +1,8 @@
 import { MFASetupData, TOTPVerificationOptions } from '@/types/mfa';
+import { withTimeout } from '@/utils/resilience/timeout';
+import { withRetry } from '@/utils/resilience/retry';
+import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
+import { TIMEOUTS, SERVICE_RETRY_CONFIG, CIRCUIT_BREAKER_CONFIG, API_ENDPOINTS } from '@/constants';
 
 const SECRET_LENGTH = 32;
 const BACKUP_CODE_LENGTH = 10;
@@ -6,6 +10,8 @@ const BACKUP_CODE_COUNT = 10;
 const TOTP_DIGITS = 6;
 const TOTP_PERIOD = 30;
 const TOTP_WINDOW = 1;
+
+const qrCodeCircuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.QR_CODE_API);
 
 function generateSecret(length: number = SECRET_LENGTH): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -108,16 +114,39 @@ async function verifyTOTP(options: TOTPVerificationOptions): Promise<boolean> {
   return false;
 }
 
-function generateTOTPQRCode(secret: string, issuer: string = 'Maskom', accountName: string = 'user'): string {
+async function generateTOTPQRCode(secret: string, issuer: string = 'Maskom', accountName: string = 'user'): Promise<string> {
   const otpAuthUrl = `otpauth://totp/${issuer}:${accountName}?secret=${secret}&issuer=${issuer}&digits=${TOTP_DIGITS}&period=${TOTP_PERIOD}`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpAuthUrl)}`;
-  return qrCodeUrl;
+  const qrCodeUrl = `${API_ENDPOINTS.QR_CODE_API}?size=200x200&data=${encodeURIComponent(otpAuthUrl)}`;
+
+  return qrCodeCircuitBreaker.execute(async () => {
+    const retryResult = await withRetry(
+      async () => {
+        return await withTimeout(
+          fetch(qrCodeUrl, { method: 'GET' }),
+          { timeoutMs: TIMEOUTS.QR_CODE_API, timeoutError: 'QR code API request timed out' }
+        );
+      },
+      {
+        maxAttempts: SERVICE_RETRY_CONFIG.QR_CODE_API.maxAttempts,
+        baseDelayMs: SERVICE_RETRY_CONFIG.QR_CODE_API.baseDelayMs,
+        maxDelayMs: SERVICE_RETRY_CONFIG.QR_CODE_API.maxDelayMs,
+        backoffMultiplier: SERVICE_RETRY_CONFIG.QR_CODE_API.backoffMultiplier,
+        retryableErrors: [...SERVICE_RETRY_CONFIG.QR_CODE_API.retryableErrors] as RegExp[]
+      }
+    );
+
+    if (!retryResult.success) {
+      throw new Error(`Failed to generate QR code: ${retryResult.error?.message || 'Unknown error'}`);
+    }
+
+    return qrCodeUrl;
+  });
 }
 
 async function createMFASetupData(accountName: string = 'user'): Promise<MFASetupData> {
   const secret = generateSecret();
   const backupCodes = generateBackupCodes();
-  const qrCodeUrl = generateTOTPQRCode(secret, 'Maskom', accountName);
+  const qrCodeUrl = await generateTOTPQRCode(secret, 'Maskom', accountName);
   
   return {
     secret,
