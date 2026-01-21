@@ -6,11 +6,11 @@ type ExecuteDrillFunction = (drillType: DrillType, backupId: string) => Promise<
 class DrillScheduler {
   private static instance: DrillScheduler
   private scheduledDrills: Map<string, NodeJS.Timeout>
-  private drillStorage: DrillStorage
+  private drillStorage: DrillStorage | null
 
   private constructor() {
     this.scheduledDrills = new Map()
-    this.drillStorage = null as any
+    this.drillStorage = null
   }
 
   static getInstance(drillStorage?: DrillStorage): DrillScheduler {
@@ -18,9 +18,17 @@ class DrillScheduler {
       DrillScheduler.instance = new DrillScheduler()
     }
     if (drillStorage) {
-      DrillScheduler.instance.drillStorage = drillStorage
+      DrillScheduler.instance.setDrillStorage(drillStorage)
     }
     return DrillScheduler.instance
+  }
+
+  setDrillStorage(storage: DrillStorage): void {
+    this.drillStorage = storage
+  }
+
+  getScheduledDrillsMap(): Map<string, NodeJS.Timeout> {
+    return this.scheduledDrills
   }
 
   async scheduleDrill(
@@ -39,9 +47,9 @@ class DrillScheduler {
       enabled: true
     }
 
-    const schedules = await this.drillStorage.getDrillSchedules()
+    const schedules = await this.drillStorage?.getDrillSchedules() || []
     schedules.push(drillSchedule)
-    await this.drillStorage.saveDrillSchedules(schedules)
+    await this.drillStorage?.saveDrillSchedules(schedules)
 
     this.scheduleNextRun(drillSchedule, executeDrill)
 
@@ -49,12 +57,12 @@ class DrillScheduler {
   }
 
   async cancelDrill(drillId: string): Promise<void> {
-    const schedules = await this.drillStorage.getDrillSchedules()
+    const schedules = await this.drillStorage?.getDrillSchedules() || []
     const index = schedules.findIndex((s) => s.drillId === drillId)
 
     if (index !== -1) {
       schedules[index].enabled = false
-      await this.drillStorage.saveDrillSchedules(schedules)
+      await this.drillStorage?.saveDrillSchedules(schedules)
 
       const timeout = this.scheduledDrills.get(drillId)
 

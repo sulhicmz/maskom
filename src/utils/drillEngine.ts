@@ -12,8 +12,7 @@ import {
   DrillHealthStatus,
   DEFAULT_DRILL_CONFIG,
   DRILL_STORAGE_KEY,
-  DRILL_DATA_KEY,
-  DRILL_SCHEDULE_KEY
+  DRILL_DATA_KEY
 } from '@/types/drill'
 
 import { BackupEngine } from '@/utils/backupEngine'
@@ -22,8 +21,6 @@ import apmManager from '@/utils/apm'
 import DrillStorage from '@/utils/drill/drillStorage'
 import DrillScheduler from '@/utils/drill/drillScheduler'
 import DrillStatisticsCalculator from '@/utils/drill/drillStatistics'
-import DrillExecutor from '@/utils/drill/drillExecutor'
-import type { DrillProgressCallback as ExternalDrillProgressCallback } from '@/utils/drill/drillExecutor'
 
 interface DrillProgress {
   current: number
@@ -108,7 +105,7 @@ class DrillEngine {
     this.backupEngine = BackupEngine.getInstance()
     this.drillStorage = DrillStorage.getInstance()
     this.drillScheduler = DrillScheduler.getInstance()
-    this.drillScheduler.drillStorage = this.drillStorage
+    this.drillScheduler.setDrillStorage(this.drillStorage)
     this.drillStatisticsCalculator = new DrillStatisticsCalculator()
   }
 
@@ -363,39 +360,29 @@ class DrillEngine {
     scheduledFor: string,
     recurrence: DrillSchedule
   ): Promise<DrillScheduleDetails> {
-    const drillSchedule: DrillScheduleDetails = {
-      drillId: generateDrillId(drillType, backupId),
+    return await this.drillScheduler.scheduleDrill(
       drillType,
       backupId,
       scheduledFor,
       recurrence,
-      enabled: true
-    }
-
-    const schedules = await this.getDrillSchedules()
-    schedules.push(drillSchedule)
-    await this.saveDrillSchedules(schedules)
-
-    this.scheduleNextRun(drillSchedule)
-
-    return drillSchedule
+      async () => {
+        switch (drillType) {
+          case DrillType.FULL_RESTORE:
+            await this.executeFullRestoreDrill(backupId)
+            break
+          case DrillType.PARTIAL_RESTORE:
+            await this.executePartialRestoreDrill(backupId)
+            break
+          case DrillType.INTEGRITY_CHECK:
+            await this.executeIntegrityCheckDrill(backupId)
+            break
+        }
+      }
+    )
   }
 
   async cancelDrill(drillId: string): Promise<void> {
-    const schedules = await this.getDrillSchedules()
-    const index = schedules.findIndex((s) => s.drillId === drillId)
-
-    if (index !== -1) {
-      schedules[index].enabled = false
-      await this.saveDrillSchedules(schedules)
-
-      const timeout = this.scheduledDrills.get(drillId)
-
-      if (timeout) {
-        clearTimeout(timeout)
-        this.scheduledDrills.delete(drillId)
-      }
-    }
+    await this.drillScheduler.cancelDrill(drillId)
   }
 
   async getDrills(filters?: DrillFilters): Promise<BackupDrill[]> {
@@ -584,65 +571,6 @@ class DrillEngine {
     apmManager.addBreadcrumb('Isolated restore completed', 'drill', 'info')
   }
 
-  private async scheduleNextRun(schedule: DrillScheduleDetails): Promise<void> {
-    if (!schedule.enabled) {
-      return
-    }
-
-    const now = new Date()
-    const scheduledTime = new Date(schedule.scheduledFor)
-
-    if (scheduledTime <= now) {
-      const nextRunTime = this.calculateNextRunTime(schedule.recurrence)
-      scheduledTime.setTime(nextRunTime.getTime())
-    }
-
-    const delay = scheduledTime.getTime() - now.getTime()
-
-    const timeout = setTimeout(async () => {
-      try {
-        switch (schedule.drillType) {
-          case DrillType.FULL_RESTORE:
-            await this.executeFullRestoreDrill(schedule.backupId)
-            break
-          case DrillType.PARTIAL_RESTORE:
-            await this.executePartialRestoreDrill(schedule.backupId)
-            break
-          case DrillType.INTEGRITY_CHECK:
-            await this.executeIntegrityCheckDrill(schedule.backupId)
-            break
-        }
-
-        if (schedule.recurrence !== DrillSchedule.MANUAL) {
-          await this.scheduleNextRun(schedule)
-        }
-      } catch (error) {
-        apmManager.captureError({
-          message: `Scheduled drill failed: ${error}`,
-          level: 'error',
-          tags: { drillId: schedule.drillId }
-        })
-      }
-    }, delay)
-
-    this.scheduledDrills.set(schedule.drillId, timeout)
-  }
-
-  private calculateNextRunTime(recurrence: DrillSchedule): Date {
-    const now = new Date()
-
-    switch (recurrence) {
-      case DrillSchedule.DAILY:
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000)
-      case DrillSchedule.WEEKLY:
-        return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-      case DrillSchedule.MONTHLY:
-        return new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-      default:
-        return now
-    }
-  }
-
   private async saveDrill(drill: BackupDrill): Promise<void> {
     if (typeof window === 'undefined') {
       return
@@ -676,32 +604,6 @@ class DrillEngine {
     } catch {
       return []
     }
-  }
-
-  private async getDrillSchedules(): Promise<DrillScheduleDetails[]> {
-    if (typeof window === 'undefined') {
-      return []
-    }
-
-    const schedulesString = global.localStorage?.getItem(DRILL_SCHEDULE_KEY)
-
-    if (!schedulesString) {
-      return []
-    }
-
-    try {
-      return JSON.parse(schedulesString)
-    } catch {
-      return []
-    }
-  }
-
-  private async saveDrillSchedules(schedules: DrillScheduleDetails[]): Promise<void> {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    global.localStorage?.setItem(DRILL_SCHEDULE_KEY, JSON.stringify(schedules))
   }
 
   private calculateDrillTypeStats(drills: BackupDrill[], drillType: DrillType): DrillTypeStats {

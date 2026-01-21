@@ -1,9 +1,4 @@
-import {
-  BackupDrill,
-  DrillType,
-  DrillStatus,
-  DrillResults
-} from '@/types/drill'
+import { BackupDrill } from '@/types/drill'
 
 type DrillProgressCallback = (progress: { current: number; total: number; message: string }) => void
 
