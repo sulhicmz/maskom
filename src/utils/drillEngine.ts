@@ -19,6 +19,11 @@ import {
 import { BackupEngine } from '@/utils/backupEngine'
 import { BackupMetadata } from '@/types/backup'
 import apmManager from '@/utils/apm'
+import DrillStorage from '@/utils/drill/drillStorage'
+import DrillScheduler from '@/utils/drill/drillScheduler'
+import DrillStatisticsCalculator from '@/utils/drill/drillStatistics'
+import DrillExecutor from '@/utils/drill/drillExecutor'
+import type { DrillProgressCallback as ExternalDrillProgressCallback } from '@/utils/drill/drillExecutor'
 
 interface DrillProgress {
   current: number
@@ -95,12 +100,16 @@ function generateDrillId(drillType: DrillType, backupId: string): string {
 class DrillEngine {
   private static instance: DrillEngine
   private backupEngine: BackupEngine
-  private scheduledDrills: Map<string, NodeJS.Timeout>
-  private isExecuting: boolean = false
+  private drillStorage: DrillStorage
+  private drillScheduler: DrillScheduler
+  private drillStatisticsCalculator: DrillStatisticsCalculator
 
   private constructor() {
     this.backupEngine = BackupEngine.getInstance()
-    this.scheduledDrills = new Map()
+    this.drillStorage = DrillStorage.getInstance()
+    this.drillScheduler = DrillScheduler.getInstance()
+    this.drillScheduler.drillStorage = this.drillStorage
+    this.drillStatisticsCalculator = new DrillStatisticsCalculator()
   }
 
   static getInstance(): DrillEngine {
