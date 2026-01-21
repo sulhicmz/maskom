@@ -1,5 +1,155 @@
 # Architecture Task Tracking
 
+## Task 385: [DATA ARCHITECT] Activity Log Data Validation (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Validation - Audit Trail Integrity
+**Effort**: Medium (2.5 hours)
+
+### Purpose
+
+Create comprehensive validation for activity log data (ActivityLog, ActivityLogFilter, ActivityStatistics, AlertRule, SuspiciousActivityAlert) to ensure audit trail data integrity and prevent security monitoring errors.
+
+### Problem Identified
+
+**Missing Activity Log Validation**:
+- ActivityLogData.ts contains 16 sample activity log entries with zero validation
+- ActivityLog interface has 10 fields (id, userId, action, resource, resourceId, details, timestamp, ipAddress, userAgent, success, errorMessage)
+- ActivityAction enum has 29 possible actions (login, logout, permissions, content, backups, etc.)
+- ActivityLogFilter, ActivityStatistics, AlertRule, SuspiciousActivityAlert also have no validation
+- Critical for security monitoring - activity logs are used for suspicious activity detection
+- Critical for compliance (GDPR, SOC 2) - audit trails must be accurate and complete
+- No validation for ActivityAction enum values
+- No validation for ISO 8601 date formats (timestamps, triggeredAt, resolvedAt)
+- No duplicate ID detection for activity logs
+- No validation for IP address format (IPv4)
+- No validation for email format in alert rules
+- No validation for alert rule thresholds and time windows
+
+**Why This Matters**:
+1. **Data Integrity**: Invalid activity data could break audit reports and compliance documentation
+2. **Security Monitoring**: Suspicious activity detection relies on valid activity data
+3. **Compliance**: GDPR and SOC 2 require accurate, complete audit trails
+4. **Alert Reliability**: Invalid alert rule data could cause false positives/negatives
+5. **Dashboard Accuracy**: Statistics must be accurate for admin dashboards
+
+### Solution
+
+**Comprehensive Activity Log Validation**:
+
+**Validators Created**:
+1. **validateActivityAction** - Validates ActivityAction enum (29 possible values)
+2. **validateActivityDetails** - Validates ActivityDetails nested object with complex types (string, number, boolean, null, undefined, arrays)
+3. **validateActivityLog** - Validates ActivityLog with 10 fields, ISO 8601 timestamps, IPv4 addresses
+4. **validateActivityLogs** - Array validation with duplicate ID detection
+5. **validateActivityLogFilter** - Validates ActivityLogFilter with date range validation (startDate ≤ endDate)
+6. **validateActivityStatistics** - Validates ActivityStatistics with nested logs by action/user/resource objects
+7. **validateAlertRule** - Validates AlertRule with email format validation, threshold/timeWindow constraints
+8. **validateSuspiciousActivityAlert** - Validates SuspiciousActivityAlert with conditional validation (resolvedAt/resolvedBy required when resolved=true)
+
+### Implementation
+
+- [x] Create activityLogValidation.ts module in src/utils/dataValidation/
+- [x] Implement validateActivityAction() for enum validation (29 valid actions)
+- [x] Implement validateActivityDetails() for complex nested object validation (8 detail types supported)
+- [x] Implement validateActivityLog() for full activity log validation with 10 fields
+- [x] Implement validateActivityLogs() for array validation with duplicate ID detection
+- [x] Implement validateActivityLogFilter() for filter validation with date range checks
+- [x] Implement validateActivityStatistics() for statistics validation with nested objects
+- [x] Implement validateAlertRule() for alert rule validation with email format and constraints
+- [x] Implement validateSuspiciousActivityAlert() for alert validation with conditional fields
+- [x] Add ISO 8601 date format validation for all timestamp fields
+- [x] Add IPv4 address format validation for ipAddress field
+- [x] Add email format validation for alertEmail field
+- [x] Add date range validation (startDate ≤ endDate) in ActivityLogFilter
+- [x] Add conditional validation (resolvedAt/resolvedBy required when resolved=true)
+- [x] Create 101 comprehensive tests following QA best practices
+- [x] Export all validators from dataValidation/index.ts
+- [x] Verify lint passes (0 errors)
+- [x] Verify full test suite passes (5560/5560 tests passing)
+- [x] Update docs/blueprint.md with activity log validation documentation
+
+### Success Criteria
+
+- [x] Activity log validation module created (activityLogValidation.ts)
+- [x] 8 validators implemented (action, details, activityLog, activityLogs, filter, statistics, alertRule, suspiciousActivityAlert)
+- [x] ActivityAction enum validation (29 valid actions)
+- [x] ISO 8601 date format validation for all timestamps
+- [x] IPv4 address format validation for ipAddress
+- [x] Email format validation for alertEmail
+- [x] Duplicate ID detection for activity log arrays
+- [x] Date range validation in ActivityLogFilter (startDate ≤ endDate)
+- [x] Conditional validation for SuspiciousActivityAlert (resolvedAt/resolvedBy when resolved=true)
+- [x] 101 tests covering happy path, sad path, edge cases, boundaries
+- [x] 100% test pass rate (101/101 passing)
+- [x] Lint passes (0 errors)
+- [x] Zero regressions in existing tests (5459 existing tests still pass)
+- [x] Added to docs/blueprint.md validators list
+
+### Related Files
+
+- ✅ Added: `src/utils/dataValidation/activityLogValidation.ts` - Activity log validators (418 lines)
+- ✅ Added: `src/utils/dataValidation/__tests__/activityLogValidation.test.ts` - Comprehensive tests (970 lines)
+- ✅ Modified: `src/utils/dataValidation/index.ts` - Export activity log validation functions (17 insertions)
+
+### Implementation Summary
+
+**Files Added**: 2 files
+**Files Modified**: 1 file (dataValidation/index.ts)
+**Lines Added**: ~1,388 lines (validator + tests)
+**Validators Implemented**: 8 functions
+**Tests Added**: 101 tests (100% passing)
+**Test Coverage**: 100% of activityLogValidation.ts exports
+
+**Key Features**:
+1. **Enum Validation**: ActivityAction enum validation with 29 valid actions
+2. **ISO Date Format**: Validates all ISO 8601 date strings (timestamps, triggeredAt, resolvedAt, startDate, endDate)
+3. **IPv4 Validation**: Validates ipAddress field format
+4. **Email Validation**: Validates alertEmail format with regex
+5. **Duplicate ID Detection**: Validates arrays for duplicate activity log IDs
+6. **Date Range Validation**: Ensures startDate ≤ endDate in ActivityLogFilter
+7. **Nested Object Validation**: Validates ActivityDetails complex object with 8 detail types
+8. **Conditional Validation**: Validates SuspiciousActivityAlert resolvedAt/resolvedBy only when resolved=true
+9. **Array Item Validation**: Validates array items in ActivityDetails (string[], number[], boolean[])
+
+**Test Categories**:
+- Happy path: 42 tests
+- Sad path: 44 tests
+- Edge cases: 8 tests
+- Boundary conditions: 7 tests
+
+### Notes
+
+- Follows Data Architect principles:
+  - **Data Integrity First**: Comprehensive validation for all activity log fields ✅
+  - **Schema Design**: Follows existing validation patterns (campaignValidation, drillValidation) ✅
+  - **Test Coverage**: 101 tests covering all validators ✅
+  - **QA Best Practices**: AAA pattern, behavior-focused, descriptive names ✅
+  - **Zero Regressions**: All existing tests still pass (5459 → 5560) ✅
+
+- **Test Statistics**:
+  - Before: 0 tests for activity log validation
+  - After: 101 tests (100% coverage of activityLogValidation.ts exports)
+  - Overall: 5560 passing tests (up from 5459, +101 new tests)
+  - Overall: 220 test suites (up from 216, +1 new test suite)
+  - Pass rate: 100% for new tests
+
+- **Security Implications**:
+  - **Audit Trail Accuracy**: Valid activity data ensures accurate compliance documentation (GDPR, SOC 2)
+  - **Suspicious Activity Detection**: Invalid data won't cause false positives/negatives in security monitoring
+  - **Alert Reliability**: Valid alert rules with proper thresholds/time windows prevent false alerts
+  - **Statistics Accuracy**: Valid statistics ensure admin dashboard displays correct information
+
+### Related Tasks
+
+- FEATURE-048 (Advanced Activity Logging & Audit Trails) - Related activity logging functionality
+- Task 316 (Activity Logging Implementation) - Related activity logging work
+- Task 381 (Drill Data Validation) - Related validation framework usage
+- Task 380 (React.memo Optimization) - Related performance work
+
+---
+
 ## Task 384: [PERFORMANCE OPTIMIZER] Additional React.memo for Admin Components (Jan 21, 2026)
 
 **Status**: ✅ Completed

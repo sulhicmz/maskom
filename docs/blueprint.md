@@ -1097,6 +1097,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - `contactValidation.ts` - ContactInfoItem validator
 - `mediaValidation.ts` - MediaAsset validator with URL and ISO date validation (Task 285)
 - `drillValidation.ts` - BackupDrill, DrillScheduleDetails, DrillResults validators for disaster recovery system
+- `activityLogValidation.ts` - ActivityLog, ActivityLogFilter, ActivityStatistics, AlertRule, SuspiciousActivityAlert validators for audit trail and security monitoring (Task 385)
 - `emailTemplateValidation.ts` - EmailTemplate, TemplateVariable validators with variable syntax validation (Task 315)
 - `campaignValidation.ts` - EmailCampaign, RecipientList, RecipientSegment, RecipientCriteria, CampaignMetrics, CampaignABTest validators (Task 335)
 - `index.ts` - Central export point (backward compatible with dataValidation.ts)
@@ -1109,7 +1110,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
  - ✅ `validateRange()` - Number range validation (via createValidator)
  - ✅ `validateEnum<T>()` - Enum value validation (via createValidator)
  
-**Implemented Validators** (26 total):
+**Implemented Validators** (34 total):
 - ✅ `validateFeedbackItem` - Testimonials with rating validation
 - ✅ `validateFaqItem` - FAQ questions and answers
 - ✅ `validatePriceItem` - Pricing packages with nested PriceDetailItem validation
@@ -1146,7 +1147,16 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateDrillType` - DrillType enum validation
 - ✅ `validateDrillStatus` - DrillStatus enum validation
 - ✅ `validateDrillSchedule` - DrillSchedule enum validation
+- ✅ `validateActivityAction` - ActivityAction enum validation with 29 valid actions (Task 385)
+- ✅ `validateActivityDetails` - ActivityDetails complex nested object validation with 8 detail types (Task 385)
+- ✅ `validateActivityLog` - ActivityLog validator with ISO 8601 timestamps and IPv4 address validation (Task 385)
+- ✅ `validateActivityLogs` - Array validation for activity logs with duplicate ID detection (Task 385)
+- ✅ `validateActivityLogFilter` - ActivityLogFilter validator with date range validation (startDate ≤ endDate) (Task 385)
+- ✅ `validateActivityStatistics` - ActivityStatistics validator with nested logsByAction, logsByUser, logsByResource objects (Task 385)
+- ✅ `validateAlertRule` - AlertRule validator with email format validation and threshold/timeWindow constraints (Task 385)
+- ✅ `validateSuspiciousActivityAlert` - SuspiciousActivityAlert validator with conditional validation (resolvedAt/resolvedBy when resolved=true) (Task 385)
 - ✅ 42 tests for drill validation (100% passing)
+- ✅ 101 tests for activity log validation (100% passing) (Task 385)
 - ✅ 27 tests for email template validation (100% passing) (Task 315)
 - ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
 - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
