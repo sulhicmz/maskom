@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import { useRouter } from 'next/navigation'
@@ -412,4 +412,4 @@ function formatBytes(bytes: number): string {
   )
 }
 
-export default BackupManagementPanel
+export default memo(BackupManagementPanel)

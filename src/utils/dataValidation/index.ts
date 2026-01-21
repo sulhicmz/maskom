@@ -98,14 +98,25 @@ import {
 } from "./emailTemplateValidation"
 
 import {
-  validateEmailCampaign,
-  validateCampaigns,
-  validateCampaignMetrics,
-  validateCampaignABTest,
-  validateRecipientCriteria,
-  validateRecipientSegment,
-  validateRecipientList,
-} from "./campaignValidation"
+   validateEmailCampaign,
+   validateCampaigns,
+   validateCampaignMetrics,
+   validateCampaignABTest,
+   validateRecipientCriteria,
+   validateRecipientSegment,
+   validateRecipientList,
+ } from "./campaignValidation"
+
+import {
+  validateBackupDrill,
+  validateBackupDrills,
+  validateDrillScheduleDetails,
+  validateDrillSchedules,
+  validateDrillResults,
+  validateDrillSchedule,
+  validateDrillStatus,
+  validateDrillType,
+} from "./drillValidation"
 
 export type {
   ValidationResult,
@@ -156,12 +167,20 @@ export type {
         validateCampaigns,
         validateCampaignMetrics,
         validateCampaignABTest,
-        validateRecipientCriteria,
-        validateRecipientSegment,
-        validateRecipientList,
-        validateViewCount,
-      validateEngagementScore,
-      validateAvgReadTime,
-      validateShareCount,
-      validateContentMetrics,
-  };
+         validateRecipientCriteria,
+         validateRecipientSegment,
+         validateRecipientList,
+         validateViewCount,
+       validateEngagementScore,
+       validateAvgReadTime,
+       validateShareCount,
+       validateContentMetrics,
+       validateBackupDrill,
+       validateBackupDrills,
+       validateDrillScheduleDetails,
+       validateDrillSchedules,
+       validateDrillResults,
+       validateDrillSchedule,
+       validateDrillStatus,
+       validateDrillType,
+   };

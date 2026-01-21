@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, memo } from 'react';
 import { createNewsletterFormSchema } from '@/utils/formValidation';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
 import type { ServiceResult } from '@/types/common';
@@ -15,7 +15,7 @@ interface NewsletterFormProps {
    buttonClassName?: string;
 }
 
-const NewsletterForm = ({ className = "", buttonClassName = "gradient-btn" }: NewsletterFormProps) => {
+const NewsletterForm = memo(({ className = "", buttonClassName = "gradient-btn" }: NewsletterFormProps) => {
    const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({ 
       resolver: yupResolver(createNewsletterFormSchema()),
    });
@@ -110,11 +110,11 @@ const NewsletterForm = ({ className = "", buttonClassName = "gradient-btn" }: Ne
                tabIndex={-1}
             >
                Berhasil berlangganan newsletter!
-            </p>
-         )}
+          </p>
+       )}
       </form>
-   );
-};
+    );
+});
 
 NewsletterForm.displayName = "NewsletterForm";
 

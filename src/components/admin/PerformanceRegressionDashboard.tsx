@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   establishBaseline,
@@ -453,4 +453,4 @@ function PerformanceRegressionDashboard() {
   );
 }
 
-export default PerformanceRegressionDashboard;
+export default memo(PerformanceRegressionDashboard);
