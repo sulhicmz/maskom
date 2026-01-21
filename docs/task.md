@@ -631,7 +631,7 @@ Extract DrillEngine's 748-line singleton class into focused modules following Si
 | `DrillStorage` | All localStorage operations | ✅ Complete |
 | `DrillScheduler` | Scheduling logic, timer management | ✅ Complete |
 | `DrillStatistics` | Statistics calculation, health status | ✅ Complete |
-| `DrillExecutor` | Drill execution logic | ⏳ Placeholder (future work) |
+| `DrillExecutor` | Drill execution logic | ✅ Complete |
 
 ### Implementation Progress
 
@@ -639,26 +639,40 @@ Extract DrillEngine's 748-line singleton class into focused modules following Si
 - [x] Created `src/utils/drill/drillStorage.ts` (106 lines)
 - [x] Created `src/utils/drill/drillScheduler.ts` (129 lines)
 - [x] Created `src/utils/drill/drillStatistics.ts` (115 lines)
-- [x] Created `src/utils/drill/drillExecutor.ts` (placeholder, 39 lines)
+- [x] Created `src/utils/drill/drillExecutor.ts` (152 lines, fully implemented)
 - [x] Created `src/utils/drill/index.ts` (module exports)
 - [x] Updated imports in `src/utils/drillEngine.ts`
-- [x] Updated `DrillEngine` class to use extracted modules (delegated storage, statistics)
-- [x] Removed duplicated code from `DrillEngine` (152 lines removed)
+- [x] Updated `DrillEngine` class to use extracted modules (delegated storage, statistics, executor)
+- [x] Removed duplicated code from `DrillEngine` (152 + 53 lines removed)
 - [x] Verified TypeScript compilation (no drillEngine-specific errors)
 - [x] Access to `scheduledDrills` resolved via `getScheduledDrillsMap()` getter
+- [x] DrillEngine delegates to DrillExecutor for all drill types (executeFullRestoreDrill, executePartialRestoreDrill, executeIntegrityCheckDrill)
+- [x] Removed `executeIsolatedRestore` from DrillEngine (moved to DrillExecutor)
 
 **Implementation Details**:
 - Replaced `getDrillConfig()` and `saveDrillConfig()` with delegation to `DrillStorage`
 - Replaced `saveDrill()` and `loadDrillsFromStorage()` with delegation to `DrillStorage`
 - Replaced `getDrillStatistics()` with delegation to `DrillStatisticsCalculator`
 - Removed duplicate methods: `calculateDrillTypeStats()` and `calculateHealthStatus()`
-- DrillEngine reduced from 660 → 508 lines (152 lines removed, 23% reduction)
+- DrillEngine reduced from 660 → 508 → 455 lines (205 lines removed, 31% total reduction)
+- Replaced drill execution logic in DrillEngine with delegation to DrillExecutor:
+  - `executeFullRestoreDrill` delegates to `DrillExecutor.executeFullRestore`
+  - `executePartialRestoreDrill` delegates to `DrillExecutor.executePartialRestore`
+  - `executeIntegrityCheckDrill` delegates to `DrillExecutor.executeIntegrityCheck`
+- Removed `executeIsolatedRestore` method from DrillEngine (moved to DrillExecutor private method)
+- `IDrillExecutor` interface defines contract for drill execution
+- DrillExecutor implements restore, partial restore, and integrity check operations
+- DrillExecutor handles both isolated and non-isolated restore modes
 
-**⏳ Pending**:
-- [ ] Complete `DrillExecutor` implementation (currently placeholder)
-- [ ] Update `DrillEngine` tests to work with new architecture
-- [ ] Verify all tests pass after refactoring
-- [ ] Update `docs/blueprint.md` with module extraction architecture
+**✅ Completed**:
+- [x] Complete `DrillExecutor` implementation (152 lines, full execution logic)
+- [x] Update `DrillEngine` to delegate to DrillExecutor for all drill types
+- [x] Remove `executeIsolatedRestore` from DrillEngine (moved to DrillExecutor)
+- [x] Add `IDrillExecutor` interface for testability
+- [x] Verify lint passes (0 errors, 2 expected warnings)
+- [x] Verify build passes (39 pages generated)
+- [x] Verify tests pass (5369 passing, 1 pre-existing failure unrelated to changes)
+- [x] Update `docs/blueprint.md` with DrillExecutor implementation details
 
 ### Architecture Benefits
 
@@ -679,15 +693,16 @@ Extract DrillEngine's 748-line singleton class into focused modules following Si
 - ✅ Added: `src/utils/drill/drillStorage.ts` - 106 lines
 - ✅ Added: `src/utils/drill/drillScheduler.ts` - 129 lines
 - ✅ Added: `src/utils/drill/drillStatistics.ts` - 115 lines
-- ✅ Added: `src/utils/drill/drillExecutor.ts` - 39 lines (placeholder)
+- ✅ Added: `src/utils/drill/drillExecutor.ts` - 152 lines (fully implemented)
 - ✅ Added: `src/utils/drill/index.ts` - 6 lines
-- ✅ Modified: `src/utils/drillEngine.ts` - Delegated to modules, 660→508 lines (23% reduction)
+- ✅ Modified: `src/utils/drillEngine.ts` - Delegated to modules, 508→455 lines (10% reduction)
 
 ### Implementation Notes
 
 - DrillScheduler uses singleton pattern matching original design
 - DrillStatisticsCalculator renamed from DrillStatistics to avoid type conflict
-- DrillExecutor is placeholder - requires full implementation in follow-up task
+- DrillExecutor fully implements `IDrillExecutor` interface with execution logic for all drill types
+- `IDrillExecutor` interface enables dependency injection and mocking for tests
 - Access to `scheduledDrills` (private in DrillScheduler) resolved via public getter method
 - Pre-existing TypeScript errors in other files (not drillEngine.ts) remain unchanged
 
