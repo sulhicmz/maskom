@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { 
     ActivityLog, 
     AuditSummary,
@@ -334,6 +334,10 @@ export const AuditReportDashboard: React.FC<AuditReportDashboardProps> = ({
         </div>
     );
 };
+
+AuditReportDashboard.displayName = "AuditReportDashboard"
+
+export default memo(AuditReportDashboard);
 
 const formatActionName = (action: string): string => {
     const actionMap: Record<string, string> = {

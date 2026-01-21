@@ -60,29 +60,32 @@ const BackupRow = memo(({ backup, onRestore, onDelete, onExport }: BackupRowProp
       <td>{backup.encryption}</td>
       <td>{backup.retention}</td>
       <td>
-        <div className="d-flex gap-1">
+        <div className="d-flex gap-1" role="group" aria-label="Backup actions">
           <button
             className="btn btn-sm btn-success"
             onClick={() => onRestore(backup.id)}
             disabled={backup.status !== 'completed'}
             title="Pulihkan Backup"
+            aria-label={`Pulihkan backup ${backup.id}`}
           >
-            <i className="bi bi-arrow-counterclockwise"></i>
+            <i className="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
           </button>
           <button
             className="btn btn-sm btn-primary"
             onClick={() => onExport(backup.id)}
             disabled={backup.status !== 'completed'}
             title="Ekspor Backup"
+            aria-label={`Ekspor backup ${backup.id}`}
           >
-            <i className="bi bi-download"></i>
+            <i className="bi bi-download" aria-hidden="true"></i>
           </button>
           <button
             className="btn btn-sm btn-danger"
             onClick={() => onDelete(backup.id)}
             title="Hapus Backup"
+            aria-label={`Hapus backup ${backup.id}`}
           >
-            <i className="bi bi-trash"></i>
+            <i className="bi bi-trash" aria-hidden="true"></i>
           </button>
         </div>
       </td>

@@ -4,6 +4,8 @@ export const TIMEOUTS = {
     EMAIL_SERVICE: 10000,
     API_ROUTE: 5000,
     QR_CODE_API: 5000,
+    COLLABORATION_API: 5000,
+    CDN_API: 5000,
 } as const;
 
 export const RETRY_CONFIG = {
@@ -41,6 +43,20 @@ export const SERVICE_RETRY_CONFIG = {
         maxDelayMs: 5000,
         backoffMultiplier: 2,
         retryableErrors: [/network/i, /timeout/i, /ECONN/i, /5\d{2}/]
+    },
+    COLLABORATION_API: {
+        maxAttempts: 2,
+        baseDelayMs: 1000,
+        maxDelayMs: 5000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
+    },
+    CDN_API: {
+        maxAttempts: 2,
+        baseDelayMs: 1000,
+        maxDelayMs: 5000,
+        backoffMultiplier: 2,
+        retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
     }
 } as const;
 

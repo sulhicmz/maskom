@@ -7,6 +7,7 @@ import { Permission } from '@/types/permission';
 import { CampaignStatus, type EmailCampaign } from '@/types/campaign';
 import campaignManager from '@/utils/campaignManager';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { logServiceInfo } from '@/services/common/logger';
 
 const StatusBadge = memo(({ status }: { status: CampaignStatus }) => {
     const getStatusColor = (status: CampaignStatus): string => {
@@ -89,21 +90,23 @@ const CampaignRow = memo(({ campaign, onEdit, onDelete, onDuplicate, onSend, onS
             <td>{campaign.bounceCount} ({bounceRate}%)</td>
             <td>{formatDate(campaign.createdAt)}</td>
             <td>
-                <div className="btn-group btn-group-sm">
+                <div className="btn-group btn-group-sm" role="group" aria-label="Campaign actions">
                     <button
                         className="btn btn-outline-primary"
                         onClick={() => onEdit(campaign.id)}
                         title="Edit Campaign"
+                        aria-label={`Edit campaign ${campaign.name}`}
                     >
-                        <i className="bi bi-pencil"></i>
+                        <i className="bi bi-pencil" aria-hidden="true"></i>
                     </button>
                     {campaign.status === 'draft' && (
                         <button
                             className="btn btn-outline-info"
                             onClick={() => onSend(campaign.id)}
                             title="Send Campaign"
+                            aria-label={`Send campaign ${campaign.name}`}
                         >
-                            <i className="bi bi-send"></i>
+                            <i className="bi bi-send" aria-hidden="true"></i>
                         </button>
                     )}
                     {campaign.status === 'draft' && (
@@ -111,8 +114,9 @@ const CampaignRow = memo(({ campaign, onEdit, onDelete, onDuplicate, onSend, onS
                             className="btn btn-outline-success"
                             onClick={() => onSchedule(campaign.id)}
                             title="Schedule Campaign"
+                            aria-label={`Schedule campaign ${campaign.name}`}
                         >
-                            <i className="bi bi-calendar"></i>
+                            <i className="bi bi-calendar" aria-hidden="true"></i>
                         </button>
                     )}
                     {(campaign.status === 'draft' || campaign.status === 'scheduled') && (
@@ -120,24 +124,27 @@ const CampaignRow = memo(({ campaign, onEdit, onDelete, onDuplicate, onSend, onS
                             className="btn btn-outline-danger"
                             onClick={() => onCancel(campaign.id)}
                             title="Cancel Campaign"
+                            aria-label={`Cancel campaign ${campaign.name}`}
                         >
-                            <i className="bi bi-x-circle"></i>
+                            <i className="bi bi-x-circle" aria-hidden="true"></i>
                         </button>
                     )}
                     <button
                         className="btn btn-outline-secondary"
                         onClick={() => onDuplicate(campaign.id)}
                         title="Duplicate Campaign"
+                        aria-label={`Duplicate campaign ${campaign.name}`}
                     >
-                        <i className="bi bi-copy"></i>
+                        <i className="bi bi-copy" aria-hidden="true"></i>
                     </button>
                     {(campaign.status === 'draft' || campaign.status === 'cancelled') && (
                         <button
                             className="btn btn-outline-danger"
                             onClick={() => onDelete(campaign.id)}
                             title="Delete Campaign"
+                            aria-label={`Delete campaign ${campaign.name}`}
                         >
-                            <i className="bi bi-trash"></i>
+                            <i className="bi bi-trash" aria-hidden="true"></i>
                         </button>
                     )}
                 </div>
@@ -206,7 +213,7 @@ const CampaignList: React.FC = () => {
     };
 
     const handleEdit = (id: string) => {
-        console.log('Edit campaign:', id);
+        logServiceInfo('CampaignList', 'handleEdit', `Campaign ID: ${id}`);
     };
 
     const handleDelete = (id: string) => {
@@ -298,7 +305,7 @@ const CampaignList: React.FC = () => {
                                         <div className="col-md-6 text-end">
                                             <button
                                                 className="btn btn-primary"
-                                                onClick={() => console.log('Create new campaign')}
+                                                onClick={() => logServiceInfo('CampaignList', 'createCampaign', 'Create new campaign button clicked')}
                                             >
                                                 <i className="bi bi-plus-lg me-1"></i>
                                                 Create Campaign
@@ -415,4 +422,6 @@ const CampaignList: React.FC = () => {
     );
 };
 
-export default CampaignList;
+CampaignList.displayName = "CampaignList"
+
+export default memo(CampaignList);

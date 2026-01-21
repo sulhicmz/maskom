@@ -420,4 +420,6 @@ const DisasterRecoveryPlanComponent: React.FC<DisasterRecoveryPlanProps> = ({
   )
 }
 
-export default DisasterRecoveryPlanComponent
+DisasterRecoveryPlanComponent.displayName = "DisasterRecoveryPlanComponent"
+
+export default memo(DisasterRecoveryPlanComponent)

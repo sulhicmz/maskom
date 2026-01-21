@@ -1,11 +1,12 @@
 import { ActivityAction, ActivityLog } from '@/types/audit';
 import { calculateActivityStatistics } from '../logStatistics';
-import { saveLogs } from '../logStorage';
+import { saveLogs, clearCache } from '../logStorage';
 
 describe('logStatistics', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         localStorage.clear();
+        clearCache();
     });
 
     const createMockLog = (overrides: Partial<ActivityLog> = {}): ActivityLog => ({

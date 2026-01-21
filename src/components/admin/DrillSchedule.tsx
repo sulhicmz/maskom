@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import {
   DrillType,
@@ -398,4 +398,6 @@ const DrillSchedule: React.FC<DrillScheduleProps> = ({ onScheduleCreated }) => {
   )
 }
 
-export default DrillSchedule
+DrillSchedule.displayName = "DrillSchedule"
+
+export default memo(DrillSchedule)

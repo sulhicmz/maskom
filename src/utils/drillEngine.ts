@@ -17,6 +17,7 @@ import { logServiceInfo } from '@/services/common/logger'
 import DrillStorage from '@/utils/drill/drillStorage'
 import DrillScheduler from '@/utils/drill/drillScheduler'
 import DrillStatisticsCalculator from '@/utils/drill/drillStatistics'
+import DrillExecutor from '@/utils/drill/drillExecutor'
 
 interface DrillProgress {
   current: number
@@ -240,39 +241,7 @@ class DrillEngine {
       initialProgressMessage: 'Initializing full restore drill...',
       totalSteps: 5,
       executeDrill: async (progressCallback) => {
-        progressCallback?.({
-          current: 3,
-          total: 5,
-          message: 'Executing restore operation...'
-        })
-
-        const startTime = Date.now()
-
-        if (isolated) {
-          await this.executeIsolatedRestore(backupId, progressCallback)
-        } else {
-          const restoreResult = await this.backupEngine.restoreBackup(backupId, (progress) => {
-            progressCallback?.({
-              current: Math.floor((progress.current / progress.total) * 5),
-              total: 5,
-              message: `Restoring: ${progress.message}`
-            })
-          })
-
-          if (!restoreResult.success) {
-            throw new Error(`Restore failed: ${restoreResult.errors.join(', ')}`)
-          }
-        }
-
-        const duration = Date.now() - startTime
-
-        return {
-          restoreDuration: duration,
-          integrityCheckPassed: true,
-          dataLossDetected: false,
-          itemsRestored: 0,
-          checksumValid: true
-        }
+        return await DrillExecutor.executeFullRestore(backupId, progressCallback, isolated)
       }
     })
   }
@@ -289,39 +258,7 @@ class DrillEngine {
       initialProgressMessage: 'Initializing partial restore drill...',
       totalSteps: 5,
       executeDrill: async (progressCallback) => {
-        progressCallback?.({
-          current: 3,
-          total: 5,
-          message: 'Executing partial restore...'
-        })
-
-        const startTime = Date.now()
-
-        if (isolated) {
-          await this.executeIsolatedRestore(backupId, progressCallback, true)
-        } else {
-          const restoreResult = await this.backupEngine.restoreBackup(backupId, (progress) => {
-            progressCallback?.({
-              current: Math.floor((progress.current / progress.total) * 5),
-              total: 5,
-              message: `Partial restore: ${progress.message}`
-            })
-          })
-
-          if (!restoreResult.success) {
-            throw new Error(`Restore failed: ${restoreResult.errors.join(', ')}`)
-          }
-        }
-
-        const duration = Date.now() - startTime
-
-        return {
-          restoreDuration: duration,
-          integrityCheckPassed: true,
-          dataLossDetected: false,
-          itemsRestored: 0,
-          checksumValid: true
-        }
+        return await DrillExecutor.executePartialRestore(backupId, progressCallback, isolated)
       }
     })
   }
@@ -337,15 +274,7 @@ class DrillEngine {
       initialProgressMessage: 'Initializing integrity check drill...',
       totalSteps: 3,
       executeDrill: async () => {
-        const duration = 0
-
-        return {
-          restoreDuration: duration,
-          integrityCheckPassed: true,
-          dataLossDetected: false,
-          itemsRestored: 0,
-          checksumValid: true
-        }
+        return await DrillExecutor.executeIntegrityCheck(backupId, onProgress)
       }
     })
   }
@@ -465,30 +394,6 @@ class DrillEngine {
 
     drill.notificationSent = true
     await this.saveDrill(drill)
-  }
-
-  private async executeIsolatedRestore(
-    backupId: string,
-    onProgress?: DrillProgressCallback,
-    partial: boolean = false
-  ): Promise<void> {
-    apmManager.addBreadcrumb(`Starting isolated ${partial ? 'partial' : 'full'} restore`, 'drill', 'info')
-
-    const metadata = await this.backupEngine.getBackupMetadataById(backupId)
-
-    if (!metadata) {
-      throw new Error(`Backup ${backupId} not found`)
-    }
-
-    onProgress?.({
-      current: 3,
-      total: 5,
-      message: 'Simulating isolated restore...'
-    })
-
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    apmManager.addBreadcrumb('Isolated restore completed', 'drill', 'info')
   }
 
   private async saveDrill(drill: BackupDrill): Promise<void> {

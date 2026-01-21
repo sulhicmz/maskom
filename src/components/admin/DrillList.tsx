@@ -104,14 +104,15 @@ const DrillRow = memo(({ drill, onRunDrill, onCancelDrill, onViewResults }: Dril
         </StatusBadge>
       </td>
       <td>
-        <div className="d-flex gap-1">
+        <div className="d-flex gap-1" role="group" aria-label="Drill actions">
           {drill.status === DrillStatus.SCHEDULED && (
             <button
               className="btn btn-sm btn-danger"
               onClick={() => onCancelDrill(drill.id)}
               title="Batalkan Latihan"
+              aria-label={`Batalkan latihan ${drill.id}`}
             >
-              <i className="bi bi-x-circle"></i>
+              <i className="bi bi-x-circle" aria-hidden="true"></i>
             </button>
           )}
           {hasResults && drill.results && (
@@ -119,8 +120,9 @@ const DrillRow = memo(({ drill, onRunDrill, onCancelDrill, onViewResults }: Dril
               className="btn btn-sm btn-info"
               onClick={() => onViewResults(drill.id)}
               title="Lihat Hasil"
+              aria-label={`Lihat hasil latihan ${drill.id}`}
             >
-              <i className="bi bi-file-text"></i>
+              <i className="bi bi-file-text" aria-hidden="true"></i>
             </button>
           )}
           {drill.status === DrillStatus.PASSED && (
@@ -128,8 +130,9 @@ const DrillRow = memo(({ drill, onRunDrill, onCancelDrill, onViewResults }: Dril
               className="btn btn-sm btn-success"
               onClick={() => onRunDrill(drill.id, drill.backupId, drill.drillType)}
               title="Jalankan Ulang"
+              aria-label={`Jalankan ulang latihan ${drill.id}`}
             >
-              <i className="bi bi-arrow-repeat"></i>
+              <i className="bi bi-arrow-repeat" aria-hidden="true"></i>
             </button>
           )}
         </div>
