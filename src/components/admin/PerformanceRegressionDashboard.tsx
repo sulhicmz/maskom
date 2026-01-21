@@ -6,51 +6,206 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  establishBaseline,
+  checkForRegressions,
+  WebVitalMetric,
+  PerformanceBaseline,
+  RegressionAlert
+} from '@/utils/performanceRegressionDetection';
+import {
+  loadFromLocalStorage,
+  getWebVitalsEntries
+} from '@/utils/webVitals';
+import apmManager from '@/utils/apm';
 
-interface RegressionAlert {
-  id: string;
-  metric: string;
-  currentValue: number;
-  baselineValue: number;
-  degradation: number;
-  statisticalSignificance: boolean;
-  detectedAt: string;
-  severity: 'low' | 'medium' | 'high';
-  status: 'active' | 'acknowledged' | 'resolved';
-}
+const REGRESSION_ALERTS_KEY = 'regression_alerts'
+const BASELINES_KEY = 'performance_baselines'
 
-interface PerformanceDashboardProps {
-  alerts: RegressionAlert[];
-  onAcknowledge: (id: string) => void;
-  onResolve: (id: string) => void;
-}
-
-function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: PerformanceDashboardProps) {
+function PerformanceRegressionDashboard() {
+  const { theme } = useTheme();
+  const [alerts, setAlerts] = useState<RegressionAlert[]>([]);
+  const [baselines, setBaselines] = useState<Map<WebVitalMetric, PerformanceBaseline>>(new Map());
   const [filter, setFilter] = useState<'all' | 'active' | 'acknowledged' | 'resolved'>('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [loading, setLoading] = useState(true);
 
-  // Filter alerts
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    setLoading(true);
+    
+    const webVitalsEntries = loadFromLocalStorage();
+    
+    const storedAlerts = localStorage.getItem(REGRESSION_ALERTS_KEY);
+    const storedBaselines = localStorage.getItem(BASELINES_KEY);
+    
+    let loadedAlerts: RegressionAlert[] = [];
+    let loadedBaselines: Map<WebVitalMetric, PerformanceBaseline> = new Map();
+    
+    if (storedAlerts) {
+      try {
+        loadedAlerts = JSON.parse(storedAlerts);
+      } catch (error) {
+        console.error('Failed to parse stored alerts:', error);
+      }
+    }
+    
+    if (storedBaselines) {
+      try {
+        const baselinesData = JSON.parse(storedBaselines);
+        for (const baseline of baselinesData) {
+          loadedBaselines.set(baseline.metric as WebVitalMetric, baseline);
+        }
+      } catch (error) {
+        console.error('Failed to parse stored baselines:', error);
+      }
+    }
+    
+    if (webVitalsEntries.length >= 10 && loadedBaselines.size === 0) {
+      const samplesByMetric = groupSamplesByMetric(webVitalsEntries);
+      for (const [metric, samples] of samplesByMetric.entries()) {
+        if (samples.length >= 10) {
+          const baseline = establishBaseline(metric, samples);
+          loadedBaselines.set(metric, baseline);
+        }
+      }
+      saveBaselines(loadedBaselines);
+    }
+    
+    if (loadedBaselines.size > 0) {
+      const samplesByMetric = groupSamplesByMetric(webVitalsEntries);
+      const newAlerts = checkForRegressions(samplesByMetric, loadedBaselines);
+      
+      const existingAlertIds = new Set(loadedAlerts.map(a => a.id));
+      for (const alert of newAlerts) {
+        if (!existingAlertIds.has(alert.id)) {
+          loadedAlerts.push(alert);
+          sendAPMAlert(alert);
+        }
+      }
+      
+      saveAlerts(loadedAlerts);
+    }
+    
+    setAlerts(loadedAlerts);
+    setBaselines(loadedBaselines);
+    setLoading(false);
+  };
+
+  const groupSamplesByMetric = (entries: any[]): Map<WebVitalMetric, any[]> => {
+    const map = new Map<WebVitalMetric, any[]>();
+    
+    for (const entry of entries) {
+      const metricName = entry.metric.toUpperCase() as WebVitalMetric;
+      if (!map.has(metricName)) {
+        map.set(metricName, []);
+      }
+      map.get(metricName)!.push({
+        metric: metricName,
+        value: entry.value,
+        timestamp: new Date(entry.timestamp).getTime()
+      });
+    }
+    
+    return map;
+  };
+
+  const sendAPMAlert = (alert: RegressionAlert) => {
+    apmManager.captureError({
+      message: `Performance regression detected for ${alert.metric}`,
+      level: 'error',
+      tags: {
+        component: 'PerformanceRegressionDetection',
+        metric: alert.metric,
+        severity: alert.severity,
+        degradation: `${alert.degradation.toFixed(1)}%`
+      },
+      extra: {
+        alertId: alert.id,
+        currentValue: alert.currentValue,
+        baselineValue: alert.baselineValue
+      }
+    });
+  };
+
+  const saveAlerts = (alerts: RegressionAlert[]) => {
+    try {
+      localStorage.setItem(REGRESSION_ALERTS_KEY, JSON.stringify(alerts));
+    } catch (error) {
+      console.error('Failed to save alerts:', error);
+    }
+  };
+
+  const saveBaselines = (baselines: Map<WebVitalMetric, PerformanceBaseline>) => {
+    try {
+      const baselinesArray = Array.from(baselines.values());
+      localStorage.setItem(BASELINES_KEY, JSON.stringify(baselinesArray));
+    } catch (error) {
+      console.error('Failed to save baselines:', error);
+    }
+  };
+
+  const handleAcknowledge = (id: string) => {
+    const updatedAlerts = alerts.map(alert =>
+      alert.id === id ? { ...alert, status: 'acknowledged' as const } : alert
+    );
+    setAlerts(updatedAlerts);
+    saveAlerts(updatedAlerts);
+  };
+
+  const handleResolve = (id: string) => {
+    const updatedAlerts = alerts.map(alert =>
+      alert.id === id ? { ...alert, status: 'resolved' as const } : alert
+    );
+    setAlerts(updatedAlerts);
+    saveAlerts(updatedAlerts);
+  };
+
+  const handleResetBaselines = () => {
+    if (confirm('Apakah Anda yakin ingin mereset semua baseline performa?')) {
+      localStorage.removeItem(BASELINES_KEY);
+      localStorage.removeItem(REGRESSION_ALERTS_KEY);
+      setBaselines(new Map());
+      setAlerts([]);
+      loadData();
+    }
+  };
+
   const filteredAlerts = alerts.filter(alert => {
     const matchesStatus = filter === 'all' || alert.status === filter;
     const matchesSeverity = severityFilter === 'all' || alert.severity === severityFilter;
     return matchesStatus && matchesSeverity;
   });
 
-  // Sort by severity and detectedAt (high first, then most recent)
   const sortedAlerts = [...filteredAlerts].sort((a, b) => {
     const severityOrder = { high: 0, medium: 1, low: 2 };
     const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
     if (severityDiff !== 0) return severityDiff;
-    return new Date(b.detectedAt).getTime() - new Date(a.detectedAt).getTime();
+    return b.detectedAt - a.detectedAt;
   });
 
-  // Calculate statistics
   const activeAlerts = alerts.filter(a => a.status === 'active');
   const highSeverityAlerts = activeAlerts.filter(a => a.severity === 'high').length;
   const avgDegradation = activeAlerts.length > 0
     ? activeAlerts.reduce((sum, a) => sum + a.degradation, 0) / activeAlerts.length
     : 0;
+
+  const getMetricDisplayName = (metric: string): string => {
+    const names: Record<string, string> = {
+      'LCP': 'Largest Contentful Paint (LCP)',
+      'FID': 'First Input Delay (FID)',
+      'CLS': 'Cumulative Layout Shift (CLS)',
+      'FCP': 'First Contentful Paint (FCP)',
+      'TTFB': 'Time to First Byte (TTFB)',
+      'INP': 'Interaction to Next Paint (INP)'
+    };
+    return names[metric] || metric;
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -78,6 +233,19 @@ function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: Pe
       default: return 'bg-secondary';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container mt-4">
+        <div className="text-center py-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Memuat...</span>
+          </div>
+          <p className="mt-3">Memuat data deteksi regresi...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-4">
@@ -129,6 +297,40 @@ function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: Pe
             </div>
           </div>
 
+          {/* Trend Visualization */}
+          {activeAlerts.length > 0 && (
+            <div className="card mb-4">
+              <div className="card-body">
+                <h5 className="card-title mb-3">Trend Degradasi Aktif</h5>
+                {activeAlerts.slice(0, 5).map(alert => (
+                  <div key={alert.id} className="mb-3">
+                    <div className="d-flex justify-content-between mb-1">
+                      <span>{getMetricDisplayName(alert.metric)}</span>
+                      <span className={`fw-bold ${getSeverityColor(alert.severity)}`}>
+                        {alert.degradation.toFixed(1)}%
+                      </span>
+                    </div>
+                    <div className="progress" style={{ height: '10px' }}>
+                      <div
+                        className={`progress-bar ${
+                          alert.severity === 'high' ? 'bg-danger' :
+                          alert.severity === 'medium' ? 'bg-warning' : 'bg-info'
+                        }`}
+                        role="progressbar"
+                        style={{ width: `${Math.min(alert.degradation, 100)}%` }}
+                        aria-valuenow={alert.degradation}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      >
+                        {alert.severity.toUpperCase()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+ 
           {/* Filters */}
           <div className="card mb-4">
             <div className="card-body">
@@ -163,6 +365,28 @@ function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: Pe
             </div>
           </div>
 
+          {/* Baseline Status */}
+          <div className="card mb-4">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h5 className="card-title mb-1">Status Baseline</h5>
+                  <p className={`mb-0 ${baselines.size > 0 ? 'text-success' : 'text-muted'}`}>
+                    {baselines.size > 0 
+                      ? `${baselines.size} metrik memiliki baseline terdefinisi`
+                      : 'Baseline belum terdefinisi (memerlukan minimal 10 sampel)'
+                    }
+                  </p>
+                </div>
+                {baselines.size > 0 && (
+                  <button className="btn btn-outline-danger" onClick={handleResetBaselines}>
+                    Reset Baseline
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Alerts List */}
           {sortedAlerts.length === 0 ? (
             <div className="alert alert-success">
@@ -181,7 +405,7 @@ function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: Pe
                   <div className="d-flex w-100 justify-content-between align-items-start">
                     <div className="flex-grow-1">
                       <h5 className="mb-1">
-                        {alert.metric}
+                        {getMetricDisplayName(alert.metric)}
                         <span className={`badge ${getSeverityBadge(alert.severity)} ms-2`}>
                           {alert.severity.toUpperCase()}
                         </span>
@@ -205,13 +429,13 @@ function PerformanceRegressionDashboard({ alerts, onAcknowledge, onResolve }: Pe
                       <div className="btn-group-vertical">
                         <button
                           className="btn btn-sm btn-warning mb-1"
-                          onClick={() => onAcknowledge(alert.id)}
+                          onClick={() => handleAcknowledge(alert.id)}
                         >
                           Akui
                         </button>
                         <button
                           className="btn btn-sm btn-success"
-                          onClick={() => onResolve(alert.id)}
+                          onClick={() => handleResolve(alert.id)}
                         >
                           Selesaikan
                         </button>
