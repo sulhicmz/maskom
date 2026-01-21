@@ -21,6 +21,14 @@ jest.mock('@/utils/mfa/totp', () => {
   };
 });
 
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    url: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=mock-qr-data'
+  } as Response)
+);
+
 describe('AuthService MFA Methods', () => {
 
   afterEach(() => {

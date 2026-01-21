@@ -25,6 +25,11 @@ export const CIRCUIT_BREAKER_CONFIG = {
             resetTimeoutMs: 30000,
             monitoringPeriodMs: 60000
         }
+    },
+    QR_CODE_API: {
+        failureThreshold: 3,
+        resetTimeoutMs: 60000,
+        monitoringPeriodMs: 60000
     }
 } as const;
 

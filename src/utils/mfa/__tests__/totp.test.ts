@@ -13,10 +13,22 @@ import {
   TOTP_WINDOW,
 } from '../totp';
 import type { TOTPVerificationOptions } from '@/types/mfa';
+import { API_ENDPOINTS } from '@/constants';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
+
+jest.mock('@/utils/resilience/circuitBreaker', () => ({
+  CircuitBreaker: jest.fn().mockImplementation(() => ({
+    execute: jest.fn(async (operation) => await operation())
+  }))
+}));
 
 jest.mock('@/utils/uuid', () => ({
   generateUUID: jest.fn(() => 'mock-uuid-12345'),
 }));
+
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 describe('TOTP Utilities', () => {
   describe('generateSecret', () => {
@@ -105,34 +117,42 @@ describe('TOTP Utilities', () => {
   });
 
   describe('generateTOTPQRCode', () => {
-    test('should generate valid QR code URL', () => {
-      const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret, 'TestIssuer', 'test@example.com');
+    beforeEach(() => {
+      mockFetch.mockClear();
+      mockFetch.mockResolvedValue({
+        ok: true,
+        url: `${API_ENDPOINTS.QR_CODE_API}?size=200x200&data=otpauth%3A%2F%2Ftotp%2FTestIssuer%3Atest%40example.com`
+      });
+    });
 
-      expect(qrCodeUrl).toContain('https://api.qrserver.com/v1/create-qr-code/');
+    test('should generate valid QR code URL', async () => {
+      const secret = 'JBSWY3DPEHPK3PXP';
+      const qrCodeUrl = await generateTOTPQRCode(secret, 'TestIssuer', 'test@example.com');
+
+      expect(qrCodeUrl).toContain(API_ENDPOINTS.QR_CODE_API);
       expect(qrCodeUrl).toContain('size=200x200');
       expect(qrCodeUrl).toContain('otpauth%3A%2F%2Ftotp%2FTestIssuer%3Atest%40example.com');
       expect(qrCodeUrl).toContain(`secret%3D${secret}`);
       expect(qrCodeUrl).toContain('issuer%3DTestIssuer');
     });
 
-    test('should generate QR code URL with default issuer', () => {
+    test('should generate QR code URL with default issuer', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret);
+      const qrCodeUrl = await generateTOTPQRCode(secret);
 
       expect(qrCodeUrl).toContain('issuer%3DMaskom');
     });
 
-    test('should generate QR code URL with default account name', () => {
+    test('should generate QR code URL with default account name', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret);
+      const qrCodeUrl = await generateTOTPQRCode(secret);
 
       expect(qrCodeUrl).toContain('Maskom%3Auser');
     });
 
-    test('should include TOTP digits and period in QR code', () => {
+    test('should include TOTP digits and period in QR code', async () => {
       const secret = 'JBSWY3DPEHPK3PXP';
-      const qrCodeUrl = generateTOTPQRCode(secret);
+      const qrCodeUrl = await generateTOTPQRCode(secret);
       
       expect(qrCodeUrl).toContain(`digits%3D${TOTP_DIGITS}`);
       expect(qrCodeUrl).toContain(`period%3D${TOTP_PERIOD}`);
@@ -223,8 +243,8 @@ describe('TOTP Utilities', () => {
 
     test('should generate valid QR code URL in setup data', async () => {
       const setupData = await createMFASetupData();
-      
-      expect(setupData.qrCodeUrl).toContain('https://api.qrserver.com/v1/create-qr-code/');
+
+      expect(setupData.qrCodeUrl).toContain(API_ENDPOINTS.QR_CODE_API);
       expect(setupData.qrCodeUrl).toContain('otpauth%3A%2F%2Ftotp%2F');
     });
 
