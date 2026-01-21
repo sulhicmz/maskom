@@ -1,5 +1,111 @@
 # Architecture Task Tracking
 
+## Task 367: [PRINCIPAL ARCHITECT] Fix Test Infrastructure - MFA Tests (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: Test Infrastructure - Build Unblocking
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Fix 20 failing MFA tests that were blocking the build due to Jest test environment limitation (`fetch` API not available), enabling production deployment.
+
+### Problem Identified
+
+**Jest Environment Limitation**:
+- MFA tests in `mfa.test.ts` were failing due to `createMFASetupData` using `fetch` API
+- Jest test environment doesn't provide `fetch` API by default
+- `initiateMFASetup()` was failing with error "fetch is not defined"
+- `enableMFA()` depends on successful `initiateMFASetup()` call
+- Without MFA setup, login tests couldn't verify MFA functionality (mfaEnabled always false)
+- **Build blocked**: Build script `"npm test && next build"` requires all tests to pass
+- **20 tests failing**: All MFA-related tests blocked by fetch issue
+
+### Why This Matters
+
+1. **Build Must Pass**: Failing build blocks production deployment and releases
+2. **Test Reliability**: Tests must pass in all environments
+3. **CI/CD Pipeline**: Automated builds require passing tests
+4. **Production Deployment**: Cannot deploy without passing test suite
+5. **Feature Verification**: MFA functionality can't be verified without passing tests
+6. **Risk Reduction**: Untested security features increase deployment risk
+
+### Solution
+
+**Add Minimal Fetch Mock for Jest Environment**:
+
+Added global fetch mock to MFA test file that returns a valid mock Response object:
+
+```javascript
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    url: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=mock-qr-data'
+  } as Response)
+);
+```
+
+**Benefits**:
+1. **Test Isolation**: Tests run independently without external API dependencies
+2. **Fast Execution**: No network calls during test execution
+3. **Deterministic Results**: Mock returns consistent response every time
+4. **Minimal Code**: 7-line mock vs complex external API mocking
+5. **Build Passes**: All 5167 tests now pass (was 5147 before fix)
+
+### Implementation
+
+- [x] Added global.fetch mock to mfa.test.ts file
+- [x] Mock returns Promise with proper Response type (ok, status, url)
+- [x] Verified all 35 MFA tests now pass (100% success rate)
+- [x] Verified full test suite passes (5167/5167 passing)
+- [x] Verified lint passes (0 errors, 1 pre-existing warning)
+- [x] Committed changes with descriptive message
+- [x] Verified build ready (all tests passing)
+
+### Success Criteria
+
+- [x] All 35 MFA tests now pass (0 failures)
+- [x] Full test suite passes (5167/5167 = 100%)
+- [x] Lint passes (0 errors, 1 pre-existing warning)
+- [x] Build unblocked (test suite can now run successfully)
+- [x] MFA functionality verified through tests
+- [x] Zero regressions in existing tests (5132 existing tests still pass)
+
+### Related Files
+
+- ✅ Modified: `src/services/auth/__tests__/mfa.test.ts` - Added global fetch mock (8 insertions)
+
+### Implementation Summary
+
+**Files Modified**: 1 file
+**Lines Added**: 8 lines
+**Tests Fixed**: 20 MFA tests (all now passing)
+**Test Pass Rate**: 5147 → 5167 (100% improvement for MFA tests)
+
+**Key Features**:
+1. **Test Infrastructure Fix**: Jest environment compatibility restored
+2. **Build Unblocked**: Production build can now proceed
+3. **Minimal Mock**: 7-line fetch mock vs complex API mocking
+4. **Type Safety**: Proper Response type with required fields
+5. **Feature Verification**: MFA functionality fully tested
+
+### Notes
+
+- This was a **Test Infrastructure** issue, not an **Architectural** issue
+- Root cause: Jest test environment doesn't provide `fetch` API by default
+- Solution is minimal and non-invasive (only adds mock to test file)
+- No changes to production AuthService code or MFA implementation
+- The fetch mock provides enough structure for `createMFASetupData` to work
+- Alternative approaches would require extensive refactoring or integration test environment setup
+
+### Related Tasks
+
+- None - This was blocking build, not a scheduled task
+
+---
+
 ## Task 366: [INTEGRATION ENGINEER] Integration Hardening - TOTP QR Code API (Jan 20, 2026)
 
 **Status**: ✅ Completed
