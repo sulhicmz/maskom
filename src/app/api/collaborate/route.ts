@@ -3,53 +3,33 @@ import { sessionManager } from '@/utils/collaboration/sessionManager'
 import { CollaborativeEvent } from '@/types/collaboration'
 import { strictRateLimiter, getClientIdentifier } from '@/utils/rateLimit'
 import { sanitizeString } from '@/utils/sanitize'
+import {
+  CollaborationRequestSchema,
+  type JoinRequest,
+  type LeaveRequest,
+  type CursorUpdateRequest,
+  type EditRequest,
+  type CommentRequest
+} from '@/utils/collaboration/validation'
+import { z } from 'zod'
 
 const MAX_EVENTS_PER_POLL = 50
+
+const PollQuerySchema = z.object({
+  sessionId: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/),
+  userId: z.string().transform(val => parseInt(val, 10)).pipe(
+    z.number().int().positive().max(Number.MAX_SAFE_INTEGER)
+  ),
+  username: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/),
+  lastEventId: z.string().optional()
+})
 
 interface PollResponse {
   success: boolean
   events: CollaborativeEvent[]
   sessionActive: boolean
   error?: string
-}
-
-interface JoinRequest {
-  postId: number
-  userId: number
-  username: string
-}
-
-interface LeaveRequest {
-  sessionId: string
-  userId: number
-}
-
-interface CursorUpdateRequest {
-  sessionId: string
-  userId: number
-  cursorPosition: { line: number; column: number }
-  selection?: { start: { line: number; column: number }; end: { line: number; column: number } }
-}
-
-interface EditRequest {
-  sessionId: string
-  userId: number
-  editOperation: {
-    type: 'insert' | 'delete' | 'replace'
-    position: { line: number; column: number }
-    content?: string
-    length?: number
-  }
-}
-
-interface CommentRequest {
-  sessionId: string
-  userId: number
-  username: string
-  comment: {
-    content: string
-    position: { line: number; column: number }
-  }
+  details?: unknown
 }
 
 const eventBuffer = new Map<string, CollaborativeEvent[]>()
@@ -90,17 +70,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const searchParams = request.nextUrl.searchParams
-    const sessionId = sanitizeString(searchParams.get('sessionId') || '')
-    const userId = parseInt(searchParams.get('userId') || '0')
-    const username = sanitizeString(searchParams.get('username') || '')
-    const lastEventId = searchParams.get('lastEventId') || undefined
+    const queryParams = {
+      sessionId: searchParams.get('sessionId') || '',
+      userId: searchParams.get('userId') || '0',
+      username: searchParams.get('username') || '',
+      lastEventId: searchParams.get('lastEventId')
+    }
 
-    if (!sessionId || !userId || !username) {
+    const validationResult = PollQuerySchema.safeParse(queryParams)
+
+    if (!validationResult.success) {
       return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: 'Missing required parameters' },
+        { success: false, events: [], sessionActive: false, error: 'Invalid query parameters', details: validationResult.error.issues },
         { status: 400 }
       )
     }
+
+    const { sessionId, lastEventId } = validationResult.data
 
     const session = sessionManager.getSession(sessionId)
 
@@ -148,24 +134,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json()
-    const action = sanitizeString(body.action || '')
 
-    switch (action) {
+    const validationResult = CollaborationRequestSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid request data', details: validationResult.error.issues },
+        { status: 400 }
+      )
+    }
+
+    const validatedRequest = validationResult.data
+
+    switch (validatedRequest.action) {
       case 'join':
-        return handleJoin(body as JoinRequest)
+        return handleJoin(validatedRequest)
       case 'leave':
-        return handleLeave(body as LeaveRequest)
+        return handleLeave(validatedRequest)
       case 'cursor_update':
-        return handleCursorUpdate(body as CursorUpdateRequest)
+        return handleCursorUpdate(validatedRequest)
       case 'edit':
-        return handleEdit(body as EditRequest)
+        return handleEdit(validatedRequest)
       case 'comment':
-        return handleComment(body as CommentRequest)
-      default:
-        return NextResponse.json(
-          { success: false, error: 'Invalid action' },
-          { status: 400 }
-        )
+        return handleComment(validatedRequest)
     }
   } catch (error) {
     console.error('Error in collaboration API:', error)

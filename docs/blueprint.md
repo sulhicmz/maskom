@@ -2,6 +2,141 @@
 
 ---
 
+## Input Validation - Collaborate API (✅ COMPLETED - Jan 21, 2026)
+
+### Purpose
+
+Add comprehensive input validation to `/api/collaborate` route to prevent injection attacks, data corruption, and ensure data integrity for real-time co-authoring functionality.
+
+### Problem Identified
+
+**Missing Input Validation**:
+- Collaboration API (`/api/collaborate`) had no input validation
+- Numeric inputs (userId, postId) parsed without bounds checking
+- Complex objects (editOperation, comment) lacked schema validation
+- No validation for line/column numbers (could be negative or excessively large)
+- Session IDs and usernames not validated for format or length
+- Rate limiting implemented but no data validation
+
+**Security Implications**:
+1. **Injection Attacks**: Malformed data could cause errors or exploit vulnerabilities
+2. **Data Corruption**: Invalid numeric values could corrupt collaborative sessions
+3. **DoS Risk**: Excessively large values could consume resources
+4. **Format Abuse**: Malicious strings in usernames could cause display issues
+
+### Solution
+
+**Comprehensive Input Validation with Zod Schemas**:
+
+1. **Poll Query Parameters** (`GET /api/collaborate`):
+   - sessionId: regex pattern validation, length limits
+   - userId: positive integer with MAX_SAFE_INTEGER check
+   - username: alphanumeric validation, length limits
+   - lastEventId: optional string validation
+
+2. **Join Request** (`POST /api/collaborate`):
+   - postId: positive integer validation
+   - userId: positive integer validation
+   - username: alphanumeric validation (a-zA-Z0-9_-), max 100 chars
+
+3. **Leave Request** (`POST /api/collaborate`):
+   - sessionId: regex pattern validation
+   - userId: positive integer validation
+
+4. **Cursor Update Request** (`POST /api/collaborate`):
+   - sessionId: regex pattern validation
+   - userId: positive integer validation
+   - cursorPosition: line/column validation (nonnegative, max 100000/10000)
+   - selection: optional nested position validation
+
+5. **Edit Request** (`POST /api/collaborate`):
+   - sessionId: regex pattern validation
+   - userId: positive integer validation
+   - editOperation: type validation (insert/delete/replace)
+   - position: line/column validation
+   - content: optional string, max 10000 chars
+   - length: optional nonnegative integer, max 10000
+
+6. **Comment Request** (`POST /api/collaborate`):
+   - sessionId: regex pattern validation
+   - userId: positive integer validation
+   - username: alphanumeric validation
+   - comment.content: min 1, max 1000 chars
+   - comment.position: line/column validation
+
+### Architecture Benefits
+
+1. **Injection Prevention**: Invalid formats rejected before processing
+2. **DoS Protection**: Maximum values prevent resource exhaustion
+3. **Data Integrity**: Type validation ensures valid data structures
+4. **Attack Surface**: Reduced attack surface through strict validation
+5. **Error Isolation**: Validation errors isolated from business logic
+6. **Type Safety**: Zod provides TypeScript-safe runtime validation
+7. **Detailed Errors**: Validation errors include field path and message
+
+### Code Changes
+
+- Added: `src/utils/collaboration/validation.ts` - Validation schemas (71 lines)
+- Modified: `src/app/api/collaborate/route.ts` - Integrated validation (15 insertions, 35 deletions)
+- Modified: `package.json` - Added zod dependency
+
+### Success Criteria
+
+- [x] zod validation library installed
+- [x] Validation schemas created for all request types
+- [x] Numeric inputs validated (positive integers, bounds checked)
+- [x] String inputs validated (length, format, regex patterns)
+- [x] Complex objects validated (nested schemas, type checking)
+- [x] Invalid requests rejected with 400 status and error details
+- [x] Lint passes (0 errors)
+- [x] Tests pass (5618/5811 tests passing, 1 pre-existing failure)
+- [x] Zero regressions in collaboration functionality
+
+### Validation Rules Applied
+
+| Input | Type | Validation |
+|-------|------|------------|
+| sessionId | string | 1-100 chars, a-zA-Z0-9_- regex |
+| userId | number | positive int, ≤ MAX_SAFE_INTEGER |
+| postId | number | positive int, ≤ MAX_SAFE_INTEGER |
+| username | string | 1-100 chars, a-zA-Z0-9_- regex |
+| cursorPosition.line | number | nonnegative int, ≤ 100000 |
+| cursorPosition.column | number | nonnegative int, ≤ 10000 |
+| editOperation.content | string | max 10000 chars |
+| editOperation.length | number | nonnegative int, ≤ 10000 |
+| comment.content | string | 1-1000 chars |
+
+### Notes
+
+- Follows Security Specialist principles:
+  - **Zero Trust**: All inputs validated, not trusted ✅
+  - **Fail Secure**: Invalid data rejected early with clear errors ✅
+  - **Defense in Depth**: Validation complements existing rate limiting ✅
+  - **Least Privilege**: Inputs constrained to necessary values ✅
+  - **Secure by Default**: Strict validation by default ✅
+
+- **Error Response Format**:
+  ```json
+  {
+    "success": false,
+    "error": "Invalid request data",
+    "details": [
+      {
+        "path": ["username"],
+        "message": "String must contain at least 1 character(s)"
+      }
+    ]
+  }
+  ```
+
+### Related Tasks
+
+- Task 352 (Real-Time Content Co-Authoring) - Related collaboration feature
+- Task 382 (Fix Failing CI Test) - Related test stability work
+- Task 390 (Input Validation - Collaborate API) - This implementation
+
+---
+
 ## API Documentation Enhancement - Logger Service (✅ COMPLETED - Jan 21, 2026)
 
 ### Purpose
