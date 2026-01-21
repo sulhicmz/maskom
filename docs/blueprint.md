@@ -2,6 +2,111 @@
 
 ---
 
+## API Documentation Enhancement - Logger Service (✅ COMPLETED - Jan 21, 2026)
+
+### Purpose
+
+Update API.md documentation to include missing `logServiceInfo` function and enhance logger documentation section with detailed descriptions and best practices.
+
+### Problem Identified
+
+**Missing API Documentation**:
+- `logServiceInfo` function was exported from `src/services/common/logger.ts` but not documented in `docs/api.md`
+- The function is actively used in production code (recent commit 9e94cbe replaced console.log with logServiceInfo)
+- Logger documentation lacked detailed descriptions for each function
+- No best practices documented for logging usage
+- Developers had to refer to source code to understand logger API
+
+### Solution
+
+**Enhanced API Documentation**:
+1. Added `logServiceInfo` function to logger documentation
+2. Added detailed descriptions for all 4 logging functions (error, success, warning, info)
+3. Documented LoggerOptions interface with all fields
+4. Added best practices section with 4 guidelines
+5. Updated example to show `logServiceInfo` usage
+6. Added appropriate use cases for each logging function
+
+### Documentation Structure
+
+**Functions Documented**:
+1. **logServiceError** - Logs error with service name, operation, and error details
+2. **logServiceSuccess** - Logs successful operation completion with optional duration
+3. **logServiceWarning** - Logs warning messages for non-critical issues
+4. **logServiceInfo** - Logs informational messages about operation progress
+
+**LoggerOptions Interface**:
+```typescript
+interface LoggerOptions {
+    service: string;           // Service name (e.g., 'EmailService', 'AuthService')
+    operation: string;          // Operation name (e.g., 'sendEmail', 'login')
+    includeDetails?: boolean;   // Include error details in logs (default: false)
+}
+```
+
+**Best Practices Added**:
+1. Always use structured logging (service/operation format)
+2. Track operation duration in `logServiceSuccess`
+3. Include details sparingly (set `includeDetails: true` only for debugging)
+4. Log at appropriate levels (info for progress, success for completion, warning for non-critical issues, error for failures)
+
+### Documentation Benefits
+
+1. **Developer Experience**: Complete documentation for all logger functions ✅
+2. **Consistency**: Best practices ensure consistent logging patterns ✅
+3. **Code Quality**: Documentation helps developers follow logging standards ✅
+4. **Maintainability**: Documentation keeps teams aligned on logging usage ✅
+5. **Single Source of Truth**: Documentation matches implementation ✅
+
+### Code Changes
+
+- Modified: `docs/api.md` - Enhanced logger documentation (50+ lines added)
+
+### Success Criteria
+
+- [x] `logServiceInfo` function documented in docs/api.md
+- [x] All 4 logging functions have detailed descriptions
+- [x] LoggerOptions interface documented
+- [x] Best practices section added with 4 guidelines
+- [x] Example updated to show `logServiceInfo` usage
+- [x] Documentation matches source code implementation
+- [x] Lint passes (0 errors)
+
+### Implementation Summary
+
+**Files Modified**: 1 file
+**Lines Added**: ~50 lines
+**Functions Documented**: 4 logging functions (error, success, warning, info)
+**Best Practices**: 4 guidelines documented
+
+**Key Features**:
+1. **Complete Documentation**: All 4 logger functions now documented
+2. **Detailed Descriptions**: Each function has clear purpose and use case
+3. **Interface Documentation**: LoggerOptions interface fully documented
+4. **Best Practices**: 4 guidelines for proper logging usage
+5. **Updated Examples**: Complete logging workflow demonstrated
+
+### Notes
+
+- Follows Technical Writer principles:
+  - **Single Source of Truth**: Documentation matches implementation ✅
+  - **Audience Awareness**: Written for developers who use service layer ✅
+  - **Clarity Over Completeness**: Clear function descriptions with practical examples ✅
+  - **Actionable Content**: Enables developers to use logger correctly ✅
+  - **Maintainability**: Easy to keep updated ✅
+  - **Progressive Disclosure**: Simple overview, depth when needed ✅
+
+- **Before vs After**:
+  - **Before**: Missing `logServiceInfo`, basic signatures only, no best practices
+  - **After**: Complete documentation, detailed descriptions, best practices, comprehensive examples
+
+### Related Tasks
+
+- Task 387 (CI Health Check) - Related code quality verification
+- Task 380 (React.memo Optimization) - Related logger usage in optimized code
+
+---
+
 ## Accessibility Fix - ARIA Labels for Icon-Only Buttons (✅ COMPLETED - Jan 21, 2026)
 
 ### Purpose

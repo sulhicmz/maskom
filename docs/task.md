@@ -1,5 +1,99 @@
 # Architecture Task Tracking
 
+## Task 388: [TECHNICAL WRITER] API Documentation Enhancement - Logger Service (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Documentation - API Documentation
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Update API.md documentation to include missing `logServiceInfo` function and enhance logger documentation section with detailed descriptions and best practices.
+
+### Problem Identified
+
+**Missing API Documentation**:
+- `logServiceInfo` function was exported from `src/services/common/logger.ts` but not documented in `docs/api.md`
+- The function is actively used in production code (recent commit 9e94cbe replaced console.log with logServiceInfo)
+- Logger documentation lacked detailed descriptions for each function
+- No best practices documented for logging usage
+- Developers had to refer to source code to understand logger API
+
+**Why This Matters**:
+1. **Developer Experience**: Missing documentation makes it harder for developers to use logger correctly
+2. **Consistency**: Incomplete docs may lead to inconsistent logging patterns across codebase
+3. **Code Quality**: Proper documentation ensures developers follow best practices
+4. **Maintainability**: Documentation keeps teams aligned on logging standards
+
+### Solution
+
+**Enhanced API Documentation**:
+1. Added `logServiceInfo` function to logger documentation
+2. Added detailed descriptions for all 4 logging functions (error, success, warning, info)
+3. Documented LoggerOptions interface with all fields
+4. Added best practices section with 4 guidelines
+5. Updated example to show `logServiceInfo` usage
+6. Added appropriate use cases for each logging function
+
+### Implementation
+
+- [x] Add `logServiceInfo` function signature to docs/api.md
+- [x] Add detailed descriptions for all 4 logging functions
+- [x] Document LoggerOptions interface (service, operation, includeDetails)
+- [x] Add best practices section (structured logging, duration tracking, details usage, appropriate levels)
+- [x] Update example to show complete logging workflow
+- [x] Verify documentation matches implementation in src/services/common/logger.ts
+
+### Success Criteria
+
+- [x] `logServiceInfo` function documented in docs/api.md
+- [x] All 4 logging functions have detailed descriptions
+- [x] LoggerOptions interface documented
+- [x] Best practices section added with 4 guidelines
+- [x] Example updated to show `logServiceInfo` usage
+- [x] Documentation matches source code implementation
+- [x] Lint passes (0 errors)
+
+### Related Files
+
+- ✅ Modified: `docs/api.md` - Enhanced logger documentation (50+ lines added)
+
+### Implementation Summary
+
+**Files Modified**: 1 file
+**Lines Added**: ~50 lines
+**Functions Documented**: 4 logging functions (error, success, warning, info)
+**Best Practices**: 4 guidelines documented
+
+**Key Features**:
+1. **Complete Documentation**: All 4 logger functions now documented
+2. **Detailed Descriptions**: Each function has clear purpose and use case
+3. **Interface Documentation**: LoggerOptions interface fully documented
+4. **Best Practices**: 4 guidelines for proper logging usage
+5. **Updated Examples**: Complete logging workflow demonstrated
+
+### Notes
+
+- Follows Technical Writer principles:
+  - **Single Source of Truth**: Documentation matches implementation ✅
+  - **Audience Awareness**: Written for developers who use service layer ✅
+  - **Clarity Over Completeness**: Clear function descriptions with practical examples ✅
+  - **Actionable Content**: Enables developers to use logger correctly ✅
+  - **Maintainability**: Easy to keep updated ✅
+  - **Progressive Disclosure**: Simple overview, depth when needed ✅
+
+- **Before vs After**:
+  - **Before**: Missing `logServiceInfo`, basic signatures only, no best practices
+  - **After**: Complete documentation, detailed descriptions, best practices, comprehensive examples
+
+### Related Tasks
+
+- Task 387 (CI Health Check) - Related code quality verification
+- Task 380 (React.memo Optimization) - Related logger usage in optimized code
+
+---
+
 ## Task 387: [DEVOPS ENGINEER] CI Health Check - Verify Green Builds (Jan 21, 2026)
 
 **Status**: ✅ Completed

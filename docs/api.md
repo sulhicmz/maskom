@@ -249,25 +249,62 @@ mapToServiceResult<T>(
 
 ### Service Logging
 
-Standardized logging utilities for consistent error handling:
+Standardized logging utilities for consistent error handling and monitoring across all services.
+
+#### Functions
+
+**logServiceError(error: unknown, options: LoggerOptions): void**
+- Logs error with service name, operation, and error details
+- Automatically extracts error codes and metadata from `ServiceException`
+- Use in catch blocks when operations fail
+
+**logServiceSuccess(service: string, operation: string, duration?: number): void**
+- Logs successful operation completion
+- Optionally includes operation duration for performance monitoring
+- Use after successful operation completion
+
+**logServiceWarning(service: string, operation: string, message: string): void**
+- Logs warning messages that don't prevent operation success
+- Use for non-critical issues or deprecation notices
+
+**logServiceInfo(service: string, operation: string, message: string): void**
+- Logs informational messages about operation progress
+- Use for tracking operation flow and debugging
+
+#### LoggerOptions Interface
 
 ```typescript
-logServiceError(error: unknown, options: { service: string; operation: string; includeDetails?: boolean }): void
-logServiceSuccess(service: string, operation: string, duration?: number): void
-logServiceWarning(service: string, operation: string, message: string): void
+interface LoggerOptions {
+    service: string;           // Service name (e.g., 'EmailService', 'AuthService')
+    operation: string;          // Operation name (e.g., 'sendEmail', 'login')
+    includeDetails?: boolean;   // Include error details in logs (default: false)
+}
 ```
 
-**Example**:
+#### Example
+
 ```typescript
-import { logServiceError, logServiceSuccess } from '@/services/common';
+import { logServiceError, logServiceSuccess, logServiceInfo } from '@/services/common';
 
 try {
+    logServiceInfo('EmailService', 'sendEmail', 'Starting email send operation');
     const result = await service.call();
     logServiceSuccess('EmailService', 'sendEmail', duration);
 } catch (error) {
     logServiceError(error, { service: 'EmailService', operation: 'sendEmail' });
 }
 ```
+
+#### Best Practices
+
+1. **Always use structured logging**: Use service/operation format for consistent logs
+2. **Track operation duration**: Include duration in `logServiceSuccess` for performance monitoring
+3. **Include details sparingly**: Set `includeDetails: true` only for debugging
+4. **Log at appropriate levels**:
+   - `logServiceInfo`: Operation start, progress tracking
+   - `logServiceSuccess`: Successful completion with timing
+   - `logServiceWarning`: Non-critical issues, retries
+   - `logServiceError`: Operation failures, exceptions
 
 ---
 
