@@ -5,14 +5,9 @@ import {
   DrillResults,
   DrillConfig,
   DrillStatistics,
-  DrillTypeStats,
   DrillFilters,
   DrillScheduleDetails,
-  DrillSchedule,
-  DrillHealthStatus,
-  DEFAULT_DRILL_CONFIG,
-  DRILL_STORAGE_KEY,
-  DRILL_DATA_KEY
+  DrillSchedule
 } from '@/types/drill'
 
 import { BackupEngine } from '@/utils/backupEngine'
