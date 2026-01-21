@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect } from '@jest/globals';
 import {
   parseSemver,
   compareVersions,
@@ -172,7 +172,7 @@ describe('generateVersionManagerConfigs', () => {
     expect(voltaConfig).toBeDefined();
     expect(voltaConfig?.configPath).toBe('package.json');
     expect(voltaConfig?.content).toContain('"volta"');
-    expect(voltaConfig?.content).toContain('node@22.0.0');
+    expect(voltaConfig?.content).toContain('"node": "22.0.0"');
   });
 
   it('should generate fnm config', () => {

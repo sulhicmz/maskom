@@ -42,3 +42,16 @@ declare module "@/assets/*" {
   const content: import("next/image").StaticImageData;
   export default content;
 }
+
+declare module "*.json" {
+  const content: {
+    name?: string;
+    version?: string;
+    engines?: {
+      node?: string;
+    };
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+  };
+  export default content;
+}

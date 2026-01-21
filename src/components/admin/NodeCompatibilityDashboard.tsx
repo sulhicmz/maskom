@@ -27,8 +27,8 @@ export default function NodeCompatibilityDashboard() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const packageJson = require('../../../../package.json');
-      const engines = packageJson.engines?.node;
+      const packageJson = await import('../../../../package.json') as { default: { engines?: { node?: string } } };
+      const engines = packageJson.default?.engines?.node;
 
       if (engines) {
         const requirement = parseEnginesField(engines);

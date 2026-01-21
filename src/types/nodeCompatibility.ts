@@ -1,10 +1,10 @@
 export type VersionStatus = 'pass' | 'warning' | 'fail';
 
 export interface NodeVersionRequirement {
-  minVersion: string;
-  maxVersion?: string;
-  requiredVersion?: string;
-}
+   minVersion?: string;
+   maxVersion?: string;
+   requiredVersion?: string;
+ }
 
 export interface NodeVersionCheckResult {
   status: VersionStatus;
