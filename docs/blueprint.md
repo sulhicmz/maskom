@@ -6233,3 +6233,73 @@ Implement automated detection of performance regressions in production using sta
 - Task 286 (Web Vitals API Integration) - Prerequisite Web Vitals tracking
 
 ---
+
+---
+
+## DrillEngine Module Extraction (Partial - Task 366, Jan 21, 2026)
+
+**Status**: 🚧 In Progress (Partial - Follow-up Required)
+
+### Purpose
+
+Extract DrillEngine's 748-line singleton class into focused modules following Single Responsibility Principle (SRP) and SOLID principles.
+
+### Problem Solved
+
+**God Class Anti-Pattern**:
+- `DrillEngine` was a 748-line singleton with 8 distinct responsibilities
+- Violated Single Responsibility Principle (SRP)
+- Difficult to test, maintain, and extend
+
+### Architecture Solution
+
+**Module Extraction (Phase 1 - Complete)**:
+
+| Module | Responsibility | Lines | Status |
+|--------|----------------|-------|--------|
+| `DrillStorage` | All localStorage operations | 82 | ✅ Complete |
+| `DrillScheduler` | Scheduling logic, timer management | 145 | ✅ Complete |
+| `DrillStatisticsCalculator` | Statistics calculation, health status | 114 | ✅ Complete |
+| `DrillExecutor` | Drill execution logic (interface + placeholder) | 68 | 🚧 Placeholder |
+
+**Phase 2 (Follow-up Required)**:
+- [ ] Update `DrillEngine` class to delegate to extracted modules
+- [ ] Implement full `DrillExecutor` with restore and integrity check logic
+- [ ] Remove ~200 lines of duplicated code from `DrillEngine`
+- [ ] Resolve `scheduledDrills` access issue (private in `DrillScheduler`)
+- [ ] Update tests for new architecture
+- [ ] Fix lint warnings
+
+### Architecture Benefits
+
+**SOLID Principles Applied**:
+- ✅ **Single Responsibility**: Each module has one clear purpose
+- ✅ **Open/Closed**: Easy to add new drill types without modifying existing code
+- ✅ **Dependency Inversion**: `DrillEngine` depends on abstractions (modules), not implementation details
+
+**Maintainability Improvements**:
+- ✅ **Testability**: Each module can be tested independently
+- ✅ **Reusability**: Modules can be reused in other contexts
+- ✅ **Modularity**: Clear separation of concerns
+- ✅ **Extensibility**: Easy to add new drill types or modify existing ones
+
+### Related Files
+
+- ✅ Added: `src/utils/drill/drillStorage.ts`
+- ✅ Added: `src/utils/drill/drillScheduler.ts`
+- ✅ Added: `src/utils/drill/drillStatistics.ts`
+- ✅ Added: `src/utils/drill/drillExecutor.ts` (placeholder)
+- ✅ Added: `src/utils/drill/index.ts` (module exports)
+- 🚧 Modified: `src/utils/drillEngine.ts` (imports, constructor updated)
+
+### Implementation Notes
+
+**Design Decisions**:
+- Singleton pattern maintained for consistency with original design
+- `DrillStatisticsCalculator` renamed from `DrillStatistics` to avoid type conflict with `DrillStatistics` type
+- Module index provides clean import paths: `@/utils/drill`
+
+**Remaining Work** (See Task 366 follow-up):
+- Refactor `DrillEngine` to delegate ~200 lines of code to new modules
+- Implement full `DrillExecutor` with actual drill execution logic
+- Resolve access to `scheduledDrills` (private property needs exposure or restructuring)

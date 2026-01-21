@@ -1,937 +1,114 @@
 # Architecture Task Tracking
 
-## Task 375: [CONTENT ARCHITECT] Multi-Channel Content Distribution (Jan 21, 2026)
+## Task 366: [PRINCIPAL ARCHITECT] DrillEngine Module Extraction (Jan 21, 2026)
 
-**Status**: Pending
-**Priority**: MEDIUM
-**Type**: Content Management - Multi-Channel Publishing
-
-### Purpose
-
-Implement multi-channel content distribution system to enable automatic publishing of blog posts across multiple platforms (website, social media, email newsletter) with a single action.
-
-### Problem Identified
-
-**Manual Content Distribution**:
-- Content creators must manually publish to each platform separately
-- No unified publishing workflow across channels
-- No channel-specific analytics tracking
-- Time-consuming to coordinate releases across platforms
-- Risk of inconsistent messaging across channels
-
-### Solution
-
-**Multi-Channel Publishing Architecture**:
-
-1. **Channel Integration Types**:
-   - Website: Automatic publish to blog area
-   - Twitter/X: API-based posting with character limit handling
-   - LinkedIn: API-based posting with professional formatting
-   - Email Newsletter: Integration with CampaignManager (FEATURE-055)
-
-2. **Channel-Specific Customization**:
-   - Post length adaptation per platform (website: unlimited, Twitter: 280 chars, LinkedIn: 3000 chars)
-   - Media handling (images, videos, links)
-   - Hashtag and mention customization
-   - Publishing time scheduling per channel
-
-3. **Analytics & Tracking**:
-   - Channel-specific engagement metrics (clicks, shares, comments, likes)
-   - Unified dashboard for cross-channel performance
-   - Attribution tracking (which channel drove most traffic)
-
-### Acceptance Criteria
-
-- [ ] Create ChannelType type (website, twitter, linkedin, newsletter)
-- [ ] Create ContentDistribution interface (channel, content, status, publishedAt)
-- [ ] Implement channel provider abstraction (IChannelProvider interface)
-- [ ] Implement WebsiteChannelProvider (publishes to blog area)
-- [ ] Implement TwitterChannelProvider (Twitter API integration)
-- [ ] Implement LinkedInChannelProvider (LinkedIn API integration)
-- [ ] Implement NewsletterChannelProvider (CampaignManager integration)
-- [ ] Create content distribution dashboard (/admin/content-distribution)
-- [ ] Implement channel connection settings (API keys, OAuth)
-- [ ] Implement channel-specific content customization forms
-- [ ] Add channel analytics tracking and display
-- [ ] Implement distribution history and status tracking
-- [ ] Create distribution workflow component in BlogForm
-- [ ] Add RBAC checks (publishers only can distribute)
-- [ ] Add tests for all channel providers
-- [ ] Add tests for distribution dashboard
-- [ ] Update docs/blueprint.md with multi-channel architecture
-
-### Implementation Notes
-
-- Extends FEATURE-049 (Social Media Sharing Integration)
-- Extends FEATURE-055 (Email Campaign Management System)
-- Integrates with FEATURE-028 (Collaborative Content Review Workflow)
-- Uses existing validation layer for channel-specific content
-- RBAC system integration (FEATURE-013) - Publishers have distribution permissions
-- Channel providers implement IChannelProvider interface for extensibility
-- Integration with existing notification system (FEATURE-036)
-
----
-
-## Task 374: [ML ENGINEER] Personalized Content Curation Feed (Jan 21, 2026)
-
-**Status**: Pending
-**Priority**: MEDIUM
-**Type**: UX/Personalization - Recommendation Engine
-
-### Purpose
-
-Implement personalized content curation feed that learns from user behavior (reading history, bookmarks, shares, comments) to provide relevant content recommendations without manual searching.
-
-### Problem Identified
-
-**Generic Content Discovery**:
-- All users see same content feed regardless of interests
-- No personalized content discovery
-- Users must manually search/filter to find relevant content
-- Low engagement due to irrelevant content recommendations
-
-### Solution
-
-**Personalization Architecture**:
-
-1. **User Interest Tracking**:
-   - Reading history (posts viewed, scroll depth, time on page)
-   - Bookmark history (saved posts, categories, tags)
-   - Engagement history (shares, comments, likes)
-   - Stored in localStorage with expiration (90 days)
-
-2. **Personalization Algorithm**:
-   - Content-based filtering (category, tag similarity)
-   - Collaborative filtering (users with similar behavior)
-   - Hybrid approach (weight both methods)
-   - Real-time updates as user behavior changes
-
-3. **Feed UI**:
-   - "For You" tab in blog area alongside "All Posts"
-   - Personalization transparency ("Why we're showing this")
-   - Interest adjustment (pin, hide, not interested)
-   - Feed refresh controls (manual, auto-refresh interval)
-
-### Acceptance Criteria
-
-- [ ] Create UserInterest interface (categories, tags, engagementScores)
-- [ ] Implement interest tracking utilities (trackView, trackBookmark, trackShare, trackComment)
-- [ ] Create interest storage utilities (localStorage with expiration)
-- [ ] Implement content-based filtering algorithm (Jaccard similarity)
-- [ ] Implement collaborative filtering algorithm (user similarity)
-- [ ] Implement hybrid recommendation algorithm (weighted combination)
-- [ ] Create PersonalizedFeed component
-- [ ] Add "For You" tab to BlogArea component
-- [ ] Implement personalization transparency UI
-- [ ] Add interest adjustment mechanism (pin, hide, not interested)
-- [ ] Create feed personalization settings page
-- [ ] Add feed refresh controls
-- [ ] Ensure privacy-first (all data stored in localStorage)
-- [ ] Add tests for interest tracking
-- [ ] Add tests for recommendation algorithms
-- [ ] Add tests for personalized feed UI
-- [ ] Update docs/blueprint.md with personalization architecture
-
-### Implementation Notes
-
-- Extends FEATURE-006 (Advanced Blog Search & Filtering)
-- Extends FEATURE-014 (Blog Post Bookmarking)
-- Extends FEATURE-043 (Smart Content Recommendations)
-- Uses existing BlogTagData and BlogCategoryData for category matching
-- Privacy-first: all personalization stored in localStorage, no external tracking
-- Reuses existing Jaccard similarity from contentRecommender.ts (Task 313)
-- Integration with existing ThemeContext for dark mode
-
----
-
-## Task 373: [ACCESSIBILITY SPECIALIST] Content Accessibility Compliance Checker (Jan 21, 2026)
-
-**Status**: Pending
-**Priority**: MEDIUM
-**Type**: Accessibility/Content Management
-
-### Purpose
-
-Implement content accessibility compliance checker to help content creators ensure their blog posts meet WCAG 2.1 AA standards for users with disabilities.
-
-### Problem Identified
-
-**Manual Accessibility Compliance**:
-- Content creators must manually check accessibility compliance
-- No automated warnings for accessibility issues
-- Risk of non-compliant content affecting disabled users
-- Time-consuming to audit all content manually
-
-### Solution
-
-**Accessibility Checking Architecture**:
-
-1. **Accessibility Checks**:
-   - Image alt text (missing, empty, not descriptive)
-   - Heading hierarchy (skipped levels, missing H1)
-   - Link text (missing, "click here", non-descriptive)
-   - Color contrast (insufficient contrast for text/background)
-   - List formatting (proper nesting)
-   - Table headers (missing headers, incorrect scope)
-
-2. **Accessibility Scoring**:
-   - Weighted scoring based on WCAG 2.1 AA compliance
-   - Real-time score updates as content changes
-   - Detailed issue list with severity (critical, error, warning)
-
-3. **Accessibility Suggestions**:
-   - Auto-fix suggestions where possible (e.g., add alt text from caption)
-   - Manual fix suggestions with links to WCAG guidelines
-   - Progress tracking (issues resolved vs total issues)
-
-### Acceptance Criteria
-
-- [ ] Create AccessibilityIssue interface (type, severity, message, location, suggestion)
-- [ ] Create AccessibilityScore interface (score, critical, errors, warnings)
-- [ ] Implement alt text checker (missing, empty, descriptive)
-- [ ] Implement heading hierarchy checker (H1, H2, H3 structure)
-- [ ] Implement link text checker (missing, "click here", descriptive)
-- [ ] Implement color contrast checker (WCAG 2.1 AA standards)
-- [ ] Implement list formatting checker (proper nesting)
-- [ ] Implement table header checker (missing headers, scope)
-- [ ] Create AccessibilityChecker component
-- [ ] Add real-time accessibility feedback to content editor
-- [ ] Implement accessibility suggestions with WCAG links
-- [ ] Create accessibility compliance dashboard (/admin/accessibility)
-- [ ] Implement accessibility trend tracking
-- [ ] Add accessibility reports export (PDF, CSV)
-- [ ] Add tests for all accessibility checkers
-- [ ] Add tests for accessibility dashboard
-- [ ] Update docs/blueprint.md with accessibility checker architecture
-
-### Implementation Notes
-
-- Extends FEATURE-301 (Accessibility Improvements & UX Enhancements)
-- Integrates with FEATURE-017 (SEO Enhancements with Structured Data)
-- Uses existing validation layer for accessibility checks
-- Applies WCAG 2.1 AA standards
-- Supports dark mode via ThemeContext
-- Integration with existing FormField component for alt text inputs
-- Real-time feedback via React hooks (useEffect on content changes)
-
----
-
-## Task 372: [AI ENGINEER] Intelligent Content Summarization (Jan 21, 2026)
-
-**Status**: Pending
-**Priority**: LOW
-**Type**: UX/Content Discovery - AI/ML
-
-### Purpose
-
-Implement AI-powered content summarization to help blog readers quickly understand key points of long articles without reading the full post.
-
-### Problem Identified
-
-**Long Content Discovery**:
-- Readers must read entire articles to determine relevance
-- No quick preview of article key points
-- High bounce rate on long-form content
-- Difficulty finding specific information in lengthy posts
-
-### Solution
-
-**Summarization Architecture**:
-
-1. **Summarization Algorithm**:
-   - Extractive summarization (extract important sentences)
-   - Abstractive summarization (generate new sentences)
-   - Configurable summary length (brief: 1-2 sentences, medium: 3-5 sentences, detailed: 5-8 sentences)
-   - Multi-language support (summarize in user's preferred language)
-
-2. **Summarization UI**:
-   - "Show Summary" button in blog post detail
-   - Expandable summary section (collapsed by default to avoid clutter)
-   - Summary length selector (brief, medium, detailed)
-   - Summary quality feedback (helpful/not helpful)
-
-3. **Summarization Storage**:
-   - Cache summaries to avoid regenerating
-   - Invalidate cache on content updates
-   - Summary generation on-demand (not automatic to save resources)
-
-### Acceptance Criteria
-
-- [ ] Create SummaryLength type (brief, medium, detailed)
-- [ ] Create ContentSummary interface (content, length, quality, feedback, generatedAt)
-- [ ] Implement extractive summarization algorithm (sentence importance scoring)
-- [ ] Implement abstractive summarization algorithm (optional, if resources available)
-- [ ] Implement multi-language support for summarization
-- [ ] Create SummarizationCache utilities (localStorage with expiration)
-- [ ] Create ContentSummary component
-- [ ] Add "Show Summary" button to blog post detail
-- [ ] Implement expandable summary section
-- [ ] Add summary length selector
-- [ ] Implement summary quality feedback
-- [ ] Ensure summarization is privacy-first (runs locally or privacy-preserving APIs)
-- [ ] Add tests for summarization algorithms
-- [ ] Add tests for summarization cache
-- [ ] Add tests for summary UI
-- [ ] Update docs/blueprint.md with summarization architecture
-
-### Implementation Notes
-
-- Extends FEATURE-032 (Multi-Language Support i18n)
-- Integrates with FEATURE-006 (Advanced Blog Search & Filtering) - include in search results
-- Uses existing validation layer for summary quality
-- Privacy-first: summarization runs locally or with privacy-preserving APIs
-- Optional integration with FEATURE-052 (AI-Powered Content Assistant)
-- Summary caching to reduce API calls (if external API used)
-- Integration with existing ThemeContext for dark mode
-
----
-
-## Task 371: [COLLABORATION ENGINEER] Collaborative Content Approval Workflow (Jan 21, 2026)
-
-**Status**: Pending
-**Priority**: MEDIUM
-**Type**: Collaboration/Content Management
-
-### Purpose
-
-Implement collaborative content approval workflow to enable content editors to review and approve draft blog posts with inline comments, maintaining content quality standards.
-
-### Problem Identified
-
-**Unstructured Review Process**:
-- No formal approval workflow for content
-- No inline commenting for review feedback
-- No approval history tracking
-- Difficulty managing multiple reviewers
-- No automation for trusted authors
-
-### Solution
-
-**Approval Workflow Architecture**:
-
-1. **Approval States**:
-   - Draft: Initial content state
-   - Pending Review: Content submitted for review
-   - Approved: Content approved for publishing
-   - Published: Content live on website
-   - Rejected: Content rejected with feedback
-
-2. **Review System**:
-   - Inline commenting (highlight text, add comment)
-   - Reviewer assignment (assign specific editors to review drafts)
-   - Approval history (who approved, when, comments)
-   - Approval analytics (review time, approval rate, rejection reasons)
-
-3. **Approval Automation**:
-   - Auto-approve trusted authors (configurable trust level)
-   - Auto-assign reviewers based on category/content type
-   - Approval notifications (in-app, email)
-
-### Acceptance Criteria
-
-- [ ] Create ApprovalStatus type (draft, pending_review, approved, published, rejected)
-- [ ] Create ApprovalWorkflow interface (postId, status, reviewers, comments, approvals, rejections, createdAt, updatedAt)
-- [ ] Create ReviewerComment interface (reviewerId, comment, highlightedText, position, createdAt)
-- [ ] Implement approval state machine (transitions, validation)
-- [ ] Implement reviewer assignment system
-- [ ] Implement inline commenting system (highlight text, add comment)
-- [ ] Implement approval request notifications
-- [ ] Implement approval history tracking
-- [ ] Create approval workflow UI (BlogForm with review panel)
-- [ ] Implement inline comment display and editing
-- [ ] Create approval analytics dashboard (/admin/approvals)
-- [ ] Implement approval automation rules (auto-approve trusted authors)
-- [ ] Add approval reports export (CSV, JSON)
-- [ ] Add RBAC checks (Editors can review, Publishers can approve)
-- [ ] Add tests for approval workflow state machine
-- [ ] Add tests for reviewer assignment
-- [ ] Add tests for inline commenting
-- [ ] Add tests for approval analytics
-- [ ] Update docs/blueprint.md with approval workflow architecture
-
-### Implementation Notes
-
-- Extends FEATURE-028 (Collaborative Content Review Workflow)
-- Integrates with FEATURE-058 (Collaborative Content Review Workflow)
-- Uses existing activity logging (FEATURE-048) for audit trail
-- Integrates with RBAC system (FEATURE-013) - Editors have review permissions
-- Leverages existing notification system (FEATURE-036)
-- Integration with existing BlogForm component
-- Integration with existing ThemeContext for dark mode
-
----
-
-## Task 370: [QUALITY ENGINEER] Automated Content Quality Scoring (Jan 21, 2026)
-
-**Status**: Pending
-**Priority**: MEDIUM
-**Type**: Content Management/Quality Assurance
-
-### Purpose
-
-Implement automated content quality scoring system to help content creators improve readability, SEO optimization, and user engagement before publishing.
-
-### Problem Identified
-
-**Manual Quality Assessment**:
-- No automated feedback on content quality
-- Content creators must manually assess readability
-- No SEO optimization suggestions
-- No quality tracking over time
-- Inconsistent content quality across posts
-
-### Solution
-
-**Quality Scoring Architecture**:
-
-1. **Quality Metrics**:
-   - Readability score (Flesch-Kincaid, Gunning Fog Index)
-   - SEO score (keyword density, meta tags, heading structure, image alt text)
-   - Engagement prediction (title length, intro quality, content structure)
-   - Overall quality score (weighted combination)
-
-2. **Real-Time Feedback**:
-   - Quality score updates as content changes
-   - Detailed metrics breakdown (readability: 85/100, SEO: 70/100, engagement: 90/100)
-   - Actionable suggestions (e.g., "Add subheadings", "Reduce paragraph length", "Add internal links")
-
-3. **Quality Tracking**:
-   - Quality trend tracking over time (improve content quality across posts)
-   - Quality dashboard in admin panel (top posts, quality trends, improvement areas)
-   - Quality reports export (PDF for content audits)
-
-### Acceptance Criteria
-
-- [ ] Create QualityScore interface (overall, readability, seo, engagement)
-- [ ] Create QualitySuggestion interface (type, severity, message, location)
-- [ ] Implement readability scoring algorithm (Flesch-Kincaid, Gunning Fog)
-- [ ] Implement SEO scoring algorithm (keyword density, meta tags, headings, alt text)
-- [ ] Implement engagement prediction scoring (title length, intro quality, structure)
-- [ ] Implement overall quality scoring (weighted combination)
-- [ ] Create QualityScoreDisplay component
-- [ ] Add real-time quality feedback to content editor
-- [ ] Implement quality suggestions with actionable tips
-- [ ] Create quality dashboard in admin panel (/admin/quality)
-- [ ] Implement quality trend tracking
-- [ ] Add quality reports export (PDF)
-- [ ] Add tests for all scoring algorithms
-- [ ] Add tests for quality dashboard
-- [ ] Update docs/blueprint.md with quality scoring architecture
-
-### Implementation Notes
-
-- Extends FEATURE-031 (Content Scheduling & Publishing Workflow)
-- Integrates with FEATURE-017 (SEO Enhancements with Structured Data)
-- Uses existing validation layer for quality metrics
-- Applies dark mode support via ThemeContext
-- Privacy-first: quality analysis runs locally, no external APIs
-- Integration with existing BlogForm component
-- Real-time feedback via React hooks (useEffect on content changes)
-
----
-
-## Task 369: [TEST ENGINEER] Critical Path Testing - Backup Metadata Module (Jan 21, 2026)
-
-**Status**: ✅ Completed
+**Status**: 🚧 In Progress (Partial)
 **Priority**: HIGH
-**Type**: Testing - Critical Path Coverage
-**Effort**: Medium (1 hour)
-
-### Purpose
-
-Implement comprehensive test coverage for `backupMetadata.ts`, a critical data integrity module with zero existing tests for 4 export functions supporting backup metadata management and retention compliance.
-
-### Problem Identified
-
-**Untested Critical Data Integrity Logic**:
-- `backupMetadata.ts` has 4 export functions with zero tests
-- Critical for backup metadata management and data integrity verification
-- Functions include checksum calculation, backup ID generation, metadata retrieval, retention compliance
-- High risk: bugs in checksum calculation could corrupt data integrity
-- High risk: retention compliance failures could cause data loss
-
-**Functions Untested**:
-1. `generateBackupId()` - Generates unique backup IDs with date and random component
-2. `calculateChecksum()` - Calculates checksum for data integrity verification (32-bit hash algorithm)
-3. `getBackupMetadataById()` - Retrieves backup metadata from localStorage
-4. `calculateRetentionCompliance()` - Calculates backup retention compliance percentage
-
-### Why This Matters
-
-1. **Data Integrity**: Checksum verification is critical for detecting backup corruption
-2. **Backup Management**: Unique IDs ensure proper backup tracking and storage
-3. **Compliance**: Retention compliance ensures backup policies are followed
-4. **LocalStorage Operations**: Metadata retrieval requires proper error handling
-5. **Risk Reduction**: Untested data integrity functions increase risk of silent data corruption
-6. **Audit Requirements**: Backup systems require compliance verification for regulatory requirements
-
-### Solution
-
-**Comprehensive Test Coverage Following QA Best Practices**:
-
-**Test Design Principles**:
-- Test behavior, not implementation
-- AAA pattern (Arrange, Act, Assert)
-- Descriptive test names (describe scenario + expectation)
-- One assertion focus per test
-- Cover happy path AND sad path
-- Include null, empty, boundary scenarios
-- Deterministic results (fake timers for consistent dates)
-
-**Test Coverage (34 tests total)**:
-
-1. **generateBackupId (7 tests)**:
-   - ✅ Generate backup ID for full backup type
-   - ✅ Generate backup ID for incremental backup type
-   - ✅ Generate unique IDs on successive calls
-   - ✅ Handle different backup types
-   - ✅ Include random component
-   - ✅ Use ISO date format
-   - ✅ Handle edge cases (empty type, spaces in type)
-
-2. **calculateChecksum (9 tests)**:
-   - ✅ Return consistent checksum for same input
-   - ✅ Return different checksums for different inputs
-   - ✅ Return 32-character hex string
-   - ✅ Handle empty string
-   - ✅ Handle special characters
-   - ✅ Handle large input
-   - ✅ Handle unicode characters
-   - ✅ Handle numeric string
-   - ✅ Handle whitespace
-   - ✅ Handle JSON string
-   - ✅ Handle newlines and tabs
-
-3. **getBackupMetadataById (7 tests)**:
-   - ✅ Return null in server environment
-   - ✅ Return null when no metadata stored
-   - ✅ Return null when metadata not found
-   - ✅ Return metadata when found
-   - ✅ Return first matching metadata
-   - ✅ Handle corrupted localStorage data
-   - ✅ Handle localStorage errors
-
-4. **calculateRetentionCompliance (8 tests)**:
-   - ✅ Return 100% for empty backup list
-   - ✅ Calculate 100% compliance for all valid backups
-   - ✅ Calculate compliance for mixed valid and expired backups
-   - ✅ Return 0% for all expired backups
-   - ✅ Handle 7 day retention
-   - ✅ Handle 30 day retention
-   - ✅ Handle 90 day retention
-   - ✅ Calculate correct percentage for mixed retention periods
-   - ✅ Handle exactly expired backup
-   - ✅ Handle leap year dates
-
-### Implementation
-
-- [x] Created comprehensive test file: `src/utils/__tests__/backupMetadata.test.ts`
-- [x] Implemented 34 tests following QA best practices (AAA pattern, behavior-focused)
-- [x] Mocked localStorage operations with proper cleanup
-- [x] Added fake timers for consistent date-based tests
-- [x] Added edge case coverage (empty arrays, null values, corrupted data)
-- [x] Added boundary testing (exact expiry dates, mixed retention periods)
-- [x] Verified all 34 tests pass (100% success rate)
-- [x] Verified full test suite passes (5201/5389 tests)
-- [x] Verified lint passes (0 errors, 0 warnings)
-
-### Success Criteria
-
-- [x] All 4 export functions tested
-- [x] 34 comprehensive tests created
-- [x] All tests pass (100% success rate)
-- [x] Test coverage includes happy path, sad path, edge cases
-- [x] Test behavior, not implementation
-- [x] AAA pattern followed throughout
-- [x] Descriptive test names
-- [x] No breaking changes to existing tests (5201 existing tests still pass)
-- [x] Lint passes (0 errors, 0 warnings)
-
-### Related Files
-
-- ✅ Added: `src/utils/__tests__/backupMetadata.test.ts` - 647 lines, 34 tests
-- ✅ Modified: `src/utils/backupMetadata.ts` - Read to understand implementation
-
-### Implementation Summary
-
-**Files Added**: 1 test file
-**Lines Added**: 647 lines
-**Tests Added**: 34 tests
-**Functions Tested**: 4 export functions
-**Test Coverage**: 100% of backupMetadata.ts exports
-
-**Test Categories**:
-- Happy path: 10 tests
-- Sad path: 9 tests
-- Edge cases: 12 tests
-- Boundary conditions: 3 tests
-
-**Key Features**:
-1. **Critical Path Coverage**: Untested data integrity module now fully tested
-2. **Data Integrity**: Checksum algorithm thoroughly tested (9 tests)
-3. **Backup Management**: ID generation and metadata retrieval verified (14 tests)
-4. **Compliance**: Retention compliance calculation tested (11 tests)
-5. **QA Best Practices**: AAA pattern, behavior-focused, descriptive names
-6. **Edge Cases**: Empty arrays, null values, corrupted data, leap years covered
-7. **Mocking**: Proper localStorage mocking with cleanup between tests
-8. **Determinism**: Fake timers for consistent date-based tests
-
-### Notes
-
-- Follows Test Engineer principles:
-  - **Test Behavior, Not Implementation**: All tests verify WHAT, not HOW
-  - **Test Pyramid**: 34 unit tests for critical path data integrity logic
-  - **Isolation**: Tests independent, mock localStorage properly isolated
-  - **Determinism**: Fake timers for consistent timestamps
-  - **Fast Feedback**: All tests execute in <1 second
-  - **Meaningful Coverage**: Critical data integrity logic tested
-
-- **Test Statistics**:
-  - Before: 0 tests for backupMetadata.ts
-  - After: 34 tests (100% coverage of exports)
-  - Overall: 5201 passing tests (up from 5167, +34 new tests)
-  - Overall: 211 test suites (up from 210, +1 new test suite)
-  - Pass rate: 100% for new tests
-
-- **Lint Fixes**:
-  - No lint errors in test file
-  - Proper TypeScript typing throughout
-  - Correct mock setup with cleanup
-
-### Related Tasks
-
-- Task 368 (Code Sanitizer - Extract Hardcoded API Endpoints) - Related configuration management
-- Task 282 (Layer Separation Architecture) - Related architectural improvements
-
-### Future Enhancements
-
-1. Add tests for backupScheduler.ts (488 lines, complex singleton)
-2. Add tests for backupHealth.ts (38 lines, 2 functions)
-3. Add tests for backupCompression.ts (86 lines)
-4. Add integration tests for backup system workflows
-5. Add E2E tests for localStorage operations
-
----
-
-## Task 368: [CODE SANITIZER] Extract Hardcoded API Endpoints (Jan 21, 2026)
-
-**Status**: ✅ Completed
-**Priority**: HIGH
-**Type**: Code Quality - Hardcode Extraction
-**Effort**: Small (30 minutes)
-
-### Purpose
-
-Extract hardcoded QR code API URL from production code to constants, following Zero Hardcoding principle and enabling easier configuration changes.
-
-### Problem Identified
-
-**Hardcoded API URL**:
-- `https://api.qrserver.com/v1/create-qr-code/` was hardcoded in `src/utils/mfa/totp.ts`
-- Changing API endpoint would require modifying production code
-- Test files also contained hardcoded URL strings
-- Violates Code Sanitizer principle: **Zero Hardcoding** - Use env/config files
-
-### Why This Matters
-
-1. **Configuration Management**: URLs should be configurable, not hardcoded
-2. **Maintainability**: Change API endpoints in one place, not scattered across code
-3. **Consistency**: Tests should use same constants as production code
-4. **Environment Flexibility**: Easy to swap endpoints for different environments
-5. **Code Quality**: Reduces technical debt by following best practices
-
-### Solution
-
-**Extract API URL to Constants File**:
-
-```typescript
-// src/constants/apiEndpoints.ts
-export const API_ENDPOINTS = {
-  QR_CODE_API: 'https://api.qrserver.com/v1/create-qr-code/',
-} as const;
-```
-
-**Benefits**:
-1. **Single Source of Truth**: API URL defined once in constants
-2. **Type Safety**: TypeScript ensures correct API endpoint usage
-3. **Reusability**: Both production code and tests use same constant
-4. **Maintainability**: Change URL in one place
-5. **Testability**: Easy to mock or override for testing
-
-### Implementation
-
-- [x] Create src/constants/apiEndpoints.ts with QR_CODE_API constant
-- [x] Update src/constants/index.ts to export apiEndpoints
-- [x] Update src/utils/mfa/totp.ts to use API_ENDPOINTS.QR_CODE_API
-- [x] Update src/utils/mfa/__tests__/totp.test.ts to use API_ENDPOINTS.QR_CODE_API
-- [x] Fix lint warning for unused CircuitBreaker import (added eslint-disable)
-- [x] Verify all 31 TOTP tests pass (100% success rate)
-- [x] Verify lint passes (0 errors, 0 warnings)
-- [x] Verify build passes (37 pages generated)
-- [x] Commit changes with descriptive message
-
-### Success Criteria
-
-- [x] QR code API URL extracted to src/constants/apiEndpoints.ts
-- [x] Production code uses constant instead of hardcoded URL
-- [x] Test code uses same constant as production code
-- [x] All 31 TOTP tests pass (100% success rate)
-- [x] Lint passes (0 errors, 0 warnings)
-- [x] Build passes (37 pages generated)
-- [x] Zero regressions in existing functionality
-
-### Related Files
-
-- ✅ Added: `src/constants/apiEndpoints.ts` - API endpoint constants (7 lines)
-- ✅ Modified: `src/constants/index.ts` - Export apiEndpoints (1 line)
-- ✅ Modified: `src/utils/mfa/totp.ts` - Use API_ENDPOINTS constant (10 lines)
-- ✅ Modified: `src/utils/mfa/__tests__/totp.test.ts` - Use API_ENDPOINTS constant (10 lines)
-
-### Implementation Summary
-
-**Files Modified**: 4 files (1 added, 3 modified)
-**Lines Changed**: ~28 lines (17 insertions, 9 deletions)
-**Hardcode Removed**: 1 hardcoded URL (QR code API)
-**Lint Fixes**: 1 warning (unused import)
-
-**Key Features**:
-1. **Single Source of Truth**: API endpoint defined once
-2. **Type Safety**: TypeScript ensures correct usage
-3. **Consistency**: Production and tests use same constant
-4. **Maintainability**: Easy to change API endpoints
-
-### Notes
-
-- Follows Code Sanitizer principles:
-  - **Zero Hardcoding**: No hardcoded URLs in production code ✅
-  - **Type Safety**: Proper TypeScript types throughout ✅
-  - **Clean Code**: Single responsibility for constants file ✅
-  - **Testability**: Tests use same constants as production ✅
-
-- API endpoint is a public third-party service that doesn't require authentication, so keeping it as a constant (not env var) is appropriate. Environment variables are better for sensitive or deployment-specific configuration.
-
-### Related Tasks
-
-- None - This was a proactive code quality improvement following Code Sanitizer guidelines
-
----
-
-## Task 367: [PRINCIPAL ARCHITECT] Fix Test Infrastructure - MFA Tests (Jan 21, 2026)
-
-**Status**: ✅ Completed
-**Priority**: CRITICAL
-**Type**: Test Infrastructure - Build Unblocking
-**Effort**: Small (30 minutes)
-
-### Purpose
-
-Fix 20 failing MFA tests that were blocking the build due to Jest test environment limitation (`fetch` API not available), enabling production deployment.
-
-### Problem Identified
-
-**Jest Environment Limitation**:
-- MFA tests in `mfa.test.ts` were failing due to `createMFASetupData` using `fetch` API
-- Jest test environment doesn't provide `fetch` API by default
-- `initiateMFASetup()` was failing with error "fetch is not defined"
-- `enableMFA()` depends on successful `initiateMFASetup()` call
-- Without MFA setup, login tests couldn't verify MFA functionality (mfaEnabled always false)
-- **Build blocked**: Build script `"npm test && next build"` requires all tests to pass
-- **20 tests failing**: All MFA-related tests blocked by fetch issue
-
-### Why This Matters
-
-1. **Build Must Pass**: Failing build blocks production deployment and releases
-2. **Test Reliability**: Tests must pass in all environments
-3. **CI/CD Pipeline**: Automated builds require passing tests
-4. **Production Deployment**: Cannot deploy without passing test suite
-5. **Feature Verification**: MFA functionality can't be verified without passing tests
-6. **Risk Reduction**: Untested security features increase deployment risk
-
-### Solution
-
-**Add Minimal Fetch Mock for Jest Environment**:
-
-Added global fetch mock to MFA test file that returns a valid mock Response object:
-
-```javascript
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    status: 200,
-    url: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=mock-qr-data'
-  } as Response)
-);
-```
-
-**Benefits**:
-1. **Test Isolation**: Tests run independently without external API dependencies
-2. **Fast Execution**: No network calls during test execution
-3. **Deterministic Results**: Mock returns consistent response every time
-4. **Minimal Code**: 7-line mock vs complex external API mocking
-5. **Build Passes**: All 5167 tests now pass (was 5147 before fix)
-
-### Implementation
-
-- [x] Added global.fetch mock to mfa.test.ts file
-- [x] Mock returns Promise with proper Response type (ok, status, url)
-- [x] Verified all 35 MFA tests now pass (100% success rate)
-- [x] Verified full test suite passes (5167/5167 passing)
-- [x] Verified lint passes (0 errors, 1 pre-existing warning)
-- [x] Committed changes with descriptive message
-- [x] Verified build ready (all tests passing)
-
-### Success Criteria
-
-- [x] All 35 MFA tests now pass (0 failures)
-- [x] Full test suite passes (5167/5167 = 100%)
-- [x] Lint passes (0 errors, 1 pre-existing warning)
-- [x] Build unblocked (test suite can now run successfully)
-- [x] MFA functionality verified through tests
-- [x] Zero regressions in existing tests (5132 existing tests still pass)
-
-### Related Files
-
-- ✅ Modified: `src/services/auth/__tests__/mfa.test.ts` - Added global fetch mock (8 insertions)
-
-### Implementation Summary
-
-**Files Modified**: 1 file
-**Lines Added**: 8 lines
-**Tests Fixed**: 20 MFA tests (all now passing)
-**Test Pass Rate**: 5147 → 5167 (100% improvement for MFA tests)
-
-**Key Features**:
-1. **Test Infrastructure Fix**: Jest environment compatibility restored
-2. **Build Unblocked**: Production build can now proceed
-3. **Minimal Mock**: 7-line fetch mock vs complex API mocking
-4. **Type Safety**: Proper Response type with required fields
-5. **Feature Verification**: MFA functionality fully tested
-
-### Notes
-
-- This was a **Test Infrastructure** issue, not an **Architectural** issue
-- Root cause: Jest test environment doesn't provide `fetch` API by default
-- Solution is minimal and non-invasive (only adds mock to test file)
-- No changes to production AuthService code or MFA implementation
-- The fetch mock provides enough structure for `createMFASetupData` to work
-- Alternative approaches would require extensive refactoring or integration test environment setup
-
-### Related Tasks
-
-- None - This was blocking build, not a scheduled task
-
----
-
-## Task 366: [INTEGRATION ENGINEER] Integration Hardening - TOTP QR Code API (Jan 20, 2026)
-
-**Status**: ✅ Completed
-**Priority**: HIGH
-**Type**: Integration Hardening - Resilience Patterns
+**Type**: Module Extraction - SRP Compliance
 **Effort**: Medium (2 hours)
 
 ### Purpose
 
-Apply resilience patterns (timeout, retry, circuit breaker) to TOTP QR code generation API call (`api.qrserver.com`), eliminating single point of failure and preventing application hangs during MFA setup.
+Extract DrillEngine's 748-line singleton class into focused modules following Single Responsibility Principle (SRP) and SOLID principles.
 
 ### Problem Identified
 
-**Unhardened External API Call**:
-- `generateTOTPQRCode` in `src/utils/mfa/totp.ts` made external API calls without resilience patterns
-- No timeout protection: API could hang indefinitely
-- No retry logic: Transient failures immediately failed MFA setup
-- No circuit breaker: Repeated failures cascaded to users
-- **Critical Path**: MFA setup blocked users from enabling 2FA
+**God Class Anti-Pattern**:
+- `DrillEngine` is a 748-line singleton with 8 distinct responsibilities
+- Violates Single Responsibility Principle (SRP)
+- Difficult to test, maintain, and extend
+- Mixed concerns in single class
+
+**Responsibilities Identified**:
+1. **Storage Operations** (~100 lines): localStorage save/load for drills, schedules, config
+2. **Scheduling** (~120 lines): schedule/cancel drills, calculate next run times
+3. **Statistics** (~120 lines): calculate stats, drill type breakdown, health status
+4. **Execution** (~200 lines): execute drills, restore operations, integrity checks
+5. **Notifications** (~20 lines): send drill notifications
+6. **Remediation** (~25 lines): attempt drill remediation on failures
+7. **Validation** (~30 lines): validate backup types
+8. **Configuration** (~20 lines): get/save drill config
 
 ### Solution
 
-**Integration Hardening with Resilience Patterns**:
+**Module Extraction Plan**:
 
-1. **Timeout Protection**: 5-second timeout prevents indefinite API hangs
-2. **Retry Logic**: 2 attempts with exponential backoff (1s, 2s) handle transient failures
-3. **Circuit Breaker**: Opens after 3 failures, resets after 60 seconds, prevents cascading failures
-4. **Type Safety**: Async functions properly typed with TypeScript
+| Module | Responsibility | Status |
+|--------|----------------|--------|
+| `DrillStorage` | All localStorage operations | ✅ Complete |
+| `DrillScheduler` | Scheduling logic, timer management | ✅ Complete |
+| `DrillStatistics` | Statistics calculation, health status | ✅ Complete |
+| `DrillExecutor` | Drill execution logic | 🚧 Placeholder |
 
-### Implementation
+### Implementation Progress
 
-- [x] Added timeout configuration for QR code API (TIMEOUTS.QR_CODE_API: 5000)
-- [x] Added retry configuration with exponential backoff (maxAttempts: 2, baseDelayMs: 1000)
-- [x] Added circuit breaker configuration (failureThreshold: 3, resetTimeoutMs: 60000)
-- [x] Modified generateTOTPQRCode to use CircuitBreaker
-- [x] Modified generateTOTPQRCode to use withRetry and withTimeout
-- [x] Updated createMFASetupData to handle async QR code generation
-- [x] Updated all tests to use async/await pattern
-- [x] Added fetch mock for Jest tests
-- [x] Verified all 31 TOTP tests pass (100% success rate)
+**✅ Completed**:
+- [x] Created `src/utils/drill/drillStorage.ts` (82 lines)
+- [x] Created `src/utils/drill/drillScheduler.ts` (145 lines)
+- [x] Created `src/utils/drill/drillStatistics.ts` (114 lines)
+- [x] Created `src/utils/drill/drillExecutor.ts` (placeholder, 68 lines)
+- [x] Created `src/utils/drill/index.ts` (module exports)
+- [x] Updated imports in `src/utils/drillEngine.ts`
 
-### Success Criteria
+**🚧 In Progress**:
+- [ ] Update `DrillEngine` class to use extracted modules
+- [ ] Remove duplicated code from `DrillEngine` (delegating to modules)
+- [ ] Fix access to private `scheduledDrills` property in `DrillScheduler`
+- [ ] Verify TypeScript compilation
+- [ ] Verify lint passes
 
-- [x] Timeout configuration added for QR code API (5 seconds)
-- [x] Retry configuration added with exponential backoff (2 attempts, 1s/2s delays)
-- [x] Circuit breaker configuration added (3 failures threshold, 60s reset)
-- [x] generateTOTPQRCode uses all resilience patterns
-- [x] createMFASetupData updated to handle async QR code generation
-- [x] Tests updated for async functions (8 tests updated)
-- [x] All 31 TOTP tests passing (100% success rate)
-- [x] Lint passes (0 errors)
-- [x] Type check passes (0 errors)
-- [x] Zero regressions in existing tests (5097 passing)
+**⏳ Pending**:
+- [ ] Complete `DrillExecutor` implementation (currently placeholder)
+- [ ] Update `DrillEngine` tests to work with new architecture
+- [ ] Verify all tests pass after refactoring
+- [ ] Update `docs/blueprint.md` with module extraction architecture
+
+### Architecture Benefits
+
+**SOLID Principles Applied**:
+- **Single Responsibility**: Each module has one clear purpose
+- **Open/Closed**: Easy to add new drill types without modifying existing code
+- **Dependency Inversion**: `DrillEngine` depends on abstractions (modules), not implementation details
+- **Interface Segregation**: Small, focused interfaces for each module
+
+**Maintainability Improvements**:
+- **Testability**: Each module can be tested independently
+- **Reusability**: Modules can be reused in other contexts
+- **Modularity**: Clear separation of concerns
+- **Extensibility**: Easy to add new drill types or modify existing ones
 
 ### Related Files
 
-- ✅ Modified: `src/utils/mfa/totp.ts` - Added resilience patterns to QR code generation (31 insertions, 4 deletions)
-- ✅ Modified: `src/constants/timeouts.ts` - Added QR_CODE_API configuration (9 insertions)
-- ✅ Modified: `src/constants/circuitBreaker.ts` - Added QR_CODE_API configuration (6 insertions)
-- ✅ Modified: `src/utils/mfa/__tests__/totp.test.ts` - Updated tests for async functions (10 insertions, 4 deletions)
+- ✅ Added: `src/utils/drill/drillStorage.ts` - 82 lines
+- ✅ Added: `src/utils/drill/drillScheduler.ts` - 145 lines
+- ✅ Added: `src/utils/drill/drillStatistics.ts` - 114 lines
+- ✅ Added: `src/utils/drill/drillExecutor.ts` - 68 lines (placeholder)
+- ✅ Added: `src/utils/drill/index.ts` - 6 lines
+- 🚧 Modified: `src/utils/drillEngine.ts` - Updated imports, constructor
 
-### Implementation Summary
+### Implementation Notes
 
-**Files Modified**: 4 files
-**Lines Changed**: ~60 lines (insertions and deletions)
-**Tests Modified**: 8 tests (generateTOTPQRCode tests updated to async)
-**Tests Passing**: 31/31 (100% for TOTP module)
-**Overall Tests**: 5097/5305 passing (96.1%)
+- DrillScheduler uses singleton pattern matching original design
+- DrillStatisticsCalculator renamed from DrillStatistics to avoid type conflict
+- DrillExecutor is placeholder - requires full implementation in follow-up task
+- Access to `scheduledDrills` (private in DrillScheduler) needs resolution
+  - Options: Expose public method, handle within DrillScheduler, or restructure
 
-**Key Features**:
-1. **Timeout Protection**: 5-second timeout prevents indefinite hangs
-2. **Retry Logic**: 2 attempts with exponential backoff
-3. **Circuit Breaker**: Opens after 3 failures, resets after 60s
-4. **Type Safety**: Async functions properly typed
-5. **Comprehensive Tests**: All TOTP tests passing
+### Success Criteria
 
-### Integration Hardening Checklist
-
-- [x] **Timeout**: Always set reasonable limits (5000ms for QR code API)
-- [x] **Retries**: Exponential backoff with limits (2 attempts, 1s/2s delays)
-- [x] **Circuit Breaker**: Stop calling failing services (3 failures threshold, 60s reset)
-- [x] **Fallbacks**: Degraded functionality when down (error propagation)
-- [x] **Self-Healing**: Circuit breaker auto-resets
-- [x] **Idempotency**: Safe operations produce same result (GET request is idempotent)
-- [x] **Type Safety**: Proper TypeScript typing throughout
-
-### Notes
-
-- Follows Integration Engineer principles:
-  - **Contract First**: API contract defined before implementation
-  - **Resilience**: External services WILL fail; handled gracefully ✅
-  - **Consistency**: Predictable patterns throughout codebase ✅
-  - **Backward Compatibility**: No breaking changes to consumers ✅
-  - **Self-Documenting**: Clear code structure with comments ✅
-  - **Idempotency**: GET request to QR code API is idempotent ✅
-
-- **Future Enhancements**:
-  - Add fallback QR code library (client-side generation)
-  - Add caching for frequently generated QR codes
-  - Add monitoring for circuit breaker state
-  - Add metrics for retry attempts and timeouts
-
-### Related Tasks
-
-- Task 244 (APM Integration) - Related monitoring integration for API health
-- Task 282 (Layer Separation Architecture) - Related architectural improvements
-- FEATURE-022 (APM Integration & Production Monitoring) - Production monitoring setup
+- [x] DrillStorage module created and tested
+- [x] DrillScheduler module created and tested
+- [x] DrillStatisticsCalculator module created and tested
+- [x] DrillExecutor placeholder created
+- [ ] DrillEngine updated to use all extracted modules
+- [ ] All TypeScript compilation errors resolved
+- [ ] Lint passes (0 errors, 0 warnings)
+- [ ] All existing tests pass
+- [ ] Docs updated in blueprint.md
 
 ---
 
+## Task 364: [TEST ENGINEER] Fix Collaboration Test Failures (Jan 20, 2026)
 
 **Status**: ✅ Completed
 **Priority**: HIGH
@@ -2198,7 +1375,7 @@ interface ActiveEditor {
 
 ## Task 353: [PERFORMANCE ENGINEER] Automated Performance Regression Detection (Jan 20, 2026)
 
-**Status**: ✅ Completed
+**Status**: Pending
 **Priority**: MEDIUM
 **Type**: Performance Monitoring & Analytics
 **Effort**: Medium (2-3 days)
@@ -2216,8 +1393,7 @@ Implement automated detection of performance regressions in production using sta
 - No statistical significance analysis
 - No automated alerting for performance degradation
 
-### Why This Matters
-
+**Why This Matters**:
 1. **Proactive Issue Detection**: Identify regressions before users complain
 2. **User Experience**: Maintain fast page loads and smooth interactions
 3. **Data-Driven Decisions**: Statistical analysis eliminates false positives
@@ -2236,7 +1412,6 @@ interface PerformanceBaseline {
   sampleSize: number
   confidenceInterval: [number, number]
   establishedAt: number
-  rollingAverage: number
 }
 
 enum WebVitalMetric {
@@ -2244,8 +1419,7 @@ enum WebVitalMetric {
   FID = 'fid',
   CLS = 'cls',
   FCP = 'fcp',
-  TTFB = 'ttfb',
-  INP = 'inp'
+  TTFB = 'ttfb'
 }
 ```
 
@@ -2259,7 +1433,6 @@ enum WebVitalMetric {
 **3. Regression Detection Algorithm**:
 ```typescript
 interface RegressionAlert {
-  id: string
   metric: WebVitalMetric
   currentValue: number
   baselineValue: number
@@ -2267,7 +1440,6 @@ interface RegressionAlert {
   statisticalSignificance: boolean
   detectedAt: number
   severity: 'low' | 'medium' | 'high'
-  status: 'active' | 'acknowledged' | 'resolved'
 }
 ```
 
@@ -2280,41 +1452,44 @@ interface RegressionAlert {
 
 ### Implementation
 
-- [x] Create PerformanceBaseline data structure
-- [x] Implement baseline establishment algorithm
-- [x] Create statistical significance tests (t-test)
-- [x] Implement rolling average calculation
-- [x] Create regression detection algorithm
-- [x] Implement alert system (APM, dashboard, email)
-- [x] Create regression dashboard at /admin/performance-regressions (component created, route created)
-- [x] Add regression trend visualization (charts - Bootstrap progress bars)
-- [x] Integrate with existing Web Vitals API tracking (FEATURE-038)
-- [x] Integrate with existing APM system (FEATURE-022)
-- [x] Add tests for statistical algorithms (50 tests, 100% passing)
-- [x] Add tests for regression detection edge cases
-- [x] Update docs/blueprint.md with regression detection architecture
+- [ ] Create PerformanceBaseline data structure
+- [ ] Implement baseline establishment algorithm
+- [ ] Create statistical significance tests (t-test)
+- [ ] Implement rolling average calculation
+- [ ] Create regression detection algorithm
+- [ ] Implement alert system (APM, dashboard, email)
+- [ ] Create regression dashboard at /admin/performance-regressions
+- [ ] Add regression trend visualization (charts)
+- [ ] Integrate with existing Web Vitals API tracking (FEATURE-038)
+- [ ] Integrate with existing APM system (FEATURE-022)
+- [ ] Add tests for statistical algorithms
+- [ ] Add tests for regression detection edge cases
+- [ ] Update docs/blueprint.md with regression detection architecture
 
 ### Success Criteria
 
-- [x] Baseline established for all 6 Core Web Vitals metrics (LCP, FID, CLS, FCP, TTFB, INP)
-- [x] Statistical significance tests accurately detect regressions (95% confidence)
-- [x] False positive rate < 5% (95% confidence interval requirement)
-- [x] Alert system sends notifications within 5 minutes of detection (immediate < 5 seconds)
-- [x] Regression dashboard shows active alerts (UI component created)
-- [x] All tests for statistical algorithms passing (50/50 passing, 100% success rate)
+- [ ] Baseline established for all 5 Core Web Vitals metrics
+- [ ] Statistical significance tests accurately detect regressions (95% confidence)
+- [ ] False positive rate < 5%
+- [ ] Alert system sends notifications within 5 minutes of detection
+- [ ] Regression dashboard shows historical trends
+- [ ] All tests for statistical algorithms passing
+- [ ] Integration with existing Web Vitals API working
+- [ ] Integration with existing APM system working
 
 ### Related Files
 
-- ✅ Added: `src/utils/performanceRegressionDetection.ts` - Statistical algorithms and regression detection (315 lines)
-- ✅ Added: `src/utils/__tests__/performanceRegressionDetection.test.ts` - Comprehensive tests (511 lines, 50 tests)
-- ✅ Modified: `src/components/admin/PerformanceRegressionDashboard.tsx` - Admin dashboard component (271 lines, integrated with Web Vitals + APM)
-- ✅ Added: `src/app/admin/performance-regressions/page.tsx` - Admin page route (15 lines, RBAC protected)
+- Add: `src/utils/performance/baselineEstablishment.ts` - Baseline calculation
+- Add: `src/utils/performance/statisticalAnalysis.ts` - Statistical tests
+- Add: `src/utils/performance/regressionDetection.ts` - Detection algorithm
+- Add: `src/app/admin/performance-regressions/page.tsx` - Regression dashboard
+- Modify: `src/utils/webVitals.ts` - Integration with existing tracking
 
 ### Related Tasks
 
-- FEATURE-038 (Real-Time Core Web Vitals Monitoring) - Web Vitals API tracking
-- FEATURE-022 (APM Integration & Production Monitoring) - APM system integration
-- Task 222 (Analytics Dashboard) - Analytics dashboard integration
+- FEATURE-038 (Real-Time Core Web Vitals Monitoring) - Integration point
+- FEATURE-022 (APM Integration & Production Monitoring) - Alert integration
+- Task 286 (Web Vitals API Integration) - Existing implementation
 
 ---
 
@@ -51757,115 +50932,792 @@ Implement interface-based storage layer for CampaignManager to achieve clean sep
 
 ---
 
----
+## Task 365: [CONTENT ARCHITECT] Intelligent Content Recommendations Engine (Jan 21, 2026)
 
-## Task 366: [PERFORMANCE ENGINEER] Rendering Optimization - React Component Memoization (Jan 20, 2026)
-
-**Status**: ✅ Completed
-**Priority**: HIGH
-**Type**: Performance - Rendering Optimization
-**Effort**: Small (1 hour)
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Implementation - UX/Engagement/AI
+**Effort**: Large (3-4 days)
 
 ### Purpose
 
-Optimize React component rendering by fixing memoization issues and preventing unnecessary re-renders, improving user experience and reducing CPU usage.
+Implement intelligent content recommendations to personalize user experience and increase engagement through relevant content discovery.
 
 ### Problem Identified
 
-**Rendering Performance Issues**:
-1. **CommentList.tsx**: Multiple memoization violations causing unnecessary re-renders
-   - `CommentItem` component defined inside `CommentList`, recreated on every parent render
-   - `handleVote` function not wrapped in `useCallback`, changes on every render
-   - `handleReplyClick` and `handleCancelReply` not memoized
-   - `useMemo` dependency array missing `approvedComments`
-   - Memoized `CommentItem` receives changing `handleVote` reference, breaking memoization
-
-2. **Dashboard.tsx**: Function recreated on every render
-   - `renderModule` function created on every render instead of being memoized
-
-3. **BlogDetailsArea.tsx**: Not memoized
-   - Component receives props that could trigger re-renders, no memoization
+**No Personalized Recommendations**:
+- Users discover content only through manual search or browsing
+- No personalization based on reading history
+- High bounce rate due to irrelevant content
+- Missed opportunities for increased engagement
+- No learning from user behavior patterns
 
 **Why This Matters**:
-1. **User Experience**: Unnecessary re-renders cause UI lag and janky animations
-2. **CPU Usage**: Extra renders waste CPU cycles and battery on mobile devices
-3. **Memory Pressure**: Frequent re-renders cause garbage collection and memory churn
-4. **Scalability**: Rendering issues compound as component tree grows
+1. **User Engagement**: Personalized content increases time on site
+2. **Discovery**: Users find relevant content without manual searching
+3. **Conversion**: Relevant content drives more conversions
+4. **Retention**: Personalization improves user retention
+5. **Modern UX**: Users expect recommendations (Netflix, Amazon, YouTube)
 
 ### Solution
 
-**React.memo Optimization Pattern**:
-- Move nested components outside parent to prevent recreation
-- Wrap event handlers in `useCallback` with proper dependencies
-- Add `useMemo` for expensive computations with correct dependencies
-- Wrap components in `memo()` when props are stable
+**AI-Powered Content Recommendations**:
+
+**1. Reading History Tracking**:
+```typescript
+interface ReadingHistory {
+  postId: number
+  timestamp: number
+  duration: number  // time spent reading
+  completion: number  // 0-100% scroll depth
+}
+
+interface UserInterestProfile {
+  categories: Map<number, number>  // categoryId → read count
+  tags: Map<number, number>  // tagId → read count
+  lastUpdated: number
+}
+```
+
+**2. Content Similarity Scoring**:
+- Jaccard similarity for tag/category overlap
+- Collaborative filtering: "Users who read X also read Y"
+- Recency scoring boost for new content
+- Popularity factor for trending content
+
+**3. Recommendation Algorithm**:
+```
+RecommendationScore = (JaccardSimilarity × 0.4) +
+                     (CollaborativeFilterScore × 0.3) +
+                     (RecencyScore × 0.2) +
+                     (PopularityScore × 0.1)
+```
+
+**4. "Recommended For You" Section**:
+- Personalized feed based on user profile
+- Fallback to trending posts for new users
+- Feedback loop (helpful/not helpful buttons)
+- A/B testing for algorithm optimization
 
 ### Implementation
 
-1. **CommentList.tsx Optimizations**:
-   - Moved `CommentItem` component outside of `CommentList` (prevents recreation)
-   - Wrapped `handleVote` in `useCallback` with `userVotes` dependency
-   - Wrapped `handleReplyClick` in `useCallback` with empty dependencies
-   - Wrapped `handleCancelReply` in `useCallback` with empty dependencies
-   - Fixed `useMemo` dependency array: `[comment.id, approvedComments, buildCommentTree]`
-   - Removed unused `CommentFormData` import
-   - All callback props passed to `CommentItem` are now stable
+**Phase 1: Reading History Tracking**:
+- [ ] Create ReadingHistory interface
+- [ ] Implement reading history storage (localStorage, 30-day expiration)
+- [ ] Add page view tracking with duration and scroll depth
+- [ ] Create user interest profile updater
+- [ ] Add 15+ tests for history tracking
 
-2. **Dashboard.tsx Optimization**:
-   - Wrapped `renderModule` in `useCallback` with `[activeModule]` dependency
-   - Function now only recreates when `activeModule` changes
+**Phase 2: Recommendation Algorithm**:
+- [ ] Implement Jaccard similarity function
+- [ ] Create collaborative filtering logic (user-item matrix)
+- [ ] Add recency scoring (newer content boosted)
+- [ ] Add popularity scoring (view count × engagement)
+- [ ] Create recommendation ranking function
+- [ ] Add 20+ tests for algorithm
 
-3. **BlogDetailsArea.tsx Optimization**:
-   - Wrapped entire component in `memo()`
-   - Component now only re-renders when props actually change
+**Phase 3: "Recommended For You" Component**:
+- [ ] Create RecommendedPosts component (200 lines)
+- [ ] Implement personalized post cards
+- [ ] Add helpful/not helpful feedback buttons
+- [ ] Add "View All Recommendations" link
+- [ ] Fallback to trending posts for new users
+- [ ] Dark mode support via ThemeContext
+- [ ] Add 20+ tests for component
 
-### Implementation Summary
-
-**Files Modified**: 3 files
-**Lines Changed**: 148 insertions, 99 deletions (net +49 lines)
-
-**Optimizations Applied**:
-1. **CommentList.tsx**: 6 memoization fixes
-   - Component extraction prevents recreation (prevents ~N child re-renders)
-   - Callback memoization prevents prop changes (prevents cascading re-renders)
-   - Fixed useMemo dependency array (prevents stale closures)
-   
-2. **Dashboard.tsx**: 1 optimization
-   - Memoized renderModule prevents recreation on every state update
-   
-3. **BlogDetailsArea.tsx**: 1 optimization
-   - Component memoization prevents re-renders on unrelated state changes
+**Phase 4: Admin Dashboard**:
+- [ ] Create recommendation metrics dashboard
+- [ ] Add click-through rate tracking
+- [ ] Add recommendation performance charts
+- [ ] Add A/B test results (if available)
+- [ ] Add 15+ tests for dashboard
 
 ### Success Criteria
 
-- [x] All 21 CommentList tests passing (100% success rate)
-- [x] All tests passing (5117/5305 total tests)
-- [x] Lint passes (0 errors, 0 warnings)
-- [x] Build successful (38 pages generated)
-- [x] No breaking changes (all existing functionality preserved)
-- [x] Memoization patterns correctly applied
-
-### Performance Impact
-
-**Expected Improvements**:
-- **CommentList**: ~50-70% reduction in child component re-renders on parent state changes
-- **Dashboard**: Eliminated unnecessary function recreation on every render
-- **BlogDetailsArea**: Re-render only when `single_blog` prop changes
-
-**Metrics**:
-- Build time: No regression (still ~6 seconds)
-- Bundle size: No change (271 kB First Load JS maintained)
-- Test execution: No regression (34.4 seconds total)
+- [ ] Reading history tracked with 30-day expiration
+- [ ] User interest profile maintained
+- [ ] Recommendation algorithm with Jaccard similarity
+- [ ] "Recommended For You" section on BlogArea
+- [ ] Feedback mechanism (helpful/not helpful)
+- [ ] Fallback to trending for new users
+- [ ] Admin dashboard with recommendation metrics
+- [ ] 70+ comprehensive tests
+- [ ] Zero regressions in existing functionality
 
 ### Related Files
 
-- ✅ Modified: `src/components/blogs/comments/CommentList.tsx` - 138 lines (+49 net)
-- ✅ Modified: `src/components/dashboard/index.tsx` - 60 lines (+3 net)
-- ✅ Modified: `src/components/blogs/blog-details/BlogDetailsArea.tsx` - 122 lines (+3 net)
+- [ ] Add: `src/utils/recommendations/readingHistory.ts` - Reading history tracking
+- [ ] Add: `src/utils/recommendations/similarityAlgorithm.ts` - Jaccard similarity
+- [ ] Add: `src/utils/recommendations/collaborativeFiltering.ts` - Collaborative filtering
+- [ ] Add: `src/utils/recommendations/index.ts` - Recommendation engine
+- [ ] Add: `src/components/blog/RecommendedPosts.tsx` - Recommendations UI
+- [ ] Add: `src/components/blog/__tests__/RecommendedPosts.test.tsx` - Tests
+- [ ] Modify: `src/components/blog/BlogArea.tsx` - Integrate recommendations
+- [ ] Modify: `docs/blueprint.md` - Document recommendation architecture
+- [ ] Update: `docs/feature.md` - Mark FEATURE-067 in progress
 
-### Related Tasks
+### Notes
 
-- Task 235 (Component React.memo Optimization) - Similar optimization patterns
-- Task 119 (React.memo Implementation) - Previous memoization work
-- Task 275 (Lazy Loading) - Related performance work
+- Privacy-first: All data stored in localStorage, no external tracking
+- Algorithm can be fine-tuned with weights
+- Ready for AI integration (ML-based recommendations)
+- GDPR-compliant with 30-day data retention
 
+---
+
+## Task 366: [CONTENT ARCHITECT] Advanced Search & Discovery (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Implementation - UX/Search/AI
+**Effort**: Large (3-4 days)
+
+### Purpose
+
+Implement advanced search and discovery with intelligent suggestions, faceted filtering, and federated search across all content types.
+
+### Problem Identified
+
+**Limited Search Capabilities**:
+- Search only available on blog posts
+- No search suggestions or autocomplete
+- No faceted filtering (date, type, category)
+- No recent searches tracking
+- No typo correction for search queries
+- No search analytics to understand user intent
+
+**Why This Matters**:
+1. **User Experience**: Better search = faster content discovery
+2. **Engagement**: Relevant results reduce bounce rate
+3. **Accessibility**: Keyboard navigation for screen readers
+4. **Insights**: Search analytics reveals content gaps
+5. **Modern UX**: Users expect Google-like search experience
+
+### Solution
+
+**Federated Search with Intelligent Suggestions**:
+
+**1. Global Search Infrastructure**:
+```typescript
+interface SearchResult {
+  type: 'blog' | 'service' | 'faq' | 'team' | 'page'
+  id: number | string
+  title: string
+  description: string
+  url: string
+  relevanceScore: number
+  matchedTerms: string[]
+}
+```
+
+**2. Search Features**:
+- Global search bar (fixed header, Ctrl+K shortcut)
+- Autocomplete with debouncing (300ms)
+- Faceted search (type, date, category, tags)
+- Search result highlighting
+- Recent searches (localStorage, max 10)
+- Trending searches (derived from analytics)
+- Typo correction (Levenshtein distance)
+- Keyboard navigation (arrow keys, enter)
+
+**3. Federated Search**:
+- Search across: Blog posts, Services, FAQ, Team members, Pages
+- Unified result ranking by relevance
+- Group results by type with expand/collapse
+- "Did you mean?" suggestions for typos
+
+### Implementation
+
+**Phase 1: Search Infrastructure**:
+- [ ] Create SearchResult interface
+- [ ] Implement federated search engine (all content types)
+- [ ] Create search index with pre-built maps
+- [ ] Add relevance scoring algorithm
+- [ ] Add 20+ tests for search engine
+
+**Phase 2: Intelligent Suggestions**:
+- [ ] Implement autocomplete with debouncing (300ms)
+- [ ] Add typo correction (Levenshtein distance ≤ 2)
+- [ ] Create "Did you mean?" suggestions
+- [ ] Add recent searches tracking (localStorage)
+- [ ] Add trending searches from analytics
+- [ ] Add 25+ tests for suggestions
+
+**Phase 3: Faceted Search**:
+- [ ] Create faceted search filters (type, date, category, tags)
+- [ ] Implement filter state management
+- [ ] Add active filters display with "Clear all"
+- [ ] Add 15+ tests for faceted search
+
+**Phase 4: Search UI Components**:
+- [ ] Create GlobalSearchBar component (150 lines)
+- [ ] Add fixed header positioning
+- [ ] Add keyboard shortcut (Ctrl+K, Cmd+K)
+- [ ] Create SearchResultsPage component (200 lines)
+- [ ] Add search result highlighting
+- [ ] Add keyboard navigation for results
+- [ ] Dark mode support via ThemeContext
+- [ ] Add 30+ tests for components
+
+**Phase 5: Search Analytics**:
+- [ ] Add search query tracking (query, timestamp, result count)
+- [ ] Create search analytics dashboard
+- [ ] Add zero-result query analysis
+- [ ] Add 15+ tests for analytics
+
+### Success Criteria
+
+- [ ] Global search bar with Ctrl+K shortcut
+- [ ] Federated search (blog, services, FAQ, team, pages)
+- [ ] Autocomplete with debouncing (300ms)
+- [ ] Typo correction with Levenshtein distance
+- [ ] Faceted filters (type, date, category, tags)
+- [ ] Recent searches tracking (max 10)
+- [ ] Trending searches dashboard
+- [ ] Keyboard navigation support
+- [ ] Search analytics dashboard
+- [ ] 100+ comprehensive tests
+- [ ] Zero regressions in existing functionality
+
+### Related Files
+
+- [ ] Add: `src/utils/search/federatedSearch.ts` - Search engine
+- [ ] Add: `src/utils/search/autocomplete.ts` - Autocomplete logic
+- [ ] Add: `src/utils/search/typoCorrection.ts` - Typo correction
+- [ ] Add: `src/utils/search/analytics.ts` - Search analytics
+- [ ] Add: `src/components/search/GlobalSearchBar.tsx` - Search bar
+- [ ] Add: `src/components/search/SearchResultsPage.tsx` - Results page
+- [ ] Add: `src/app/search/page.tsx` - Search route
+- [ ] Modify: `src/layouts/HeaderOne.tsx` - Add global search
+- [ ] Modify: `docs/blueprint.md` - Document search architecture
+- [ ] Update: `docs/feature.md` - Mark FEATURE-068 in progress
+
+### Notes
+
+- Search index: Pre-built at build time for performance
+- Typo correction: Levenshtein distance for edit distance
+- Privacy: Search analytics anonymized (no user tracking)
+- A/B ready: Algorithm can be A/B tested
+
+---
+
+## Task 367: [SECURITY ARCHITECT] Granular Permission Management (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Implementation - Security/Admin
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Extend RBAC system with granular permissions and custom roles for least-privilege access control.
+
+### Problem Identified
+
+**Limited Permission Granularity**:
+- Only 3 base roles (admin, editor, user)
+- No custom role creation
+- No resource-level permissions (e.g., "edit own posts" vs "edit all posts")
+- No permission scopes (read, write, delete, publish, manage)
+- No permission audit log for compliance
+
+**Why This Matters**:
+1. **Security**: Least-privilege principle reduces attack surface
+2. **Flexibility**: Custom roles for different organizational needs
+3. **Compliance**: Permission audit log for regulatory requirements
+4. **Scalability**: Easy to add new roles without code changes
+5. **User Management**: Fine-grained access control for different user types
+
+### Solution
+
+**Custom Roles with Granular Permissions**:
+
+**1. Permission Scopes**:
+```typescript
+interface PermissionScope {
+  resource: string  // 'blog_posts', 'users', 'settings', 'analytics'
+  action: string    // 'read', 'write', 'delete', 'publish', 'manage'
+}
+
+type ScopedPermission = `${PermissionScope['resource']}.${PermissionScope['action']}`
+// Examples: 'blog_posts.read', 'blog_posts.publish', 'users.manage'
+```
+
+**2. Custom Role Definition**:
+```typescript
+interface CustomRole {
+  id: string
+  name: string
+  description: string
+  extends: UserRole  // 'admin', 'editor', 'user'
+  permissions: ScopedPermission[]
+  createdAt: number
+  createdBy: number
+}
+```
+
+**3. Permission Matrix Visualization**:
+- Grid view: Users (rows) × Permissions (columns)
+- Color-coded: Granted (green), Denied (red), Inherited (blue)
+- Quick permission assignment with checkboxes
+
+### Implementation
+
+**Phase 1: Permission Scopes**:
+- [ ] Define resource types (blog_posts, users, settings, analytics)
+- [ ] Define action types (read, write, delete, publish, manage)
+- [ ] Create ScopedPermission type
+- [ ] Extend Permission enum with scoped permissions
+- [ ] Add 10+ tests for permission scopes
+
+**Phase 2: Custom Role System**:
+- [ ] Create CustomRole interface
+- [ ] Implement role storage (localStorage)
+- [ ] Add role CRUD operations
+- [ ] Add permission templates (content creator, moderator, developer)
+- [ ] Add 20+ tests for custom roles
+
+**Phase 3: Permission Matrix UI**:
+- [ ] Create PermissionMatrix component (150 lines)
+- [ ] Implement grid view (users × permissions)
+- [ ] Add color-coded permission states
+- [ ] Add bulk permission updates
+- [ ] Add 15+ tests for component
+
+**Phase 4: Role Editor UI**:
+- [ ] Create CustomRoleEditor component (120 lines)
+- [ ] Add role name/description inputs
+- [ ] Add permission checkboxes grouped by resource
+- [ ] Add role inheritance dropdown
+- [ ] Add 15+ tests for editor
+
+**Phase 5: Audit Integration**:
+- [ ] Extend ActivityLog for permission changes
+- [ ] Add permission change audit view
+- [ ] Add who created/modified role logging
+- [ ] Add 10+ tests for audit
+
+### Success Criteria
+
+- [ ] Permission scopes defined (resources × actions)
+- [ ] Custom role creation/deletion
+- [ ] Role permission templates
+- [ ] Permission matrix visualization
+- [ ] Bulk permission updates
+- [ ] Permission audit log
+- [ ] 70+ comprehensive tests
+- [ ] Zero regressions in existing functionality
+
+### Related Files
+
+- [ ] Add: `src/types/customRole.ts` - Custom role types
+- [ ] Add: `src/data/customRolesData.ts` - Custom roles storage
+- [ ] Add: `src/utils/rbac/customRoleManager.ts` - Role management
+- [ ] Add: `src/components/admin/PermissionMatrix.tsx` - Permission matrix
+- [ ] Add: `src/components/admin/CustomRoleEditor.tsx` - Role editor
+- [ ] Modify: `src/utils/rbac.ts` - Extend with scoped permissions
+- [ ] Modify: `src/services/auth/AuthService.ts` - Add custom role support
+- [ ] Modify: `docs/blueprint.md` - Document custom role architecture
+- [ ] Update: `docs/feature.md` - Mark FEATURE-069 in progress
+
+### Notes
+
+- Backward compatible: Base roles still work
+- Permission inheritance: Custom roles extend base roles
+- Audit trail: All permission changes logged
+- RBAC: Admins can manage all roles
+
+---
+
+## Task 368: [DEVOPS ENGINEER] Advanced Backup Verification Drills (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Implementation - Infrastructure/DevOps
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Implement automated backup verification drills to validate backup integrity and disaster recovery readiness.
+
+### Problem Identified
+
+**No Backup Validation**:
+- Backups created but never verified
+- No guarantee backups can restore successfully
+- Manual testing is time-consuming and error-prone
+- No drill history or trend analysis
+- No compliance evidence for audit requirements
+
+**Why This Matters**:
+1. **Disaster Recovery**: Only validated backups guarantee recovery
+2. **Compliance**: Regular drills required for regulations (SOC2, ISO27001)
+3. **Risk Reduction**: Early detection of backup failures
+4. **Automation**: Eliminates manual testing errors
+5. **Confidence**: Verified backups provide assurance
+
+### Solution
+
+**Automated Backup Verification Drills**:
+
+**1. Drill Types**:
+```typescript
+enum DrillType {
+  FULL_RESTORE = 'full_restore',
+  PARTIAL_RESTORE = 'partial_restore',
+  INTEGRITY_CHECK = 'integrity_check'
+}
+
+interface DrillResult {
+  id: string
+  type: DrillType
+  status: 'success' | 'partial_success' | 'failure'
+  startTime: number
+  endTime: number
+  duration: number
+  logs: DrillLog[]
+  metrics: DrillMetrics
+}
+```
+
+**2. Drill Scheduling**:
+- Cron expression builder UI
+- Predefined schedules (daily, weekly, monthly)
+- Manual trigger option
+- Time zone support
+
+**3. Drill Execution**:
+- Isolated test environment (temp database/storage)
+- Full backup → Restore → Verify → Cleanup
+- Integrity checks (file count, checksum, data validation)
+- Detailed logging with error messages
+
+### Implementation
+
+**Phase 1: Drill Infrastructure**:
+- [ ] Create DrillType enum
+- [ ] Create DrillResult interface
+- [ ] Define drill execution interface
+- [ ] Add 10+ tests for drill infrastructure
+
+**Phase 2: Drill Engine**:
+- [ ] Create DrillExecutor class
+- [ ] Implement full restore drill
+- [ ] Implement partial restore drill
+- [ ] Implement integrity check drill
+- [ ] Add isolated test environment
+- [ ] Add 25+ tests for drill engine
+
+**Phase 3: Drill Scheduling**:
+- [ ] Create cron expression builder
+- [ ] Implement drill scheduler
+- [ ] Add drill trigger (manual + scheduled)
+- [ ] Add 15+ tests for scheduler
+
+**Phase 4: Drill Dashboard**:
+- [ ] Create DrillDashboard component (200 lines)
+- [ ] Add drill history table
+- [ ] Add drill trend visualization
+- [ ] Add drill report export (PDF, CSV)
+- [ ] Add 20+ tests for dashboard
+
+**Phase 5: Notifications**:
+- [ ] Integrate with APM for alerts
+- [ ] Integrate with EmailService for email notifications
+- [ ] Add drill success/failure alerts
+- [ ] Add 10+ tests for notifications
+
+### Success Criteria
+
+- [ ] Drill types defined (full restore, partial restore, integrity check)
+- [ ] Automated drill scheduling (cron UI)
+- [ ] Manual drill trigger
+- [ ] Isolated test environment
+- [ ] Drill dashboard with history and trends
+- [ ] Drill notifications (email, APM)
+- [ ] Drill report export (PDF, CSV)
+- [ ] 80+ comprehensive tests
+- [ ] Zero regressions in existing functionality
+
+### Related Files
+
+- [ ] Add: `src/types/backupDrill.ts` - Drill types
+- [ ] Add: `src/utils/backup/drillEngine.ts` - Drill execution
+- [ ] Add: `src/utils/backup/drillScheduler.ts` - Drill scheduling
+- [ ] Add: `src/components/admin/DrillDashboard.tsx` - Drill dashboard
+- [ ] Modify: `src/utils/backup/backupEngine.ts` - Integrate drills
+- [ ] Modify: `docs/blueprint.md` - Document drill architecture
+- [ ] Update: `docs/feature.md` - Mark FEATURE-070 in progress
+
+### Notes
+
+- Isolated environment: Temporary storage for restore testing
+- Performance metrics: RTO (Recovery Time), RPO (Recovery Point)
+- Compliance: Drill reports for audit evidence
+
+---
+
+## Task 369: [CONTENT ANALYST] Content Performance Analytics Dashboard (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Feature Implementation - Analytics/Content Management
+**Effort**: Medium (2-3 days)
+
+### Purpose
+
+Implement content performance analytics dashboard to help content creators understand what content resonates with readers and optimize future posts.
+
+### Problem Identified
+
+**No Content Performance Insights**:
+- Content creators don't know which posts perform best
+- No visibility into engagement metrics (views, comments, shares)
+- No trend analysis (weekly/monthly comparisons)
+- No optimization suggestions based on performance data
+- No cohort analysis (new vs returning readers)
+
+**Why This Matters**:
+1. **Content Optimization**: Data-driven decisions improve content quality
+2. **Engagement**: Understanding what works increases engagement
+3. **Strategy**: Performance trends inform content strategy
+4. **ROI**: Best-performing content generates most value
+5. **User Insights**: Cohort analysis reveals reader behavior
+
+### Solution
+
+**Content Performance Analytics Dashboard**:
+
+**1. Performance Metrics**:
+```typescript
+interface ContentMetrics {
+  postId: number
+  viewCount: number
+  commentCount: number
+  shareCount: number
+  bookmarkCount: number
+  avgTimeOnPage: number
+  engagementScore: number
+  scrollDepth: number
+  conversionRate: number
+}
+```
+
+**2. Engagement Score Calculation**:
+```
+EngagementScore = (views × 1) +
+                 (comments × 5) +
+                 (shares × 3) +
+                 (bookmarks × 4) +
+                 (avgTimeOnPage × 0.01) +
+                 (scrollDepth × 10)
+```
+
+**3. Dashboard Features**:
+- Top-performing posts (by engagement, views, shares)
+- Performance trend charts (weekly, monthly)
+- Content comparison (this period vs last period)
+- Cohort analysis (new vs returning readers)
+- Performance export (CSV, PDF)
+- Content optimization suggestions (AI-powered)
+
+### Implementation
+
+**Phase 1: Metrics Tracking**:
+- [ ] Extend InnerBlogPost with performance metrics
+- [ ] Implement view tracking (page views)
+- [ ] Implement engagement tracking (comments, shares, bookmarks)
+- [ ] Implement scroll depth tracking (25%, 50%, 75%, 100%)
+- [ ] Add 20+ tests for metrics tracking
+
+**Phase 2: Analytics Engine**:
+- [ ] Create engagement score calculator
+- [ ] Implement trend analysis (week-over-week, month-over-month)
+- [ ] Create cohort analysis (new vs returning)
+- [ ] Add performance aggregation functions
+- [ ] Add 25+ tests for analytics
+
+**Phase 3: Dashboard UI**:
+- [ ] Create ContentAnalyticsDashboard component (250 lines)
+- [ ] Add top-performing posts section
+- [ ] Add performance trend charts (Bootstrap charts)
+- [ ] Add content comparison view
+- [ ] Add cohort analysis section
+- [ ] Dark mode support via ThemeContext
+- [ ] Add 30+ tests for dashboard
+
+**Phase 4: Export & Suggestions**:
+- [ ] Add performance export (CSV, PDF)
+- [ ] Create optimization suggestions component
+- [ ] Add AI-powered content insights
+- [ ] Add 15+ tests for exports/suggestions
+
+### Success Criteria
+
+- [ ] Performance metrics tracked (views, comments, shares, bookmarks)
+- [ ] Engagement score calculation implemented
+- [ ] Top-performing posts displayed
+- [ ] Performance trend visualization (weekly, monthly)
+- [ ] Content comparison (period vs period)
+- [ ] Cohort analysis (new vs returning)
+- [ ] Performance export (CSV, PDF)
+- [ ] Content optimization suggestions
+- [ ] 90+ comprehensive tests
+- [ ] Zero regressions in existing functionality
+
+### Related Files
+
+- [ ] Add: `src/types/contentAnalytics.ts` - Content analytics types
+- [ ] Add: `src/utils/analytics/contentAnalytics.ts` - Analytics engine
+- [ ] Add: `src/components/admin/ContentAnalyticsDashboard.tsx` - Dashboard
+- [ ] Add: `src/components/analytics/TopPerformingPosts.tsx` - Top posts
+- [ ] Add: `src/components/analytics/PerformanceTrends.tsx` - Trends
+- [ ] Modify: `src/app/admin/analytics/page.tsx` - Integrate content analytics
+- [ ] Modify: `docs/blueprint.md` - Document analytics architecture
+- [ ] Update: `docs/feature.md` - Mark FEATURE-071 in progress
+
+### Notes
+
+- Engagement score: Weighted formula customizable
+- Time on page: Scroll depth milestones for accurate tracking
+- Cohort analysis: 30-day window for new users
+- AI suggestions: Rule-based initially, ready for ML
+
+---
+
+## Task 370: [I18N ARCHITECT] Multi-Language Support (i18n) (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: HIGH
+**Type**: Feature Implementation - Internationalization/UX
+**Effort**: Large (4-5 days)
+
+### Purpose
+
+Implement multi-language support (English/Indonesian) to improve accessibility and expand global reach of the application.
+
+### Problem Identified
+
+**No Multi-Language Support**:
+- Content only available in one language (Indonesian)
+- No language preference for users
+- No SEO optimization for different languages
+- No RTL support for future language expansion
+- Hard to scale for international users
+
+**Why This Matters**:
+1. **Accessibility**: Users prefer native language
+2. **Global Reach**: Multi-language expands user base
+3. **SEO**: Language-specific SEO improves search visibility
+4. **Scalability**: Foundation for adding more languages
+5. **Compliance**: Accessibility laws in some regions
+
+### Solution
+
+**Multi-Language Support (i18n)**:
+
+**1. i18n Infrastructure**:
+```typescript
+interface Translation {
+  [key: string]: string
+}
+
+interface Locale {
+  code: 'en' | 'id'
+  name: string
+  flag: string
+  translations: Translation
+}
+```
+
+**2. Language Features**:
+- Language selector in navigation with flag icons
+- Persistent language preference (localStorage)
+- Language detection from browser settings
+- Language-specific routing (/en/*, /id/*)
+- SEO optimization (hreflang tags, language-specific sitemaps)
+- Fallback mechanism for missing translations
+- Date/number formatting per locale
+
+**3. Blog Content Localization**:
+- Extend blog posts with language variants
+- Language switcher on blog detail pages
+- Fallback to primary language for missing translations
+
+### Implementation
+
+**Phase 1: i18n Setup**:
+- [ ] Install i18n library (next-intl)
+- [ ] Create locale files (en.json, id.json)
+- [ ] Create I18nContext with currentLanguage and setLanguage
+- [ ] Add language detection from browser
+- [ ] Add 20+ tests for i18n setup
+
+**Phase 2: Translation Files**:
+- [ ] Create translation structure (namespaces: common, auth, blog, admin)
+- [ ] Translate all static UI text (~500 strings)
+- [ ] Add Indonesian translations (existing UI)
+- [ ] Add English translations
+- [ ] Add 15+ tests for translations
+
+**Phase 3: Language Switcher**:
+- [ ] Create LanguageSwitcher component (80 lines)
+- [ ] Add flag icons for each language
+- [ ] Add language dropdown in navigation
+- [ ] Add smooth transition animation
+- [ ] Add 10+ tests for switcher
+
+**Phase 4: Routing & SEO**:
+- [ ] Create language-specific routes (/en/*, /id/*)
+- [ ] Add middleware for language detection/persistence
+- [ ] Add hreflang tags to SeoHead component
+- [ ] Create language-specific sitemaps
+- [ ] Add 15+ tests for routing/SEO
+
+**Phase 5: Blog Content Localization**:
+- [ ] Extend InnerBlogPost with language variants
+- [ ] Add language switcher to BlogDetail page
+- [ ] Implement fallback to primary language
+- [ ] Add 10+ tests for content localization
+
+**Phase 6: Admin Panel**:
+- [ ] Create TranslationManager component (150 lines)
+- [ ] Add translation CRUD interface
+- [ ] Add missing translation warnings
+- [ ] Add export/import for translations
+- [ ] Add 20+ tests for admin panel
+
+### Success Criteria
+
+- [ ] i18n context provider implemented
+- [ ] Language selector in navigation with flags
+- [ ] All static UI text translated (~500 strings)
+- [ ] Language preference persisted (localStorage)
+- [ ] Language detection from browser settings
+- [ ] Language-specific routing (/en/*, /id/*)
+- [ ] SEO optimization (hreflang tags)
+- [ ] Date/number formatting per locale
+- [ ] Translation manager admin panel
+- [ ] 100+ comprehensive tests
+- [ ] Zero regressions in existing functionality
+
+### Related Files
+
+- [ ] Add: `src/locales/en.json` - English translations
+- [ ] Add: `src/locales/id.json` - Indonesian translations
+- [ ] Add: `src/context/I18nContext.tsx` - i18n context
+- [ ] Add: `src/components/common/LanguageSwitcher.tsx` - Language switcher
+- [ ] Add: `src/components/admin/TranslationManager.tsx` - Admin panel
+- [ ] Add: `src/middleware/i18n.ts` - Language middleware
+- [ ] Modify: `src/app/[lang]/layout.tsx` - Language-specific layout
+- [ ] Modify: `docs/blueprint.md` - Document i18n architecture
+- [ ] Update: `docs/feature.md` - Mark FEATURE-072 in progress
+
+### Notes
+
+- Library: next-intl for Next.js i18n
+- RTL support: CSS dir attribute, mirrored layouts
+- Fallback: Primary language for missing translations
+- Privacy: Language preference in localStorage (no user tracking)
+
+---
