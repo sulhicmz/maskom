@@ -35,6 +35,11 @@ export const CIRCUIT_BREAKER_CONFIG = {
         failureThreshold: 5,
         resetTimeoutMs: 60000,
         monitoringPeriodMs: 60000
+    },
+    CDN_API: {
+        failureThreshold: 3,
+        resetTimeoutMs: 60000,
+        monitoringPeriodMs: 60000
     }
 } as const;
 

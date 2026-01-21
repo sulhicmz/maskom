@@ -3,10 +3,17 @@
 import { useState, useEffect } from 'react';
 import { CDNConfig, CDNProvider, CDNMetrics } from '@/types/cdn';
 import { cdnConfigManager } from '@/utils/cdnConfig';
+import { withTimeout } from '@/utils/resilience/timeout';
+import { withRetry } from '@/utils/resilience/retry';
+import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
+import { TIMEOUTS, SERVICE_RETRY_CONFIG } from '@/constants';
+import { CIRCUIT_BREAKER_CONFIG } from '@/constants/circuitBreaker';
 
 interface CDNConfigFormProps {
   onSave?: (config: CDNConfig) => void;
 }
+
+const cdnCircuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.CDN_API);
 
 export default function CDNConfigForm({ onSave }: CDNConfigFormProps) {
   const [config, setConfig] = useState<CDNConfig>(cdnConfigManager.getConfig());
@@ -20,10 +27,24 @@ export default function CDNConfigForm({ onSave }: CDNConfigFormProps) {
 
   const loadMetrics = async () => {
     try {
-      const response = await fetch('/api/cdn/metrics');
-      if (response.ok) {
-        const data = await response.json();
-        setMetrics(data);
+      const retryResult = await cdnCircuitBreaker.execute(async () => {
+        return await withRetry(
+          async () => {
+            return await withTimeout(
+              fetch('/api/cdn/metrics'),
+              { timeoutMs: TIMEOUTS.CDN_API, timeoutError: 'CDN metrics request timed out' }
+            );
+          },
+          { ...SERVICE_RETRY_CONFIG.CDN_API, retryableErrors: [...SERVICE_RETRY_CONFIG.CDN_API.retryableErrors] }
+        );
+      });
+
+      if (retryResult.success && retryResult.data) {
+        const response = retryResult.data;
+        if (response.ok) {
+          const data = await response.json();
+          setMetrics(data);
+        }
       }
     } catch (error) {
       console.error('Failed to load CDN metrics:', error);
@@ -44,18 +65,33 @@ export default function CDNConfigForm({ onSave }: CDNConfigFormProps) {
     try {
       cdnConfigManager.updateConfig(config);
 
-      const response = await fetch('/api/cdn/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config)
+      const retryResult = await cdnCircuitBreaker.execute(async () => {
+        return await withRetry(
+          async () => {
+            return await withTimeout(
+              fetch('/api/cdn/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+              }),
+              { timeoutMs: TIMEOUTS.CDN_API, timeoutError: 'CDN config save request timed out' }
+            );
+          },
+          { ...SERVICE_RETRY_CONFIG.CDN_API, retryableErrors: [...SERVICE_RETRY_CONFIG.CDN_API.retryableErrors] }
+        );
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save CDN configuration');
-      }
+      if (retryResult.success && retryResult.data) {
+        const response = retryResult.data;
+        if (!response.ok) {
+          throw new Error('Failed to save CDN configuration');
+        }
 
-      onSave?.(config);
-      await loadMetrics();
+        onSave?.(config);
+        await loadMetrics();
+      } else {
+        throw new Error(retryResult.error?.message || 'Failed to save CDN configuration');
+      }
     } catch (error) {
       setErrors([error instanceof Error ? error.message : 'Unknown error']);
     } finally {
@@ -68,15 +104,30 @@ export default function CDNConfigForm({ onSave }: CDNConfigFormProps) {
     setErrors([]);
 
     try {
-      const response = await fetch('/api/cdn/purge', {
-        method: 'POST'
+      const retryResult = await cdnCircuitBreaker.execute(async () => {
+        return await withRetry(
+          async () => {
+            return await withTimeout(
+              fetch('/api/cdn/purge', {
+                method: 'POST'
+              }),
+              { timeoutMs: TIMEOUTS.CDN_API, timeoutError: 'CDN cache purge request timed out' }
+            );
+          },
+          { ...SERVICE_RETRY_CONFIG.CDN_API, retryableErrors: [...SERVICE_RETRY_CONFIG.CDN_API.retryableErrors] }
+        );
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to purge cache');
-      }
+      if (retryResult.success && retryResult.data) {
+        const response = retryResult.data;
+        if (!response.ok) {
+          throw new Error('Failed to purge cache');
+        }
 
-      await loadMetrics();
+        await loadMetrics();
+      } else {
+        throw new Error(retryResult.error?.message || 'Failed to purge cache');
+      }
     } catch (error) {
       setErrors([error instanceof Error ? error.message : 'Failed to purge cache']);
     } finally {

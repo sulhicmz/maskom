@@ -1,12 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { withTimeout } from '@/utils/resilience/timeout';
+import { withRetry } from '@/utils/resilience/retry';
+import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
+import { TIMEOUTS, SERVICE_RETRY_CONFIG } from '@/constants';
+import { CIRCUIT_BREAKER_CONFIG } from '@/constants/circuitBreaker';
 
 interface CDNHealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';
   lastCheck: string;
   message: string;
 }
+
+const cdnCircuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.CDN_API);
 
 export default function CDNHealthIndicator() {
   const [health, setHealth] = useState<CDNHealthStatus | null>(null);
@@ -21,24 +28,44 @@ export default function CDNHealthIndicator() {
   const checkHealth = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/cdn/health');
-      if (response.ok) {
-        const data = await response.json();
-        setHealth(data);
+      const retryResult = await cdnCircuitBreaker.execute(async () => {
+        return await withRetry(
+          async () => {
+            return await withTimeout(
+              fetch('/api/cdn/health'),
+              { timeoutMs: TIMEOUTS.CDN_API, timeoutError: 'CDN health check request timed out' }
+            );
+          },
+          { ...SERVICE_RETRY_CONFIG.CDN_API, retryableErrors: [...SERVICE_RETRY_CONFIG.CDN_API.retryableErrors] }
+        );
+      });
+
+      if (retryResult.success && retryResult.data) {
+        const response = retryResult.data;
+        if (response.ok) {
+          const data = await response.json();
+          setHealth(data);
+        } else {
+          setHealth({
+            status: 'unhealthy',
+            lastCheck: new Date().toISOString(),
+            message: 'Gagal memeriksa status CDN'
+          });
+        }
       } else {
         setHealth({
           status: 'unhealthy',
           lastCheck: new Date().toISOString(),
-          message: 'Gagal memeriksa status CDN'
+          message: retryResult.error?.message || 'CDN tidak dapat diakses'
         });
       }
-      } catch {
-        setHealth({
-          status: 'unhealthy',
-          lastCheck: new Date().toISOString(),
-          message: 'CDN tidak dapat diakses'
-        });
-      } finally {
+    } catch (error) {
+      setHealth({
+        status: 'unhealthy',
+        lastCheck: new Date().toISOString(),
+        message: error instanceof Error ? error.message : 'CDN tidak dapat diakses'
+      });
+    } finally {
       setIsLoading(false);
     }
   };
