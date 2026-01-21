@@ -6,37 +6,34 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   establishBaseline,
   checkForRegressions,
   WebVitalMetric,
   PerformanceBaseline,
-  RegressionAlert
+  RegressionAlert,
+  MetricSample
 } from '@/utils/performanceRegressionDetection';
 import {
-  loadFromLocalStorage,
-  getWebVitalsEntries
+  loadFromLocalStorage
 } from '@/utils/webVitals';
+import { WebVitalsEntry } from '@/types/analytics';
 import apmManager from '@/utils/apm';
 
 const REGRESSION_ALERTS_KEY = 'regression_alerts'
 const BASELINES_KEY = 'performance_baselines'
 
 function PerformanceRegressionDashboard() {
-  const { theme } = useTheme();
+  useTheme();
   const [alerts, setAlerts] = useState<RegressionAlert[]>([]);
   const [baselines, setBaselines] = useState<Map<WebVitalMetric, PerformanceBaseline>>(new Map());
   const [filter, setFilter] = useState<'all' | 'active' | 'acknowledged' | 'resolved'>('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
+  const loadData = useCallback(() => {
     setLoading(true);
     
     const webVitalsEntries = loadFromLocalStorage();
@@ -45,7 +42,7 @@ function PerformanceRegressionDashboard() {
     const storedBaselines = localStorage.getItem(BASELINES_KEY);
     
     let loadedAlerts: RegressionAlert[] = [];
-    let loadedBaselines: Map<WebVitalMetric, PerformanceBaseline> = new Map();
+    const loadedBaselines: Map<WebVitalMetric, PerformanceBaseline> = new Map();
     
     if (storedAlerts) {
       try {
@@ -95,10 +92,14 @@ function PerformanceRegressionDashboard() {
     setAlerts(loadedAlerts);
     setBaselines(loadedBaselines);
     setLoading(false);
-  };
+  }, []);
 
-  const groupSamplesByMetric = (entries: any[]): Map<WebVitalMetric, any[]> => {
-    const map = new Map<WebVitalMetric, any[]>();
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const groupSamplesByMetric = (entries: WebVitalsEntry[]): Map<WebVitalMetric, MetricSample[]> => {
+    const map = new Map<WebVitalMetric, MetricSample[]>();
     
     for (const entry of entries) {
       const metricName = entry.metric.toUpperCase() as WebVitalMetric;
