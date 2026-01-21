@@ -5,19 +5,15 @@ import {
   DrillResults,
   DrillConfig,
   DrillStatistics,
-  DrillTypeStats,
   DrillFilters,
   DrillScheduleDetails,
-  DrillSchedule,
-  DrillHealthStatus,
-  DEFAULT_DRILL_CONFIG,
-  DRILL_STORAGE_KEY,
-  DRILL_DATA_KEY
+  DrillSchedule
 } from '@/types/drill'
 
 import { BackupEngine } from '@/utils/backupEngine'
 import { BackupMetadata } from '@/types/backup'
 import apmManager from '@/utils/apm'
+import { logServiceInfo } from '@/services/common/logger'
 import DrillStorage from '@/utils/drill/drillStorage'
 import DrillScheduler from '@/utils/drill/drillScheduler'
 import DrillStatisticsCalculator from '@/utils/drill/drillStatistics'
@@ -416,92 +412,16 @@ class DrillEngine {
 
   async getDrillStatistics(): Promise<DrillStatistics> {
     const drills = await this.getDrills()
-
-    const totalDrills = drills.length
-    const successfulDrills = drills.filter((d) => d.status === DrillStatus.PASSED).length
-    const failedDrills = drills.filter((d) => d.status === DrillStatus.FAILED).length
-    const cancelledDrills = drills.filter((d) => d.status === DrillStatus.CANCELLED).length
-
-    const completedDrills = drills.filter((d) =>
-      [DrillStatus.PASSED, DrillStatus.FAILED].includes(d.status)
-    )
-
-    const averageDuration =
-      completedDrills.length > 0
-        ? completedDrills.reduce((sum, d) => sum + d.duration, 0) / completedDrills.length
-        : 0
-
-    const lastDrill = drills[0]
-    const lastDrillDate = lastDrill ? lastDrill.timestamp : null
-    const lastDrillStatus = lastDrill ? lastDrill.status : DrillStatus.SCHEDULED
-
-    const sortedDrills = [...drills].sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
-
-    let consecutiveFailures = 0
-
-    for (const drill of sortedDrills) {
-      if (drill.status === DrillStatus.FAILED) {
-        consecutiveFailures++
-      } else if (drill.status === DrillStatus.PASSED) {
-        break
-      }
-    }
-
-    const drillTypeBreakdown: Record<DrillType, DrillTypeStats> = {
-      [DrillType.FULL_RESTORE]: this.calculateDrillTypeStats(drills, DrillType.FULL_RESTORE),
-      [DrillType.PARTIAL_RESTORE]: this.calculateDrillTypeStats(drills, DrillType.PARTIAL_RESTORE),
-      [DrillType.INTEGRITY_CHECK]: this.calculateDrillTypeStats(drills, DrillType.INTEGRITY_CHECK)
-    }
-
     const config = await this.getDrillConfig()
-    const healthStatus = this.calculateHealthStatus(
-      consecutiveFailures,
-      failedDrills,
-      totalDrills,
-      config.maxConsecutiveFailures
-    )
-
-    return {
-      totalDrills,
-      successfulDrills,
-      failedDrills,
-      cancelledDrills,
-      averageDuration: Math.round(averageDuration),
-      lastDrillDate,
-      lastDrillStatus,
-      consecutiveFailures,
-      healthStatus,
-      drillTypeBreakdown
-    }
+    return this.drillStatisticsCalculator.calculateDrillStatistics(drills, config)
   }
 
   async getDrillConfig(): Promise<DrillConfig> {
-    if (typeof window === 'undefined') {
-      return DEFAULT_DRILL_CONFIG
-    }
-
-    const configString = global.localStorage?.getItem(DRILL_STORAGE_KEY)
-
-    if (!configString) {
-      await this.saveDrillConfig(DEFAULT_DRILL_CONFIG)
-      return DEFAULT_DRILL_CONFIG
-    }
-
-    try {
-      return JSON.parse(configString)
-    } catch {
-      return DEFAULT_DRILL_CONFIG
-    }
+    return await this.drillStorage.getDrillConfig()
   }
 
   async saveDrillConfig(config: DrillConfig): Promise<void> {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    global.localStorage?.setItem(DRILL_STORAGE_KEY, JSON.stringify(config))
+    await this.drillStorage.saveDrillConfig(config)
   }
 
   private async attemptRemediation(drill: BackupDrill): Promise<void> {
@@ -540,7 +460,7 @@ class DrillEngine {
     apmManager.addBreadcrumb(`Drill notification: ${drill.status}`, 'drill', 'info')
 
     if (config.notificationEmails.length > 0) {
-      console.log(`[Drill Notification] Sending drill ${drill.id} status ${drill.status} to:`, config.notificationEmails)
+      logServiceInfo('DrillEngine', 'sendDrillNotification', `Sending drill ${drill.id} status ${drill.status} to: ${config.notificationEmails.join(', ')}`)
     }
 
     drill.notificationSent = true
@@ -572,88 +492,13 @@ class DrillEngine {
   }
 
   private async saveDrill(drill: BackupDrill): Promise<void> {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const drills = await this.loadDrillsFromStorage()
-    const index = drills.findIndex((d) => d.id === drill.id)
-
-    if (index !== -1) {
-      drills[index] = drill
-    } else {
-      drills.push(drill)
-    }
-
-    global.localStorage?.setItem(DRILL_DATA_KEY, JSON.stringify(drills))
+    await this.drillStorage.saveDrill(drill)
   }
 
   private async loadDrillsFromStorage(): Promise<BackupDrill[]> {
-    if (typeof window === 'undefined') {
-      return []
-    }
-
-    const drillsString = global.localStorage?.getItem(DRILL_DATA_KEY)
-
-    if (!drillsString) {
-      return []
-    }
-
-    try {
-      return JSON.parse(drillsString)
-    } catch {
-      return []
-    }
+    return await this.drillStorage.loadDrillsFromStorage()
   }
 
-  private calculateDrillTypeStats(drills: BackupDrill[], drillType: DrillType): DrillTypeStats {
-    const typeDrills = drills.filter((d) => d.drillType === drillType)
-
-    const total = typeDrills.length
-    const passed = typeDrills.filter((d) => d.status === DrillStatus.PASSED).length
-    const failed = typeDrills.filter((d) => d.status === DrillStatus.FAILED).length
-
-    const completedDrills = typeDrills.filter((d) =>
-      [DrillStatus.PASSED, DrillStatus.FAILED].includes(d.status)
-    )
-
-    const averageDuration =
-      completedDrills.length > 0
-        ? completedDrills.reduce((sum, d) => sum + d.duration, 0) / completedDrills.length
-        : 0
-
-    return {
-      total,
-      passed,
-      failed,
-      averageDuration: Math.round(averageDuration)
-    }
-  }
-
-  private calculateHealthStatus(
-    consecutiveFailures: number,
-    failedDrills: number,
-    totalDrills: number,
-    maxConsecutiveFailures: number
-  ): DrillHealthStatus {
-    if (consecutiveFailures >= maxConsecutiveFailures) {
-      return 'critical'
-    }
-
-    if (failedDrills > 0 && totalDrills > 0) {
-      const failureRate = failedDrills / totalDrills
-
-      if (failureRate > 0.2) {
-        return 'critical'
-      }
-
-      if (failureRate > 0.1) {
-        return 'warning'
-      }
-    }
-
-    return 'healthy'
-  }
 }
 
 export default DrillEngine

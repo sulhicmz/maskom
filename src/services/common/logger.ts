@@ -42,3 +42,7 @@ export function logServiceSuccess(service: string, operation: string, duration?:
 export function logServiceWarning(service: string, operation: string, message: string): void {
     console.warn(`[${service}] ${operation} warning:`, message);
 }
+
+export function logServiceInfo(service: string, operation: string, message: string): void {
+    console.log(`[${service}] ${operation}:`, message);
+}

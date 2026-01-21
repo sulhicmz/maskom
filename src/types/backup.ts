@@ -380,3 +380,33 @@ export const BACKUP_STORAGE_KEY = 'maskom_backup_config'
 export const BACKUP_METADATA_KEY = 'maskom_backup_metadata'
 export const BACKUP_DATA_KEY_PREFIX = 'maskom_backup_data_'
 export const DISASTER_RECOVERY_PLAN_KEY = 'maskom_disaster_recovery_plan'
+
+export interface BackupProgress {
+  current: number
+  total: number
+  message: string
+}
+
+export type BackupProgressCallback = (progress: BackupProgress) => void
+
+export interface IBackupEngine {
+  createFullBackup(
+    config: BackupConfig,
+    onProgress?: BackupProgressCallback,
+  ): Promise<BackupMetadata>
+  createIncrementalBackup(
+    config: BackupConfig,
+    lastFullBackup: BackupMetadata | null,
+    onProgress?: BackupProgressCallback,
+  ): Promise<BackupMetadata>
+  restoreBackup(
+    backupId: string,
+    onProgress?: BackupProgressCallback,
+  ): Promise<RestoreResult>
+  verifyBackupIntegrity(backupId: string): Promise<boolean>
+  getBackupStatistics(): Promise<BackupStatistics>
+  deleteBackup(backupId: string): Promise<boolean>
+  exportBackupToFile(backupId: string): Promise<Blob | null>
+  getBackupMetadataList(): Promise<BackupMetadata[]>
+  getBackupMetadataById(backupId: string): Promise<BackupMetadata | null>
+}
