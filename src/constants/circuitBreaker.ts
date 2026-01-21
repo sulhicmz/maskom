@@ -30,6 +30,11 @@ export const CIRCUIT_BREAKER_CONFIG = {
         failureThreshold: 3,
         resetTimeoutMs: 60000,
         monitoringPeriodMs: 60000
+    },
+    COLLABORATION_API: {
+        failureThreshold: 5,
+        resetTimeoutMs: 60000,
+        monitoringPeriodMs: 60000
     }
 } as const;
 

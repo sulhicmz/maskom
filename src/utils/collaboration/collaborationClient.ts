@@ -1,4 +1,8 @@
 import { CollaborativeEvent, ActiveEditor, CursorPosition } from '@/types/collaboration'
+import { withTimeout, CircuitBreaker } from '@/utils/resilience'
+import { withRetry } from '@/utils/resilience/retry'
+import { TIMEOUTS, SERVICE_RETRY_CONFIG } from '@/constants/timeouts'
+import { CIRCUIT_BREAKER_CONFIG } from '@/constants/circuitBreaker'
 
 interface CollaborationClientConfig {
   sessionId: string
@@ -24,27 +28,48 @@ export class CollaborationClient {
   private pollTimer: NodeJS.Timeout | null = null
   private lastEventId: string | undefined = undefined
   private isConnected = false
+  private circuitBreaker: CircuitBreaker
 
   constructor(config: CollaborationClientConfig) {
     this.config = {
       pollInterval: 1000,
       ...config
     }
+    this.circuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.COLLABORATION_API)
   }
 
   async join(): Promise<boolean> {
     try {
-      const response = await fetch('/api/collaborate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'join',
-          postId: this.extractPostId(this.config.sessionId),
-          userId: this.config.userId,
-          username: this.config.username
-        })
-      })
+      const retryResult = await withRetry(
+        () => this.circuitBreaker.execute(async () => {
+          return await withTimeout(
+            fetch('/api/collaborate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'join',
+                postId: this.extractPostId(this.config.sessionId),
+                userId: this.config.userId,
+                username: this.config.username
+              })
+            }),
+            { timeoutMs: TIMEOUTS.COLLABORATION_API, timeoutError: 'Collaboration API join request timed out' }
+          )
+        }),
+        {
+          maxAttempts: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxAttempts,
+          baseDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.baseDelayMs,
+          maxDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxDelayMs,
+          backoffMultiplier: SERVICE_RETRY_CONFIG.COLLABORATION_API.backoffMultiplier,
+          retryableErrors: [...SERVICE_RETRY_CONFIG.COLLABORATION_API.retryableErrors]
+        }
+      )
 
+      if (!retryResult.success) {
+        throw retryResult.error
+      }
+
+      const response = retryResult.data!
       const result = await response.json()
 
       if (result.success) {
@@ -66,16 +91,35 @@ export class CollaborationClient {
     this.isConnected = false
 
     try {
-      const response = await fetch('/api/collaborate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'leave',
-          sessionId: this.config.sessionId,
-          userId: this.config.userId
-        })
-      })
+      const retryResult = await withRetry(
+        () => this.circuitBreaker.execute(async () => {
+          return await withTimeout(
+            fetch('/api/collaborate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'leave',
+                sessionId: this.config.sessionId,
+                userId: this.config.userId
+              })
+            }),
+            { timeoutMs: TIMEOUTS.COLLABORATION_API, timeoutError: 'Collaboration API leave request timed out' }
+          )
+        }),
+        {
+          maxAttempts: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxAttempts,
+          baseDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.baseDelayMs,
+          maxDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxDelayMs,
+          backoffMultiplier: SERVICE_RETRY_CONFIG.COLLABORATION_API.backoffMultiplier,
+          retryableErrors: [...SERVICE_RETRY_CONFIG.COLLABORATION_API.retryableErrors]
+        }
+      )
 
+      if (!retryResult.success) {
+        throw retryResult.error
+      }
+
+      const response = retryResult.data!
       const result = await response.json()
       return result.success
     } catch (error) {
@@ -93,18 +137,37 @@ export class CollaborationClient {
     }
 
     try {
-      const response = await fetch('/api/collaborate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'cursor_update',
-          sessionId: this.config.sessionId,
-          userId: this.config.userId,
-          cursorPosition,
-          selection
-        })
-      })
+      const retryResult = await withRetry(
+        () => this.circuitBreaker.execute(async () => {
+          return await withTimeout(
+            fetch('/api/collaborate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'cursor_update',
+                sessionId: this.config.sessionId,
+                userId: this.config.userId,
+                cursorPosition,
+                selection
+              })
+            }),
+            { timeoutMs: TIMEOUTS.COLLABORATION_API, timeoutError: 'Collaboration API cursor update timed out' }
+          )
+        }),
+        {
+          maxAttempts: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxAttempts,
+          baseDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.baseDelayMs,
+          maxDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxDelayMs,
+          backoffMultiplier: SERVICE_RETRY_CONFIG.COLLABORATION_API.backoffMultiplier,
+          retryableErrors: [...SERVICE_RETRY_CONFIG.COLLABORATION_API.retryableErrors]
+        }
+      )
 
+      if (!retryResult.success) {
+        throw retryResult.error
+      }
+
+      const response = retryResult.data!
       const result = await response.json()
       return result.success
     } catch (error) {
@@ -125,17 +188,36 @@ export class CollaborationClient {
     }
 
     try {
-      const response = await fetch('/api/collaborate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'edit',
-          sessionId: this.config.sessionId,
-          userId: this.config.userId,
-          editOperation
-        })
-      })
+      const retryResult = await withRetry(
+        () => this.circuitBreaker.execute(async () => {
+          return await withTimeout(
+            fetch('/api/collaborate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'edit',
+                sessionId: this.config.sessionId,
+                userId: this.config.userId,
+                editOperation
+              })
+            }),
+            { timeoutMs: TIMEOUTS.COLLABORATION_API, timeoutError: 'Collaboration API edit timed out' }
+          )
+        }),
+        {
+          maxAttempts: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxAttempts,
+          baseDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.baseDelayMs,
+          maxDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxDelayMs,
+          backoffMultiplier: SERVICE_RETRY_CONFIG.COLLABORATION_API.backoffMultiplier,
+          retryableErrors: [...SERVICE_RETRY_CONFIG.COLLABORATION_API.retryableErrors]
+        }
+      )
 
+      if (!retryResult.success) {
+        throw retryResult.error
+      }
+
+      const response = retryResult.data!
       const result = await response.json()
       return result.success
     } catch (error) {
@@ -153,18 +235,37 @@ export class CollaborationClient {
     }
 
     try {
-      const response = await fetch('/api/collaborate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'comment',
-          sessionId: this.config.sessionId,
-          userId: this.config.userId,
-          username: this.config.username,
-          comment
-        })
-      })
+      const retryResult = await withRetry(
+        () => this.circuitBreaker.execute(async () => {
+          return await withTimeout(
+            fetch('/api/collaborate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'comment',
+                sessionId: this.config.sessionId,
+                userId: this.config.userId,
+                username: this.config.username,
+                comment
+              })
+            }),
+            { timeoutMs: TIMEOUTS.COLLABORATION_API, timeoutError: 'Collaboration API comment timed out' }
+          )
+        }),
+        {
+          maxAttempts: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxAttempts,
+          baseDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.baseDelayMs,
+          maxDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxDelayMs,
+          backoffMultiplier: SERVICE_RETRY_CONFIG.COLLABORATION_API.backoffMultiplier,
+          retryableErrors: [...SERVICE_RETRY_CONFIG.COLLABORATION_API.retryableErrors]
+        }
+      )
 
+      if (!retryResult.success) {
+        throw retryResult.error
+      }
+
+      const response = retryResult.data!
       const result = await response.json()
       return result.success
     } catch (error) {
@@ -210,7 +311,27 @@ export class CollaborationClient {
         params.append('lastEventId', this.lastEventId)
       }
 
-      const response = await fetch(`/api/collaborate?${params.toString()}`)
+      const retryResult = await withRetry(
+        () => this.circuitBreaker.execute(async () => {
+          return await withTimeout(
+            fetch(`/api/collaborate?${params.toString()}`),
+            { timeoutMs: TIMEOUTS.COLLABORATION_API, timeoutError: 'Collaboration API poll timed out' }
+          )
+        }),
+        {
+          maxAttempts: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxAttempts,
+          baseDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.baseDelayMs,
+          maxDelayMs: SERVICE_RETRY_CONFIG.COLLABORATION_API.maxDelayMs,
+          backoffMultiplier: SERVICE_RETRY_CONFIG.COLLABORATION_API.backoffMultiplier,
+          retryableErrors: [...SERVICE_RETRY_CONFIG.COLLABORATION_API.retryableErrors]
+        }
+      )
+
+      if (!retryResult.success) {
+        throw retryResult.error
+      }
+
+      const response = retryResult.data!
       const result = await response.json() as PollResponse
 
       if (!result.sessionActive) {
@@ -250,6 +371,14 @@ export class CollaborationClient {
 
   getSessionId(): string {
     return this.config.sessionId
+  }
+
+  getCircuitBreakerState() {
+    return this.circuitBreaker.getState()
+  }
+
+  resetCircuitBreaker() {
+    this.circuitBreaker.reset()
   }
 }
 
