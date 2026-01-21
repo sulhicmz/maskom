@@ -154,7 +154,7 @@ const nextConfig: NextConfig = {
     optimizeCss: false,
   },
   
-  // Implementasi caching strategies untuk static assets
+  // Implementasi caching strategies dan security headers untuk static assets
   async headers() {
     return [
       {
@@ -164,6 +164,10 @@ const nextConfig: NextConfig = {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
         ],
       },
       {
@@ -172,6 +176,19 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
         ],
       },
