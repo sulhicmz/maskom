@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import {
   BackupDrill,
@@ -382,4 +382,6 @@ const DrillResultsComponent: React.FC<DrillResultsProps> = ({ drillId, onClose }
   )
 }
 
-export default DrillResultsComponent
+DrillResultsComponent.displayName = "DrillResultsComponent"
+
+export default memo(DrillResultsComponent)

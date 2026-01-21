@@ -464,4 +464,6 @@ const SuspiciousActivityAlertsPanel: React.FC = () => {
     )
 }
 
-export default SuspiciousActivityAlertsPanel
+SuspiciousActivityAlertsPanel.displayName = "SuspiciousActivityAlertsPanel"
+
+export default memo(SuspiciousActivityAlertsPanel)

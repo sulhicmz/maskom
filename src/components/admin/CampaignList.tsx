@@ -415,4 +415,6 @@ const CampaignList: React.FC = () => {
     );
 };
 
-export default CampaignList;
+CampaignList.displayName = "CampaignList"
+
+export default memo(CampaignList);

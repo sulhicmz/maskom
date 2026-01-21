@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import {
   DrillStatistics,
@@ -71,7 +71,7 @@ interface StatCardProps {
   }
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, trend }) => {
+const StatCard: React.FC<StatCardProps> = memo(({ title, value, icon, color, trend }) => {
   const { theme } = useTheme()
 
   return (
@@ -95,16 +95,18 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, trend })
       </div>
     </div>
   )
-}
+})
+
+StatCard.displayName = "StatCard"
 
 const DrillTypeStatsCard: React.FC<{
   type: string
   stats: DrillTypeStats
-}> = ({ type, stats }) => {
+}> = memo(({ type, stats }) => {
   const { theme } = useTheme()
 
   const successRate =
-    stats.total > 0 ? ((stats.passed / stats.total) * 100).toFixed(1) : '0'
+    stats.total >0 ? ((stats.passed / stats.total) * 100).toFixed(1) : '0'
 
   return (
     <div className={`card ${theme} shadow-sm`}>
@@ -141,7 +143,9 @@ const DrillTypeStatsCard: React.FC<{
       </div>
     </div>
   )
-}
+})
+
+DrillTypeStatsCard.displayName = "DrillTypeStatsCard"
 
 const DrillDashboard: React.FC = () => {
   const { theme } = useTheme()
@@ -356,4 +360,6 @@ const DrillDashboard: React.FC = () => {
   )
 }
 
-export default DrillDashboard
+DrillDashboard.displayName = "DrillDashboard"
+
+export default memo(DrillDashboard)
