@@ -73,8 +73,9 @@ const AlertRow = memo(({ alert, onResolve }: { alert: SuspiciousActivityAlert; o
                         className="btn btn-sm btn-outline-success"
                         onClick={() => onResolve(alert.id)}
                         title="Selesaikan Alert"
+                        aria-label={`Selesaikan alert ${alert.id}`}
                     >
-                        <i className="bi bi-check-circle"></i>
+                        <i className="bi bi-check-circle" aria-hidden="true"></i>
                     </button>
                 )}
             </td>
@@ -104,20 +105,24 @@ const AlertRuleRow = memo(({ rule, onEdit, onDelete }: { rule: AlertRule; onEdit
             </td>
             <td>{rule.alertEmail || '-'}</td>
             <td>
-                <button
-                    className="btn btn-sm btn-outline-primary me-2"
-                    onClick={() => onEdit(rule)}
-                    title="Edit Rule"
-                >
-                    <i className="bi bi-pencil"></i>
-                </button>
-                <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => onDelete(rule.id)}
-                    title="Hapus Rule"
-                >
-                    <i className="bi bi-trash"></i>
-                </button>
+                <div className="d-flex gap-2" role="group" aria-label="Alert rule actions">
+                    <button
+                        className="btn btn-sm btn-outline-primary me-2"
+                        onClick={() => onEdit(rule)}
+                        title="Edit Rule"
+                        aria-label={`Edit rule ${rule.name}`}
+                    >
+                        <i className="bi bi-pencil" aria-hidden="true"></i>
+                    </button>
+                    <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => onDelete(rule.id)}
+                        title="Hapus Rule"
+                        aria-label={`Hapus rule ${rule.name}`}
+                    >
+                        <i className="bi bi-trash" aria-hidden="true"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     )
