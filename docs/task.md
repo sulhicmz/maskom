@@ -1,5 +1,66 @@
 # Architecture Task Tracking
 
+## Task 378: [CODE SANITIZER] Remove Dead Code - BackupEngine Unused Imports (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: MEDIUM
+**Type**: Code Quality - Dead Code Removal
+**Effort**: Small (15 minutes)
+
+### Purpose
+
+Remove unused imports from `backupEngine.ts` that were left over from Task 377 interface refactoring.
+
+### Problem Identified
+
+**Unused Import Lint Warnings**:
+- `decryptData` imported from `./backupCrypto` but never used
+- `decompressData` imported from `./backupCompression` but never used
+- Task 377 removed wrapper methods but left unused imports in place
+- Lint warnings indicate technical debt
+
+### Solution
+
+**Remove Unused Imports**:
+- Removed `decryptData` import from backupCrypto
+- Removed `decompressData` import from backupCompression
+- Kept `encryptData` and `compressData` (still used in createFullBackup and createIncrementalBackup)
+
+### Implementation
+
+- [x] Remove unused `decryptData` import
+- [x] Remove unused `decompressData` import
+- [x] Verify lint passes (0 errors, 0 warnings)
+- [x] Verify build passes (37 pages generated)
+- [x] Verify tests pass (5281/5281 tests passing)
+
+### Success Criteria
+
+- [x] Unused imports removed
+- [x] Lint clean (0 errors, 0 warnings)
+- [x] Build passes (37 pages generated)
+- [x] Tests pass (5281/5281 tests passing)
+- [x] Zero regressions in backup functionality
+
+### Related Files
+
+- ✅ Modified: `src/utils/backupEngine.ts` - Removed unused imports (2 deletions)
+
+### Implementation Summary
+
+**Files Modified**: 1 file
+**Lines Removed**: 2 imports
+**Lint Warnings Fixed**: 2 → 0 (100% reduction)
+
+### Notes
+
+- Follows Code Sanitizer principles:
+  - **No Dead Code**: Unused imports removed ✅
+  - **Build Must Pass**: Build continues to pass ✅
+  - **Zero Lint Errors**: Lint clean ✅
+
+---
+
 ## Task 377: [PRINCIPAL ARCHITECT] BackupEngine Interface Definition & Refactoring (Jan 21, 2026)
 
 **Status**: ✅ Completed

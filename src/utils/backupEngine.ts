@@ -42,12 +42,10 @@ import {
 
 import {
   encryptData,
-  decryptData,
 } from './backupCrypto'
 
 import {
   compressData,
-  decompressData,
 } from './backupCompression'
 
 import {
