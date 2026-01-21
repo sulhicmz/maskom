@@ -1,5 +1,90 @@
 # Architecture Task Tracking
 
+## Task 382: [DEVOPS ENGINEER] Fix Failing CI Test - logStatistics Cache Bug (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: CRITICAL
+**Type**: CI Fix - Test Isolation Issue
+**Effort**: Small (30 minutes)
+
+### Purpose
+
+Fix failing CI test in logStatistics.test.ts that was blocking production builds.
+
+### Problem Identified
+
+**Test Isolation Bug**:
+- Test `should calculate last 7 days activity correctly` failed in full suite but passed individually
+- Expected: 2 logs, Received: 1 log
+- Root cause: `logsCache` in logStorage.ts retained stale data from previous test runs
+- `beforeEach` called `localStorage.clear()` but NOT `clearCache()`
+
+**Why This Matters**:
+1. **CI Blocking**: Failing test blocked production deployment
+2. **Test Isolation**: Tests must be independent and deterministic
+3. **False Negatives**: Cache could cause flaky/unpredictable test behavior
+
+### Solution
+
+**Cache Clearing Fix**:
+- Import `clearCache` from logStorage
+- Call `clearCache()` in beforeEach alongside `localStorage.clear()`
+- Ensures fresh cache state for each test
+
+### Implementation
+
+- [x] Import clearCache from logStorage
+- [x] Add clearCache() call to beforeEach in logStatistics.test.ts
+- [x] Verify all tests pass (5370/5370 passing)
+- [x] Verify lint passes (0 errors)
+- [x] Verify build passes (39 pages generated)
+- [x] Commit and push to agent branch
+- [x] CI now green
+
+### Success Criteria
+
+- [x] Test failure fixed (last7DaysActivity now passes)
+- [x] All tests passing (5370/5370, 192 skipped)
+- [x] Lint passes (0 errors)
+- [x] Build passes (39 pages)
+- [x] CI is green
+- [x] Zero regressions in existing functionality
+
+### Related Files
+
+- ✅ Modified: `src/utils/__tests__/logStatistics.test.ts` - Added clearCache() to beforeEach (1 insertion, 1 deletion)
+
+### Implementation Summary
+
+**Files Modified**: 1 file
+**Lines Changed**: 2 lines (1 insertion, 1 deletion)
+**Tests Fixed**: 1 failing test (last7DaysActivity)
+**Test Result**: 5370 passing (up from 5369)
+
+**Key Features**:
+1. **Test Isolation**: Cache now cleared between tests
+2. **Deterministic Results**: No stale data from previous tests
+3. **CI Green**: All tests passing, build successful
+
+### Notes
+
+- Follows DevOps Engineer principles:
+  - **Green Builds Always**: CI is now green ✅
+  - **Fix CI Failures**: Priority task completed ✅
+  - **Test Reliability**: Deterministic test behavior restored ✅
+  - **Zero Regressions**: All existing tests still pass ✅
+
+- Related Tasks:
+  - Task 379 (Security Headers & Middleware) - CI now green
+  - Task 367 (Test Infrastructure Best Practices) - Related test patterns
+
+### Related Tasks
+
+- FEATURE-048 (Advanced Activity Logging & Audit Trails) - Related logStatistics functionality
+- Task 316 (Advanced Activity Logging & Audit Trails Implementation) - Related audit features
+
+---
+
 ## Task 381: [DATA ARCHITECT] Drill Data Validation (Jan 21, 2026)
 
 **Status**: ✅ Completed
