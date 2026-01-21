@@ -1035,12 +1035,93 @@ if (logoutResult.success) {
 
 ### Standard Error Format
 
-All API errors follow a consistent format:
+All API errors follow a consistent format with standardized error codes:
 
 ```typescript
 interface ApiError {
     success: false;
-    error: string;  // Human-readable error message (non-sensitive)
+    error: string;          // Human-readable error message (non-sensitive)
+    errorCode: string;       // Standardized error code (defined in constants)
+    details?: unknown;       // Additional error details (optional)
+    timestamp?: string;      // Error timestamp (optional)
+}
+```
+
+### Standardized Error Codes
+
+Error codes are defined in `src/constants/errorCodes.ts`:
+
+| Error Code | Description | Retryable | HTTP Status |
+|------------|-------------|-------------|--------------|
+| `VALIDATION_ERROR` | Input validation failed | No | 400 |
+| `AUTHENTICATION_ERROR` | Authentication failed | No | 401 |
+| `AUTHORIZATION_ERROR` | Authorization failed | No | 403 |
+| `RESOURCE_NOT_FOUND` | Resource not found | No | 404 |
+| `RESOURCE_CONFLICT` | Resource conflict | No | 409 |
+| `RATE_LIMIT_EXCEEDED` | Rate limit exceeded | No | 429 |
+| `REQUEST_TIMEOUT` | Request timed out | Yes | 408/504 |
+| `SERVICE_UNAVAILABLE` | Service temporarily unavailable | No | 503 |
+| `NETWORK_ERROR` | Network error occurred | Yes | 502/503 |
+| `INTERNAL_ERROR` | Internal server error | No | 500 |
+| `CIRCUIT_BREAKER_OPEN` | Circuit breaker is open | No | 503 |
+| `SESSION_NOT_FOUND` | Session not found | No | 404 |
+| `USER_NOT_FOUND_IN_SESSION` | User not found in session | No | 404 |
+| `INVALID_REQUEST_DATA` | Invalid request data | No | 400 |
+| `INVALID_QUERY_PARAMETERS` | Invalid query parameters | No | 400 |
+| `MISSING_REQUIRED_FIELDS` | Missing required fields | No | 400 |
+| `INVALID_CREDENTIALS` | Invalid credentials | No | 401 |
+| `TEMPLATE_NOT_FOUND` | Template not found | No | 404 |
+
+### Error Response Examples
+
+#### Validation Error (400)
+```json
+{
+  "success": false,
+  "error": "Invalid request data",
+  "errorCode": "INVALID_REQUEST_DATA",
+  "details": [
+    {
+      "path": ["username"],
+      "message": "String must contain at least 1 character(s)"
+    }
+  ]
+}
+```
+
+#### Rate Limit Error (429)
+```json
+{
+  "success": false,
+  "error": "Rate limit exceeded",
+  "errorCode": "RATE_LIMIT_EXCEEDED"
+}
+```
+
+#### Not Found Error (404)
+```json
+{
+  "success": false,
+  "error": "Session not found",
+  "errorCode": "SESSION_NOT_FOUND"
+}
+```
+
+#### Timeout Error (504)
+```json
+{
+  "success": false,
+  "error": "Request timed out",
+  "errorCode": "REQUEST_TIMEOUT"
+}
+```
+
+#### Circuit Breaker Error (503)
+```json
+{
+  "success": false,
+  "error": "Service temporarily unavailable",
+  "errorCode": "CIRCUIT_BREAKER_OPEN"
 }
 ```
 
@@ -1050,19 +1131,28 @@ interface ApiError {
 
 | Code | Message | Retryable | Description |
 |------|---------|-----------|-------------|
-| 400 | "EmailJS credentials not configured" | No | Missing or invalid environment variables |
-| 400 | "Invalid email format" | No | Email validation failed |
-| 400 | "Missing required fields" | No | Form validation failed |
-| 429 | "Terlalu banyak percobaan. Silakan coba lagi nanti." | No | Rate limit exceeded (auth) |
+| 400 | "Validation failed" | No | Input validation failed |
+| 400 | "Invalid request data" | No | Request body validation failed |
+| 400 | "Invalid query parameters" | No | Query parameter validation failed |
+| 400 | "Missing required fields" | No | Required fields missing |
+| 401 | "Authentication failed" | No | Authentication failed |
+| 401 | "Invalid credentials" | No | Invalid credentials |
+| 403 | "Authorization failed" | No | Authorization failed |
+| 404 | "Resource not found" | No | Resource not found |
+| 404 | "Session not found" | No | Session not found |
+| 404 | "User not found in session" | No | User not found in session |
+| 409 | "Resource conflict" | No | Resource conflict |
+| 429 | "Rate limit exceeded" | No | Rate limit exceeded |
 
 #### 2. Server Errors (5xx)
 
 | Code | Message | Retryable | Description |
 |------|---------|-----------|-------------|
-| 408 | "EmailJS request timed out" | Yes | Request exceeded timeout threshold |
-| 502 | "Email send failed after retries" | Yes | All retry attempts exhausted |
-| 503 | "Circuit breaker is open. Service temporarily unavailable." | No | Service in failure state |
-| 500 | "Unknown error" | No | Unexpected error occurred |
+| 408/504 | "Request timed out" | Yes | Request exceeded timeout threshold |
+| 502 | "Network error occurred" | Yes | Network-related failure |
+| 503 | "Service temporarily unavailable" | No | Service in failure state |
+| 503 | "Circuit breaker is open" | No | Circuit breaker is open |
+| 500 | "Internal server error" | No | Unexpected error occurred |
 
 ### Error Handling Best Practices
 
