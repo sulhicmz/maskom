@@ -2566,4 +2566,250 @@ As a Product Manager, I want to analyze conversion funnels for user journeys (si
 
 ---
 
-**Last Updated**: 2026-01-19 (FEATURE-061 through FEATURE-066 added in Phase 15 Creative Enhancement)
+**Last Updated**: 2026-01-21 (FEATURE-061 through FEATURE-066 added in Phase 15 Creative Enhancement; FEATURE-067 through FEATURE-072 added in Phase 17 Creative Enhancement)
+
+---
+
+## [FEATURE-067] Intelligent Content Recommendations Engine
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/Engagement/AI
+
+### User Story
+
+As a Blog Reader, I want to see personalized content recommendations based on my reading history and interests, so that I can discover relevant content without manual searching.
+
+### Acceptance Criteria
+
+- [ ] Implement reading history tracking (localStorage with 30-day expiration)
+- [ ] Create user interest profile (categories, tags, topics read)
+- [ ] Implement content similarity scoring algorithm (Jaccard similarity + collaborative filtering)
+- [ ] Add "Recommended For You" section to BlogArea and homepage
+- [ ] Implement personalized homepage feed with prioritized recommendations
+- [ ] Add recommendation feedback mechanism (helpful/not helpful buttons)
+- [ ] Implement fallback recommendations for new users (trending posts, most read)
+- [ ] Create recommendation settings (opt-out, influence level)
+- [ ] Add recommendation performance tracking (click-through rate, engagement)
+- [ ] Create admin dashboard for recommendation metrics
+- [ ] Add tests for recommendation algorithm
+- [ ] Update docs/blueprint.md with recommendation architecture
+
+### Implementation Notes:
+- Extends FEATURE-006 (Advanced Blog Search & Filtering) with personalized results
+- Integrates with FEATURE-014 (Blog Post Bookmarking) for reading history
+- Uses existing BlogTagData and BlogCategoryData for category/tag matching
+- Applies privacy-first approach (no external tracking, localStorage only)
+- Leverages existing validation layer for user preferences
+- Jaccard similarity algorithm: J(A,B) = |A∩B| / |A∪B|
+- Collaborative filtering hybrid: content similarity + user behavior patterns
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-068] Advanced Search & Discovery
+
+**Status**: Pending
+**Priority**: P2
+**Type**: UX/Search/AI
+
+### User Story
+
+As a Website Visitor, I want to search across all content types with intelligent suggestions and faceted filtering, so that I can find relevant information without browsing multiple pages.
+
+### Acceptance Criteria
+
+- [ ] Implement global search bar (fixed header or keyboard shortcut Ctrl+K)
+- [ ] Add federated search (blog + services + FAQ + team + pages)
+- [ ] Implement search suggestions/autocomplete with debouncing (300ms)
+- [ ] Add search result highlighting (matched text in bold)
+- [ ] Implement faceted search (filters by type, date, category, tags)
+- [ ] Add recent searches display (localStorage, max 10 items)
+- [ ] Implement popular/trending searches (derived from search analytics)
+- [ ] Add keyboard navigation for search results (arrow keys, enter to select)
+- [ ] Implement search analytics (what users search for, zero-result queries)
+- [ ] Add "did you mean?" suggestions for typos using Levenshtein distance
+- [ ] Create search results page with grouped results by type
+- [ ] Add tests for search functionality
+- [ ] Update docs/blueprint.md with search architecture
+
+### Implementation Notes:
+- Extends FEATURE-006 (Advanced Blog Search & Filtering) with federated search
+- Integrates with FEATURE-043 (Smart Content Recommendations) for suggestions
+- Leverages existing data validation for search inputs
+- Privacy-focused: Search analytics anonymized, no user tracking
+- Keyboard shortcut: Ctrl+K (Windows/Linux), Cmd+K (Mac)
+- Fuzzy search support for typos (Levenshtein distance ≤ 2)
+- Result ranking: relevance score + recency + popularity
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-069] Granular Permission Management
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Security/Admin
+
+### User Story
+
+As a Site Administrator, I want to create custom roles with granular permissions, so that I can implement least-privilege access control for different user types.
+
+### Acceptance Criteria
+
+- [ ] Extend RBAC system with custom role creation
+- [ ] Define granular permissions (resource-level: blog_posts, users, settings)
+- [ ] Implement permission scopes (read, write, delete, publish, manage)
+- [ ] Create custom role editor UI (name, description, permission checkboxes)
+- [ ] Add permission templates (content creator, moderator, developer)
+- [ ] Implement permission inheritance (custom roles can extend base roles)
+- [ ] Add role audit log (who created/modified role and when)
+- [ ] Create permission matrix visualization (users vs permissions)
+- [ ] Implement bulk permission updates (assign role to multiple users)
+- [ ] Add permission conflict detection and warnings
+- [ ] Integrate with existing RBAC (FEATURE-013)
+- [ ] Add tests for permission management
+- [ ] Update docs/blueprint.md with permission architecture
+
+### Implementation Notes:
+- Extends FEATURE-013 (User Roles & Permissions) with custom roles
+- Leverages existing Permission enum with granular resource-level permissions
+- Permission scopes: {resource}.{action} (e.g., blog_posts.publish, users.read)
+- Role inheritance via extends field (CustomRole extends BaseRole)
+- Permission matrix: Grid view with users as rows, permissions as columns
+- Audit logging via existing ActivityLog (FEATURE-048)
+- RBAC: admin can manage all roles, editor can manage assigned roles
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-070] Advanced Backup Verification Drills
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Infrastructure/DevOps
+
+### User Story
+
+As a DevOps Engineer, I want to run automated backup verification drills, so that I can verify backup integrity and disaster recovery readiness without manual testing.
+
+### Acceptance Criteria
+
+- [ ] Define drill types: full restore test, partial restore test, integrity check only
+- [ ] Implement automated drill scheduling (daily, weekly, monthly, manual trigger)
+- [ ] Create drill execution engine with isolated test environment (doesn't affect production data)
+- [ ] Implement drill results tracking (success, partial success, failure with detailed logs)
+- [ ] Add drill dashboard with history and trend visualization
+- [ ] Implement drill notifications (success, failure alerts via email/APM)
+- [ ] Add drill report generation (PDF, CSV for compliance evidence)
+- [ ] Implement rollback capability after failed drill
+- [ ] Add drill performance metrics (restore time, data integrity score)
+- [ ] Create drill schedule editor (cron expression builder UI)
+- [ ] Integrate with existing backup engine
+- [ ] Add tests for drill execution
+- [ ] Update docs/blueprint.md with drill architecture
+
+### Implementation Notes:
+- Extends existing backup system with verification layer
+- Leverages existing APM integration (FEATURE-022) for drill alerts
+- Uses existing EmailService (FEATURE-001) for drill notifications
+- Isolated test environment: Temporary database/drive for restore verification
+- Drill execution: Full backup → Restore to temp → Verify integrity → Cleanup temp
+- Integrity checks: File count, checksum verification, data validation
+- Cron expression builder: UI for scheduling (e.g., "Every Sunday at 2 AM")
+- Report generation: PDF with drill summary, CSV with detailed logs
+- Performance metrics: RTO (Recovery Time Objective), RPO (Recovery Point Objective)
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-071] Content Performance Analytics Dashboard
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Analytics/Content Management
+
+### User Story
+
+As a Content Creator, I want to view performance analytics for my blog posts (views, engagement, shares, conversion), so that I can understand what content resonates with readers and optimize future posts.
+
+### Acceptance Criteria
+
+- [ ] Add performance metrics to InnerBlogPost interface (viewCount, engagementScore, shareCount, avgTimeOnPage)
+- [ ] Implement analytics tracking for blog post views and engagement (scroll depth, time on page)
+- [ ] Create content performance dashboard in admin panel
+- [ ] Add performance trend visualization (weekly/monthly charts)
+- [ ] Implement top-performing posts highlight (by engagement, views, shares)
+- [ ] Add content performance comparison (compare periods: this week vs last week)
+- [ ] Implement engagement score calculation (weighted: views*1 + comments*5 + shares*3 + bookmarks*4)
+- [ ] Add content cohort analysis (new vs returning readers)
+- [ ] Implement content performance export (CSV, PDF)
+- [ ] Add A/B test results integration (if content A/B tests exist)
+- [ ] Create content optimization suggestions (based on performance data)
+- [ ] Integrate with existing analytics dashboard (FEATURE-009)
+- [ ] Add tests for performance analytics
+- [ ] Update docs/blueprint.md with content analytics architecture
+
+### Implementation Notes:
+- Extends FEATURE-009 (Analytics Dashboard) with content-specific metrics
+- Extends FEATURE-042 (Content Performance Analytics) with enhanced metrics
+- Leverages existing APM integration (FEATURE-022) for tracking
+- Engagement score formula: (views × 1) + (comments × 5) + (shares × 3) + (bookmarks × 4)
+- Time on page tracking: Scroll depth milestones (25%, 50%, 75%, 100%)
+- Cohort analysis: New users (first visit in 30 days) vs returning users
+- Content optimization: AI-powered suggestions (e.g., "Posts with 'how-to' in title get 30% more views")
+- Export formats: CSV for data analysis, PDF with charts for presentations
+
+**Completion Date**: TBD
+
+---
+
+## [FEATURE-072] Multi-Language Support (i18n)
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Internationalization/UX
+
+### User Story
+
+As a Website Visitor, I want to view website in my preferred language (English/Indonesian), so that I can understand content and navigate site comfortably in my native language.
+
+### Acceptance Criteria
+
+- [ ] Implement i18n context provider (English/Indonesian)
+- [ ] Add language selector in navigation menu with flag icons
+- [ ] Translate all static UI text (buttons, labels, messages, error messages)
+- [ ] Translate blog content with language variants (title, description, content per language)
+- [ ] Persist language preference in localStorage
+- [ ] Update SEO meta tags based on selected language (hreflang tags)
+- [ ] Add language switcher animation (smooth transition)
+- [ ] Implement RTL support for future languages (Arabic, Hebrew)
+- [ ] Add language-specific routing (example.com/en/blog vs example.com/id/blog)
+- [ ] Create translation management admin panel (add/edit translations)
+- [ ] Implement date/number formatting per locale
+- [ ] Add language detection from browser settings
+- [ ] Create fallback mechanism for missing translations
+- [ ] Add tests for i18n functionality
+- [ ] Update docs/blueprint.md with i18n architecture
+
+### Implementation Notes:
+- Uses next-intl or similar i18n library for React
+- Translation files: src/locales/en.json, src/locales/id.json
+- Language context: I18nContext with currentLanguage and setLanguage
+- Blog content: Extend InnerBlogPost with title, description, content per language
+- Route structure: /en/*, /id/* with middleware for language detection
+- SEO: hreflang tags, language-specific sitemaps
+- RTL support: CSS dir attribute per language, mirrored layouts
+- Date formatting: toLocaleDateString() with locale parameter
+- Number formatting: toLocaleString() with locale parameter
+- Admin panel: Translation CRUD interface with missing translation warnings
+- Privacy: Language preference stored in localStorage (no user tracking)
+
+**Completion Date**: TBD
+
+---
+
