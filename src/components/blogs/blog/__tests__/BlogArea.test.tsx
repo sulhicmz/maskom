@@ -2,7 +2,14 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BlogArea from '../BlogArea';
-import inner_blog_data from '@/data/InnerBlogData';
+
+jest.mock('@/data/InnerBlogData', () => {
+    const originalModule = jest.requireActual('@/data/InnerBlogData') as { default: typeof import('@/data/InnerBlogData').default };
+    return {
+        __esModule: true,
+        default: originalModule.default,
+    };
+});
 
 jest.mock('react-paginate', () => {
   return function MockReactPaginate({ pageCount, onPageChange }: { pageCount: number; onPageChange: (data: { selected: number }) => void }) {

@@ -1,18 +1,30 @@
 "use client";
 
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { EmailCampaign } from '@/types/campaign';
 import type { EmailTemplate } from '@/types/data';
-import email_template_data from '@/data/EmailTemplateData';
 import { substituteTemplateVariables, type VariableSubstitution } from '@/utils/templateUtils';
 
 const CampaignPreview = memo(({ campaign }: { campaign: EmailCampaign }) => {
     const { theme } = useTheme();
+    const [emailTemplateData, setEmailTemplateData] = useState<EmailTemplate[]>([]);
     const [previewSubject, setPreviewSubject] = useState<string>('');
     const [previewBody, setPreviewBody] = useState<string>('');
 
-    const template: EmailTemplate | undefined = email_template_data.find(
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const dataModule = await import('@/data/EmailTemplateData');
+                setEmailTemplateData(dataModule.default as EmailTemplate[]);
+            } catch (error) {
+                console.error('Failed to load email template data:', error);
+            }
+        };
+        loadData();
+    }, []);
+
+    const template: EmailTemplate | undefined = emailTemplateData.find(
         (t) => t.id === campaign.templateId
     );
 
