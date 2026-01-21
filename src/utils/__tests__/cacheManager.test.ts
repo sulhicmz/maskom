@@ -62,7 +62,7 @@ describe('cacheManager', () => {
 
       setCacheConfig(customConfig);
 
-      expect(consoleSpy).toHaveBeenCalledWith('[Cache Config] Updated configuration:', customConfig);
+      expect(consoleSpy).toHaveBeenCalledWith('[CacheManager] setCacheConfig:', `Updated configuration: ${JSON.stringify(customConfig)}`);
       consoleSpy.mockRestore();
     });
   });
@@ -310,7 +310,7 @@ describe('cacheManager', () => {
 
       await cleanupOldEntries();
 
-      expect(consoleSpy).toHaveBeenCalledWith('[Cache Config] Cleanup completed');
+      expect(consoleSpy).toHaveBeenCalledWith('[CacheManager] cleanupOldCache:', 'Cleanup completed');
       consoleSpy.mockRestore();
     });
 

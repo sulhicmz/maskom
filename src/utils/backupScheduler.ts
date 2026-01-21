@@ -10,6 +10,7 @@ import {
 } from './backupEngine'
 
 import { BACKUP_METADATA_KEY } from '@/types/backup'
+import { logServiceInfo } from '@/services/common/logger'
 
 const BACKUP_SCHEDULER_KEY = 'maskom_backup_scheduler'
 const BACKUP_SCHEDULER_INTERVAL_KEY = 'maskom_backup_scheduler_interval'
@@ -257,7 +258,7 @@ class BackupScheduler {
         metadata = await createFullBackup(
           scheduledBackup.config,
           (progress) => {
-            console.log('Backup progress:', progress)
+            logServiceInfo('BackupScheduler', 'Backup progress', JSON.stringify(progress))
           },
         )
       } else {
@@ -267,7 +268,7 @@ class BackupScheduler {
           metadata = await createFullBackup(
             scheduledBackup.config,
             (progress) => {
-              console.log('Backup progress:', progress)
+              logServiceInfo('BackupScheduler', 'Backup progress', JSON.stringify(progress))
             },
           )
         } else {
@@ -275,7 +276,7 @@ class BackupScheduler {
             scheduledBackup.config,
             lastFullBackup,
             (progress) => {
-              console.log('Backup progress:', progress)
+              logServiceInfo('BackupScheduler', 'Backup progress', JSON.stringify(progress))
             },
           )
         }

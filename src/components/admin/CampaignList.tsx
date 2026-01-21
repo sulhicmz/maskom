@@ -7,6 +7,7 @@ import { Permission } from '@/types/permission';
 import { CampaignStatus, type EmailCampaign } from '@/types/campaign';
 import campaignManager from '@/utils/campaignManager';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { logServiceInfo } from '@/services/common/logger';
 
 const StatusBadge = memo(({ status }: { status: CampaignStatus }) => {
     const getStatusColor = (status: CampaignStatus): string => {
@@ -212,7 +213,7 @@ const CampaignList: React.FC = () => {
     };
 
     const handleEdit = (id: string) => {
-        console.log('Edit campaign:', id);
+        logServiceInfo('CampaignList', 'handleEdit', `Campaign ID: ${id}`);
     };
 
     const handleDelete = (id: string) => {
@@ -304,7 +305,7 @@ const CampaignList: React.FC = () => {
                                         <div className="col-md-6 text-end">
                                             <button
                                                 className="btn btn-primary"
-                                                onClick={() => console.log('Create new campaign')}
+                                                onClick={() => logServiceInfo('CampaignList', 'createCampaign', 'Create new campaign button clicked')}
                                             >
                                                 <i className="bi bi-plus-lg me-1"></i>
                                                 Create Campaign

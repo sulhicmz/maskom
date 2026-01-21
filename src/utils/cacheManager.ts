@@ -1,4 +1,5 @@
 import { CacheConfig, DEFAULT_CACHE_CONFIG } from '@/types/cache';
+import { logServiceInfo } from '@/services/common/logger';
 
 let cacheConfig: CacheConfig = DEFAULT_CACHE_CONFIG;
 
@@ -15,7 +16,7 @@ export function getCacheConfig(): CacheConfig {
 
 export function setCacheConfig(config: CacheConfig): void {
   cacheConfig = config;
-  console.log('[Cache Config] Updated configuration:', config);
+  logServiceInfo('CacheManager', 'setCacheConfig', `Updated configuration: ${JSON.stringify(config)}`);
 }
 
 export function getCacheStats() {
@@ -112,7 +113,7 @@ export async function cleanupOldEntries(): Promise<void> {
     }
   }
 
-  console.log('[Cache Config] Cleanup completed');
+  logServiceInfo('CacheManager', 'cleanupOldCache', 'Cleanup completed');
 }
 
 export async function checkCacheSize(): Promise<number> {
