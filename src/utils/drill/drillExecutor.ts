@@ -113,6 +113,8 @@ class DrillExecutor implements IDrillExecutor {
     backupId: string,
     onProgress?: DrillProgressCallback
   ): Promise<{ restoreDuration: number; integrityCheckPassed: boolean; dataLossDetected: boolean; itemsRestored: number; checksumValid: boolean }> {
+    void backupId
+    void onProgress
     return {
       restoreDuration: 0,
       integrityCheckPassed: true,
