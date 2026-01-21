@@ -1311,7 +1311,118 @@ As a Security-Conscious User, I want to enable multi-factor authentication (2FA)
 
 ---
 
-**Last Updated**: 2026-01-20
+**Last Updated**: 2026-01-21
+
+---
+
+## [FEATURE-073] Skipped Test Diagnostic Dashboard
+
+**Status**: Pending
+**Priority**: P2
+**Type**: QA/Maintenance
+
+### User Story
+
+As a Quality Assurance Engineer, I want a diagnostic dashboard for skipped tests, so that I can identify the reasons for test skips and either fix issues or remove obsolete tests.
+
+### Acceptance Criteria
+
+- [ ] Create skipped test diagnostic data structure (SkippedTestInfo with reason, category, lastRun)
+- [ ] Implement test skip reason tracking in existing test files
+- [ ] Add diagnostic dashboard page at /qa/skipped-tests
+- [ ] Display skipped tests grouped by category (timeout, pending, skip)
+- [ ] Add skip reason annotations and recommendations
+- [ ] Implement bulk action to re-enable specific skipped tests
+- [ ] Add skip trend visualization (new skips over time)
+- [ ] Export skipped test report (PDF, CSV for team review)
+- [ ] Integrate with existing Jest test framework
+- [ ] Add tests for diagnostic dashboard functionality
+- [ ] Update docs/blueprint.md with test diagnostic architecture
+
+### Implementation Notes
+
+- Leverages existing Jest test runner infrastructure
+- Uses test metadata from Jest results
+- Integrates with existing CI/CD pipeline monitoring
+- Privacy-first: no external test tracking services
+- Applies existing dark mode support via ThemeContext
+
+**Task 376**: Skipped Test Diagnostic Dashboard (MEDIUM priority)
+
+---
+
+## [FEATURE-074] Node.js Compatibility Verification Tool
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Infrastructure/Maintenance
+
+### User Story
+
+As a DevOps Engineer, I want a Node.js compatibility verification tool, so that I can detect version mismatches early and prevent deployment issues.
+
+### Acceptance Criteria
+
+- [ ] Create Node.js compatibility data structure (NodeVersionRequirement)
+- [ ] Implement version check utility for package.json engines
+- [ ] Add compatibility verification step to build process
+- [ ] Display version mismatch warnings in build output
+- [ ] Create compatibility dashboard at /admin/node-compatibility
+- [ ] Show supported Node.js versions with status indicators
+- [ ] Implement auto-configuration for Node.js version managers
+- [ ] Add compatibility report for all dependencies
+- [ ] Generate remediation suggestions for version conflicts
+- [ ] Add tests for compatibility verification utilities
+- [ ] Update docs/blueprint.md with compatibility verification architecture
+
+### Implementation Notes
+
+- Extends existing build pipeline infrastructure
+- Uses package.json engines field for requirements
+- Integrates with existing APM for version monitoring
+- Privacy-first: no external version tracking
+- RBAC integration (admin-only access to compatibility dashboard)
+
+**Task 377**: Node.js Compatibility Verification Tool (HIGH priority)
+
+---
+
+## [FEATURE-075] Automated Dependency Update Management
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Infrastructure/Maintenance
+
+### User Story
+
+As a DevOps Engineer, I want automated dependency update management, so that I can keep packages current while ensuring stability through automated testing.
+
+### Acceptance Criteria
+
+- [ ] Create dependency update data structure (DependencyUpdateInfo with version, type, risk)
+- [ ] Implement dependency scanning for available updates (major, minor, patch)
+- [ ] Add update risk assessment (security vulnerability, breaking changes)
+- [ ] Create dependency update dashboard at /admin/dependencies
+- [ ] Display updates grouped by severity (critical, high, moderate, low)
+- [ ] Implement automated update testing (test before merge)
+- [ ] Add changelog integration (show what changed in each update)
+- [ ] Implement update batch scheduling (monthly, weekly, manual)
+- [ ] Add rollback capability for problematic updates
+- [ ] Security vulnerability alerts for outdated dependencies
+- [ ] Export dependency report (PDF, CSV for compliance)
+- [ ] Add tests for dependency management utilities
+- [ ] Update docs/blueprint.md with dependency management architecture
+
+### Implementation Notes
+
+- Integrates with existing npm/yarn package management
+- Uses npm audit for security vulnerability detection
+- Leverages existing CI/CD pipeline for automated testing
+- Integrates with existing APM for post-update monitoring
+- Privacy-first: no external package tracking
+- RBAC integration (admin-only access to dependency dashboard)
+
+**Task 378**: Automated Dependency Update Management (MEDIUM priority)
 
 ---
 

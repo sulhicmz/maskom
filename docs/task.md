@@ -1,5 +1,325 @@
 # Architecture Task Tracking
 
+## Task 379: [QA ENGINEER] Skipped Test Diagnostic Dashboard (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: HIGH
+**Type**: QA - Test Diagnostics
+**Effort**: Medium (2 hours)
+
+### Purpose
+
+Create a diagnostic dashboard for skipped tests to identify reasons for test skips and either fix issues or remove obsolete tests.
+
+### Problem Identified
+
+**Skipped Test Blind Spot**:
+- 188 tests are skipped but not systematically reviewed
+- No centralized view of skipped test reasons
+- Potential bugs could be hiding in skipped tests
+- Maintenance burden to manually review skipped tests
+- No tracking of test skip trends over time
+- Obsolete tests remain in codebase indefinitely
+
+**Why This Matters**:
+1. **Test Quality**: Skipped tests may hide legitimate bugs
+2. **Maintenance Efficiency**: Systematic review reduces manual overhead
+3. **Code Health**: Identifying and fixing obsolete tests improves codebase
+4. **Coverage Accuracy**: Accurate test metrics require active tests only
+5. **Trend Analysis**: Monitoring skip patterns reveals systemic issues
+
+### Solution
+
+**Skipped Test Diagnostic Dashboard**:
+
+1. **Skipped Test Data Structure** - Track test file, test name, skip reason, category, last run date
+2. **Reason Categorization** - Group skips by: timeout, pending (todo), skip, fixture issues, dependency issues
+3. **Diagnostic Dashboard** - Display all skipped tests with details and recommendations
+4. **Bulk Actions** - Re-enable multiple tests at once, delete obsolete tests
+5. **Trend Visualization** - Show new skips added over time, skip category distribution
+6. **Integration** - Leverage existing Jest framework and CI/CD pipeline
+
+### Implementation
+
+- [ ] Create SkippedTestInfo interface in src/types/testDiagnostics.ts
+- [ ] Implement test skip reason tracking in existing test files (add comments)
+- [ ] Create SkippedTestDiagnostic utility to scan and categorize skipped tests
+- [ ] Build SkippedTestDashboard component at /qa/skipped-tests
+- [ ] Group skipped tests by category (timeout, pending, skip, etc.)
+- [ ] Add skip reason annotations and actionable recommendations
+- [ ] Implement bulk action UI (re-enable selected tests, delete selected)
+- [ ] Add skip trend visualization (new skips per week, category breakdown)
+- [ ] Implement export functionality (PDF for team review, CSV for analysis)
+- [ ] Add RBAC protection (QA engineers, admins only)
+- [ ] Create tests for diagnostic dashboard (UI, utilities, integration)
+- [ ] Update docs/blueprint.md with test diagnostic architecture
+- [ ] Verify all existing 188 skipped tests have proper annotations
+
+### Success Criteria
+
+- [ ] SkippedTestDiagnostic utility created and accurate
+- [ ] Diagnostic dashboard displays all 188 skipped tests
+- [ ] Tests grouped by skip category with accurate counts
+- [ ] Each skipped test has clear reason and recommendation
+- [ ] Bulk re-enable/delete actions work correctly
+- [ ] Trend visualization shows skip patterns over time
+- [ ] Export functionality works (PDF, CSV formats)
+- [ ] RBAC protection implemented (QA engineers and admins)
+- [ ] 0 regressions in existing tests
+- [ ] Lint passes (0 errors)
+
+### Related Files
+
+- Add: `src/types/testDiagnostics.ts` - Skipped test data structures
+- Add: `src/utils/testDiagnostics/skippedTestScanner.ts` - Skip detection utility
+- Add: `src/components/qa/SkippedTestDashboard.tsx` - Diagnostic dashboard
+- Add: `src/app/qa/skipped-tests/page.tsx` - Route page
+- Modify: Multiple test files - Add skip reason comments
+
+### Implementation Summary
+
+**Files Added**: 4 files (types, utility, component, route)
+**Files Modified**: ~10 test files (add skip comments)
+**Lines Added**: ~500 lines
+
+**Key Features**:
+1. **Complete Visibility**: All 188 skipped tests visible in one dashboard
+2. **Categorized**: Skips grouped by reason (timeout, pending, skip, etc.)
+3. **Actionable**: Clear recommendations for each skipped test
+4. **Bulk Operations**: Re-enable or delete multiple tests at once
+5. **Trend Analysis**: Track skip patterns over time
+6. **Exportable**: Generate reports for team review
+
+### Notes
+
+- Follows QA Engineer principles:
+  - **Visibility First**: All skipped tests visible and categorized ✅
+  - **Actionable**: Clear recommendations for each skip ✅
+  - **Efficiency**: Bulk operations reduce manual work ✅
+  - **Data-Driven**: Trend analysis reveals systemic issues ✅
+
+### Related Tasks
+
+- Task 367 (Test Infrastructure Best Practices) - Related test patterns
+- Task 382 (Fix Failing CI Test) - Related test stability work
+
+---
+
+## Task 380: [DEVOPS ENGINEER] Node.js Compatibility Verification Tool (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: HIGH
+**Type**: Infrastructure - Compatibility Verification
+**Effort**: Medium (2 hours)
+
+### Purpose
+
+Create a Node.js compatibility verification tool to detect version mismatches early and prevent deployment issues.
+
+### Problem Identified
+
+**Node.js Version Mismatch**:
+- Next.js requires Node.js >=22.0.0, but system runs v20.19.6
+- Version mismatch warnings in build output (non-blocking but concerning)
+- No early detection of compatibility issues
+- Deployment could fail due to version requirements
+- Dependency compatibility not verified systematically
+- No remediation suggestions for version conflicts
+
+**Why This Matters**:
+1. **Deployment Reliability**: Version mismatches can break production deployments
+2. **Developer Experience**: Early detection prevents wasted build time
+3. **Dependency Safety**: Some packages require specific Node.js versions
+4. **Security**: Outdated Node.js versions may have unpatched vulnerabilities
+5. **Compliance**: Security requirements may mandate minimum Node.js versions
+
+### Solution
+
+**Node.js Compatibility Verification Tool**:
+
+1. **Version Check Utility** - Parse package.json engines field, compare to running version
+2. **Compatibility Dashboard** - Display Node.js version status, supported versions, remediation
+3. **Build Integration** - Fail builds if version mismatch is critical
+4. **Dependency Scanning** - Check all dependencies for Node.js version requirements
+5. **Auto-Configuration** - Generate config for version managers (nvm, volta, fnm)
+6. **Report Generation** - Export compatibility reports for compliance
+
+### Implementation
+
+- [ ] Create NodeVersionRequirement interface in src/types/nodeCompatibility.ts
+- [ ] Implement checkNodeVersion utility (compare running vs required)
+- [ ] Implement scanDependencyVersions utility (check all dependencies)
+- [ ] Add build step to Next.js build script (verify version before build)
+- [ ] Create NodeCompatibilityDashboard component at /admin/node-compatibility
+- [ ] Display current Node.js version with status indicator (pass/warning/fail)
+- [ ] Show supported Node.js versions from package.json engines
+- [ ] Display dependency compatibility matrix
+- [ ] Implement auto-configuration for version managers (nvm, volta, fnm)
+- [ ] Add remediation suggestions (upgrade/downgrade commands)
+- [ ] Generate compatibility report (PDF for compliance, CSV for analysis)
+- [ ] Add RBAC protection (admin-only access)
+- [ ] Create tests for compatibility utilities
+- [ ] Update docs/blueprint.md with compatibility verification architecture
+
+### Success Criteria
+
+- [ ] NodeVersionCheck utility created and accurate
+- [ ] Compatibility dashboard displays Node.js version status
+- [ ] Build fails on critical version mismatches (configurable)
+- [ ] All dependencies scanned for version requirements
+- [ ] Auto-configuration generated for nvm/volta/fnm
+- [ ] Remediation suggestions are actionable
+- [ ] Export functionality works (PDF, CSV formats)
+- [ ] RBAC protection implemented (admin-only)
+- [ ] Zero regressions in existing builds
+- [ ] Lint passes (0 errors)
+
+### Related Files
+
+- Add: `src/types/nodeCompatibility.ts` - Node.js version data structures
+- Add: `src/utils/nodeCompatibility/versionCheck.ts` - Version verification utilities
+- Add: `src/components/admin/NodeCompatibilityDashboard.tsx` - Compatibility dashboard
+- Add: `src/app/admin/node-compatibility/page.tsx` - Admin route
+- Modify: `package.json` - Add pre-build verification step
+
+### Implementation Summary
+
+**Files Added**: 4 files (types, utilities, component, route)
+**Files Modified**: 1 file (package.json build script)
+**Lines Added**: ~400 lines
+
+**Key Features**:
+1. **Early Detection**: Version mismatches detected before build
+2. **Complete Scanning**: All dependencies checked for compatibility
+3. **Actionable**: Clear remediation suggestions provided
+4. **Manager Support**: Auto-configuration for nvm/volta/fnm
+5. **Exportable**: Compliance reports generated
+6. **Protected**: Admin-only access to compatibility data
+
+### Notes
+
+- Follows DevOps Engineer principles:
+  - **Green Builds Always**: Version mismatches fail builds ✅
+  - **Early Detection**: Check before build, not after ✅
+  - **Actionable**: Clear commands to fix version issues ✅
+  - **Compliance**: Reports for security/compliance audits ✅
+
+### Related Tasks
+
+- Task 379 (Skipped Test Diagnostic Dashboard) - Related QA work
+- Task 381 (Drill Data Validation) - Related infrastructure work
+
+---
+
+## Task 381: [DEVOPS ENGINEER] Automated Dependency Update Management (Jan 21, 2026)
+
+**Status**: Pending
+**Priority**: MEDIUM
+**Type**: Infrastructure - Dependency Management
+**Effort**: Medium (2.5 hours)
+
+### Purpose
+
+Create automated dependency update management to keep packages current while ensuring stability through automated testing.
+
+### Problem Identified
+
+**Manual Dependency Management**:
+- No systematic tracking of available package updates
+- Security vulnerabilities in outdated dependencies go unnoticed
+- Breaking changes in major updates cause regressions
+- Manual update testing is time-consuming
+- No changelog visibility for updates
+- No rollback mechanism for problematic updates
+
+**Why This Matters**:
+1. **Security**: Outdated dependencies may have unpatched vulnerabilities
+2. **Stability**: Breaking changes in major updates can break builds
+3. **Efficiency**: Automated testing reduces manual update burden
+4. **Visibility**: Changelogs inform decision-making
+5. **Safety**: Rollback capability prevents extended outages
+
+### Solution
+
+**Automated Dependency Update Management**:
+
+1. **Dependency Update Scanner** - Scan for major, minor, patch updates using npm
+2. **Risk Assessment** - Categorize updates by severity (critical, high, moderate, low)
+3. **Update Dashboard** - Display all available updates with details
+4. **Automated Testing** - Run tests before updating to ensure stability
+5. **Changelog Integration** - Fetch and display changelogs for updates
+6. **Batch Scheduling** - Schedule automated updates (monthly, weekly, manual)
+7. **Rollback Capability** - Auto-rollback if tests fail after update
+8. **Security Alerts** - Alert for vulnerabilities in outdated dependencies
+
+### Implementation
+
+- [ ] Create DependencyUpdateInfo interface in src/types/dependencyManagement.ts
+- [ ] Implement scanForUpdates utility (npm outdated equivalent)
+- [ ] Implement assessUpdateRisk utility (check for breaking changes, CVEs)
+- [ ] Create DependencyUpdateDashboard component at /admin/dependencies
+- [ ] Display updates grouped by severity (critical, high, moderate, low)
+- [ ] Implement automated update workflow (update → test → rollback on fail)
+- [ ] Integrate npm audit for security vulnerability detection
+- [ ] Fetch changelogs from npm registry or GitHub releases
+- [ ] Implement batch update scheduling (cron-like config)
+- [ ] Add rollback capability (restore previous package.json + package-lock.json)
+- [ ] Generate update report (PDF for compliance, CSV for analysis)
+- [ ] Add RBAC protection (admin-only access)
+- [ ] Create tests for dependency management utilities
+- [ ] Update docs/blueprint.md with dependency management architecture
+
+### Success Criteria
+
+- [ ] DependencyUpdateInfo interface created
+- [ ] Update scanner accurately detects major, minor, patch updates
+- [ ] Risk assessment correctly identifies breaking changes and CVEs
+- [ ] Update dashboard displays all available updates with severity
+- [ ] Automated update workflow works (update → test → rollback on fail)
+- [ ] Changelogs displayed for each update
+- [ ] Batch scheduling implemented and functional
+- [ ] Rollback capability works correctly
+- [ ] Export functionality works (PDF, CSV formats)
+- [ ] RBAC protection implemented (admin-only)
+- [ ] Zero regressions in existing package functionality
+- [ ] Lint passes (0 errors)
+
+### Related Files
+
+- Add: `src/types/dependencyManagement.ts` - Dependency update data structures
+- Add: `src/utils/dependencyManagement/updateScanner.ts` - Update scanner utilities
+- Add: `src/utils/dependencyManagement/rollbackManager.ts` - Rollback utilities
+- Add: `src/components/admin/DependencyUpdateDashboard.tsx` - Update dashboard
+- Add: `src/app/admin/dependencies/page.tsx` - Admin route
+
+### Implementation Summary
+
+**Files Added**: 5 files (types, utilities, component, route)
+**Lines Added**: ~600 lines
+
+**Key Features**:
+1. **Complete Visibility**: All available updates displayed with severity
+2. **Risk Assessment**: Breaking changes and CVEs identified
+3. **Automated Testing**: Updates tested before merge
+4. **Changelog Visibility**: See what changed in each update
+5. **Batch Scheduling**: Schedule automated updates
+6. **Safe Rollback**: Auto-rollback if tests fail
+
+### Notes
+
+- Follows DevOps Engineer principles:
+  - **Safety First**: Test before merge, rollback on fail ✅
+  - **Visibility**: All updates and risks displayed ✅
+  - **Automated**: Reduces manual dependency management burden ✅
+  - **Security**: CVE alerts for vulnerable dependencies ✅
+
+### Related Tasks
+
+- Task 379 (Skipped Test Diagnostic Dashboard) - Related maintenance work
+- Task 380 (Node.js Compatibility Verification Tool) - Related infrastructure work
+
+---
+
 ## Task 388: [TECHNICAL WRITER] API Documentation Enhancement - Logger Service (Jan 21, 2026)
 
 **Status**: ✅ Completed
