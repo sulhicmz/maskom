@@ -20,40 +20,38 @@ import {
  */
 export function categorizeSkipReason(reason: string): SkipCategory {
   const lowerReason = reason.toLowerCase();
-
-  const words = lowerReason.split(/\s+/);
-
+  
   if (lowerReason.includes('timeout') || lowerReason.includes('time out')) {
     return 'timeout';
   }
-  if (words.some(w => ['pending', 'todo'].includes(w))) {
+  if (lowerReason.includes('pending') || lowerReason.includes('todo')) {
     return 'pending';
   }
-  if (words.some(w => ['fixture', 'mock'].includes(w))) {
+  if (lowerReason.includes('fixture') || lowerReason.includes('mock')) {
     return 'fixture-issues';
   }
-  if (words.some(w => ['obsolete', 'deprecated'].includes(w))) {
+  if (lowerReason.includes('obsolete') || lowerReason.includes('deprecated')) {
     return 'obsolete';
   }
   if (lowerReason.includes('no longer exists')) {
     return 'obsolete';
   }
-  if (words.some(w => ['dependen', 'dep'].includes(w))) {
+  if (lowerReason.includes('depend') || lowerReason.includes('dep')) {
     return 'dependency-issues';
   }
-  if (words.some(w => ['environment', 'env'].includes(w))) {
+  if (lowerReason.includes('environment') || lowerReason.includes('env')) {
     return 'environment-issues';
   }
-  if (words.some(w => ['known', 'bug'].includes(w))) {
+  if (lowerReason.includes('known') || lowerReason.includes('bug')) {
     return 'known-issue';
   }
-  if (words.some(w => ['temporary', 'temp'].includes(w))) {
+  if (lowerReason.includes('temporary') || lowerReason.includes('temp')) {
     return 'temporary';
   }
-  if (words.some(w => ['skip'].includes(w))) {
+  if (lowerReason.includes('skip')) {
     return 'skip';
   }
-
+  
   return 'unknown';
 }
 
@@ -286,9 +284,7 @@ export function generateTrendData(
  * Scan all test files for skipped tests
  * This is a placeholder that would use Jest's JSON reporter in production
  */
-export async function scanForSkippedTests(
-  _testDirectory: string = 'src',
-): Promise<SkippedTestInfo[]> {
+export async function scanForSkippedTests(): Promise<SkippedTestInfo[]> {
   // In production, this would:
   // 1. Run Jest with --json flag to get test results
   // 2. Parse the JSON output for skipped tests
@@ -301,10 +297,8 @@ export async function scanForSkippedTests(
 /**
  * Generate diagnostic report for skipped tests
  */
-export async function generateDiagnosticReport(
-  testDirectory: string = 'src',
-): Promise<SkippedTestDiagnosticReport> {
-  const skippedTests = await scanForSkippedTests(testDirectory);
+export async function generateDiagnosticReport(): Promise<SkippedTestDiagnosticReport> {
+  const skippedTests = await scanForSkippedTests();
   const categoryStats = calculateCategoryStats(skippedTests);
   const criticalIssues = getCriticalIssues(skippedTests);
   const trendData = generateTrendData(skippedTests);

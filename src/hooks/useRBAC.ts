@@ -35,7 +35,7 @@ export const useRBAC = (): RBACContextType => {
     if (!currentUser) {
       return false;
     }
-
+    
     // Simple permission check based on roles
     const rolePermissions: Record<UserRole, Permission[]> = {
       admin: [
@@ -61,8 +61,8 @@ export const useRBAC = (): RBACContextType => {
         Permission.EDIT_CONTENT,
       ],
     };
-
-    const userPermissions = rolePermissions[currentUser.role] || [];
+    
+    const userPermissions: Permission[] = rolePermissions[currentUser.role as UserRole] || [];
     return userPermissions.includes(permission);
   };
 

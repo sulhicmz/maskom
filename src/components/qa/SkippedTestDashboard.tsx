@@ -20,7 +20,8 @@ import {
   exportSkippedTestsAsCSV,
 } from '@/utils/testDiagnostics/skippedTestScanner';
 import { useRBAC } from '@/hooks/useRBAC';
-import Button from '@/components/common/Button';
+import { Permission } from '@/types/permission';
+import Button from '@/components/ui/Button';
 
 const SkippedTestDashboard = () => {
   const { hasPermission } = useRBAC();
@@ -158,7 +159,7 @@ const SkippedTestDashboard = () => {
   };
 
   // Check permissions
-  if (!hasPermission('read', 'qa')) {
+  if (!hasPermission(Permission.VIEW_QA)) {
     return (
       <div className="alert alert-danger">
         <i className="bi bi-exclamation-triangle-fill me-2"></i>
@@ -201,7 +202,7 @@ const SkippedTestDashboard = () => {
           </p>
         </div>
         <Button
-          variant="outline-primary"
+          variant="primary"
           onClick={() => setShowExportModal(true)}
         >
           <i className="bi bi-download me-2"></i>
@@ -402,8 +403,8 @@ const SkippedTestDashboard = () => {
             </span>
             <div>
               <Button
-                variant="outline-success"
-                size="sm"
+                variant="primary"
+                size="small"
                 onClick={handleReEnableTests}
                 className="me-2"
               >
@@ -411,8 +412,8 @@ const SkippedTestDashboard = () => {
                 Aktifkan Kembali
               </Button>
               <Button
-                variant="outline-danger"
-                size="sm"
+                variant="danger"
+                size="small"
                 onClick={handleDeleteTests}
               >
                 <i className="bi bi-trash me-1"></i>
@@ -548,7 +549,7 @@ const SkippedTestDashboard = () => {
               </div>
               <div className="modal-footer">
                 <Button
-                  variant="outline-secondary"
+                  variant="secondary"
                   onClick={() => setShowExportModal(false)}
                 >
                   Batal

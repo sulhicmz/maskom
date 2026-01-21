@@ -17,11 +17,12 @@ describe('Permission Types', () => {
       expect(Permission.DELETE_CONTENT).toBe('delete_content')
       expect(Permission.VIEW_ADMIN_DASHBOARD).toBe('view_admin_dashboard')
       expect(Permission.MANAGE_SETTINGS).toBe('manage_settings')
+      expect(Permission.VIEW_QA).toBe('view_qa')
     })
 
-    it('should have 9 permissions total', () => {
+    it('should have 10 permissions total', () => {
       const permissions = Object.values(Permission)
-      expect(permissions).toHaveLength(9)
+      expect(permissions).toHaveLength(10)
     })
   })
 
