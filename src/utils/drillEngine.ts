@@ -13,6 +13,7 @@ import {
 import { BackupEngine } from '@/utils/backupEngine'
 import { BackupMetadata } from '@/types/backup'
 import apmManager from '@/utils/apm'
+import { logServiceInfo } from '@/services/common/logger'
 import DrillStorage from '@/utils/drill/drillStorage'
 import DrillScheduler from '@/utils/drill/drillScheduler'
 import DrillStatisticsCalculator from '@/utils/drill/drillStatistics'
@@ -459,7 +460,7 @@ class DrillEngine {
     apmManager.addBreadcrumb(`Drill notification: ${drill.status}`, 'drill', 'info')
 
     if (config.notificationEmails.length > 0) {
-      console.log(`[Drill Notification] Sending drill ${drill.id} status ${drill.status} to:`, config.notificationEmails)
+      logServiceInfo('DrillEngine', 'sendDrillNotification', `Sending drill ${drill.id} status ${drill.status} to: ${config.notificationEmails.join(', ')}`)
     }
 
     drill.notificationSent = true
