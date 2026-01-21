@@ -5,12 +5,14 @@ import {
   RestoreResult,
   BackupStatistics,
   BackupConfig,
+  IBackupEngine,
+  BackupProgressCallback,
 } from '@/types/backup'
 
 import {
   generateBackupId,
   calculateChecksum,
-  getBackupMetadataById,
+  getBackupMetadataById as getBackupMetadataByIdUtil,
   calculateRetentionCompliance,
 } from './backupMetadata'
 
@@ -32,7 +34,7 @@ import {
 import {
   saveBackupToStorage,
   loadBackupFromStorage,
-  getBackupMetadataList,
+  getBackupMetadataList as getBackupMetadataListUtil,
   updateBackupMetadataList,
   deleteBackupFromStorage,
   exportBackupToFile as exportBackupToFileUtil,
@@ -53,18 +55,10 @@ import {
   calculateHealthStatus,
 } from './backupHealth'
 
-interface BackupProgress {
-  current: number
-  total: number
-  message: string
-}
-
-type BackupProgressCallback = (progress: BackupProgress) => void
-
 const APPLICATION_VERSION = '1.0.0'
 const BACKUP_VERSION = '1.0.0'
 
-export class BackupEngine {
+export class BackupEngine implements IBackupEngine {
   private static instance: BackupEngine
 
   private constructor() {}
@@ -338,7 +332,7 @@ export class BackupEngine {
         message: 'Loading backup metadata...',
       })
 
-      const metadata = await getBackupMetadataById(backupId)
+      const metadata = await getBackupMetadataByIdUtil(backupId)
 
       if (!metadata) {
         throw new Error(`Backup ${backupId} not found`)
@@ -453,7 +447,7 @@ export class BackupEngine {
         return false
       }
 
-      const metadata = await getBackupMetadataById(backupId)
+      const metadata = await getBackupMetadataByIdUtil(backupId)
 
       if (!metadata) {
         return false
@@ -473,25 +467,9 @@ export class BackupEngine {
     }
   }
 
-  async encryptData(data: string): Promise<string> {
-    return encryptData(data)
-  }
-
-  async decryptData(encryptedData: string): Promise<string> {
-    return decryptData(encryptedData)
-  }
-
-  async compressData(data: string): Promise<string> {
-    return compressData(data)
-  }
-
-  async decompressData(compressedData: string): Promise<string> {
-    return decompressData(compressedData)
-  }
-
   async getBackupStatistics(): Promise<BackupStatistics> {
     try {
-      const metadataList = await getBackupMetadataList()
+      const metadataList = await getBackupMetadataListUtil()
 
       const totalBackups = metadataList.length
       const completedBackups = metadataList.filter(
@@ -554,13 +532,13 @@ export class BackupEngine {
   }
 
   public async getBackupMetadataList(): Promise<BackupMetadata[]> {
-    return getBackupMetadataList()
+    return getBackupMetadataListUtil()
   }
 
   public async getBackupMetadataById(
     backupId: string,
   ): Promise<BackupMetadata | null> {
-    return getBackupMetadataById(backupId)
+    return getBackupMetadataByIdUtil(backupId)
   }
 }
 
@@ -572,8 +550,8 @@ export const createFullBackup = backupEngine.createFullBackup.bind(backupEngine)
 export const createIncrementalBackup = backupEngine.createIncrementalBackup.bind(backupEngine)
 export const restoreBackup = backupEngine.restoreBackup.bind(backupEngine)
 export const verifyBackupIntegrity = backupEngine.verifyBackupIntegrity.bind(backupEngine)
-export const encryptBackup = backupEngine.encryptData.bind(backupEngine)
-export const decryptBackup = backupEngine.decryptData.bind(backupEngine)
 export const getBackupStatistics = backupEngine.getBackupStatistics.bind(backupEngine)
 export const deleteBackup = backupEngine.deleteBackup.bind(backupEngine)
 export const exportBackupToFile = backupEngine.exportBackupToFile.bind(backupEngine)
+export const getBackupMetadataList = backupEngine.getBackupMetadataList.bind(backupEngine)
+export const getBackupMetadataById = backupEngine.getBackupMetadataById.bind(backupEngine)

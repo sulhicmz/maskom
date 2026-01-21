@@ -3,6 +3,99 @@
 
 ---
 
+## Interface Definition - BackupEngine Interface Abstraction (✅ COMPLETED - Jan 21, 2026)
+
+### Purpose
+
+Create IBackupEngine interface to enable dependency injection, improve testability, and follow Dependency Inversion Principle.
+
+### Problem Identified
+
+**Missing Interface Abstraction**:
+- `BackupEngine` class (580 lines) had no interface definition
+- Singleton pattern prevented dependency injection
+- Tight coupling to concrete implementation throughout codebase
+- Violated Dependency Inversion Principle (DIP)
+- No contract for backup operations
+- Encrypted/compressed/decompressed methods were redundant wrappers
+
+**Circular Reference Bug**:
+- Class methods `getBackupMetadataList()` and `getBackupMetadataById()` called themselves recursively
+- Imported utility functions had same names as class methods
+- Created infinite recursion when calling these methods
+
+### Solution
+
+**Interface-First Architecture**:
+
+```
+IBackupEngine Interface (Contract)
+    ↓
+BackupEngine Implementation
+    ↓
+Utility Functions (encryption, compression, storage, etc.)
+```
+
+**Interface Definition** (`src/types/backup.ts`):
+```typescript
+export interface IBackupEngine {
+  createFullBackup(config: BackupConfig, onProgress?: BackupProgressCallback): Promise<BackupMetadata>
+  createIncrementalBackup(config: BackupConfig, lastFullBackup: BackupMetadata | null, onProgress?: BackupProgressCallback): Promise<BackupMetadata>
+  restoreBackup(backupId: string, onProgress?: BackupProgressCallback): Promise<RestoreResult>
+  verifyBackupIntegrity(backupId: string): Promise<boolean>
+  getBackupStatistics(): Promise<BackupStatistics>
+  deleteBackup(backupId: string): Promise<boolean>
+  exportBackupToFile(backupId: string): Promise<Blob | null>
+  getBackupMetadataList(): Promise<BackupMetadata[]>
+  getBackupMetadataById(backupId: string): Promise<BackupMetadata | null>
+}
+```
+
+**Implementation Changes** (`src/utils/backupEngine.ts`):
+1. Export `BackupProgress` and `BackupProgressCallback` types to `src/types/backup.ts`
+2. Add `implements IBackupEngine` to BackupEngine class declaration
+3. Remove redundant wrapper methods: `encryptData()`, `decryptData()`, `compressData()`, `decompressData()`
+4. Fix circular reference bug by using import aliases:
+   - `getBackupMetadataById as getBackupMetadataByIdUtil`
+   - `getBackupMetadataList as getBackupMetadataListUtil`
+5. Remove exports for `encryptBackup` and `decryptBackup` (no longer needed)
+6. Add exports for `getBackupMetadataList` and `getBackupMetadataById`
+
+### Architecture Benefits
+
+1. **Interface Abstraction**: Clear contract for backup operations ✅
+2. **Dependency Injection**: Enables replacing BackupEngine with mock implementations ✅
+3. **Testability**: Can mock IBackupEngine for unit tests ✅
+4. **Dependency Inversion**: Dependencies flow correctly (types ← implementations) ✅
+5. **Reduced Coupling**: Consumers depend on interface, not concrete class ✅
+6. **Fixed Bugs**: Eliminated infinite recursion in metadata methods ✅
+7. **Code Cleanup**: Removed 14 lines of redundant wrapper methods ✅
+
+### Code Changes
+
+- Added: `src/types/backup.ts` - IBackupEngine interface (30 lines)
+- Modified: `src/utils/backupEngine.ts` - Implements IBackupEngine, fixes bugs, removes wrappers (-34 lines net)
+- Net change: +42 lines added, -34 lines removed
+
+### Success Criteria
+
+- [x] IBackupEngine interface created in src/types/backup.ts
+- [x] BackupProgress and BackupProgressCallback moved to types layer
+- [x] BackupEngine class implements IBackupEngine
+- [x] Redundant wrapper methods removed (encryptData, decryptData, compressData, decompressData)
+- [x] Circular reference bug fixed (getBackupMetadataList, getBackupMetadataById)
+- [x] Import aliases used to prevent naming conflicts
+- [x] Removed exports for encryptBackup and decryptBackup
+- [x] Added exports for getBackupMetadataList and getBackupMetadataById
+- [x] No breaking changes to consumers
+
+### Related Files
+
+- ✅ Modified: `src/types/backup.ts` - Added IBackupEngine interface (30 insertions)
+- ✅ Modified: `src/utils/backupEngine.ts` - Implements interface, fixes bugs, removes wrappers (12 insertions, 46 deletions)
+
+---
+
 ## Integration Hardening - TOTP QR Code API (✅ COMPLETED - Jan 20, 2026)
 
 ### Purpose

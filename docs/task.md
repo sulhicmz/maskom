@@ -1,5 +1,56 @@
 # Architecture Task Tracking
 
+## Task 377: [PRINCIPAL ARCHITECT] BackupEngine Interface Definition & Refactoring (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Interface Definition - Dependency Inversion Principle
+**Effort**: Medium (1 hour)
+
+### Purpose
+
+Create IBackupEngine interface to enable dependency injection, improve testability, and follow Dependency Inversion Principle (DIP).
+
+### Problem Identified
+
+**Missing Interface Abstraction**:
+- BackupEngine class (580 lines) had no interface definition
+- Singleton pattern prevented dependency injection
+- Tight coupling to concrete implementation throughout codebase
+- Violated Dependency Inversion Principle (DIP)
+- No contract for backup operations
+- Encrypted/compressed/decompressed methods were redundant wrappers
+
+**Circular Reference Bug**:
+- Class methods getBackupMetadataList() and getBackupMetadataById() called themselves recursively
+- Imported utility functions had same names as class methods
+- Created infinite recursion when calling these methods
+
+### Solution
+
+**Interface-First Architecture**:
+1. Created IBackupEngine interface in src/types/backup.ts
+2. Moved BackupProgress and BackupProgressCallback types to types layer
+3. BackupEngine now implements IBackupEngine
+4. Removed redundant wrapper methods (encryptData, decryptData, compressData, decompressData)
+5. Fixed circular reference bug using import aliases
+
+### Success Criteria
+
+- [x] IBackupEngine interface created
+- [x] BackupProgress and BackupProgressCallback moved to types layer
+- [x] BackupEngine implements IBackupEngine
+- [x] Redundant wrapper methods removed
+- [x] Circular reference bug fixed
+- [x] No breaking changes to consumers
+
+### Related Files
+
+- ✅ Modified: src/types/backup.ts - Added IBackupEngine interface
+- ✅ Modified: src/utils/backupEngine.ts - Implements interface, fixes bugs
+
+---
+
 ## Task 366: [PRINCIPAL ARCHITECT] DrillEngine Module Extraction (Jan 21, 2026)
 
 **Status**: ✅ Completed
