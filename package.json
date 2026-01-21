@@ -13,7 +13,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm test && next build",
+    "verify-node-version": "tsx scripts/verifyNodeVersion.ts",
+    "build": "npm run verify-node-version && npm test && next build",
     "start": "next start",
     "test": "jest",
     "lint": "eslint .",
