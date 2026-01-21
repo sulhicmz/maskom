@@ -2,7 +2,7 @@ import { MFASetupData, TOTPVerificationOptions } from '@/types/mfa';
 import { withTimeout } from '@/utils/resilience/timeout';
 import { withRetry } from '@/utils/resilience/retry';
 import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
-import { TIMEOUTS, SERVICE_RETRY_CONFIG, CIRCUIT_BREAKER_CONFIG } from '@/constants';
+import { TIMEOUTS, SERVICE_RETRY_CONFIG, CIRCUIT_BREAKER_CONFIG, API_ENDPOINTS } from '@/constants';
 
 const SECRET_LENGTH = 32;
 const BACKUP_CODE_LENGTH = 10;
@@ -116,8 +116,8 @@ async function verifyTOTP(options: TOTPVerificationOptions): Promise<boolean> {
 
 async function generateTOTPQRCode(secret: string, issuer: string = 'Maskom', accountName: string = 'user'): Promise<string> {
   const otpAuthUrl = `otpauth://totp/${issuer}:${accountName}?secret=${secret}&issuer=${issuer}&digits=${TOTP_DIGITS}&period=${TOTP_PERIOD}`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpAuthUrl)}`;
-  
+  const qrCodeUrl = `${API_ENDPOINTS.QR_CODE_API}?size=200x200&data=${encodeURIComponent(otpAuthUrl)}`;
+
   return qrCodeCircuitBreaker.execute(async () => {
     const retryResult = await withRetry(
       async () => {
@@ -134,11 +134,11 @@ async function generateTOTPQRCode(secret: string, issuer: string = 'Maskom', acc
         retryableErrors: [...SERVICE_RETRY_CONFIG.QR_CODE_API.retryableErrors] as RegExp[]
       }
     );
-    
+
     if (!retryResult.success) {
       throw new Error(`Failed to generate QR code: ${retryResult.error?.message || 'Unknown error'}`);
     }
-    
+
     return qrCodeUrl;
   });
 }
