@@ -1,5 +1,137 @@
 # Architecture Task Tracking
 
+## Task 381: [DATA ARCHITECT] Drill Data Validation (Jan 21, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Data Validation - Drill Data Integrity
+**Effort**: Medium (2 hours)
+
+### Purpose
+
+Create comprehensive validation for drill data (BackupDrill, DrillScheduleDetails) to ensure disaster recovery system data integrity and prevent configuration errors.
+
+### Problem Identified
+
+**Missing Drill Validation**:
+- DrillData.ts contains 10 backup drill records and 3 schedule details with zero validation
+- BackupDrill type has 12 fields (id, backupId, drillType, status, timestamps, duration, results, remediation flags)
+- DrillScheduleDetails type has 6 fields (drillId, drillType, backupId, scheduledFor, recurrence, enabled)
+- Critical for disaster recovery - drill data determines backup integrity and system resilience
+- No validation for drill type, status, schedule enums
+- No validation for ISO 8601 date formats (timestamps, scheduledFor, completedAt)
+- No duplicate ID detection for drills and schedules
+- No validation for drill results nested objects (restoreDuration, integrity flags, item counts)
+- No temporal validation (completedAt must be after or equal to timestamp)
+
+**Why This Matters**:
+1. **Data Integrity**: Invalid drill configurations could cause backup failures
+2. **Disaster Recovery**: Drill data is critical for business continuity planning
+3. **Configuration Safety**: Invalid enums or dates could break scheduled drills
+4. **Duplicate Detection**: Duplicate drill IDs could cause data consistency issues
+5. **Nested Validation**: Drill results contain multiple boolean/number fields requiring validation
+
+### Solution
+
+**Comprehensive Drill Validation**:
+
+**Validators Created**:
+1. **validateDrillType** - Validates DrillType enum (FULL_RESTORE, PARTIAL_RESTORE, INTEGRITY_CHECK)
+2. **validateDrillStatus** - Validates DrillStatus enum (SCHEDULED, RUNNING, PASSED, FAILED, CANCELLED)
+3. **validateDrillSchedule** - Validates DrillSchedule enum (DAILY, WEEKLY, MONTHLY, MANUAL)
+4. **validateDrillResults** - Validates DrillResults nested object with 7 fields
+5. **validateBackupDrill** - Validates BackupDrill with 12 fields and temporal constraints
+6. **validateDrillScheduleDetails** - Validates DrillScheduleDetails with 6 fields
+7. **validateBackupDrills** - Array validation with duplicate ID detection
+8. **validateDrillSchedules** - Array validation with duplicate ID detection
+
+### Implementation
+
+- [x] Create drillValidation.ts module in src/utils/dataValidation/
+- [x] Implement validateDrillType() for enum validation
+- [x] Implement validateDrillStatus() for enum validation
+- [x] Implement validateDrillSchedule() for enum validation
+- [x] Implement validateDrillResults() for nested object validation
+- [x] Implement validateBackupDrill() for full drill validation with temporal constraints
+- [x] Implement validateDrillScheduleDetails() for schedule validation
+- [x] Implement validateBackupDrills() for array validation with duplicate ID detection
+- [x] Implement validateDrillSchedules() for array validation with duplicate ID detection
+- [x] Add optional field handling (results, errors, scheduledFor, startedAt, completedAt)
+- [x] Implement temporal validation (completedAt must be after or equal to timestamp)
+- [x] Create 42 comprehensive tests following QA best practices
+- [x] Export all validators from dataValidation/index.ts
+- [x] Update docs/blueprint.md with drill validation documentation
+- [x] Verify lint passes (0 errors)
+- [x] Verify full test suite passes (5374/5374 tests passing)
+
+### Success Criteria
+
+- [x] Drill validation module created (drillValidation.ts)
+- [x] 8 validators implemented (type, status, schedule, results, backupDrill, scheduleDetails, backupDrills, drillSchedules)
+- [x] Enum validation for drill types, statuses, schedules
+- [x] ISO 8601 date format validation for timestamps
+- [x] Duplicate ID detection for drill arrays
+- [x] Temporal validation (completedAt after timestamp)
+- [x] Nested object validation for drill results
+- [x] 42 tests covering happy path, sad path, edge cases, boundaries
+- [x] 100% test pass rate (42/42 passing)
+- [x] Lint passes (0 errors)
+- [x] Zero regressions in existing tests (5332 existing tests still pass)
+- [x] Added to docs/blueprint.md validators list
+
+### Related Files
+
+- ✅ Added: `src/utils/dataValidation/drillValidation.ts` - Drill data validators (279 lines)
+- ✅ Added: `src/utils/dataValidation/__tests__/drillValidation.test.ts` - Comprehensive tests (529 lines)
+- ✅ Modified: `src/utils/dataValidation/index.ts` - Export drill validation functions
+
+### Implementation Summary
+
+**Files Added**: 2 files
+**Files Modified**: 1 file (dataValidation/index.ts)
+**Lines Added**: ~808 lines (validator + tests)
+**Validators Implemented**: 8 functions
+**Tests Added**: 42 tests (100% passing)
+**Test Coverage**: 100% of drill validation module exports
+
+**Key Features**:
+1. **Enum Validation**: DrillType, DrillStatus, DrillSchedule enum validation
+2. **ISO Date Format**: Validates all ISO 8601 date strings (timestamps, scheduledFor, completedAt)
+3. **Duplicate ID Detection**: Validates arrays for duplicate drill/schedule IDs
+4. **Temporal Validation**: Ensures completedAt is after or equal to timestamp
+5. **Nested Object Validation**: Validates drill results objects with multiple fields
+6. **Optional Field Handling**: Correctly handles optional fields (results, errors, scheduledFor, etc.)
+7. **Type Safety**: Proper TypeScript typing throughout
+
+**Test Categories**:
+- Happy path: 11 tests
+- Sad path: 23 tests
+- Edge cases: 5 tests
+- Boundary conditions: 3 tests
+
+### Notes
+
+- Follows Data Architect principles:
+  - **Data Integrity First**: Comprehensive validation for all drill fields ✅
+  - **Schema Design**: Follows existing validation patterns (campaignValidation) ✅
+  - **Test Coverage**: 42 tests covering all validators ✅
+  - **QA Best Practices**: AAA pattern, behavior-focused, descriptive names ✅
+  - **Zero Regressions**: All existing tests still pass (5332 → 5374) ✅
+
+- **Test Statistics**:
+  - Before: 0 tests for drill validation
+  - After: 42 tests (100% coverage of drillValidation.ts exports)
+  - Overall: 5374 passing tests (up from 5332, +42 new tests)
+  - Overall: 216 test suites (up from 215, +1 new test suite)
+  - Pass rate: 100% for new tests
+
+### Related Tasks
+
+- Task 366 (DrillEngine Module Extraction) - Related drill system work
+- Task 40 (Data Architecture Enhancement) - Core data validation framework
+
+---
+
 ## Task 380: [PERFORMANCE OPTIMIZER] React.memo Optimization for Reducing Re-renders (Jan 21, 2026)
 
 **Status**: ✅ Completed

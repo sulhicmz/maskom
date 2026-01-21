@@ -734,6 +734,7 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - `socialValidation.ts` - SocialLink validator
 - `contactValidation.ts` - ContactInfoItem validator
 - `mediaValidation.ts` - MediaAsset validator with URL and ISO date validation (Task 285)
+- `drillValidation.ts` - BackupDrill, DrillScheduleDetails, DrillResults validators for disaster recovery system
 - `emailTemplateValidation.ts` - EmailTemplate, TemplateVariable validators with variable syntax validation (Task 315)
 - `campaignValidation.ts` - EmailCampaign, RecipientList, RecipientSegment, RecipientCriteria, CampaignMetrics, CampaignABTest validators (Task 335)
 - `index.ts` - Central export point (backward compatible with dataValidation.ts)
@@ -775,6 +776,15 @@ export const home_2_feedback = filterItems(testi_data, "home_2");
 - ✅ `validateRecipientCriteria` - RecipientCriteria validator for segmentation (Task 335)
 - ✅ `validateRecipientSegment` - RecipientSegment validator with count validation (Task 335)
 - ✅ `validateRecipientList` - RecipientList validator with segment validation (Task 335)
+- ✅ `validateBackupDrill` - BackupDrill validator with enum and date validation
+- ✅ `validateBackupDrills` - Array validation for drills with duplicate ID detection
+- ✅ `validateDrillScheduleDetails` - DrillScheduleDetails validator with schedule validation
+- ✅ `validateDrillSchedules` - Array validation for schedules with duplicate ID detection
+- ✅ `validateDrillResults` - DrillResults validator with nested object validation
+- ✅ `validateDrillType` - DrillType enum validation
+- ✅ `validateDrillStatus` - DrillStatus enum validation
+- ✅ `validateDrillSchedule` - DrillSchedule enum validation
+- ✅ 42 tests for drill validation (100% passing)
 - ✅ 27 tests for email template validation (100% passing) (Task 315)
 - ✅ `validateBlogCategoryData` - Blog category string array validation (Task 158)
 - ✅ 32 tests for validateBlogCategoryData (100% passing) (Task 158)
