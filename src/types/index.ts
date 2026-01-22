@@ -57,3 +57,6 @@ export * from './abTest';
 
 // Email Scheduler types (SendTimeInsights, OptimalSendWindow, etc.)
 export * from './emailScheduler';
+
+// Anomaly Detection types (Anomaly, AnomalyAlert, AnomalyThreshold, etc.)
+export * from './anomaly';
