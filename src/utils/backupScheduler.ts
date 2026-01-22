@@ -24,7 +24,7 @@ class BackupScheduler implements IBackupScheduler {
   private static instance: BackupScheduler
 
   private intervalId: NodeJS.Timeout | null = null
-  private notificationCallbacks: BackupNotificationCallback[] = []
+  private notificationCallbacks: BackupSchedulerNotificationCallback[] = []
 
   private constructor() {}
 
@@ -134,7 +134,7 @@ class BackupScheduler implements IBackupScheduler {
         return null
       }
 
-      return JSON.parse(scheduledBackup) as ScheduledBackup
+      return JSON.parse(scheduledBackup) as BackupSchedulerConfig
     } catch {
       return null
     }
@@ -414,7 +414,7 @@ class BackupScheduler implements IBackupScheduler {
     return diffDays
   }
 
-  private loadSchedulerConfig(): SchedulerConfig | null {
+  private loadSchedulerConfig(): BackupSchedulerConfig | null {
     try {
       if (typeof window === 'undefined') {
         return null
@@ -426,12 +426,7 @@ class BackupScheduler implements IBackupScheduler {
         return null
       }
 
-      return {
-        schedule: scheduledBackup.schedule,
-        time: scheduledBackup.time,
-        enabled: scheduledBackup.enabled,
-        config: scheduledBackup.config,
-      }
+      return scheduledBackup
     } catch {
       return null
     }
