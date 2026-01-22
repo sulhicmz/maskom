@@ -48,3 +48,6 @@ export * from './audit';
 
 // Auth types (User, LoginCredentials, etc.)
 export type { User } from '../services/auth/types';
+
+// A/B Test types (ABTest, ABTestVariant, etc.)
+export * from './abTest';
