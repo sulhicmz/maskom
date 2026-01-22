@@ -49,5 +49,11 @@ export * from './audit';
 // Auth types (User, LoginCredentials, etc.)
 export type { User } from '../services/auth/types';
 
+// Campaign types (EmailCampaign, CampaignMetrics, etc.)
+export * from './campaign';
+
 // A/B Test types (ABTest, ABTestVariant, etc.)
 export * from './abTest';
+
+// Email Scheduler types (SendTimeInsights, OptimalSendWindow, etc.)
+export * from './emailScheduler';
