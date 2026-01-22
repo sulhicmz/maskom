@@ -19,6 +19,7 @@ export interface MigrationResult {
   error?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface MigrationOptions<T = unknown> {
   storageKey: string;
   currentVersion: string;
@@ -49,7 +50,7 @@ export class StorageMigration<T = unknown> {
     const history = this.loadHistory();
     const entry = history.find(h => h.storageKey === this.storageKey);
     const lastMigratedVersion = entry?.migrations?.[entry.migrations.length - 1] || '0.0.0';
-    const dataVersion = typeof data === 'object' && 'version' in data ? this.normalizeVersion((data as Record<string, unknown>).version) : undefined;
+    const dataVersion = data !== null && typeof data === 'object' && 'version' in data ? this.normalizeVersion((data as Record<string, unknown>).version as string | number) : undefined;
     
     if (this.compareVersions(lastMigratedVersion, this.currentVersion) === 0) {
       return {

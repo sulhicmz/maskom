@@ -824,5 +824,18 @@ class AnomalyDetector implements IAnomalyDetector {
 }
 
 export { AnomalyDetector, MetricsHistoryManager };
-export const anomalyDetector = new AnomalyDetector();
+
+let detectorInstance: AnomalyDetector | null = null;
+export const anomalyDetector = new Proxy({} as AnomalyDetector, {
+  get(_target, prop: string | symbol) {
+    if (!detectorInstance && typeof window !== 'undefined') {
+      detectorInstance = new AnomalyDetector();
+    }
+    if (!detectorInstance) {
+      return () => {};
+    }
+    const value = (detectorInstance as unknown as Record<string, unknown>)[String(prop)];
+    return typeof value === 'function' ? value.bind(detectorInstance) : value;
+  },
+});
 export default anomalyDetector;

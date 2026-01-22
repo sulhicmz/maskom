@@ -5,11 +5,13 @@
  * calculating scores, and managing audit results.
  */
 
-import { AxeResults, run } from '@axe-core/react';
+import axe from 'axe-core';
+import type { AxeResults as AxeCoreResults, NodeResult as AxeNodeResult, CheckResult } from 'axe-core';
 import type {
   AccessibilityAudit,
   AccessibilityIssue,
   AccessibilityScore,
+  AccessibilityScoreTrend,
   AccessibilitySummary,
   AccessibilityAuditMetadata,
   AccessibilitySeverity,
@@ -85,25 +87,61 @@ export function determineWcagLevel(tags: string[]): 'A' | 'AA' | 'AAA' {
 }
 
 /**
+ * Convert axe-core target selector to string array
+ */
+function convertTargetToStringArray(target: AxeNodeResult['target']): string[] {
+  if (!target) return [];
+  if (typeof target === 'string') {
+    return [target];
+  }
+  if (Array.isArray(target)) {
+    return target.map(t => typeof t === 'string' ? t : JSON.stringify(t));
+  }
+  // Handle CrossTreeSelector and ShadowDomSelector objects
+  if (typeof target === 'object' && target !== null) {
+    const obj = target as Record<string, unknown>;
+    if ('selector' in obj && Array.isArray(obj.selector)) {
+      return obj.selector.map(s => typeof s === 'string' ? s : JSON.stringify(s));
+    }
+  }
+  return [JSON.stringify(target)];
+}
+
+/**
  * Convert axe-core result to our issue format
  */
 function convertAxeResultToIssue(
-  result: AxeResults['violations'][0]
+  result: AxeCoreResults['violations'][0]
 ): AccessibilityIssue {
   return {
     id: result.id,
-    impact: mapAxeImpactToSeverity(result.impact),
+    impact: mapAxeImpactToSeverity(result.impact || null),
     tags: result.tags,
     description: result.description,
     help: result.help,
     helpUrl: result.helpUrl,
-    nodes: result.nodes.map(node => ({
-      html: node.html,
-      target: node.target || [],
-      failureSummary: node.failureSummary || '',
-      any: node.any || [],
-      all: node.all || [],
-      none: node.none || [],
+    nodes: result.nodes.map((axeNode: AxeNodeResult) => ({
+      html: axeNode.html,
+      target: convertTargetToStringArray(axeNode.target),
+      failureSummary: axeNode.failureSummary || '',
+      any: (axeNode.any || []).map((check: CheckResult) => ({
+        id: check.id,
+        impact: mapAxeImpactToSeverity(check.impact || null),
+        message: check.message,
+        data: check.data || {},
+      })),
+      all: (axeNode.all || []).map((check: CheckResult) => ({
+        id: check.id,
+        impact: mapAxeImpactToSeverity(check.impact || null),
+        message: check.message,
+        data: check.data || {},
+      })),
+      none: (axeNode.none || []).map((check: CheckResult) => ({
+        id: check.id,
+        impact: mapAxeImpactToSeverity(check.impact || null),
+        message: check.message,
+        data: check.data || {},
+      })),
     })),
     category: mapAxeTagsToCategory(result.tags),
     wcagLevel: determineWcagLevel(result.tags),
@@ -231,15 +269,16 @@ export function getDeviceType(width: number): 'desktop' | 'mobile' | 'tablet' {
  */
 export async function runAccessibilityAudit(
   url: string,
-  _context?: {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  context?: {
     include?: string[];
     exclude?: string[];
   }
 ): Promise<AccessibilityAudit> {
   const startTime = Date.now();
-  
+
   // Run axe-core
-  const axeResults: AxeResults = await run(document);
+  const axeResults: AxeCoreResults = await axe.run(document);
   
   const auditDuration = Date.now() - startTime;
   
@@ -338,14 +377,13 @@ export function getScoreTrend(
   scores: AccessibilityScoreTrend[]
 ): 'improving' | 'stable' | 'degrading' {
   if (scores.length < 2) return 'stable';
-  
+
   const recent = scores.slice(-5);
   const first = recent[0].score;
   const last = recent[recent.length - 1].score;
-  
+
   if (last > first + 5) return 'improving';
   if (last < first - 5) return 'degrading';
   return 'stable';
 }
 
-export type { AccessibilityScoreTrend };

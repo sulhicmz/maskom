@@ -248,7 +248,7 @@ const AccessibilityDashboard: React.FC = () => {
                 >
                   {runningAudit ? (
                     <>
-                      <LoadingSpinner size="sm" />
+                      <LoadingSpinner />
                       <span className="ms-2">Sedang Menjalankan Audit...</span>
                     </>
                   ) : (

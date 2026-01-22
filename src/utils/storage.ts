@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { StorageValidator, StorageValidatorOptions, ValidationResult } from './storageValidator';
-import { StorageMigration, Migration, MigrationOptions, MigrationResult } from './storageMigration';
+import { StorageValidator, ValidationResult } from './storageValidator';
+import { StorageMigration, Migration, MigrationResult } from './storageMigration';
 
 export interface StorageConfig<T> {
   key: string;

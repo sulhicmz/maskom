@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ABTest, ABTestVariant, ABTestResult, ABTestStatus, ABTestSuccessMetric, IAbTestEngine } from '@/types/abTest';
-import { createValidator, StorageValidator } from './storageValidator';
+import { StorageValidator } from './storageValidator';
 
 const STORAGE_KEY = 'ab_tests';
 const USER_ASSIGNMENT_KEY = 'ab_test_assignments';

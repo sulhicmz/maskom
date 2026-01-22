@@ -16,6 +16,7 @@ describe('StorageMigration', () => {
           newField: 'default',
         }),
         down: (data: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { newField, ...rest } = data;
           return rest;
         },
@@ -28,6 +29,7 @@ describe('StorageMigration', () => {
           version: 2,
         }),
         down: (data: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { version, ...rest } = data;
           return rest;
         },
@@ -63,6 +65,7 @@ describe('StorageMigration', () => {
 
       it('should apply all migrations in order', () => {
         const initialData = { id: 'test', name: 'Test' };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const result = migration.migrate(initialData);
 
         const history = JSON.parse(localStorage.getItem('maskom_migration_history') || '[]');
