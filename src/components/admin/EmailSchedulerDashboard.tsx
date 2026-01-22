@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { Permission } from '@/types/permission';
@@ -12,6 +12,46 @@ import type {
 } from '@/types/emailScheduler';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+const DAYS_IN_INDONESIAN: Record<DayOfWeek, string> = {
+    Monday: 'Senin',
+    Tuesday: 'Selasa',
+    Wednesday: 'Rabu',
+    Thursday: 'Kamis',
+    Friday: 'Jumat',
+    Saturday: 'Sabtu',
+    Sunday: 'Minggu',
+};
+
+const getConfidenceBadgeClass = (score: number): string => {
+    if (score >= 80) return 'bg-success';
+    if (score >= 60) return 'bg-info';
+    if (score >= 40) return 'bg-warning';
+    return 'bg-secondary';
+};
+
+const getConfidenceLabel = (score: number): string => {
+    if (score >= 80) return 'Tinggi';
+    if (score >= 60) return 'Sedang';
+    if (score >= 40) return 'Rendah';
+    return 'Sangat Rendah';
+};
+
+const formatTime = (hour: number): string => {
+    const h = hour.toString().padStart(2, '0');
+    return `${h}:00`;
+};
+
+const formatDateTime = (isoString: string): string => {
+    const date = new Date(isoString);
+    return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+};
+
 const EmailSchedulerDashboard: React.FC = () => {
     const { theme } = useTheme();
     const [insights, setInsights] = useState<SendTimeInsights | null>(null);
@@ -19,47 +59,7 @@ const EmailSchedulerDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [recipientId, setRecipientId] = useState<string>('');
 
-    const DAYS_IN_INDONESIAN: Record<DayOfWeek, string> = {
-        Monday: 'Senin',
-        Tuesday: 'Selasa',
-        Wednesday: 'Rabu',
-        Thursday: 'Kamis',
-        Friday: 'Jumat',
-        Saturday: 'Sabtu',
-        Sunday: 'Minggu',
-    };
-
-    const getConfidenceBadgeClass = (score: number): string => {
-        if (score >= 80) return 'bg-success';
-        if (score >= 60) return 'bg-info';
-        if (score >= 40) return 'bg-warning';
-        return 'bg-secondary';
-    };
-
-    const getConfidenceLabel = (score: number): string => {
-        if (score >= 80) return 'Tinggi';
-        if (score >= 60) return 'Sedang';
-        if (score >= 40) return 'Rendah';
-        return 'Sangat Rendah';
-    };
-
-    const formatTime = (hour: number): string => {
-        const h = hour.toString().padStart(2, '0');
-        return `${h}:00`;
-    };
-
-    const formatDateTime = (isoString: string): string => {
-        const date = new Date(isoString);
-        return date.toLocaleString('id-ID', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
-
-    const getHeatmapColor = (value: number, max: number): string => {
+    const getHeatmapColor = useCallback((value: number, max: number): string => {
         const percentage = value / max;
         if (percentage === 0) return '#e9ecef';
 
@@ -74,7 +74,7 @@ const EmailSchedulerDashboard: React.FC = () => {
             if (percentage > 0.25) return '#b8daff';
             return '#a2d2ef';
         }
-    };
+    }, [theme]);
 
     const handleRefresh = useCallback(() => {
         setLoading(true);
@@ -91,12 +91,12 @@ const EmailSchedulerDashboard: React.FC = () => {
         }, 500);
     }, [recipientId]);
 
-    const handleClearData = () => {
+    const handleClearData = useCallback(() => {
         if (confirm('Apakah Anda yakin ingin menghapus semua data engagement?')) {
             emailScheduler.clearEngagementData();
             handleRefresh();
         }
-    };
+    }, [handleRefresh]);
 
     useEffect(() => {
         handleRefresh();
@@ -386,4 +386,6 @@ const EmailSchedulerDashboard: React.FC = () => {
     );
 };
 
-export default EmailSchedulerDashboard;
+EmailSchedulerDashboard.displayName = 'EmailSchedulerDashboard';
+
+export default memo(EmailSchedulerDashboard);
