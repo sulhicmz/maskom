@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { Permission } from '@/types/permission';
 import emailScheduler from '@/utils/emailScheduler';
 import type {
     SendTimeInsights,
-    OptimalSendWindow,
     ScheduleRecommendation,
-    HourlyEngagementData,
     DayOfWeek,
 } from '@/types/emailScheduler';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -61,26 +59,6 @@ const EmailSchedulerDashboard: React.FC = () => {
         });
     };
 
-    const calculateHourlyAverages = (data: HourlyEngagementData[]): { [key: number]: number } => {
-        const averages: { [key: number]: number } = {};
-
-        for (let hour = 0; hour < 24; hour++) {
-            let totalOpenRate = 0;
-            let count = 0;
-
-            data.forEach((hourly) => {
-                if (hourly.totalEvents > 0) {
-                    totalOpenRate += hourly.openRate;
-                    count++;
-                }
-            });
-
-            averages[hour] = count > 0 ? totalOpenRate / count : 0;
-        }
-
-        return averages;
-    };
-
     const getHeatmapColor = (value: number, max: number): string => {
         const percentage = value / max;
         if (percentage === 0) return '#e9ecef';
@@ -98,7 +76,7 @@ const EmailSchedulerDashboard: React.FC = () => {
         }
     };
 
-    const handleRefresh = () => {
+    const handleRefresh = useCallback(() => {
         setLoading(true);
         setTimeout(() => {
             const newInsights = emailScheduler.getSendTimeInsights(recipientId || undefined);
@@ -111,7 +89,7 @@ const EmailSchedulerDashboard: React.FC = () => {
 
             setLoading(false);
         }, 500);
-    };
+    }, [recipientId]);
 
     const handleClearData = () => {
         if (confirm('Apakah Anda yakin ingin menghapus semua data engagement?')) {
@@ -122,7 +100,7 @@ const EmailSchedulerDashboard: React.FC = () => {
 
     useEffect(() => {
         handleRefresh();
-    }, []);
+    }, [handleRefresh]);
 
     if (loading) {
         return <LoadingSpinner />;

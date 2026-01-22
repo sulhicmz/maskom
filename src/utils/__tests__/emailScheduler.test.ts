@@ -2,7 +2,6 @@ import { EmailScheduler } from '../emailScheduler';
 import type {
     EngagementEvent,
     DayOfWeek,
-    EventType,
 } from '@/types/emailScheduler';
 
 describe('EmailScheduler', () => {
@@ -457,7 +456,7 @@ describe('EmailScheduler', () => {
             const heatmap = scheduler.generateEngagementHeatmap();
 
             expect(heatmap.size).toBe(7);
-            heatmap.forEach((hourlyData, day) => {
+            heatmap.forEach((hourlyData) => {
                 expect(hourlyData).toHaveLength(24);
                 expect(hourlyData.every((h) => h.totalEvents === 0)).toBe(true);
             });

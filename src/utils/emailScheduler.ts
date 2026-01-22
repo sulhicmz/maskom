@@ -1,7 +1,6 @@
 import type {
     IEmailScheduler,
     EngagementEvent,
-    EventType,
     HourlyEngagementData,
     DayOfWeekEngagementData,
     RecipientEngagementPattern,
@@ -398,7 +397,7 @@ class EmailScheduler implements IEmailScheduler {
                     endHour: hour + 1,
                     openRate: hourly.openRate,
                     clickRate: hourly.clickRate,
-                    confidenceScore: this.calculateConfidenceScore(hourly.totalEvents, hourly.openRate),
+                    confidenceScore: this.calculateConfidenceScore(hourly.totalEvents),
                     sampleSize: hourly.totalEvents,
                 };
 
@@ -415,7 +414,7 @@ class EmailScheduler implements IEmailScheduler {
         return windows;
     }
 
-    private calculateConfidenceScore(sampleSize: number, openRate: number): number {
+    private calculateConfidenceScore(sampleSize: number): number {
         if (sampleSize < 5) {
             return 30;
         } else if (sampleSize < 20) {
