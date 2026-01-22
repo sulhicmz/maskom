@@ -1,5 +1,5 @@
 "use client"
-import React from "react";
+import React, { memo } from "react";
 import tags from "@/data/BlogTagData";
 import AnimationWrapper from "@/components/common/AnimationWrapper";
 
@@ -46,4 +46,4 @@ const Tags: React.FC<TagsProps> = ({ selectedTagId, onTagClick }) => {
 
 Tags.displayName = "Tags"
 
-export default Tags
+export default memo(Tags)

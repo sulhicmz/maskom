@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, memo } from "react"
 import Input from "@/components/ui/Input"
 
 interface BlogSearchProps {
@@ -55,4 +55,4 @@ const BlogSearch: React.FC<BlogSearchProps> = ({ value, onChange }) => {
 
 BlogSearch.displayName = "BlogSearch"
 
-export default BlogSearch
+export default memo(BlogSearch)

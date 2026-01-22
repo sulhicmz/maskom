@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { bookmarkExists, addBookmark, removeBookmark } from '@/utils/bookmarkStorage';
 
 export interface BookmarkButtonProps {
@@ -13,7 +13,7 @@ export interface BookmarkButtonProps {
   onBookmarkChange?: (isBookmarked: boolean) => void;
 }
 
-export default function BookmarkButton({
+export default memo(function BookmarkButton({
   postId,
   postTitle,
   postSlug,
@@ -89,4 +89,4 @@ export default function BookmarkButton({
       )}
     </button>
   );
-}
+});

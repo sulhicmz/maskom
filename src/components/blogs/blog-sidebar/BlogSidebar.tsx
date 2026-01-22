@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { memo } from "react"
 import Category from "./Category"
 import LatestNews from "./LatestNews"
 import Tags from "./Tags"
@@ -39,4 +39,4 @@ const BlogSidebar = ({
 
 BlogSidebar.displayName = "BlogSidebar"
 
-export default BlogSidebar
+export default memo(BlogSidebar)
