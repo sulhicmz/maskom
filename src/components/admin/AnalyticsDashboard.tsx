@@ -116,4 +116,4 @@ const AnalyticsDashboard: React.FC = () => {
   )
 }
 
-export default AnalyticsDashboard
+export default React.memo(AnalyticsDashboard)

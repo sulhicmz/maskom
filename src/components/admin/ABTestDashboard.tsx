@@ -484,4 +484,4 @@ const ABTestDashboard: React.FC = () => {
   )
 }
 
-export default ABTestDashboard
+export default React.memo(ABTestDashboard)

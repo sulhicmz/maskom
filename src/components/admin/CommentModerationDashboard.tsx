@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { BlogCommentItem, CommentModerationStatus } from '@/types/data';
 import { calculateModerationStats, bulkModerateComments, filterCommentsByStatus } from '@/utils/moderation';
@@ -23,23 +23,23 @@ const CommentModerationDashboard = () => {
     [comments, selectedStatus]
   );
 
-  const handleSelectComment = (commentId: number) => {
+  const handleSelectComment = useCallback((commentId: number) => {
     setSelectedComments((prev) =>
       prev.includes(commentId)
         ? prev.filter((id) => id !== commentId)
         : [...prev, commentId]
     );
-  };
+  }, []);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (selectedComments.length === filteredComments.length) {
       setSelectedComments([]);
     } else {
       setSelectedComments(filteredComments.map((comment) => comment.id));
     }
-  };
+  }, [filteredComments, selectedComments]);
 
-  const handleBulkModerate = async (newStatus: CommentModerationStatus) => {
+  const handleBulkModerate = useCallback(async (newStatus: CommentModerationStatus) => {
     setLoading(true);
     setError('');
     setMessage('');
@@ -69,9 +69,9 @@ const CommentModerationDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [comments, selectedComments]);
 
-  const getStatusColor = (status: CommentModerationStatus): 'success' | 'danger' | 'warning' | 'info' => {
+  const getStatusColor = useCallback((status: CommentModerationStatus): 'success' | 'danger' | 'warning' | 'info' => {
     const colorMap: Record<CommentModerationStatus, 'success' | 'danger' | 'warning' | 'info'> = {
       pending: 'warning',
       approved: 'success',
@@ -79,9 +79,9 @@ const CommentModerationDashboard = () => {
       spam: 'info',
     };
     return colorMap[status] || 'info';
-  };
+  }, []);
 
-  const getStatusLabel = (status: CommentModerationStatus): string => {
+  const getStatusLabel = useCallback((status: CommentModerationStatus): string => {
     const labelMap = {
       pending: 'Menunggu',
       approved: 'Disetujui',
@@ -89,7 +89,7 @@ const CommentModerationDashboard = () => {
       spam: 'Spam',
     };
     return labelMap[status] || status;
-  };
+  }, []);
 
   return (
     <div className="comment-moderation-dashboard">
@@ -354,4 +354,4 @@ const CommentModerationDashboard = () => {
   );
 };
 
-export default CommentModerationDashboard;
+export default React.memo(CommentModerationDashboard);
