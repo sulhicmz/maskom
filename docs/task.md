@@ -3,6 +3,7 @@
 ## Task 403: [CODE ARCHITECT] Interface Definition - DrillStorage Interface Abstraction (Jan 22, 2026)
 
 **Status**: ✅ Completed
+**PR**: https://github.com/sulhicmz/maskom/pull/216
 **Priority**: HIGH
 **Type**: Architecture - Interface Definition
 **Effort**: Medium (1 hour)
