@@ -72,7 +72,8 @@ const Form = ({
     for (const [key, value] of formData.entries()) {
       const input = event.currentTarget.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(`[name="${key}"]`);
       if (input && input.required && !value) {
-        formErrors[key] = `${key} is required`;
+        const label = input.getAttribute('aria-label') || input.getAttribute('aria-labelledby') || key;
+        formErrors[key] = `${label} wajib diisi`;
       }
     }
 
@@ -110,6 +111,9 @@ const Form = ({
     isSubmitting,
   };
 
+  const errorCount = Object.keys(errors).length;
+  const hasErrors = errorCount > 0;
+
   return (
     <FormContext.Provider value={contextValue}>
       <form
@@ -122,6 +126,11 @@ const Form = ({
         noValidate
         {...props}
       >
+        {hasErrors && (
+          <div style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }} role="alert" aria-live="assertive" aria-atomic="true">
+            Formulir memiliki {errorCount} error. Harap perbaiki sebelum mengirim.
+          </div>
+        )}
         {children}
       </form>
     </FormContext.Provider>

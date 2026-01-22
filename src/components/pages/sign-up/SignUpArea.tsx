@@ -13,12 +13,12 @@ const SignUpArea = () => {
       <section className="user-section pt-120 pb-70">
          <div className="container">
             <div className="row align-items-center">
-                <div className="col-xl-6">
-                    <AnimationWrapper animation="fadeInLeft" className="signup-image-box p-r z-1 mb-50">
-                       <Image src={login_img1} className="image-one" alt="Ilustrasi robot layanan digital Maskom" loading="lazy" />
-                       <Image src={login_img2} className="image-two" alt="Base ilustrasi platform digital" loading="lazy" />
-                    </AnimationWrapper>
-                </div>
+                 <div className="col-xl-6">
+                     <AnimationWrapper animation="fadeInLeft" className="signup-image-box p-r z-1 mb-50" role="img" aria-label="Ilustrasi layanan digital Maskom">
+                        <Image src={login_img1} className="image-one" alt="Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi" loading="lazy" />
+                        <Image src={login_img2} className="image-two" alt="Platform digital Maskom dengan antarmuka modern" loading="lazy" />
+                     </AnimationWrapper>
+                 </div>
                <div className="col-xl-6">
                   <AnimationWrapper animation="fadeInRight" className="user-wrapper mb-50">
                      <div className="form-title mb-35">
