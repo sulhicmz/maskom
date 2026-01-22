@@ -82,9 +82,10 @@ describe('AboutArea', () => {
       const { container } = render(<AboutArea />);
 
       const images = container.querySelectorAll('img[data-testid="next-image"]');
-      const descriptiveImages = Array.from(images).filter(img =>
-        (img as HTMLElement).getAttribute('alt') && (img as HTMLElement).getAttribute('alt')?.trim().length! > 10
-      );
+      const descriptiveImages = Array.from(images).filter(img => {
+        const alt = (img as HTMLElement).getAttribute('alt');
+        return alt && alt.trim().length > 10;
+      });
       expect(descriptiveImages.length).toBeGreaterThanOrEqual(3);
     });
 
