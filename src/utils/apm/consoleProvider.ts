@@ -1,4 +1,5 @@
-import type { IAPMProvider, APMError, APMTransaction, APMUser, APMPerformanceMetrics } from './types';
+import type { IAPMProvider } from './types';
+import type { APMError, APMTransaction, APMUser, APMPerformanceMetrics } from '@/types/apm';
 
 class ConsoleAPMProvider implements IAPMProvider {
   private enabled: boolean = true;

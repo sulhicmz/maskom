@@ -1,5 +1,5 @@
-import type { IAPMProvider, APMTransaction, APMError, APMUser, APMPerformanceMetrics } from './types';
-import type { APMConfig, APMProviderType, IAPMManager } from '@/types/apm';
+import type { IAPMProvider, APMConfig } from './types';
+import type { APMProviderType, IAPMManager, APMTransaction, APMError, APMUser, APMPerformanceMetrics } from '@/types/apm';
 import { ConsoleAPMProvider } from './consoleProvider';
 
 class APMManager implements IAPMManager {
