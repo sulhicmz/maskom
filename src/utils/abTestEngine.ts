@@ -1,58 +1,127 @@
+import { z } from 'zod';
 import { ABTest, ABTestVariant, ABTestResult, ABTestStatus, ABTestSuccessMetric, IAbTestEngine } from '@/types/abTest';
+import { createValidator, StorageValidator } from './storageValidator';
 
 const STORAGE_KEY = 'ab_tests';
 const USER_ASSIGNMENT_KEY = 'ab_test_assignments';
 
+const abTestArraySchema = z.array(
+  z.object({
+    id: z.string(),
+    postId: z.number(),
+    type: z.enum(['headline', 'content', 'layout', 'image']),
+    status: z.enum(['draft', 'running', 'paused', 'completed']),
+    trafficSplit: z.number(),
+    duration: z.number(),
+    successMetric: z.enum(['views', 'clicks', 'engagement', 'timeOnPage', 'conversions']),
+    minSampleSize: z.number().default(1000),
+    confidenceLevel: z.number().default(0.95),
+    variants: z.array(
+      z.object({
+        id: z.string(),
+        testId: z.string(),
+        variantName: z.string(),
+        content: z.record(z.string(), z.unknown()),
+        assignmentRate: z.number(),
+        metrics: z.object({
+          views: z.number().default(0),
+          clicks: z.number().default(0),
+          engagement: z.number().default(0),
+          timeOnPage: z.number().default(0),
+          conversions: z.number().default(0),
+        }).default({
+          views: 0,
+          clicks: 0,
+          engagement: 0,
+          timeOnPage: 0,
+          conversions: 0,
+        }),
+        assignedUsers: z.array(z.string()).default([]),
+      })
+    ),
+    createdAt: z.string(),
+    startedAt: z.string().optional(),
+    completedAt: z.string().optional(),
+    winner: z.object({
+      testId: z.string(),
+      winnerId: z.string(),
+      loserId: z.string(),
+      statisticalSignificance: z.boolean(),
+      pValue: z.number(),
+      confidenceInterval: z.object({
+        winner: z.object({ lower: z.number(), upper: z.number() }),
+        loser: z.object({ lower: z.number(), upper: z.number() }),
+      }),
+      uplift: z.number(),
+      declaredAt: z.string(),
+    }).nullable(),
+  })
+);
+
+const userAssignmentsSchema = z.record(z.string(), z.string());
+
 export class ABTestEngine implements IAbTestEngine {
   private tests: Map<string, ABTest> = new Map();
   private userAssignments: Map<string, string> = new Map();
+  private testsValidator: StorageValidator<ABTest[]>;
+  private assignmentsValidator: StorageValidator<Record<string, string>>;
 
   constructor() {
+    this.testsValidator = new StorageValidator<ABTest[]>({
+      schema: abTestArraySchema,
+      defaultValue: [],
+      storageKey: STORAGE_KEY,
+      logErrors: true,
+    });
+
+    this.assignmentsValidator = new StorageValidator<Record<string, string>>({
+      schema: userAssignmentsSchema,
+      defaultValue: {},
+      storageKey: USER_ASSIGNMENT_KEY,
+      logErrors: true,
+    });
+
     this.loadTests();
     this.loadUserAssignments();
   }
 
   loadTests(): void {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const tests: ABTest[] = JSON.parse(stored);
-        tests.forEach(test => this.tests.set(test.id, test));
-      }
-    } catch (error) {
-      console.error('Failed to load A/B tests:', error);
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const tests = this.testsValidator.safeParseFromStorage(stored);
+      tests.forEach(test => this.tests.set(test.id, test));
     }
   }
 
   saveTests(): void {
-    try {
-      const testsArray = Array.from(this.tests.values());
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(testsArray));
-    } catch (error) {
-      console.error('Failed to save A/B tests:', error);
+    const testsArray = Array.from(this.tests.values());
+    const result = this.testsValidator.parse(testsArray);
+    
+    if (result.success) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(result.data));
+    } else {
+      console.error('[ABTestEngine] Failed to save tests:', result.error);
     }
   }
 
   loadUserAssignments(): void {
-    try {
-      const stored = localStorage.getItem(USER_ASSIGNMENT_KEY);
-      if (stored) {
-        const assignments = JSON.parse(stored);
-        Object.entries(assignments).forEach(([testId, variantId]) => {
-          this.userAssignments.set(testId, variantId as string);
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load user assignments:', error);
+    const stored = localStorage.getItem(USER_ASSIGNMENT_KEY);
+    if (stored) {
+      const assignments = this.assignmentsValidator.safeParseFromStorage(stored);
+      Object.entries(assignments).forEach(([testId, variantId]) => {
+        this.userAssignments.set(testId, variantId);
+      });
     }
   }
 
   saveUserAssignments(): void {
-    try {
-      const assignmentsObj = Object.fromEntries(this.userAssignments);
-      localStorage.setItem(USER_ASSIGNMENT_KEY, JSON.stringify(assignmentsObj));
-    } catch (error) {
-      console.error('Failed to save user assignments:', error);
+    const assignmentsObj = Object.fromEntries(this.userAssignments);
+    const result = this.assignmentsValidator.parse(assignmentsObj);
+    
+    if (result.success) {
+      localStorage.setItem(USER_ASSIGNMENT_KEY, JSON.stringify(result.data));
+    } else {
+      console.error('[ABTestEngine] Failed to save assignments:', result.error);
     }
   }
 

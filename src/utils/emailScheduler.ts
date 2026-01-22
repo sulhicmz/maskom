@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type {
     IEmailScheduler,
     EngagementEvent,
@@ -10,6 +11,7 @@ import type {
     ScheduleRecommendation,
     DayOfWeek,
 } from '@/types/emailScheduler';
+import { StorageValidator } from './storageValidator';
 
 const STORAGE_KEYS = {
     ENGAGEMENT_EVENTS: 'email_scheduler_engagement_events',
@@ -39,12 +41,67 @@ const INDUSTRY_FALLBACK: OptimalSendWindow = {
     sampleSize: 0,
 };
 
+const engagementEventArraySchema = z.array(
+  z.object({
+    id: z.string(),
+    campaignId: z.string(),
+    recipientId: z.string(),
+    eventType: z.enum(['open', 'click']),
+    timestamp: z.string(),
+    timezone: z.string(),
+  })
+);
+
+const recipientPatternArraySchema = z.array(
+  z.object({
+    recipientId: z.string(),
+    engagementEvents: engagementEventArraySchema,
+    optimalDay: z.enum(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']).nullable(),
+    optimalHour: z.number().nullable(),
+    timezone: z.string(),
+    lastUpdated: z.string(),
+  })
+);
+
+const timezoneDataArraySchema = z.array(
+  z.object({
+    recipientId: z.string(),
+    timezone: z.string(),
+    autoDetected: z.boolean(),
+    lastDetected: z.string(),
+  })
+);
+
 class EmailScheduler implements IEmailScheduler {
     private engagementEvents: EngagementEvent[];
     private recipientPatterns: Map<string, RecipientEngagementPattern>;
     private timezoneData: Map<string, TimezoneData>;
+    private engagementEventsValidator: StorageValidator<EngagementEvent[]>;
+    private recipientPatternsValidator: StorageValidator<RecipientEngagementPattern[]>;
+    private timezoneDataValidator: StorageValidator<TimezoneData[]>;
 
     constructor() {
+        this.engagementEventsValidator = new StorageValidator<EngagementEvent[]>({
+            schema: engagementEventArraySchema,
+            defaultValue: [],
+            storageKey: STORAGE_KEYS.ENGAGEMENT_EVENTS,
+            logErrors: true,
+        });
+
+        this.recipientPatternsValidator = new StorageValidator<RecipientEngagementPattern[]>({
+            schema: recipientPatternArraySchema,
+            defaultValue: [],
+            storageKey: STORAGE_KEYS.RECIPIENT_PATTERNS,
+            logErrors: true,
+        });
+
+        this.timezoneDataValidator = new StorageValidator<TimezoneData[]>({
+            schema: timezoneDataArraySchema,
+            defaultValue: [],
+            storageKey: STORAGE_KEYS.TIMEZONE_DATA,
+            logErrors: true,
+        });
+
         this.engagementEvents = this.loadEngagementEvents();
         this.recipientPatterns = this.loadRecipientPatterns();
         this.timezoneData = this.loadTimezoneData();
@@ -52,33 +109,48 @@ class EmailScheduler implements IEmailScheduler {
 
     private loadEngagementEvents(): EngagementEvent[] {
         const stored = localStorage.getItem(STORAGE_KEYS.ENGAGEMENT_EVENTS);
-        return stored ? JSON.parse(stored) : [];
+        return stored ? this.engagementEventsValidator.safeParseFromStorage(stored) : [];
     }
 
     private saveEngagementEvents(): void {
-        localStorage.setItem(STORAGE_KEYS.ENGAGEMENT_EVENTS, JSON.stringify(this.engagementEvents));
+        const result = this.engagementEventsValidator.parse(this.engagementEvents);
+        if (result.success) {
+            localStorage.setItem(STORAGE_KEYS.ENGAGEMENT_EVENTS, JSON.stringify(result.data));
+        } else {
+            console.error('[EmailScheduler] Failed to save engagement events:', result.error);
+        }
     }
 
     private loadRecipientPatterns(): Map<string, RecipientEngagementPattern> {
         const stored = localStorage.getItem(STORAGE_KEYS.RECIPIENT_PATTERNS);
-        const patterns: RecipientEngagementPattern[] = stored ? JSON.parse(stored) : [];
+        const patterns = stored ? this.recipientPatternsValidator.safeParseFromStorage(stored) : [];
         return new Map(patterns.map((p) => [p.recipientId, p]));
     }
 
     private saveRecipientPatterns(): void {
         const patterns = Array.from(this.recipientPatterns.values());
-        localStorage.setItem(STORAGE_KEYS.RECIPIENT_PATTERNS, JSON.stringify(patterns));
+        const result = this.recipientPatternsValidator.parse(patterns);
+        if (result.success) {
+            localStorage.setItem(STORAGE_KEYS.RECIPIENT_PATTERNS, JSON.stringify(result.data));
+        } else {
+            console.error('[EmailScheduler] Failed to save recipient patterns:', result.error);
+        }
     }
 
     private loadTimezoneData(): Map<string, TimezoneData> {
         const stored = localStorage.getItem(STORAGE_KEYS.TIMEZONE_DATA);
-        const data: TimezoneData[] = stored ? JSON.parse(stored) : [];
+        const data = stored ? this.timezoneDataValidator.safeParseFromStorage(stored) : [];
         return new Map(data.map((t) => [t.recipientId, t]));
     }
 
     private saveTimezoneData(): void {
         const data = Array.from(this.timezoneData.values());
-        localStorage.setItem(STORAGE_KEYS.TIMEZONE_DATA, JSON.stringify(data));
+        const result = this.timezoneDataValidator.parse(data);
+        if (result.success) {
+            localStorage.setItem(STORAGE_KEYS.TIMEZONE_DATA, JSON.stringify(result.data));
+        } else {
+            console.error('[EmailScheduler] Failed to save timezone data:', result.error);
+        }
     }
 
     trackEngagementEvent(event: EngagementEvent): void {
@@ -98,7 +170,7 @@ class EmailScheduler implements IEmailScheduler {
 
         const timezone = this.timezoneData.get(recipientId)?.timezone || 'UTC';
 
-        const hourlyData = new Map<number, { opens: number; clicks: number }>();
+        const hourlyData = new Map<string, { opens: number; clicks: number }>();
 
         recipientEvents.forEach((event) => {
             const date = new Date(event.timestamp);

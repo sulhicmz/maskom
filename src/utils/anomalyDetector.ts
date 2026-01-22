@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
   Anomaly,
   AnomalyAlert,
@@ -14,6 +15,7 @@ import {
   IMetricsHistory,
   DEFAULT_ANOMALY_THRESHOLDS,
 } from '@/types/anomaly';
+import { StorageValidator } from './storageValidator';
 
 const STORAGE_KEYS = {
   ANOMALIES: 'anomalies',
@@ -22,6 +24,74 @@ const STORAGE_KEYS = {
   ALERTS: 'anomaly_alerts',
   METRICS_HISTORY: 'anomaly_metrics_history',
 };
+
+const anomalyArraySchema = z.array(
+  z.object({
+    id: z.string(),
+    type: z.enum(['traffic', 'error', 'performance']),
+    severity: z.enum(['low', 'medium', 'high', 'critical']),
+    status: z.enum(['detected', 'confirmed', 'false_positive', 'investigating']),
+    metric: z.string(),
+    metricType: z.string(),
+    actualValue: z.number(),
+    expectedValue: z.number(),
+    deviation: z.number(),
+    zScore: z.number().optional(),
+    threshold: z.number(),
+    detectedAt: z.string(),
+    confirmedAt: z.string().optional(),
+    acknowledgedBy: z.string().optional(),
+    description: z.string(),
+    recommendation: z.string(),
+    context: z.record(z.string(), z.unknown()).optional(),
+  })
+);
+
+const anomalyThresholdArraySchema = z.array(
+  z.object({
+    metricType: z.enum(['traffic', 'error', 'performance']),
+    thresholdMethod: z.enum(['z_score', 'moving_average', 'isolation_forest']),
+    sensitivityLevel: z.enum(['low', 'medium', 'high']),
+    zScoreThreshold: z.number(),
+    movingAverageWindow: z.number(),
+    alertChannels: z.array(z.enum(['dashboard', 'email', 'webhook', 'sms'])),
+    webhookUrl: z.string().optional(),
+    emailAddress: z.string().optional(),
+    enabled: z.boolean(),
+  })
+);
+
+const baselineDataArraySchema = z.array(
+  z.object({
+    metricType: z.string(),
+    metric: z.string(),
+    baseline: z.number(),
+    samples: z.array(z.number()),
+    sampleSize: z.number(),
+    windowSize: z.number(),
+    lastUpdated: z.string(),
+    standardDeviation: z.number(),
+  })
+);
+
+const alertsArraySchema = z.array(
+  z.object({
+    anomalyId: z.string(),
+    alerts: z.array(
+      z.object({
+        id: z.string(),
+        anomalyId: z.string(),
+        channels: z.array(z.enum(['dashboard', 'email', 'webhook', 'sms'])),
+        sentAt: z.string(),
+        acknowledgedAt: z.string().optional(),
+        status: z.enum(['sent', 'acknowledged', 'failed']),
+        error: z.string().optional(),
+        webhookUrl: z.string().optional(),
+        emailAddress: z.string().optional(),
+      })
+    ),
+  })
+);
 
 const MAX_HISTORY_SIZE = 1000;
 const MAX_ALERTS = 1000;
@@ -133,9 +203,42 @@ class AnomalyDetector implements IAnomalyDetector {
   private baselines: Map<string, BaselineData> = new Map();
   private alerts: Map<string, AnomalyAlert[]> = new Map();
   private metricsHistory: MetricsHistoryManager;
+  private anomaliesValidator: StorageValidator<Anomaly[]>;
+  private thresholdsValidator: StorageValidator<AnomalyThreshold[]>;
+  private baselinesValidator: StorageValidator<BaselineData[]>;
+  private alertsValidator: StorageValidator<{ anomalyId: string; alerts: AnomalyAlert[] }[]>;
 
   constructor() {
     this.metricsHistory = new MetricsHistoryManager(MAX_HISTORY_SIZE);
+
+    this.anomaliesValidator = new StorageValidator<Anomaly[]>({
+      schema: anomalyArraySchema,
+      defaultValue: [],
+      storageKey: STORAGE_KEYS.ANOMALIES,
+      logErrors: true,
+    });
+
+    this.thresholdsValidator = new StorageValidator<AnomalyThreshold[]>({
+      schema: anomalyThresholdArraySchema,
+      defaultValue: [],
+      storageKey: STORAGE_KEYS.THRESHOLDS,
+      logErrors: true,
+    });
+
+    this.baselinesValidator = new StorageValidator<BaselineData[]>({
+      schema: baselineDataArraySchema,
+      defaultValue: [],
+      storageKey: STORAGE_KEYS.BASELINES,
+      logErrors: true,
+    });
+
+    this.alertsValidator = new StorageValidator<{ anomalyId: string; alerts: AnomalyAlert[] }[]>({
+      schema: alertsArraySchema,
+      defaultValue: [],
+      storageKey: STORAGE_KEYS.ALERTS,
+      logErrors: true,
+    });
+
     this.loadAnomalies();
     this.loadThresholds();
     this.loadBaselines();
@@ -143,103 +246,92 @@ class AnomalyDetector implements IAnomalyDetector {
   }
 
   loadAnomalies(): void {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.ANOMALIES);
-      if (stored) {
-        const anomalies: Anomaly[] = JSON.parse(stored);
-        anomalies.forEach(anomaly => {
-          if (anomaly && anomaly.id) {
-            this.anomalies.set(anomaly.id, anomaly);
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load anomalies:', error);
-    }
-  }
-
-  saveAnomalies(): void {
-    try {
-      const anomaliesArray = Array.from(this.anomalies.values());
-      localStorage.setItem(STORAGE_KEYS.ANOMALIES, JSON.stringify(anomaliesArray));
-    } catch (error) {
-      console.error('Failed to save anomalies:', error);
-    }
-  }
-
-  loadThresholds(): void {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.THRESHOLDS);
-      if (stored) {
-        const thresholds: AnomalyThreshold[] = JSON.parse(stored);
-        thresholds.forEach(threshold => this.thresholds.set(threshold.metricType, threshold));
-      } else {
-        Object.entries(DEFAULT_ANOMALY_THRESHOLDS).forEach(([type, threshold]) => {
-          this.thresholds.set(type as AnomalyType, threshold);
-        });
-        this.saveThresholds();
-      }
-    } catch (error) {
-      console.error('Failed to load thresholds:', error);
-      Object.entries(DEFAULT_ANOMALY_THRESHOLDS).forEach(([type, threshold]) => {
-        this.thresholds.set(type as AnomalyType, threshold);
+    const stored = localStorage.getItem(STORAGE_KEYS.ANOMALIES);
+    if (stored) {
+      const anomalies = this.anomaliesValidator.safeParseFromStorage(stored);
+      anomalies.forEach(anomaly => {
+        if (anomaly && anomaly.id) {
+          this.anomalies.set(anomaly.id, anomaly);
+        }
       });
     }
   }
 
+  saveAnomalies(): void {
+    const anomaliesArray = Array.from(this.anomalies.values());
+    const result = this.anomaliesValidator.parse(anomaliesArray);
+
+    if (result.success) {
+      localStorage.setItem(STORAGE_KEYS.ANOMALIES, JSON.stringify(result.data));
+    } else {
+      console.error('[AnomalyDetector] Failed to save anomalies:', result.error);
+    }
+  }
+
+  loadThresholds(): void {
+    const stored = localStorage.getItem(STORAGE_KEYS.THRESHOLDS);
+    if (stored) {
+      const thresholds = this.thresholdsValidator.safeParseFromStorage(stored);
+      thresholds.forEach(threshold => this.thresholds.set(threshold.metricType, threshold));
+    } else {
+      Object.entries(DEFAULT_ANOMALY_THRESHOLDS).forEach(([type, threshold]) => {
+        this.thresholds.set(type as AnomalyType, threshold);
+      });
+      this.saveThresholds();
+    }
+  }
+
   saveThresholds(): void {
-    try {
-      const thresholdsArray = Array.from(this.thresholds.values());
-      localStorage.setItem(STORAGE_KEYS.THRESHOLDS, JSON.stringify(thresholdsArray));
-    } catch (error) {
-      console.error('Failed to save thresholds:', error);
+    const thresholdsArray = Array.from(this.thresholds.values());
+    const result = this.thresholdsValidator.parse(thresholdsArray);
+
+    if (result.success) {
+      localStorage.setItem(STORAGE_KEYS.THRESHOLDS, JSON.stringify(result.data));
+    } else {
+      console.error('[AnomalyDetector] Failed to save thresholds:', result.error);
     }
   }
 
   loadBaselines(): void {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.BASELINES);
-      if (stored) {
-        const baselines: BaselineData[] = JSON.parse(stored);
-        baselines.forEach(baseline => {
-          this.baselines.set(`${baseline.metricType}:${baseline.metric}`, baseline);
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load baselines:', error);
+    const stored = localStorage.getItem(STORAGE_KEYS.BASELINES);
+    if (stored) {
+      const baselines = this.baselinesValidator.safeParseFromStorage(stored);
+      baselines.forEach(baseline => {
+        this.baselines.set(`${baseline.metricType}:${baseline.metric}`, baseline);
+      });
     }
   }
 
   saveBaselines(): void {
-    try {
-      const baselinesArray = Array.from(this.baselines.values());
-      localStorage.setItem(STORAGE_KEYS.BASELINES, JSON.stringify(baselinesArray));
-    } catch (error) {
-      console.error('Failed to save baselines:', error);
+    const baselinesArray = Array.from(this.baselines.values());
+    const result = this.baselinesValidator.parse(baselinesArray);
+
+    if (result.success) {
+      localStorage.setItem(STORAGE_KEYS.BASELINES, JSON.stringify(result.data));
+    } else {
+      console.error('[AnomalyDetector] Failed to save baselines:', result.error);
     }
   }
 
   loadAlerts(): void {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.ALERTS);
-      if (stored) {
-        const alerts: { anomalyId: string; alerts: AnomalyAlert[] }[] = JSON.parse(stored);
-        alerts.forEach(item => this.alerts.set(item.anomalyId, item.alerts));
-      }
-    } catch (error) {
-      console.error('Failed to load alerts:', error);
+    const stored = localStorage.getItem(STORAGE_KEYS.ALERTS);
+    if (stored) {
+      const alerts = this.alertsValidator.safeParseFromStorage(stored);
+      alerts.forEach(item => this.alerts.set(item.anomalyId, item.alerts));
     }
   }
 
   saveAlerts(): void {
-    try {
-      const alertsArray = Array.from(this.alerts.entries()).map(([anomalyId, alerts]) => ({
-        anomalyId,
-        alerts,
-      }));
-      localStorage.setItem(STORAGE_KEYS.ALERTS, JSON.stringify(alertsArray));
-    } catch (error) {
-      console.error('Failed to save alerts:', error);
+    const alertsArray = Array.from(this.alerts.entries()).map(([anomalyId, alerts]) => ({
+      anomalyId,
+      alerts,
+    }));
+    const result = this.alertsValidator.parse(alertsArray);
+
+    if (result.success) {
+      localStorage.setItem(STORAGE_KEYS.ALERTS, JSON.stringify(result.data));
+    } else {
+      console.error('[AnomalyDetector] Failed to save alerts:', result.error);
     }
   }
 
