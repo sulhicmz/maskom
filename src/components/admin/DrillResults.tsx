@@ -6,7 +6,6 @@ import {
   BackupDrill,
   DrillType
 } from '@/types/drill'
-import drillData from '@/data/DrillData'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 interface DrillResultsProps {
@@ -40,20 +39,33 @@ interface DrillResultsProps {
 
 const DrillResultsComponent: React.FC<DrillResultsProps> = ({ drillId, onClose }) => {
   const { theme } = useTheme()
+  const [drillData, setDrillData] = useState<BackupDrill[]>([])
   const [drill, setDrill] = useState<BackupDrill | null>(null)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const dataModule = await import('@/data/DrillData')
+        setDrillData(dataModule.default as BackupDrill[])
+      } catch (error) {
+        console.error('Failed to load drill data:', error)
+      }
+    }
+    loadData()
+  }, [])
 
   const loadDrill = useCallback(async () => {
     setLoading(true)
     try {
-      const foundDrill = drillData.find(d => d.id === drillId)
+      const foundDrill = drillData.find((d: BackupDrill) => d.id === drillId)
       setDrill(foundDrill || null)
     } catch (error) {
       console.error('Error loading drill:', error)
     } finally {
       setLoading(false)
     }
-  }, [drillId])
+  }, [drillId, drillData])
 
   useEffect(() => {
     loadDrill()

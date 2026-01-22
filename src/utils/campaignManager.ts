@@ -1,41 +1,18 @@
-import type { EmailCampaign, CampaignMetrics, CampaignStatus } from '@/types/campaign';
+import type {
+    EmailCampaign,
+    CampaignMetrics,
+    ICampaignManager,
+    BulkSendProgress,
+    CampaignFilter,
+    CampaignScheduleResult,
+    CampaignSendResult,
+} from '@/types/campaign';
 import campaign_data from '@/data/CampaignData';
 import emailService from '@/services/email/EmailService';
 import type { ICampaignStorage } from './campaignStorage';
 import campaignLocalStorage from './campaignStorage';
 
-export interface BulkSendProgress {
-    campaignId: string;
-    totalRecipients: number;
-    sentCount: number;
-    failedCount: number;
-    isComplete: boolean;
-}
-
-export interface CampaignFilter {
-    status?: CampaignStatus;
-    templateId?: number;
-    searchQuery?: string;
-    dateRange?: {
-        from: string;
-        to: string;
-    };
-}
-
-export interface CampaignScheduleResult {
-    success: boolean;
-    message: string;
-    campaignId?: string;
-}
-
-export interface CampaignSendResult {
-    success: boolean;
-    sentCount: number;
-    failedCount: number;
-    message: string;
-}
-
-class CampaignManager {
+class CampaignManager implements ICampaignManager {
     private campaigns: EmailCampaign[];
     private idCounter = 1;
     private storage: ICampaignStorage;
@@ -495,4 +472,6 @@ class CampaignManager {
 
 const campaignManagerInstance = new CampaignManager();
 
+export { CampaignManager };
 export default campaignManagerInstance;
+export { type ICampaignManager } from '@/types/campaign';

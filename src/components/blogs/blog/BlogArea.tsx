@@ -1,10 +1,9 @@
 "use client"
-import React, { useState, useMemo, useCallback, Suspense } from "react"
+import React, { useState, useMemo, useCallback, Suspense, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
-import inner_blog_data from "@/data/InnerBlogData"
 import { usePagination } from "@/hooks/usePagination"
 import AnimationWrapper from "@/components/common/AnimationWrapper"
 import PaginationWrapper from "@/components/common/PaginationWrapper"
@@ -15,6 +14,7 @@ import Skeleton from "@/components/ui/Skeleton"
 import { filterBlogPosts, type BlogFilterCriteria } from "@/utils/blogFilters"
 import BookmarkButton from "@/components/common/BookmarkButton"
 import SocialShareButtons from "@/components/common/SocialShareButtons"
+import type { InnerBlogPost } from "@/types/data"
 
 const BlogSidebar = dynamic(() => import("../blog-sidebar/BlogSidebar"), {
   loading: () => (
@@ -34,23 +34,36 @@ const PresetSelector = dynamic(() => import("@/components/common/PresetSelector"
 
 const BlogArea = React.memo(() => {
    const router = useRouter()
- 
+
+   const [blogData, setBlogData] = useState<InnerBlogPost[]>([])
    const [searchQuery, setSearchQuery] = useState("")
    const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
    const [selectedTagId, setSelectedTagId] = useState<number | null>(null)
-   
+
+   useEffect(() => {
+      const loadData = async () => {
+         try {
+            const dataModule = await import('@/data/InnerBlogData')
+            setBlogData(dataModule.default as InnerBlogPost[])
+         } catch (error) {
+            console.error('Failed to load blog data:', error)
+         }
+      }
+      loadData()
+   }, [])
+
    const itemsPerPage = 3;
- 
+
      const filterCriteria: BlogFilterCriteria = useMemo(() => ({
        searchQuery,
        categoryId: selectedCategory,
        tagId: selectedTagId,
        status: 'published',
-     }), [searchQuery, selectedCategory, selectedTagId])
+      }), [searchQuery, selectedCategory, selectedTagId])
 
-     const { filteredPosts, hasFilters } = useMemo(() => {
-      return filterBlogPosts(inner_blog_data, filterCriteria)
-    }, [filterCriteria])
+      const { filteredPosts, hasFilters } = useMemo(() => {
+      return filterBlogPosts(blogData, filterCriteria)
+    }, [blogData, filterCriteria])
 
      const { currentItems, pageCount, handlePageClick } = usePagination({
         data: filteredPosts,
@@ -72,14 +85,14 @@ const BlogArea = React.memo(() => {
        setSelectedTagId(tagId)
     }, [])
 
-   const handlePresetSelect = useCallback((criteria: BlogFilterCriteria) => {
-      setSearchQuery(criteria.searchQuery || "")
-      setSelectedCategory(criteria.categoryId || null)
-      setSelectedTagId(criteria.tagId || null)
-   }, [])
+    const handlePresetSelect = useCallback((criteria: BlogFilterCriteria) => {
+       setSearchQuery(criteria.searchQuery || "")
+       setSelectedCategory(criteria.categoryId || null)
+       setSelectedTagId(criteria.tagId || null)
+    }, [])
 
-   return (
-      <section className="blogs-section pt-120 pb-90">
+    return (
+       <section className="blogs-section pt-120 pb-90">
          <div className="container">
             <div className="row">
                <div className="col-xl-8">

@@ -45,3 +45,6 @@ export * from './backup';
 
 // Audit types (ActivityLog, ActivityAction, etc.)
 export * from './audit';
+
+// Auth types (User, LoginCredentials, etc.)
+export type { User } from '../services/auth/types';

@@ -4,6 +4,11 @@ import '@testing-library/jest-dom';
 import BlogDetailsArea from '../BlogDetailsArea';
 import { InnerBlogPost } from '@/types/data';
 
+jest.mock('@/data/BlogCommentData', () => ({
+    __esModule: true,
+    default: [],
+}));
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({ alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => <img alt={alt} {...props} />,

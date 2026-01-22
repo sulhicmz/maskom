@@ -17,7 +17,8 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       Permission.EDIT_CONTENT,
       Permission.DELETE_CONTENT,
       Permission.VIEW_ADMIN_DASHBOARD,
-      Permission.MANAGE_SETTINGS
+      Permission.MANAGE_SETTINGS,
+      Permission.VIEW_QA
     ]
   },
   {
@@ -26,7 +27,8 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
       Permission.MANAGE_CONTENT,
       Permission.PUBLISH_CONTENT,
       Permission.EDIT_CONTENT,
-      Permission.DELETE_CONTENT
+      Permission.DELETE_CONTENT,
+      Permission.VIEW_QA
     ]
   },
   {

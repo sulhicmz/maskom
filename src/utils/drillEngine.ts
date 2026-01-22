@@ -2,12 +2,14 @@ import {
   BackupDrill,
   DrillType,
   DrillStatus,
-  DrillResults,
   DrillConfig,
   DrillStatistics,
   DrillFilters,
   DrillScheduleDetails,
-  DrillSchedule
+  DrillSchedule,
+  DrillProgressCallback,
+  DrillExecutionContext,
+  IDrillEngine
 } from '@/types/drill'
 
 import { BackupEngine } from '@/utils/backupEngine'
@@ -18,23 +20,6 @@ import DrillStorage from '@/utils/drill/drillStorage'
 import DrillScheduler from '@/utils/drill/drillScheduler'
 import DrillStatisticsCalculator from '@/utils/drill/drillStatistics'
 import DrillExecutor from '@/utils/drill/drillExecutor'
-
-interface DrillProgress {
-  current: number
-  total: number
-  message: string
-}
-
-type DrillProgressCallback = (progress: DrillProgress) => void
-
-interface DrillExecutionContext {
-  drillType: DrillType
-  backupId: string
-  executeDrill: (onProgress?: DrillProgressCallback) => Promise<DrillResults>
-  onProgress?: DrillProgressCallback
-  initialProgressMessage: string
-  totalSteps: number
-}
 
 function createDrillObject(
   drillType: DrillType,
@@ -91,7 +76,7 @@ function generateDrillId(drillType: DrillType, backupId: string): string {
   return `drill-${drillType}-${backupId}-${timestamp}-${random}`
 }
 
-class DrillEngine {
+export class DrillEngine implements IDrillEngine {
   private static instance: DrillEngine
   private backupEngine: BackupEngine
   private drillStorage: DrillStorage
@@ -406,4 +391,4 @@ class DrillEngine {
 
 }
 
-export default DrillEngine
+export type { IDrillEngine } from '@/types/drill'

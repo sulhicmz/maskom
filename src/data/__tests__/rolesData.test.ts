@@ -13,24 +13,26 @@ describe('Roles Data', () => {
   describe('ROLE_PERMISSIONS', () => {
     it('should have permissions for admin role', () => {
       const adminPermissions = ROLE_PERMISSIONS.find(r => r.role === 'admin')
-
+      
       expect(adminPermissions).toBeDefined()
-      expect(adminPermissions?.permissions).toHaveLength(9)
+      expect(adminPermissions?.permissions).toHaveLength(10)
       expect(adminPermissions?.permissions).toContain(Permission.VIEW_ANALYTICS)
       expect(adminPermissions?.permissions).toContain(Permission.MANAGE_USERS)
       expect(adminPermissions?.permissions).toContain(Permission.MANAGE_ROLES)
       expect(adminPermissions?.permissions).toContain(Permission.MANAGE_SETTINGS)
+      expect(adminPermissions?.permissions).toContain(Permission.VIEW_QA)
     })
 
     it('should have permissions for editor role', () => {
       const editorPermissions = ROLE_PERMISSIONS.find(r => r.role === 'editor')
-
+      
       expect(editorPermissions).toBeDefined()
-      expect(editorPermissions?.permissions).toHaveLength(4)
+      expect(editorPermissions?.permissions).toHaveLength(5)
       expect(editorPermissions?.permissions).toContain(Permission.MANAGE_CONTENT)
       expect(editorPermissions?.permissions).toContain(Permission.PUBLISH_CONTENT)
       expect(editorPermissions?.permissions).toContain(Permission.EDIT_CONTENT)
       expect(editorPermissions?.permissions).toContain(Permission.DELETE_CONTENT)
+      expect(editorPermissions?.permissions).toContain(Permission.VIEW_QA)
     })
 
     it('should have permissions for user role', () => {
@@ -45,8 +47,8 @@ describe('Roles Data', () => {
   describe('getPermissionsByRole', () => {
     it('should return all permissions for admin', () => {
       const permissions = getPermissionsByRole('admin')
-
-      expect(permissions).toHaveLength(9)
+      
+      expect(permissions).toHaveLength(10)
       expect(permissions).toContain(Permission.VIEW_ANALYTICS)
       expect(permissions).toContain(Permission.MANAGE_USERS)
       expect(permissions).toContain(Permission.VIEW_ADMIN_DASHBOARD)
@@ -54,8 +56,8 @@ describe('Roles Data', () => {
 
     it('should return content permissions for editor', () => {
       const permissions = getPermissionsByRole('editor')
-
-      expect(permissions).toHaveLength(4)
+      
+      expect(permissions).toHaveLength(5)
       expect(permissions).toContain(Permission.MANAGE_CONTENT)
       expect(permissions).not.toContain(Permission.VIEW_ANALYTICS)
       expect(permissions).not.toContain(Permission.MANAGE_USERS)

@@ -3,53 +3,35 @@ import { sessionManager } from '@/utils/collaboration/sessionManager'
 import { CollaborativeEvent } from '@/types/collaboration'
 import { strictRateLimiter, getClientIdentifier } from '@/utils/rateLimit'
 import { sanitizeString } from '@/utils/sanitize'
+import {
+  CollaborationRequestSchema,
+  type JoinRequest,
+  type LeaveRequest,
+  type CursorUpdateRequest,
+  type EditRequest,
+  type CommentRequest
+} from '@/utils/collaboration/validation'
+import { z } from 'zod'
+import { ERROR_CODES, createApiError } from '@/constants'
 
 const MAX_EVENTS_PER_POLL = 50
+
+const PollQuerySchema = z.object({
+  sessionId: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/),
+  userId: z.string().transform(val => parseInt(val, 10)).pipe(
+    z.number().int().positive().max(Number.MAX_SAFE_INTEGER)
+  ),
+  username: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/),
+  lastEventId: z.string().optional()
+})
 
 interface PollResponse {
   success: boolean
   events: CollaborativeEvent[]
   sessionActive: boolean
   error?: string
-}
-
-interface JoinRequest {
-  postId: number
-  userId: number
-  username: string
-}
-
-interface LeaveRequest {
-  sessionId: string
-  userId: number
-}
-
-interface CursorUpdateRequest {
-  sessionId: string
-  userId: number
-  cursorPosition: { line: number; column: number }
-  selection?: { start: { line: number; column: number }; end: { line: number; column: number } }
-}
-
-interface EditRequest {
-  sessionId: string
-  userId: number
-  editOperation: {
-    type: 'insert' | 'delete' | 'replace'
-    position: { line: number; column: number }
-    content?: string
-    length?: number
-  }
-}
-
-interface CommentRequest {
-  sessionId: string
-  userId: number
-  username: string
-  comment: {
-    content: string
-    position: { line: number; column: number }
-  }
+  errorCode?: string
+  details?: unknown
 }
 
 const eventBuffer = new Map<string, CollaborativeEvent[]>()
@@ -78,8 +60,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const rateLimitResult = strictRateLimiter(clientIdentifier)
 
     if (!rateLimitResult.success) {
+      const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
       return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: 'Rate limit exceeded' },
+        { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
         { status: 429, headers: {
           'Retry-After': rateLimitResult.resetTime.toString(),
           'X-RateLimit-Limit': rateLimitResult.limit.toString(),
@@ -90,23 +73,31 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const searchParams = request.nextUrl.searchParams
-    const sessionId = sanitizeString(searchParams.get('sessionId') || '')
-    const userId = parseInt(searchParams.get('userId') || '0')
-    const username = sanitizeString(searchParams.get('username') || '')
-    const lastEventId = searchParams.get('lastEventId') || undefined
+    const queryParams = {
+      sessionId: searchParams.get('sessionId') || '',
+      userId: searchParams.get('userId') || '0',
+      username: searchParams.get('username') || '',
+      lastEventId: searchParams.get('lastEventId')
+    }
 
-    if (!sessionId || !userId || !username) {
+    const validationResult = PollQuerySchema.safeParse(queryParams)
+
+    if (!validationResult.success) {
+      const apiError = createApiError(ERROR_CODES.INVALID_QUERY_PARAMETERS, validationResult.error.issues)
       return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: 'Missing required parameters' },
+        { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
         { status: 400 }
       )
     }
 
+    const { sessionId, lastEventId } = validationResult.data
+
     const session = sessionManager.getSession(sessionId)
 
     if (!session) {
+      const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
       return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: 'Session not found' },
+        { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
         { status: 404 }
       )
     }
@@ -123,8 +114,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     })
   } catch (error) {
     console.error('Error in collaboration poll:', error)
+    const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, error instanceof Error ? error.message : 'Unknown error')
     return NextResponse.json<PollResponse>(
-      { success: false, events: [], sessionActive: false, error: 'Internal server error' },
+      { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
       { status: 500 }
     )
   }
@@ -136,8 +128,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const rateLimitResult = strictRateLimiter(clientIdentifier)
 
     if (!rateLimitResult.success) {
+      const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
       return NextResponse.json(
-        { success: false, error: 'Rate limit exceeded' },
+        { success: false, error: apiError.message, errorCode: apiError.code },
         { status: 429, headers: {
           'Retry-After': rateLimitResult.resetTime.toString(),
           'X-RateLimit-Limit': rateLimitResult.limit.toString(),
@@ -148,29 +141,36 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json()
-    const action = sanitizeString(body.action || '')
 
-    switch (action) {
+    const validationResult = CollaborationRequestSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      const apiError = createApiError(ERROR_CODES.INVALID_REQUEST_DATA, validationResult.error.issues)
+      return NextResponse.json(
+        { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
+        { status: 400 }
+      )
+    }
+
+    const validatedRequest = validationResult.data
+
+    switch (validatedRequest.action) {
       case 'join':
-        return handleJoin(body as JoinRequest)
+        return handleJoin(validatedRequest)
       case 'leave':
-        return handleLeave(body as LeaveRequest)
+        return handleLeave(validatedRequest)
       case 'cursor_update':
-        return handleCursorUpdate(body as CursorUpdateRequest)
+        return handleCursorUpdate(validatedRequest)
       case 'edit':
-        return handleEdit(body as EditRequest)
+        return handleEdit(validatedRequest)
       case 'comment':
-        return handleComment(body as CommentRequest)
-      default:
-        return NextResponse.json(
-          { success: false, error: 'Invalid action' },
-          { status: 400 }
-        )
+        return handleComment(validatedRequest)
     }
   } catch (error) {
     console.error('Error in collaboration API:', error)
+    const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, error instanceof Error ? error.message : 'Unknown error')
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
       { status: 500 }
     )
   }
@@ -180,8 +180,9 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
   const { postId, userId, username } = request
 
   if (!postId || !userId || !username) {
+    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
     return NextResponse.json(
-      { success: false, error: 'Missing required fields' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 400 }
     )
   }
@@ -189,8 +190,9 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
   const session = sessionManager.getSessionByPostId(postId)
 
   if (!session) {
+    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND, 'No session exists for this post. Start a new collaboration session.')
     return NextResponse.json(
-      { success: false, error: 'No session exists for this post. Start a new collaboration session.' },
+      { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
       { status: 404 }
     )
   }
@@ -198,8 +200,9 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
   const added = sessionManager.addEditor(session.sessionId, userId, username)
 
   if (!added) {
+    const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, 'Failed to join session')
     return NextResponse.json(
-      { success: false, error: 'Failed to join session' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 500 }
     )
   }
@@ -230,8 +233,9 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
   const { sessionId, userId } = request
 
   if (!sessionId || !userId) {
+    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
     return NextResponse.json(
-      { success: false, error: 'Missing required fields' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 400 }
     )
   }
@@ -239,8 +243,9 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
-      { success: false, error: 'Session not found' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 404 }
     )
   }
@@ -248,8 +253,9 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
   const removed = sessionManager.removeEditor(sessionId, userId)
 
   if (!removed) {
+    const apiError = createApiError(ERROR_CODES.USER_NOT_FOUND_IN_SESSION)
     return NextResponse.json(
-      { success: false, error: 'User not found in session' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 404 }
     )
   }
@@ -276,8 +282,9 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   const { sessionId, userId, cursorPosition, selection } = request
 
   if (!sessionId || !userId || !cursorPosition) {
+    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
     return NextResponse.json(
-      { success: false, error: 'Missing required fields' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 400 }
     )
   }
@@ -285,8 +292,9 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
-      { success: false, error: 'Session not found' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 404 }
     )
   }
@@ -294,8 +302,9 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   const updated = sessionManager.updateEditorCursor(sessionId, userId, cursorPosition, selection)
 
   if (!updated) {
+    const apiError = createApiError(ERROR_CODES.USER_NOT_FOUND_IN_SESSION)
     return NextResponse.json(
-      { success: false, error: 'User not found in session' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 404 }
     )
   }
@@ -324,8 +333,9 @@ async function handleEdit(request: EditRequest): Promise<NextResponse> {
   const { sessionId, userId, editOperation } = request
 
   if (!sessionId || !userId || !editOperation) {
+    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
     return NextResponse.json(
-      { success: false, error: 'Missing required fields' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 400 }
     )
   }
@@ -333,8 +343,9 @@ async function handleEdit(request: EditRequest): Promise<NextResponse> {
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
-      { success: false, error: 'Session not found' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 404 }
     )
   }
@@ -364,8 +375,9 @@ async function handleComment(request: CommentRequest): Promise<NextResponse> {
   const { sessionId, userId, username, comment } = request
 
   if (!sessionId || !userId || !username || !comment) {
+    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
     return NextResponse.json(
-      { success: false, error: 'Missing required fields' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 400 }
     )
   }
@@ -373,8 +385,9 @@ async function handleComment(request: CommentRequest): Promise<NextResponse> {
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
-      { success: false, error: 'Session not found' },
+      { success: false, error: apiError.message, errorCode: apiError.code },
       { status: 404 }
     )
   }

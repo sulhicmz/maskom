@@ -1,4 +1,4 @@
-import DrillEngine from '../drillEngine'
+import { DrillEngine } from '../drillEngine'
 
 import {
   DrillType,

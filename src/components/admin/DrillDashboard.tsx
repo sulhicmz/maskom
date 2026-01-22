@@ -8,7 +8,7 @@ import {
   DrillHealthStatus
 } from '@/types/drill'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import DrillEngine from '@/utils/drillEngine'
+import { DrillEngine } from '@/utils/drillEngine'
 
 const formatDuration = (ms: number): string => {
   const seconds = Math.floor(ms / 1000)

@@ -8,7 +8,6 @@ import {
   DrillStatus,
   DrillFilters
 } from '@/types/drill'
-import drillData from '@/data/DrillData'
 import StatusBadge from '@/components/ui/StatusBadge'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
@@ -149,9 +148,25 @@ const DrillList: React.FC<DrillListProps> = ({
   onViewResults
 }) => {
   const { theme } = useTheme()
+  const [drillData, setDrillData] = useState<BackupDrill[]>([])
   const [drills, setDrills] = useState<BackupDrill[]>([])
   const [loading, setLoading] = useState(true)
+  const [dataLoading, setDataLoading] = useState(true)
   const [filters, setFilters] = useState<DrillFilters>({})
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const dataModule = await import('@/data/DrillData')
+        setDrillData(dataModule.default as BackupDrill[])
+      } catch (error) {
+        console.error('Failed to load drill data:', error)
+      } finally {
+        setDataLoading(false)
+      }
+    }
+    loadData()
+  }, [])
 
   const loadDrills = useCallback(async () => {
     setLoading(true)
@@ -162,11 +177,13 @@ const DrillList: React.FC<DrillListProps> = ({
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [drillData])
 
   useEffect(() => {
-    loadDrills()
-  }, [loadDrills])
+    if (drillData.length > 0) {
+      loadDrills()
+    }
+  }, [drillData, loadDrills])
 
   const filteredDrills = useMemo(() => {
     let filtered = [...drills]
@@ -204,6 +221,10 @@ const DrillList: React.FC<DrillListProps> = ({
   const clearFilters = useCallback(() => {
     setFilters({})
   }, [])
+
+  if (dataLoading) {
+    return <LoadingSpinner minHeight={400} color="primary" />
+  }
 
   if (loading) {
     return <LoadingSpinner />

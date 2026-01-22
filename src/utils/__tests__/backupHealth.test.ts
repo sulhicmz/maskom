@@ -1,5 +1,6 @@
 import { calculateStorageUsage, calculateHealthStatus } from '../backupHealth'
 import type { BackupMetadata } from '@/types/backup'
+import { BACKUP_METADATA_KEY } from '@/types/backup'
 
 describe('backupHealth', () => {
   beforeEach(() => {
@@ -15,7 +16,7 @@ describe('backupHealth', () => {
         { id: '3', type: 'full', timestamp: '2024-01-03T00:00:00.000Z', size: 512 * 1024 * 1024, encrypted: false, compressed: false },
       ]
 
-      localStorage.setItem('backup_metadata_list', JSON.stringify(metadata))
+      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(metadata))
 
       const result = calculateStorageUsage()
 
@@ -23,7 +24,7 @@ describe('backupHealth', () => {
     })
 
     it('should return 0 when no backups exist', () => {
-      localStorage.setItem('backup_metadata_list', '[]')
+      localStorage.setItem(BACKUP_METADATA_KEY, '[]')
 
       const result = calculateStorageUsage()
 
@@ -59,7 +60,7 @@ describe('backupHealth', () => {
     })
 
     it('should return 0 on JSON parse error', () => {
-      localStorage.setItem('backup_metadata_list', 'invalid json')
+      localStorage.setItem(BACKUP_METADATA_KEY, 'invalid json')
 
       const result = calculateStorageUsage()
 
@@ -72,7 +73,7 @@ describe('backupHealth', () => {
         { id: '1', type: 'full', timestamp: '2024-01-01T00:00:00.000Z', size: fiveGB, encrypted: false, compressed: false },
       ]
 
-      localStorage.setItem('backup_metadata_list', JSON.stringify(metadata))
+      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(metadata))
 
       const result = calculateStorageUsage()
 
@@ -84,7 +85,7 @@ describe('backupHealth', () => {
         { id: '1', type: 'full', timestamp: '2024-01-01T00:00:00.000Z', size: 1024 * 1024 * 1024, encrypted: false, compressed: false },
       ]
 
-      localStorage.setItem('backup_metadata_list', JSON.stringify(metadata))
+      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(metadata))
 
       const result = calculateStorageUsage()
 
@@ -98,7 +99,7 @@ describe('backupHealth', () => {
         { id: '3', type: 'full', timestamp: '2024-01-03T00:00:00.000Z', size: 512, encrypted: false, compressed: false },
       ]
 
-      localStorage.setItem('backup_metadata_list', JSON.stringify(metadata))
+      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(metadata))
 
       const result = calculateStorageUsage()
 

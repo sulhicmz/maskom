@@ -11,6 +11,8 @@ import {
   calculateHealthStatus,
 } from '@/utils/backupHealth'
 
+import { BACKUP_METADATA_KEY } from '@/types/backup'
+
 import {
   restoreUserData,
   restoreContentData,
@@ -283,7 +285,7 @@ describe('backupHealth', () => {
         { id: '1', size: 1024 * 1024, created: '', type: 'full' },
         { id: '2', size: 2048 * 1024, created: '', type: 'full' },
       ]
-      localStorage.setItem('backup_metadata_list', JSON.stringify(metadataList))
+      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(metadataList))
 
       const result = calculateStorageUsage()
 
@@ -292,7 +294,7 @@ describe('backupHealth', () => {
     })
 
     it('should return 0 when no backups exist', () => {
-      localStorage.setItem('backup_metadata_list', '[]')
+      localStorage.setItem(BACKUP_METADATA_KEY, '[]')
 
       const result = calculateStorageUsage()
 
@@ -311,7 +313,7 @@ describe('backupHealth', () => {
     })
 
     it('should handle JSON parse errors gracefully', () => {
-      localStorage.setItem('backup_metadata_list', 'invalid-json')
+      localStorage.setItem(BACKUP_METADATA_KEY, 'invalid-json')
 
       const result = calculateStorageUsage()
 
@@ -323,7 +325,7 @@ describe('backupHealth', () => {
         { id: '1', size: 2 * 1024 * 1024 * 1024, created: '', type: 'full' },
         { id: '2', size: 2 * 1024 * 1024 * 1024, created: '', type: 'full' },
       ]
-      localStorage.setItem('backup_metadata_list', JSON.stringify(metadataList))
+      localStorage.setItem(BACKUP_METADATA_KEY, JSON.stringify(metadataList))
 
       const result = calculateStorageUsage()
 

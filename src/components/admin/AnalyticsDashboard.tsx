@@ -9,15 +9,17 @@ import PerformanceMetrics from './PerformanceMetrics'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import FormSubmissionsTable from './FormSubmissionsTable'
 import PageViewsTable from './PageViewsTable'
-import analyticsData from '@/data/analyticsData'
 import { calculateAnalyticsSummary } from '@/utils/analytics'
 import { useRouter } from 'next/navigation'
+import type { AnalyticsData } from '@/types/analytics'
 
 const AnalyticsDashboard: React.FC = () => {
   const { theme } = useTheme()
   const { user } = useAuthService()
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
+  const [dataLoading, setDataLoading] = useState(true)
 
   useEffect(() => {
     setIsClient(true)
@@ -27,12 +29,30 @@ const AnalyticsDashboard: React.FC = () => {
     }
   }, [user, router])
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const dataModule = await import('@/data/analyticsData')
+        setAnalyticsData(dataModule.default as AnalyticsData)
+      } catch (error) {
+        console.error('Failed to load analytics data:', error)
+      } finally {
+        setDataLoading(false)
+      }
+    }
+    loadData()
+  }, [])
+
   if (!isClient) {
     return <LoadingSpinner minHeight={400} color="primary" />
   }
 
   if (!user) {
     return null
+  }
+
+  if (dataLoading || !analyticsData) {
+    return <LoadingSpinner minHeight={400} color="primary" />
   }
 
   const summary = calculateAnalyticsSummary(analyticsData)

@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import { Suspense, useMemo } from "react"
+import { Suspense, useMemo, useState, useEffect } from "react"
 import BlogSidebar from "../blog-sidebar/BlogSidebar"
 import { InnerBlogPost, BlogCommentItem } from "@/types/data"
 import { tagsById } from "@/data/BlogTagData"
@@ -9,22 +9,35 @@ import BookmarkButton from "@/components/common/BookmarkButton"
 import SocialShareButtons from "@/components/common/SocialShareButtons"
 import CommentList from "../comments/CommentList"
 import CommentForm from "../comments/CommentForm"
-import blogCommentData from "@/data/BlogCommentData"
 
 import blog_thumb from "@/assets/images/blog/blog-single-1.jpg"
 import quote from "@/assets/images/icon/right-quote.png"
 import thumb_2 from "@/assets/images/blog/blog-single-2.jpg"
 
 const BlogDetailsArea = ({ single_blog }: { single_blog?: InnerBlogPost }) => {
+   const [blogCommentData, setBlogCommentData] = useState<BlogCommentItem[]>([])
+
+   useEffect(() => {
+      const loadData = async () => {
+         try {
+            const dataModule = await import('@/data/BlogCommentData')
+            setBlogCommentData(dataModule.default as BlogCommentItem[])
+         } catch (error) {
+            console.error('Failed to load blog comment data:', error)
+         }
+      }
+      loadData()
+   }, [])
+
    const tag = single_blog?.tagId ? tagsById.get(single_blog.tagId)?.name : null;
 
    const filteredComments = useMemo(() => {
       if (!single_blog?.id) return [];
       return blogCommentData.filter((comment: BlogCommentItem) => comment.blogId === single_blog.id);
-   }, [single_blog?.id]);
+    }, [single_blog?.id, blogCommentData]);
 
    return (
-      <section className="blog-details-section pt-120 pb-80">
+       <section className="blog-details-section pt-120 pb-80">
          <div className="container">
             <div className="row">
                <div className="col-xl-8">

@@ -7,7 +7,8 @@ export enum Permission {
   EDIT_CONTENT = 'edit_content',
   DELETE_CONTENT = 'delete_content',
   VIEW_ADMIN_DASHBOARD = 'view_admin_dashboard',
-  MANAGE_SETTINGS = 'manage_settings'
+  MANAGE_SETTINGS = 'manage_settings',
+  VIEW_QA = 'view_qa'
 }
 
 export interface PermissionConfig {
@@ -70,6 +71,12 @@ export const PERMISSION_CONFIGS: Record<Permission, PermissionConfig> = {
     id: Permission.MANAGE_SETTINGS,
     name: 'Manage Settings',
     description: 'Modify system settings',
+    category: 'admin'
+  },
+  [Permission.VIEW_QA]: {
+    id: Permission.VIEW_QA,
+    name: 'View QA Diagnostics',
+    description: 'Access QA diagnostic dashboards',
     category: 'admin'
   }
 }

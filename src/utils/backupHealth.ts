@@ -1,4 +1,4 @@
-import { BackupMetadata, BackupHealthStatus } from '@/types/backup'
+import { BackupMetadata, BackupHealthStatus, BACKUP_METADATA_KEY } from '@/types/backup'
 
 export function calculateStorageUsage(): number {
   try {
@@ -7,7 +7,7 @@ export function calculateStorageUsage(): number {
     }
 
     const metadataList = JSON.parse(
-      localStorage.getItem('backup_metadata_list') || '[]',
+      localStorage.getItem(BACKUP_METADATA_KEY) || '[]',
     ) as BackupMetadata[]
     const totalSize = metadataList.reduce((sum, backup) => sum + backup.size, 0)
 

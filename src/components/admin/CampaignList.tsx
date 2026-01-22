@@ -4,10 +4,14 @@ import React, { useState, useEffect, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { Permission } from '@/types/permission';
-import { CampaignStatus, type EmailCampaign } from '@/types/campaign';
+import { CampaignStatus, type EmailCampaign, type ICampaignManager } from '@/types/campaign';
 import campaignManager from '@/utils/campaignManager';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { logServiceInfo } from '@/services/common/logger';
+
+interface CampaignListProps {
+    campaignManager?: ICampaignManager;
+}
 
 const StatusBadge = memo(({ status }: { status: CampaignStatus }) => {
     const getStatusColor = (status: CampaignStatus): string => {
@@ -155,8 +159,9 @@ const CampaignRow = memo(({ campaign, onEdit, onDelete, onDuplicate, onSend, onS
 
 CampaignRow.displayName = 'CampaignRow';
 
-const CampaignList: React.FC = () => {
+const CampaignList: React.FC<CampaignListProps> = ({ campaignManager: injectedCampaignManager }) => {
     const { theme } = useTheme();
+    const cm = injectedCampaignManager || campaignManager;
     const [isClient, setIsClient] = useState(false);
     const [campaigns, setCampaigns] = useState<EmailCampaign[]>([]);
     const [filteredCampaigns, setFilteredCampaigns] = useState<EmailCampaign[]>([]);
@@ -174,7 +179,7 @@ const CampaignList: React.FC = () => {
             const loadCampaigns = () => {
                 setLoading(true);
                 try {
-                    const allCampaigns = campaignManager.getAllCampaigns();
+                    const allCampaigns = cm.getAllCampaigns();
                     setCampaigns(allCampaigns);
                     applyFilters(allCampaigns);
                 } catch (error) {
@@ -218,24 +223,24 @@ const CampaignList: React.FC = () => {
 
     const handleDelete = (id: string) => {
         if (window.confirm('Are you sure you want to delete this campaign?')) {
-            campaignManager.deleteCampaign(id);
-            const updatedCampaigns = campaignManager.getAllCampaigns();
+            cm.deleteCampaign(id);
+            const updatedCampaigns = cm.getAllCampaigns();
             setCampaigns(updatedCampaigns);
             applyFilters(updatedCampaigns);
         }
     };
 
     const handleDuplicate = (id: string) => {
-        campaignManager.duplicateCampaign(id);
-        const updatedCampaigns = campaignManager.getAllCampaigns();
+        cm.duplicateCampaign(id);
+        const updatedCampaigns = cm.getAllCampaigns();
         setCampaigns(updatedCampaigns);
         applyFilters(updatedCampaigns);
     };
 
     const handleSend = (id: string) => {
-        const result = campaignManager.sendCampaign(id);
+        const result = cm.sendCampaign(id);
         if (result.success) {
-            const updatedCampaigns = campaignManager.getAllCampaigns();
+            const updatedCampaigns = cm.getAllCampaigns();
             setCampaigns(updatedCampaigns);
             applyFilters(updatedCampaigns);
             alert(result.message);
@@ -247,9 +252,9 @@ const CampaignList: React.FC = () => {
     const handleSchedule = (id: string) => {
         const scheduledDate = prompt('Enter scheduled date (ISO 8601 format):', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
         if (scheduledDate) {
-            const result = campaignManager.scheduleCampaign(id, scheduledDate);
+            const result = cm.scheduleCampaign(id, scheduledDate);
             if (result.success) {
-                const updatedCampaigns = campaignManager.getAllCampaigns();
+                const updatedCampaigns = cm.getAllCampaigns();
                 setCampaigns(updatedCampaigns);
                 applyFilters(updatedCampaigns);
                 alert(result.message);
@@ -261,8 +266,8 @@ const CampaignList: React.FC = () => {
 
     const handleCancel = (id: string) => {
         if (window.confirm('Are you sure you want to cancel this campaign?')) {
-            campaignManager.cancelCampaign(id);
-            const updatedCampaigns = campaignManager.getAllCampaigns();
+            cm.cancelCampaign(id);
+            const updatedCampaigns = cm.getAllCampaigns();
             setCampaigns(updatedCampaigns);
             applyFilters(updatedCampaigns);
         }

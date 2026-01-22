@@ -118,16 +118,32 @@ import {
    validateDrillType,
  } from "./drillValidation"
 
-import {
-   validateActivityAction,
-   validateActivityDetails,
-   validateActivityLog,
-   validateActivityLogs,
-   validateActivityLogFilter,
-   validateActivityStatistics,
-   validateAlertRule,
-   validateSuspiciousActivityAlert,
- } from "./activityLogValidation"
+ import {
+    validateActivityAction,
+    validateActivityDetails,
+    validateActivityLog,
+    validateActivityLogs,
+    validateActivityLogFilter,
+    validateActivityStatistics,
+    validateAlertRule,
+    validateSuspiciousActivityAlert,
+  } from "./activityLogValidation"
+
+  import {
+    validateBackupType,
+    validateBackupStatus,
+    validateBackupEncryption,
+    validateBackupMetadata,
+    validateBackupMetadataArray,
+    validateRestoreStep,
+    validateEmergencyContact,
+    validateValidationChecklist,
+    validateDisasterRecoveryPlan,
+    validateRelationshipType,
+    validateCollectionName,
+    validateDataRelationship,
+    validateDataRelationships,
+  } from "./backupValidation"
 
 export type {
   ValidationResult,
@@ -194,12 +210,25 @@ export {
         validateDrillSchedule,
         validateDrillStatus,
         validateDrillType,
-        validateActivityAction,
-        validateActivityDetails,
-        validateActivityLog,
-        validateActivityLogs,
-        validateActivityLogFilter,
-        validateActivityStatistics,
-        validateAlertRule,
-        validateSuspiciousActivityAlert,
-    };
+          validateActivityAction,
+          validateActivityDetails,
+          validateActivityLog,
+          validateActivityLogs,
+          validateActivityLogFilter,
+          validateActivityStatistics,
+          validateAlertRule,
+          validateSuspiciousActivityAlert,
+          validateBackupType,
+          validateBackupStatus,
+          validateBackupEncryption,
+          validateBackupMetadata,
+          validateBackupMetadataArray,
+          validateRestoreStep,
+          validateEmergencyContact,
+          validateValidationChecklist,
+          validateDisasterRecoveryPlan,
+          validateRelationshipType,
+          validateCollectionName,
+          validateDataRelationship,
+          validateDataRelationships,
+     };

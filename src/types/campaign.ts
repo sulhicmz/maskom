@@ -60,3 +60,53 @@ export interface CampaignABTest {
     clickCount: number;
     winner?: 'A' | 'B' | 'none';
 }
+
+export interface BulkSendProgress {
+    campaignId: string;
+    totalRecipients: number;
+    sentCount: number;
+    failedCount: number;
+    isComplete: boolean;
+}
+
+export interface CampaignFilter {
+    status?: CampaignStatus;
+    templateId?: number;
+    searchQuery?: string;
+    dateRange?: {
+        from: string;
+        to: string;
+    };
+}
+
+export interface CampaignScheduleResult {
+    success: boolean;
+    message: string;
+    campaignId?: string;
+}
+
+export interface CampaignSendResult {
+    success: boolean;
+    sentCount: number;
+    failedCount: number;
+    message: string;
+}
+
+export interface ICampaignManager {
+    getAllCampaigns(): EmailCampaign[];
+    getCampaignById(id: string): EmailCampaign | undefined;
+    filterCampaigns(filter: CampaignFilter): EmailCampaign[];
+    createCampaign(campaign: Partial<EmailCampaign>): EmailCampaign;
+    updateCampaign(id: string, updates: Partial<EmailCampaign>): EmailCampaign | null;
+    deleteCampaign(id: string): boolean;
+    duplicateCampaign(id: string): EmailCampaign | null;
+    sendCampaign(id: string): CampaignSendResult;
+    scheduleCampaign(id: string, scheduledFor: string): CampaignScheduleResult;
+    cancelCampaign(id: string): boolean;
+    trackEmailEvent(campaignId: string, eventType: 'open' | 'click' | 'bounce'): void;
+    updateCampaignMetrics(campaignId: string, metrics: Partial<CampaignMetrics>): void;
+    getCampaignStats(): { total: number; draft: number; scheduled: number; sending: number; sent: number; cancelled: number };
+    executeBulkSend(campaignId: string): Promise<BulkSendProgress>;
+    processScheduledCampaigns(): Promise<BulkSendProgress[]>;
+    reset(): void;
+}

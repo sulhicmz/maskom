@@ -2,7 +2,12 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BlogArea from '../BlogArea';
-import inner_blog_data from '@/data/InnerBlogData';
+const inner_blog_data = jest.requireActual('@/data/InnerBlogData').default as typeof import('@/data/InnerBlogData').default;
+
+jest.mock('@/data/InnerBlogData', () => ({
+    __esModule: true,
+    default: jest.requireActual('@/data/InnerBlogData').default,
+}));
 
 jest.mock('react-paginate', () => {
   return function MockReactPaginate({ pageCount, onPageChange }: { pageCount: number; onPageChange: (data: { selected: number }) => void }) {
@@ -207,10 +212,10 @@ jest.mock('next/dynamic', () => {
           return (
             <div data-testid="blog-sidebar">
               <MockBlogSearch value={props.searchValue || ''} onChange={props.onSearchChange || (() => {})} />
-              <MockBlogCategoryFilter selectedCategory={props.selectedCategory} onCategoryChange={props.onCategoryChange || (() => {})} />
+              <MockBlogCategoryFilter selectedCategory={props.selectedCategory ?? null} onCategoryChange={props.onCategoryChange || (() => {})} />
               <div>Mock Category</div>
               <div>Mock LatestNews</div>
-              <MockTags selectedTagId={props.selectedTagId} onTagClick={props.onTagClick || (() => {})} />
+              <MockTags selectedTagId={props.selectedTagId ?? null} onTagClick={props.onTagClick || (() => {})} />
             </div>
           );
         };
@@ -231,107 +236,129 @@ jest.mock('next/image', () => ({
 }));
 
 describe('BlogArea', () => {
-  it('renders blog section with container', () => {
+  it('renders blog section with container', async () => {
     render(<BlogArea />);
 
-    expect(screen.getByTestId('blog-sidebar')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('blog-sidebar')).toBeInTheDocument();
+    });
   });
 
-  it('renders initial blog items (3 per page)', () => {
+  it('renders initial blog items (3 per page)', async () => {
     render(<BlogArea />);
 
-    const blogLinks = screen.getAllByRole('link');
-    const blogTitleLinks = blogLinks.filter(link => 
-      link.textContent?.includes('BACA SELENGKAPNYA')
-    );
-    
-    expect(blogTitleLinks.length).toBeLessThanOrEqual(3);
+    await waitFor(() => {
+      const blogLinks = screen.getAllByRole('link');
+      const blogTitleLinks = blogLinks.filter(link =>
+        link.textContent?.includes('BACA SELENGKAPNYA')
+      );
+
+      expect(blogTitleLinks.length).toBeLessThanOrEqual(3);
+    });
   });
 
-  it('renders blog post titles', () => {
+  it('renders blog post titles', async () => {
     render(<BlogArea />);
 
-    expect(screen.getByText(/strategi maskom/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/strategi maskom/i)).toBeInTheDocument();
+    });
   });
 
-  it('renders blog metadata (date, user, tag)', () => {
+  it('renders blog metadata (date, user, tag)', async () => {
     render(<BlogArea />);
 
-    const clockIcon = screen.getAllByText(/tim/i).find(el => el.textContent?.includes('Tim'));
-    expect(clockIcon || screen.getByText(/tim/i)).toBeInTheDocument();
+    await waitFor(() => {
+      const clockIcon = screen.getAllByText(/tim/i).find(el => el.textContent?.includes('Tim'));
+      expect(clockIcon || screen.getByText(/tim/i)).toBeInTheDocument();
+    });
   });
 
-  it('renders pagination component', () => {
+  it('renders pagination component', async () => {
     render(<BlogArea />);
 
-    expect(screen.getByTestId('react-paginate')).toBeInTheDocument();
-    expect(screen.getByTestId('next-page')).toBeInTheDocument();
-    expect(screen.getByTestId('prev-page')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('react-paginate')).toBeInTheDocument();
+      expect(screen.getByTestId('next-page')).toBeInTheDocument();
+      expect(screen.getByTestId('prev-page')).toBeInTheDocument();
+    });
   });
 
-  it('displays correct page count based on data', () => {
+  it('displays correct page count based on data', async () => {
     render(<BlogArea />);
 
-    const pageCount = screen.getByTestId('page-count');
-    const publishedPosts = inner_blog_data.filter(post =>
-      post.status === 'published' || !('status' in post)
-    );
-    const expectedPages = Math.ceil(publishedPosts.length / 3);
+    await waitFor(() => {
+      const pageCount = screen.getByTestId('page-count');
+      const publishedPosts = inner_blog_data.filter(post =>
+        post.status === 'published' || !('status' in post)
+      );
+      const expectedPages = Math.ceil(publishedPosts.length / 3);
 
-    expect(pageCount.textContent).toBe(String(expectedPages));
+      expect(pageCount.textContent).toBe(String(expectedPages));
+    });
   });
 
   it('handles pagination navigation', async () => {
     render(<BlogArea />);
 
-    const nextButton = screen.getByTestId('next-page');
-    
-    fireEvent.click(nextButton);
-
     await waitFor(() => {
-      expect(screen.getByTestId('next-page')).toBeInTheDocument();
+      const nextButton = screen.getByTestId('next-page');
+
+      fireEvent.click(nextButton);
     });
   });
 
-  it('renders social share buttons for each blog post', () => {
+  it('renders social share buttons for each blog post', async () => {
     render(<BlogArea />);
 
-    const shareButtons = screen.getAllByRole('button', { name: /share/i });
-    expect(shareButtons.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const shareButtons = screen.getAllByRole('button', { name: /share/i });
+      expect(shareButtons.length).toBeGreaterThan(0);
+    });
   });
 
-  it('renders individual social media buttons (Facebook, Twitter, LinkedIn, Instagram)', () => {
+  it('renders individual social media buttons (Facebook, Twitter, LinkedIn, Instagram)', async () => {
     render(<BlogArea />);
 
-    expect(screen.getAllByLabelText(/facebook/i).length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(screen.getAllByLabelText(/facebook/i).length).toBeGreaterThan(0);
+    });
   });
 
-  it('maintains blog item structure', () => {
+  it('maintains blog item structure', async () => {
     render(<BlogArea />);
 
-    const blogArticles = document.querySelectorAll('.blog-post-item');
-    expect(blogArticles.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const blogArticles = document.querySelectorAll('.blog-post-item');
+      expect(blogArticles.length).toBeGreaterThan(0);
+    });
   });
 
-  it('renders "BACA SELENGKAPNYA" links for blog posts', () => {
+  it('renders "BACA SELENGKAPNYA" links for blog posts', async () => {
     render(<BlogArea />);
 
-    const readMoreLinks = screen.getAllByText('BACA SELENGKAPNYA');
-    expect(readMoreLinks.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const readMoreLinks = screen.getAllByText('BACA SELENGKAPNYA');
+      expect(readMoreLinks.length).toBeGreaterThan(0);
+    });
   });
 
-  it('uses correct itemsPerPage (3)', () => {
+  it('uses correct itemsPerPage (3)', async () => {
     render(<BlogArea />);
 
-    const blogItems = document.querySelectorAll('.blog-post-item');
-    expect(blogItems.length).toBeLessThanOrEqual(3);
+    await waitFor(() => {
+      const blogItems = document.querySelectorAll('.blog-post-item');
+      expect(blogItems.length).toBeLessThanOrEqual(3);
+    });
   });
 
-  it('renders blog images with proper alt text', () => {
+  it('renders blog images with proper alt text', async () => {
     render(<BlogArea />);
 
-    const images = screen.getAllByAltText(/Thumbnail gambar artikel:/i);
-    expect(images.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      const images = screen.getAllByAltText(/Thumbnail gambar artikel:/i);
+      expect(images.length).toBeGreaterThan(0);
+    });
   });
 
   it('preserves blog data structure (id, thumb, title, desc, date, user, tagId)', () => {
@@ -348,17 +375,20 @@ describe('BlogArea', () => {
   it('handles pagination state changes', async () => {
     render(<BlogArea />);
 
-    const nextButton = screen.getByTestId('next-page');
-    const prevButton = screen.getByTestId('prev-page');
+    await waitFor(async () => {
+      const nextButton = screen.getByTestId('next-page');
+      const prevButton = screen.getByTestId('prev-page');
 
-    fireEvent.click(nextButton);
-    await waitFor(() => {
-      expect(screen.getByTestId('next-page')).toBeInTheDocument();
-    });
+      fireEvent.click(nextButton);
 
-    fireEvent.click(prevButton);
-    await waitFor(() => {
-      expect(screen.getByTestId('prev-page')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('next-page')).toBeInTheDocument();
+      });
+
+      fireEvent.click(prevButton);
+      await waitFor(() => {
+        expect(screen.getByTestId('prev-page')).toBeInTheDocument();
+      });
     });
   });
 
