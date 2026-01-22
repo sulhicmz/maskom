@@ -2,15 +2,16 @@ openapi: 3.0.3
 info:
   title: Maskom API
   description: >
-    API specification for Maskom monitoring and service health endpoints.
+    API specification for Maskom monitoring, service health, and collaboration endpoints.
     
     ## Architecture Overview
     
     Maskom uses a client-side service layer for external integrations:
     - **EmailService**: Client-side service for EmailJS integration
     - **AuthService**: Client-side service for authentication (mock mode)
+    - **CollaborationService**: Real-time collaboration for blog editing
     
-    Server-side API routes provide monitoring and health check capabilities.
+    Server-side API routes provide monitoring, health check, and collaboration capabilities.
     
     ## Service Layer vs API Routes
     
@@ -23,6 +24,8 @@ info:
     - /api/health - Health check endpoint
     - /api/metrics - Metrics aggregation endpoint
     - /api/services/status - Service status monitoring endpoint
+    - /api/email-queue - Email queue management endpoint
+    - /api/collaborate - Real-time collaboration endpoint
     
     ## Response Format
     
@@ -30,7 +33,7 @@ info:
     - Success: success=true, message=string, data=T
     - Error: success=false, error=string, errorCode=string, metadata=object
     
-    All responses include ServiceResult wrapper with the following structure:
+    All responses include ServiceResult wrapper with following structure:
     ```typescript
     interface ServiceResult<T> {
         success: boolean;
@@ -47,8 +50,15 @@ info:
     All responses include:
     - Content-Type: application/json
     - Cache-Control: no-cache, no-store, must-revalidate
+    
+    ## Resilience Features
+    
+    - **Circuit Breaker**: Protects against cascading failures (3 failures, 30s reset)
+    - **Timeout**: Prevents hanging requests (5-10s depending on endpoint)
+    - **Retry**: Automatic retries with exponential backoff (2-3 attempts)
+    - **Rate Limiting**: Per-endpoint rate limiting with configurable windows
   
-  version: 3.0.0
+  version: 3.1.0
   contact:
     name: Maskom Development Team
     url: https://maskom.co.id
@@ -69,6 +79,10 @@ tags:
     description: Metrics and monitoring endpoints
   - name: Service Status
     description: Service status monitoring endpoints
+  - name: Email Queue
+    description: Email queue management endpoints
+  - name: Collaboration
+    description: Real-time collaboration endpoints
 
 paths:
   /health:
@@ -79,9 +93,9 @@ paths:
       description: >
         Performs health check for all services with configurable success rate threshold.
         
-        This endpoint checks the health of EmailService and AuthService by evaluating
+        This endpoint checks health of EmailService and AuthService by evaluating
         their success rate metrics. A service is considered healthy if its success rate
-        meets or exceeds the threshold parameter.
+        meets or exceeds threshold parameter.
       operationId: healthCheck
       parameters:
         - in: query
@@ -283,8 +297,486 @@ paths:
                       lastFailureTime: 1736697500000
                       nextAttemptTime: null
 
+  /email-queue:
+    get:
+      tags:
+        - Email Queue
+      summary: Get email queue status
+      description: >
+        Returns current email queue status including size, expired emails, and circuit breaker state.
+        
+        **Circuit Breaker**: Protected by circuit breaker (3 failures, 30s reset)
+        **Timeout**: 5 second timeout
+        **Retry**: 2 attempts with exponential backoff
+      operationId: getEmailQueueStatus
+      responses:
+        '200':
+          description: Email queue status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailQueueStatusResponse'
+              example:
+                success: true
+                message: 'Email queue status retrieved successfully'
+                data:
+                  timestamp: '2026-01-14T12:00:00.000Z'
+                  queue:
+                    size: 5
+                    expired: 1
+                    status: 'has_pending_emails'
+                  circuitBreaker:
+                    isOpen: false
+                    failureCount: 0
+                    lastFailureTime: null
+                    lastSuccessTime: 1736697600000
+                    status: 'closed'
+                  metrics:
+                    serviceName: 'EmailService'
+                    totalCalls: 100
+                    successCalls: 95
+                    failureCalls: 5
+                    averageResponseTime: 1500
+        '503':
+          description: Service temporarily unavailable (circuit breaker open)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: Request timed out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Email Queue
+      summary: Process email queue
+      description: >
+        Processes all emails in queue. Failed emails are retried up to 3 times 
+        with exponential backoff. Emails that fail after max attempts are removed 
+        from queue and counted as failed.
+        
+        **Circuit Breaker**: Protected by circuit breaker (3 failures, 30s reset)
+        **Timeout**: 10 second timeout per email
+        **Retry**: 3 attempts per email with exponential backoff (2s, 4s, 8s)
+        **Rate Limiting**: Skipped for queue processor (higher priority)
+      operationId: processEmailQueue
+      responses:
+        '200':
+          description: Email queue processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailQueueProcessResponse'
+              example:
+                success: true
+                message: 'Email queue processed'
+                data:
+                  processed: 5
+                  failed: 1
+        '503':
+          description: Circuit breaker is open, cannot process queue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: Request timed out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /collaborate:
+    get:
+      tags:
+        - Collaboration
+      summary: Poll for collaboration events
+      description: >
+        Polls for new collaboration events in a session using long-polling pattern.
+        
+        Returns events that occurred after the provided lastEventId. Maximum 50 events
+        are buffered per session, oldest events are discarded when buffer is full.
+        
+        **Circuit Breaker**: Protected by circuit breaker (3 failures, 30s reset)
+        **Timeout**: 5 second timeout
+        **Retry**: 2 attempts with exponential backoff
+        **Rate Limiting**: 50 requests per minute per client
+      operationId: pollCollaborationEvents
+      parameters:
+        - in: query
+          name: sessionId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+            pattern: '^[a-zA-Z0-9_-]+$'
+          description: Collaboration session identifier
+          example: 'sess_abc123'
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: User ID
+          example: 123
+        - in: query
+          name: username
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+            pattern: '^[a-zA-Z0-9_-]+$'
+          description: Username of the polling user
+          example: 'john_doe'
+        - in: query
+          name: lastEventId
+          required: false
+          schema:
+            type: string
+          description: Last received event ID to filter new events
+          example: 'sess_abc123_45'
+      responses:
+        '200':
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationPollResponse'
+              example:
+                success: true
+                events:
+                  - type: 'user_joined'
+                    sessionId: 'sess_abc123'
+                    postId: 123
+                    userId: 456
+                    timestamp: 1736697600000
+                    data:
+                      eventId: 'sess_abc123_46'
+                      username: 'jane_doe'
+                  - type: 'cursor_moved'
+                    sessionId: 'sess_abc123'
+                    postId: 123
+                    userId: 789
+                    timestamp: 1736697601000
+                    data:
+                      eventId: 'sess_abc123_47'
+                      cursorPosition:
+                        line: 5
+                        column: 10
+                sessionActive: true
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationErrorResponse'
+              example:
+                success: false
+                events: []
+                sessionActive: false
+                error: 'Invalid request data'
+                errorCode: 'VALIDATION_ERROR'
+                details:
+                  - field: 'sessionId'
+                    message: 'Session not found'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until rate limit resets
+              schema:
+                type: integer
+            X-RateLimit-Limit:
+              description: Rate limit per window
+              schema:
+                type: integer
+            X-RateLimit-Remaining:
+              description: Remaining requests in current window
+              schema:
+                type: integer
+            X-RateLimit-Reset:
+              description: Timestamp when rate limit resets
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationErrorResponse'
+        '503':
+          description: Service temporarily unavailable (circuit breaker open)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: Request timed out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Collaboration
+      summary: Submit collaboration action
+      description: >
+        Submits a collaboration action (join, leave, cursor_update, edit, comment).
+        
+        Actions are validated and broadcast to other users in the session via polling.
+        
+        **Circuit Breaker**: Protected by circuit breaker (3 failures, 30s reset)
+        **Timeout**: 5 second timeout
+        **Retry**: 2 attempts with exponential backoff
+        **Rate Limiting**: 50 requests per minute per client
+      operationId: submitCollaborationAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollaborationRequest'
+            examples:
+              join:
+                summary: Join session
+                value:
+                  action: 'join'
+                  postId: 123
+                  userId: 456
+                  username: 'john_doe'
+              leave:
+                summary: Leave session
+                value:
+                  action: 'leave'
+                  sessionId: 'sess_abc123'
+                  userId: 456
+              cursor_update:
+                summary: Update cursor position
+                value:
+                  action: 'cursor_update'
+                  sessionId: 'sess_abc123'
+                  userId: 456
+                  cursorPosition:
+                    line: 10
+                    column: 25
+                  selection:
+                    start:
+                      line: 10
+                      column: 20
+                    end:
+                      line: 10
+                      column: 30
+              edit:
+                summary: Apply edit operation
+                value:
+                  action: 'edit'
+                  sessionId: 'sess_abc123'
+                  userId: 456
+                  editOperation:
+                    type: 'insert'
+                    position:
+                      line: 5
+                      column: 10
+                    text: 'Hello world'
+              comment:
+                summary: Add comment
+                value:
+                  action: 'comment'
+                  sessionId: 'sess_abc123'
+                  userId: 456
+                  username: 'john_doe'
+                  comment:
+                    content: 'This looks great!'
+                    position:
+                      line: 5
+                      column: 10
+      responses:
+        '200':
+          description: Action processed successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/CollaborationActionSuccessResponse'
+                  - $ref: '#/components/schemas/ServiceResult'
+              examples:
+                join_success:
+                  summary: Successfully joined session
+                  value:
+                    success: true
+                    sessionId: 'sess_abc123'
+                    postId: 123
+                    userId: 456
+                leave_success:
+                  summary: Successfully left session
+                  value:
+                    success: true
+                edit_success:
+                  summary: Successfully applied edit
+                  value:
+                    success: true
+                    version: 42
+        '400':
+          description: Invalid request data or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationErrorResponse'
+              example:
+                success: false
+                error: 'Invalid request data'
+                errorCode: 'VALIDATION_ERROR'
+                details:
+                  - field: 'action'
+                    message: 'Invalid action type'
+        '404':
+          description: Session or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationErrorResponse'
+              example:
+                success: false
+                error: 'Session not found'
+                errorCode: 'SESSION_NOT_FOUND'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until rate limit resets
+              schema:
+                type: integer
+            X-RateLimit-Limit:
+              description: Rate limit per window
+              schema:
+                type: integer
+            X-RateLimit-Remaining:
+              description: Remaining requests in current window
+              schema:
+                type: integer
+            X-RateLimit-Reset:
+              description: Timestamp when rate limit resets
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollaborationErrorResponse'
+        '503':
+          description: Service temporarily unavailable (circuit breaker open)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '504':
+          description: Request timed out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
+    ServiceResult:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Indicates if operation was successful
+          example: true
+        message:
+          type: string
+          description: Human-readable message
+          example: 'Success'
+        data:
+          type: object
+          description: Response data (present on success)
+        error:
+          type: string
+          description: Error message (present on failure)
+          example: 'Internal server error'
+        errorCode:
+          type: string
+          description: Machine-readable error code
+          enum:
+            - VALIDATION_ERROR
+            - INVALID_QUERY_PARAMETERS
+            - INVALID_REQUEST_DATA
+            - MISSING_REQUIRED_FIELDS
+            - SESSION_NOT_FOUND
+            - USER_NOT_FOUND_IN_SESSION
+            - INTERNAL_ERROR
+            - RATE_LIMIT_EXCEEDED
+            - TIMEOUT
+            - CIRCUIT_BREAKER_OPEN
+            - CREDENTIALS_MISSING
+            - NETWORK_ERROR
+            - UNKNOWN_ERROR
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Additional metadata
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Human-readable error message
+          example: 'Internal server error'
+        errorCode:
+          type: string
+          description: Machine-readable error code
+        metadata:
+          type: object
+          description: Additional error metadata
+          properties:
+            isRetryable:
+              type: boolean
+              description: Whether error is retryable
+            isTimeout:
+              type: boolean
+              description: Whether error is a timeout
+            isRateLimited:
+              type: boolean
+              description: Whether error is due to rate limiting
+            rateLimitResetTime:
+              type: integer
+              format: int64
+              description: Unix timestamp when rate limit resets
+
     HealthCheckResponse:
       type: object
       description: Health check response for all services
@@ -567,37 +1059,395 @@ components:
           nullable: true
           description: Next attempt allowed timestamp (when open)
           example: 1736697660000
+        isOpen:
+          type: boolean
+          description: Whether circuit breaker is open
+          example: false
+        lastSuccessTime:
+          type: integer
+          format: int64
+          nullable: true
+          description: Last success timestamp (Unix epoch)
+          example: 1736697600000
+        status:
+          type: string
+          enum: ['open', 'closed']
+          description: Status string for compatibility
+          example: 'closed'
 
-    ErrorResponse:
+    EmailQueueStatusResponse:
       type: object
-      description: Error response format
+      description: Email queue status response
       properties:
         success:
           type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Email queue status retrieved successfully'
+        data:
+          $ref: '#/components/schemas/EmailQueueStatusData'
+
+    EmailQueueStatusData:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of queue check
+          example: '2026-01-14T12:00:00.000Z'
+        queue:
+          $ref: '#/components/schemas/EmailQueueInfo'
+        circuitBreaker:
+          $ref: '#/components/schemas/CircuitBreakerState'
+        metrics:
+          $ref: '#/components/schemas/ServiceMetrics'
+
+    EmailQueueInfo:
+      type: object
+      properties:
+        size:
+          type: integer
+          description: Number of emails in queue
+          example: 5
+        expired:
+          type: integer
+          description: Number of expired emails in queue
+          example: 1
+        status:
+          type: string
+          enum: ['has_pending_emails', 'empty']
+          description: Queue status
+          example: 'has_pending_emails'
+
+    EmailQueueProcessResponse:
+      type: object
+      description: Email queue process response
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Email queue processed'
+        data:
+          $ref: '#/components/schemas/EmailQueueProcessData'
+
+    EmailQueueProcessData:
+      type: object
+      properties:
+        processed:
+          type: integer
+          description: Number of emails successfully processed
+          example: 5
+        failed:
+          type: integer
+          description: Number of emails that failed after max attempts
+          example: 1
+
+    CollaborationPollResponse:
+      type: object
+      description: Collaboration polling response
+      required:
+        - success
+        - events
+        - sessionActive
+      properties:
+        success:
+          type: boolean
+          description: Indicates if poll was successful
+          example: true
+        events:
+          type: array
+          description: Array of collaboration events
+          items:
+            $ref: '#/components/schemas/CollaborativeEvent'
+        sessionActive:
+          type: boolean
+          description: Whether session is still active
+          example: true
+        error:
+          type: string
+          description: Error message (present on failure)
+          example: 'Invalid request data'
+        errorCode:
+          type: string
+          description: Machine-readable error code (present on failure)
+          enum:
+            - VALIDATION_ERROR
+            - INVALID_QUERY_PARAMETERS
+            - SESSION_NOT_FOUND
+            - RATE_LIMIT_EXCEEDED
+          example: 'VALIDATION_ERROR'
+        details:
+          type: object
+          description: Additional error details
+          properties:
+            field:
+              type: string
+              description: Field that failed validation
+            message:
+              type: string
+              description: Validation error message
+
+    CollaborationErrorResponse:
+      type: object
+      description: Collaboration error response
+      required:
+        - success
+        - error
+        - errorCode
+      properties:
+        success:
+          type: boolean
+          description: Always false for error responses
+          example: false
+        events:
+          type: array
+          description: Empty array on error
+          items: {}
+        sessionActive:
+          type: boolean
+          description: Session active status (false on error)
           example: false
         error:
           type: string
           description: Human-readable error message
-          example: 'Internal server error'
+          example: 'Session not found'
         errorCode:
           type: string
+          description: Machine-readable error code
           enum:
             - VALIDATION_ERROR
+            - INVALID_QUERY_PARAMETERS
+            - INVALID_REQUEST_DATA
+            - MISSING_REQUIRED_FIELDS
+            - SESSION_NOT_FOUND
+            - USER_NOT_FOUND_IN_SESSION
+            - INTERNAL_ERROR
             - RATE_LIMIT_EXCEEDED
             - TIMEOUT
             - CIRCUIT_BREAKER_OPEN
-            - CREDENTIALS_MISSING
             - NETWORK_ERROR
             - UNKNOWN_ERROR
-          description: Standardized error code
-          example: 'UNKNOWN_ERROR'
-        metadata:
+          example: 'SESSION_NOT_FOUND'
+        details:
+          oneOf:
+            - type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+            - type: object
+          description: Additional error details
+
+    CollaborationRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum: ['join', 'leave', 'cursor_update', 'edit', 'comment']
+          description: Collaboration action type
+          example: 'join'
+        postId:
+          type: integer
+          description: Blog post ID (required for join action)
+          example: 123
+        userId:
+          type: integer
+          description: User ID
+          example: 456
+        username:
+          type: string
+          description: Username (required for join and comment actions)
+          example: 'john_doe'
+        sessionId:
+          type: string
+          description: Session ID (required for leave, cursor_update, edit, comment actions)
+          example: 'sess_abc123'
+        cursorPosition:
           type: object
-          description: Additional error metadata
+          description: Cursor position (required for cursor_update action)
           properties:
-            isRetryable:
-              type: boolean
-              description: Whether error is retryable
-            isTimeout:
-              type: boolean
-              description: Whether error is a timeout
+            line:
+              type: integer
+              example: 10
+            column:
+              type: integer
+              example: 25
+        selection:
+          type: object
+          description: Text selection (optional for cursor_update action)
+          properties:
+            start:
+              type: object
+              properties:
+                line:
+                  type: integer
+                  example: 10
+                column:
+                  type: integer
+                  example: 20
+            end:
+              type: object
+              properties:
+                line:
+                  type: integer
+                  example: 10
+                column:
+                  type: integer
+                  example: 30
+        editOperation:
+          type: object
+          description: Edit operation (required for edit action)
+          properties:
+            type:
+              type: string
+              enum: ['insert', 'delete', 'replace']
+              example: 'insert'
+            position:
+              type: object
+              properties:
+                line:
+                  type: integer
+                  example: 5
+                column:
+                  type: integer
+                  example: 10
+            text:
+              type: string
+              description: Text to insert or replace (for insert/replace actions)
+              example: 'Hello world'
+            length:
+              type: integer
+              description: Number of characters to delete (for delete/replace actions)
+              example: 5
+        comment:
+          type: object
+          description: Comment data (required for comment action)
+          properties:
+            content:
+              type: string
+              description: Comment content (will be sanitized)
+              example: 'This looks great!'
+            position:
+              type: object
+              properties:
+                line:
+                  type: integer
+                  example: 5
+                column:
+                  type: integer
+                  example: 10
+
+    CollaborationActionSuccessResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        sessionId:
+          type: string
+          description: Session ID (returned for join action)
+          example: 'sess_abc123'
+        postId:
+          type: integer
+          description: Post ID (returned for join action)
+          example: 123
+        userId:
+          type: integer
+          description: User ID (returned for join action)
+          example: 456
+        version:
+          type: integer
+          description: Document version (returned for edit action)
+          example: 42
+
+    CollaborativeEvent:
+      type: object
+      required:
+        - type
+        - sessionId
+        - timestamp
+      properties:
+        type:
+          type: string
+          enum: ['user_joined', 'user_left', 'cursor_moved', 'edit_applied', 'comment_added']
+          description: Event type
+          example: 'user_joined'
+        sessionId:
+          type: string
+          description: Session ID
+          example: 'sess_abc123'
+        postId:
+          type: integer
+          description: Post ID (for user_joined, edit_applied, comment_added events)
+          example: 123
+        userId:
+          type: integer
+          description: User ID
+          example: 456
+        timestamp:
+          type: integer
+          format: int64
+          description: Event timestamp (Unix epoch)
+          example: 1736697600000
+        data:
+          type: object
+          description: Event data (varies by event type)
+          properties:
+            eventId:
+              type: string
+              description: Unique event ID
+              example: 'sess_abc123_46'
+            username:
+              type: string
+              description: Username (for user_joined, comment_added events)
+              example: 'john_doe'
+            cursorPosition:
+              type: object
+              description: Cursor position (for cursor_moved events)
+              properties:
+                line:
+                  type: integer
+                  example: 10
+                column:
+                  type: integer
+                  example: 25
+            selection:
+              type: object
+              description: Text selection (for cursor_moved events)
+            authorId:
+              type: integer
+              description: Edit author ID (for edit_applied events)
+            content:
+              type: string
+              description: Comment content (for comment_added events)
+              example: 'This looks great!'
+            position:
+              type: object
+              description: Comment position (for comment_added events)
+              properties:
+                line:
+                  type: integer
+                  example: 5
+                column:
+                  type: integer
+                  example: 10
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication token (currently mock, will use production JWT)
+
+security:
+  - BearerAuth: []

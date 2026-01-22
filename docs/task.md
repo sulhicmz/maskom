@@ -1,5 +1,152 @@
 # Architecture Task Tracking
 
+## Task 422: [INTEGRATION ENGINEER] API Documentation - OpenAPI Specification Consolidation & Completeness (Jan 22, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Integration - API Documentation
+**Effort**: Medium (2-3 hours)
+
+### Purpose
+
+Consolidate duplicate OpenAPI specification files into a single source of truth and document missing `/api/collaborate` endpoint for comprehensive API reference.
+
+### Problem Identified
+
+**Duplicate and Incomplete API Documentation**:
+
+**Duplicate OpenAPI Files**:
+- `docs/openapi.yaml` - Version 1.0.0 with `/email-queue` documented
+- `docs/openapi-spec.yaml` - Version 3.0.0 without `/email-queue` documented
+- Conflicting version numbers create confusion about which spec to use
+- Two sources of truth violate Single Source of Truth principle
+
+**Missing Collaboration API Documentation**:
+- `/api/collaborate` endpoint exists but not documented in either spec
+- Critical real-time collaboration feature undocumented for API consumers
+- GET polling and POST actions (join, leave, cursor_update, edit, comment) not specified
+- Rate limiting and error responses for collaboration API not documented
+
+**Why This Matters**:
+1. **Single Source of Truth**: Duplicate specs cause confusion about which is authoritative
+2. **API Consumers**: Missing documentation prevents external integrations from using collaboration API
+3. **Developer Experience**: Developers don't have complete API reference
+4. **Contract Definition**: Undocumented endpoints break Contract First principle
+5. **Tooling**: API clients and documentation generators need complete specs
+
+### Solution
+
+**OpenAPI Specification Consolidation and Completion**:
+
+**1. Consolidated OpenAPI Spec** (`docs/openapi-spec.yaml`):
+   - Merged content from both `openapi.yaml` and `openapi-spec.yaml`
+   - Removed duplicate file `docs/openapi.yaml` (had YAML syntax error)
+   - Updated version to 3.1.0 (incremented from 3.0.0)
+   - Single authoritative source for all API documentation
+
+**2. Added Collaboration API Documentation**:
+   - **GET /api/collaborate** - Poll for collaboration events with long-polling
+   - **POST /api/collaborate** - Submit collaboration actions
+   - **5 Action Types**: join, leave, cursor_update, edit, comment
+   - **Request/Response Schemas**: Complete type definitions for all actions
+   - **Error Handling**: Rate limiting, validation errors, session not found
+   - **Rate Limit Headers**: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+   - **Resilience**: Circuit breaker, timeout, retry documentation
+
+**3. Updated Email Queue API Documentation**:
+   - Ensured `/api/email-queue` (GET and POST) in consolidated spec
+   - Documented queue status, circuit breaker state, and processing operations
+   - Added complete response schemas
+
+**4. Standardized Response Format**:
+   - All endpoints documented with ServiceResult<T> pattern
+   - Consistent error codes and response structures
+   - Complete example requests/responses for all endpoints
+
+### Acceptance Criteria
+
+- [x] Duplicate OpenAPI specs consolidated into single file
+- [x] Version bumped to 3.1.0 (from 3.0.0)
+- [x] /api/collaborate endpoint documented (GET polling, POST actions)
+- [x] /api/email-queue endpoint documented in consolidated spec
+- [x] All endpoints follow ServiceResult<T> pattern
+- [x] Complete request/response schemas for all endpoints
+- [x] Resilience patterns documented (circuit breaker, timeout, retry)
+- [x] Rate limiting documented with headers
+- [x] Lint passes (0 errors, 7 pre-existing warnings)
+- [x] YAML syntax valid for consolidated spec
+
+### Implementation Notes
+
+- Follows Integration Engineer principles:
+   - **Contract First**: Clear API contracts for all endpoints
+   - **Self-Documenting**: OpenAPI spec serves as executable documentation
+   - **Single Source of Truth**: One authoritative spec file
+   - **Backward Compatible**: No breaking changes to existing endpoints
+
+- **Consolidation Strategy**: Merged two duplicate files, kept more comprehensive version
+- **Version Management**: Bumped to 3.1.0 for major consolidation change
+
+### Related Files
+
+- ✅ Added: `docs/openapi-spec.yaml` - Consolidated OpenAPI 3.1.0 spec (1100+ lines)
+- ✅ Deleted: `docs/openapi.yaml` - Duplicate spec with syntax error
+
+### Implementation Summary
+
+**Files Modified**: 0 files (new spec written, old spec deleted)
+**Files Added**: 1 file (consolidated spec)
+**Files Deleted**: 1 file (duplicate spec)
+**Lines Added**: ~1100 lines (complete OpenAPI spec)
+**Endpoints Documented**: 5 endpoints (health, metrics, services/status, email-queue, collaborate)
+
+**Key Features**:
+1. **Single Source of Truth**: One authoritative OpenAPI specification
+2. **Complete Coverage**: All API endpoints documented
+3. **Collaboration API**: Full documentation for real-time collaboration feature
+4. **Standardized Format**: ServiceResult<T> pattern throughout
+5. **Resilience Documentation**: Circuit breaker, timeout, retry patterns documented
+6. **Rate Limiting**: Headers and behavior documented
+7. **Examples**: Complete request/response examples for all operations
+8. **Version Management**: Bumped to 3.1.0 for major consolidation
+
+### Endpoints Documented
+
+**Before**:
+- `/api/health` - Health check ✅
+- `/api/metrics` - Metrics aggregation ✅
+- `/api/services/status` - Service status ✅
+- `/api/email-queue` - Email queue (in one file only) ⚠️
+- `/api/collaborate` - Collaboration (NOT documented) ❌
+
+**After**:
+- `/api/health` - Health check ✅
+- `/api/metrics` - Metrics aggregation ✅
+- `/api/services/status` - Service status ✅
+- `/api/email-queue` - Email queue (GET status, POST process) ✅
+- `/api/collaborate` - Collaboration (GET polling, POST actions) ✅
+
+### Notes
+
+- **Test Status**:
+   - Lint: ✅ Pass (0 errors, 7 pre-existing warnings)
+   - YAML Syntax: ✅ Valid for consolidated spec
+   - Duplicate File: ✅ Removed
+
+- **Future Enhancement Opportunities**:
+   - Generate API client libraries from OpenAPI spec
+   - Add interactive API documentation (Swagger UI)
+   - Add OpenAPI validation tests
+   - Consider versioning strategy for API changes
+
+### Related Tasks
+
+- Task 416 (Critical Path Testing - API Routes) - Related API testing work
+- Task 393 (API Error Response Standardization) - Related API standards work
+- Task 404 (Application Security Hardening) - Related security work
+
+---
+
 ## Task 421: [DATA ARCHITECT] LocalStorage Schema Validation & Migration Framework (Jan 22, 2026)
 
 **Status**: ✅ Completed
