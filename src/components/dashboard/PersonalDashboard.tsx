@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, memo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthService } from '@/hooks/useAuthService'
 import { useRouter } from 'next/navigation'
@@ -16,18 +16,31 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { UserDashboardData } from '@/types/dashboard'
 import { loadDashboardData } from '@/utils/dashboardUtils'
 
+const DASHBOARD_SECTIONS = [
+    { id: 'overview', label: 'Ikhtisar', icon: '📊' },
+    { id: 'history', label: 'Riwayat Bacaan', icon: '📚' },
+    { id: 'bookmarks', label: 'Bookmark', icon: '🔖' },
+    { id: 'statistics', label: 'Statistik', icon: '📈' },
+    { id: 'activity', label: 'Aktivitas', icon: '🔔' },
+    { id: 'account', label: 'Akun', icon: '👤' },
+    { id: 'privacy', label: 'Privasi', icon: '🔒' },
+    { id: 'accessibility', label: 'Aksesibilitas', icon: '♿' },
+] as const
+
+type DashboardSectionId = typeof DASHBOARD_SECTIONS[number]['id']
+
 const PersonalDashboard: React.FC = () => {
     const { theme } = useTheme()
     const { user } = useAuthService()
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
     const [dashboardData, setDashboardData] = useState<UserDashboardData | null>(null)
-    const [activeSection, setActiveSection] = useState('overview')
+    const [activeSection, setActiveSection] = useState<DashboardSectionId>('overview')
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setIsClient(true)
-        
+
         if (!user) {
             router.push('/login')
         }
@@ -47,6 +60,10 @@ const PersonalDashboard: React.FC = () => {
         loadData()
     }, [])
 
+    const handleSectionChange = useCallback((sectionId: DashboardSectionId) => {
+        setActiveSection(sectionId)
+    }, [])
+
     if (!isClient) {
         return <LoadingSpinner minHeight={400} color="primary" />
     }
@@ -58,17 +75,6 @@ const PersonalDashboard: React.FC = () => {
     if (loading || !dashboardData) {
         return <LoadingSpinner minHeight={400} color="primary" />
     }
-
-    const sections = [
-        { id: 'overview', label: 'Ikhtisar', icon: '📊' },
-        { id: 'history', label: 'Riwayat Bacaan', icon: '📚' },
-        { id: 'bookmarks', label: 'Bookmark', icon: '🔖' },
-        { id: 'statistics', label: 'Statistik', icon: '📈' },
-        { id: 'activity', label: 'Aktivitas', icon: '🔔' },
-        { id: 'account', label: 'Akun', icon: '👤' },
-        { id: 'privacy', label: 'Privasi', icon: '🔒' },
-        { id: 'accessibility', label: 'Aksesibilitas', icon: '♿' },
-    ]
 
     return (
         <section className={`dashboard-section ${theme === 'dark' ? 'dark-mode' : ''}`}>
@@ -88,10 +94,10 @@ const PersonalDashboard: React.FC = () => {
                             <div className="card-body">
                                 <h5 className="card-title mb-3">Menu</h5>
                                 <nav className="nav flex-column">
-                                    {sections.map(section => (
+                                    {DASHBOARD_SECTIONS.map(section => (
                                         <button
                                             key={section.id}
-                                            onClick={() => setActiveSection(section.id)}
+                                            onClick={() => handleSectionChange(section.id)}
                                             className={`nav-link ${activeSection === section.id ? 'active' : ''}`}
                                         >
                                             <span className="nav-icon">{section.icon}</span>
@@ -140,4 +146,6 @@ const PersonalDashboard: React.FC = () => {
     )
 }
 
-export default PersonalDashboard
+PersonalDashboard.displayName = 'PersonalDashboard'
+
+export default memo(PersonalDashboard)

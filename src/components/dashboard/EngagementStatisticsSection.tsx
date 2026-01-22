@@ -1,7 +1,6 @@
 "use client"
 
-import React from 'react'
-import { useTheme } from '@/contexts/ThemeContext'
+import React, { useMemo, memo } from 'react'
 import { EngagementStats } from '@/types/dashboard'
 
 interface EngagementStatisticsSectionProps {
@@ -9,9 +8,7 @@ interface EngagementStatisticsSectionProps {
 }
 
 const EngagementStatisticsSection: React.FC<EngagementStatisticsSectionProps> = ({ statistics }) => {
-    const { theme } = useTheme()
-
-    const stats = [
+    const stats = useMemo(() => [
         {
             label: 'Total Postingan Dibaca',
             value: statistics.totalPostsRead,
@@ -40,7 +37,17 @@ const EngagementStatisticsSection: React.FC<EngagementStatisticsSectionProps> = 
             color: 'warning',
             progress: 0
         }
-    ]
+    ], [statistics.totalPostsRead, statistics.totalBookmarksCreated, statistics.totalTimeSpent, statistics.currentStreak, statistics.monthlyReadingGoal])
+
+    const weeklyProgress = useMemo(() => Math.min(
+        Math.round((statistics.totalPostsRead / statistics.weeklyReadingGoal) * 100),
+        100
+    ), [statistics.totalPostsRead, statistics.weeklyReadingGoal])
+
+    const monthlyProgress = useMemo(() => Math.min(
+        Math.round((statistics.totalPostsRead / statistics.monthlyReadingGoal) * 100),
+        100
+    ), [statistics.totalPostsRead, statistics.monthlyReadingGoal])
 
     return (
         <div className="card mb-4">
@@ -64,7 +71,7 @@ const EngagementStatisticsSection: React.FC<EngagementStatisticsSectionProps> = 
                                 <p className="stat-label">{stat.label}</p>
                                 {stat.progress > 0 && (
                                     <div className="progress mt-2">
-                                        <div 
+                                        <div
                                             className={`progress-bar bg-${stat.color}`}
                                             role="progressbar"
                                             style={{ width: `${Math.min(stat.progress, 100)}%` }}
@@ -92,20 +99,14 @@ const EngagementStatisticsSection: React.FC<EngagementStatisticsSectionProps> = 
                             <div className="goal-content">
                                 <div className="goal-progress">
                                     <div className="progress">
-                                        <div 
+                                        <div
                                             className="progress-bar bg-success"
-                                            style={{ 
-                                                width: `${Math.min(
-                                                    (statistics.totalPostsRead / statistics.weeklyReadingGoal) * 100,
-                                                    100
-                                                )}%` 
+                                            style={{
+                                                width: `${weeklyProgress}%`
                                             }}
                                             role="progressbar"
                                         >
-                                            {Math.min(
-                                                Math.round((statistics.totalPostsRead / statistics.weeklyReadingGoal) * 100),
-                                                100
-                                            )}%
+                                            {weeklyProgress}%
                                         </div>
                                     </div>
                                 </div>
@@ -123,20 +124,14 @@ const EngagementStatisticsSection: React.FC<EngagementStatisticsSectionProps> = 
                             <div className="goal-content">
                                 <div className="goal-progress">
                                     <div className="progress">
-                                        <div 
+                                        <div
                                             className="progress-bar bg-primary"
-                                            style={{ 
-                                                width: `${Math.min(
-                                                    (statistics.totalPostsRead / statistics.monthlyReadingGoal) * 100,
-                                                    100
-                                                )}%` 
+                                            style={{
+                                                width: `${monthlyProgress}%`
                                             }}
                                             role="progressbar"
                                         >
-                                            {Math.min(
-                                                Math.round((statistics.totalPostsRead / statistics.monthlyReadingGoal) * 100),
-                                                100
-                                            )}%
+                                            {monthlyProgress}%
                                         </div>
                                     </div>
                                 </div>
@@ -152,4 +147,6 @@ const EngagementStatisticsSection: React.FC<EngagementStatisticsSectionProps> = 
     )
 }
 
-export default EngagementStatisticsSection
+EngagementStatisticsSection.displayName = 'EngagementStatisticsSection'
+
+export default memo(EngagementStatisticsSection)

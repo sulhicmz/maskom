@@ -1,14 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { useTheme } from '@/contexts/ThemeContext'
+import React, { useState, useEffect, useMemo, memo } from 'react'
 import { ReadingHistoryEntry } from '@/types/dashboard'
 import { loadDashboardData } from '@/utils/dashboardUtils'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { toast } from 'react-toastify'
 
 const ReadingHistorySection: React.FC = () => {
-    const { theme } = useTheme()
     const [history, setHistory] = useState<ReadingHistoryEntry[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -32,6 +30,21 @@ const ReadingHistorySection: React.FC = () => {
         loadHistory()
     }, [])
 
+    const groupedByDate = useMemo(() => {
+        return history.reduce((groups: { [key: string]: ReadingHistoryEntry[] }, entry) => {
+            const dateKey = new Date(entry.readAt).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })
+            if (!groups[dateKey]) {
+                groups[dateKey] = []
+            }
+            groups[dateKey].push(entry)
+            return groups
+        }, {})
+    }, [history])
+
     if (loading) {
         return <LoadingSpinner minHeight={200} color="primary" />
     }
@@ -49,19 +62,6 @@ const ReadingHistorySection: React.FC = () => {
             </div>
         )
     }
-
-    const groupedByDate = history.reduce((groups: { [key: string]: ReadingHistoryEntry[] }, entry) => {
-        const dateKey = new Date(entry.readAt).toLocaleDateString('id-ID', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        })
-        if (!groups[dateKey]) {
-            groups[dateKey] = []
-        }
-        groups[dateKey].push(entry)
-        return groups
-    }, {})
 
     return (
         <div className="card mb-4">
@@ -118,4 +118,6 @@ const ReadingHistorySection: React.FC = () => {
     )
 }
 
-export default ReadingHistorySection
+ReadingHistorySection.displayName = 'ReadingHistorySection'
+
+export default memo(ReadingHistorySection)

@@ -1,15 +1,18 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { useTheme } from '@/contexts/ThemeContext'
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react'
+import Image from 'next/image'
 import { UserDashboardData } from '@/types/dashboard'
 import { loadDashboardData, removeBookmark } from '@/utils/dashboardUtils'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { toast } from 'react-toastify'
 import InnerBlogData from '@/data/InnerBlogData'
 
+const getPostSlug = (title: string): string => {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
 const BookmarksSection: React.FC = () => {
-    const { theme } = useTheme()
     const [dashboardData, setDashboardData] = useState<UserDashboardData | null>(null)
     const [loading, setLoading] = useState(true)
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -29,20 +32,23 @@ const BookmarksSection: React.FC = () => {
         loadBookmarks()
     }, [])
 
-    const handleRemoveBookmark = (postId: string) => {
+    const handleRemoveBookmark = useCallback((postId: string) => {
         removeBookmark(postId)
         const updated = loadDashboardData()
         setDashboardData(updated)
         toast.success('Bookmark dihapus')
-    }
+    }, [])
+
+    const bookmarkedPosts = useMemo(() => {
+        if (!dashboardData) return []
+        return dashboardData.bookmarks
+            .map(id => InnerBlogData.find(post => post.id === id))
+            .filter((post): post is NonNullable<typeof post> => post !== undefined)
+    }, [dashboardData])
 
     if (loading || !dashboardData) {
         return <LoadingSpinner minHeight={200} color="primary" />
     }
-
-    const bookmarkedPosts = dashboardData.bookmarks
-        .map(id => InnerBlogData.find(post => post.id === id))
-        .filter(post => post !== undefined)
 
     if (bookmarkedPosts.length === 0) {
         return (
@@ -92,17 +98,17 @@ const BookmarksSection: React.FC = () => {
                                 <div key={post.id} className="col-lg-4 col-md-6 mb-4">
                                     <div className="bookmark-card">
                                         <div className="card-img-top">
-                                            <img src={post.thumbnail || '/assets/images/blog/blog-1.jpg'} alt={post.title} />
+                                            <Image src={post.thumb || '/assets/images/blog/blog-1.jpg'} alt={post.title} width={400} height={250} />
                                         </div>
                                         <div className="card-body">
                                             <h6 className="card-title">
-                                                <a href={`/blog/${post.slug}`}>{post.title}</a>
+                                                <a href={`/blog/${getPostSlug(post.title)}`}>{post.title}</a>
                                             </h6>
                                             <div className="bookmark-actions">
-                                                <a href={`/blog/${post.slug}`} className="btn btn-primary btn-sm">
+                                                <a href={`/blog/${getPostSlug(post.title)}`} className="btn btn-primary btn-sm">
                                                     Baca
                                                 </a>
-                                                <button 
+                                                <button
                                                     className="btn btn-outline-danger btn-sm"
                                                     onClick={() => handleRemoveBookmark(post.id.toString())}
                                                 >
@@ -120,21 +126,21 @@ const BookmarksSection: React.FC = () => {
                         {bookmarkedPosts.map(post => (
                             <div key={post.id} className="bookmark-list-item">
                                 <div className="bookmark-thumbnail">
-                                    <img src={post.thumbnail || '/assets/images/blog/blog-1.jpg'} alt={post.title} />
+                                    <Image src={post.thumb || '/assets/images/blog/blog-1.jpg'} alt={post.title} width={80} height={80} />
                                 </div>
                                 <div className="bookmark-content">
                                     <h6 className="bookmark-title">
-                                        <a href={`/blog/${post.slug}`}>{post.title}</a>
+                                        <a href={`/blog/${getPostSlug(post.title)}`}>{post.title}</a>
                                     </h6>
                                     <span className="bookmark-date">
-                                        {post.createdAt ? new Date(post.createdAt).toLocaleDateString('id-ID') : '-'}
+                                        {post.date ? new Date(post.date).toLocaleDateString('id-ID') : '-'}
                                     </span>
                                 </div>
                                 <div className="bookmark-actions">
-                                    <a href={`/blog/${post.slug}`} className="btn btn-primary btn-sm">
+                                    <a href={`/blog/${getPostSlug(post.title)}`} className="btn btn-primary btn-sm">
                                         Baca
                                     </a>
-                                    <button 
+                                    <button
                                         className="btn btn-outline-danger btn-sm"
                                         onClick={() => handleRemoveBookmark(post.id.toString())}
                                     >
@@ -150,4 +156,6 @@ const BookmarksSection: React.FC = () => {
     )
 }
 
-export default BookmarksSection
+BookmarksSection.displayName = 'BookmarksSection'
+
+export default memo(BookmarksSection)

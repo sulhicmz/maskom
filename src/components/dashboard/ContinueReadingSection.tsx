@@ -1,14 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { useTheme } from '@/contexts/ThemeContext'
+import React, { useState, useEffect, memo } from 'react'
+import Image from 'next/image'
 import { ReadingHistoryEntry } from '@/types/dashboard'
 import { getContinueReadingPosts, loadDashboardData } from '@/utils/dashboardUtils'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { toast } from 'react-toastify'
 
 const ContinueReadingSection: React.FC = () => {
-    const { theme } = useTheme()
     const [posts, setPosts] = useState<ReadingHistoryEntry[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -61,13 +60,14 @@ const ContinueReadingSection: React.FC = () => {
                     {posts.map(post => (
                         <div key={post.id} className="reading-item">
                             <div className="reading-thumbnail">
-                                <img 
-                                    src={post.thumbnail} 
+                                <Image
+                                    src={post.thumbnail}
                                     alt={post.postTitle}
-                                    className="img-fluid"
+                                    width={80}
+                                    height={80}
                                 />
                                 <div className="progress-overlay">
-                                    <div 
+                                    <div
                                         className="progress-bar"
                                         style={{ width: `${post.progress}%` }}
                                     >
@@ -88,7 +88,7 @@ const ContinueReadingSection: React.FC = () => {
                                     </span>
                                 </div>
                             </div>
-                            <a 
+                            <a
                                 href={`/blog/${post.postSlug}`}
                                 className="btn btn-primary btn-sm"
                             >
@@ -102,4 +102,6 @@ const ContinueReadingSection: React.FC = () => {
     )
 }
 
-export default ContinueReadingSection
+ContinueReadingSection.displayName = 'ContinueReadingSection'
+
+export default memo(ContinueReadingSection)
