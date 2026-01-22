@@ -19,6 +19,16 @@ This directory contains user guides for Maskom website features.
 **Features**: JSON-LD, sitemap, robots.txt, metadata generation
 **Audience**: Developers, SEO specialists
 
+### Anomaly Detection Guide
+**File**: [anomaly-detection-guide.md](anomaly-detection-guide.md)
+**Features**: Real-time anomaly detection, monitoring dashboard, severity levels, alert system
+**Audience**: Administrators, security engineers
+
+### Email Scheduler Guide
+**File**: [email-scheduler-guide.md](email-scheduler-guide.md)
+**Features**: Optimal send time analysis, engagement tracking, heatmap visualization, scheduling recommendations
+**Audience**: Marketers, administrators
+
 ## Quick Reference
 
 | Guide | Topic | Target Audience |
@@ -26,6 +36,8 @@ This directory contains user guides for Maskom website features.
 | Dark Mode Guide | Theme switching | End users, developers |
 | Blog Features Guide | Content discovery | End users, developers |
 | SEO Features Guide | Search engine optimization | Developers, SEO specialists |
+| Anomaly Detection Guide | Real-time monitoring | Administrators, security engineers |
+| Email Scheduler Guide | Campaign optimization | Marketers, administrators |
 
 ## Documentation Standards
 
@@ -59,4 +71,4 @@ When adding new feature documentation:
 
 ---
 
-**Last Updated**: January 16, 2026
+**Last Updated**: January 22, 2026
