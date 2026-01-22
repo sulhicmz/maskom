@@ -115,15 +115,6 @@ export interface DrillExecutionContext {
   totalSteps: number
 }
 
-export interface IDrillStorage {
-  getDrillConfig(): Promise<DrillConfig>
-  saveDrillConfig(config: DrillConfig): Promise<void>
-  saveDrill(drill: BackupDrill): Promise<void>
-  loadDrillsFromStorage(): Promise<BackupDrill[]>
-  getDrillSchedules(): Promise<DrillScheduleDetails[]>
-  saveDrillSchedules(schedules: DrillScheduleDetails[]): Promise<void>
-}
-
 export interface IDrillEngine {
   executeFullRestoreDrill(backupId: string, onProgress?: DrillProgressCallback, isolated?: boolean): Promise<BackupDrill>
   executePartialRestoreDrill(backupId: string, onProgress?: DrillProgressCallback, isolated?: boolean): Promise<BackupDrill>
