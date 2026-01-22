@@ -389,6 +389,41 @@ export interface BackupProgress {
 
 export type BackupProgressCallback = (progress: BackupProgress) => void
 
+export interface BackupSchedulerConfig {
+  id: string
+  schedule: BackupSchedule
+  time: string
+  enabled: boolean
+  lastRun?: string
+  nextRun?: string
+  config: BackupConfig
+}
+
+export type BackupSchedulerNotificationType = 'success' | 'error' | 'warning'
+
+export interface BackupSchedulerNotification {
+  type: BackupSchedulerNotificationType
+  message: string
+  backupId?: string
+  timestamp: string
+}
+
+export type BackupSchedulerNotificationCallback = (notification: BackupSchedulerNotification) => void
+
+export interface IBackupScheduler {
+  initializeScheduler(): Promise<void>
+  scheduleBackup(
+    schedule: BackupSchedule,
+    time: string,
+    config: BackupConfig,
+  ): Promise<boolean>
+  cancelScheduledBackup(): Promise<boolean>
+  onNotification(callback: BackupSchedulerNotificationCallback): void
+  offNotification(callback: BackupSchedulerNotificationCallback): void
+  getScheduledBackup(): BackupSchedulerConfig | null
+  getLastScheduledBackupRun(): Promise<Date | null>
+}
+
 export interface IBackupEngine {
   createFullBackup(
     config: BackupConfig,

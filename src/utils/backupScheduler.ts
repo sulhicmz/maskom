@@ -2,6 +2,11 @@ import {
   BackupConfig,
   BackupSchedule,
   BackupMetadata,
+  BackupSchedulerConfig,
+  BackupSchedulerNotification,
+  BackupSchedulerNotificationCallback,
+  IBackupScheduler,
+  BACKUP_METADATA_KEY,
 } from '@/types/backup'
 
 import {
@@ -9,40 +14,13 @@ import {
   createIncrementalBackup,
 } from './backupEngine'
 
-import { BACKUP_METADATA_KEY } from '@/types/backup'
 import { logServiceInfo } from '@/services/common/logger'
 
 const BACKUP_SCHEDULER_KEY = 'maskom_backup_scheduler'
 const BACKUP_SCHEDULER_INTERVAL_KEY = 'maskom_backup_scheduler_interval'
 const BACKUP_SCHEDULER_LAST_RUN_KEY = 'maskom_backup_scheduler_last_run'
 
-interface ScheduledBackup {
-  id: string
-  schedule: BackupSchedule
-  time: string
-  enabled: boolean
-  lastRun?: string
-  nextRun?: string
-  config: BackupConfig
-}
-
-interface SchedulerConfig {
-  schedule: BackupSchedule
-  time: string
-  enabled: boolean
-  config: BackupConfig
-}
-
-type BackupNotification = {
-  type: 'success' | 'error' | 'warning'
-  message: string
-  backupId?: string
-  timestamp: string
-}
-
-type BackupNotificationCallback = (notification: BackupNotification) => void
-
-class BackupScheduler {
+class BackupScheduler implements IBackupScheduler {
   private static instance: BackupScheduler
 
   private intervalId: NodeJS.Timeout | null = null
@@ -89,7 +67,7 @@ class BackupScheduler {
 
       const nextRun = this.calculateNextRun(schedule, time)
 
-      const scheduledBackup: ScheduledBackup = {
+      const scheduledBackup: BackupSchedulerConfig = {
         id: this.generateSchedulerId(),
         schedule,
         time,
@@ -134,17 +112,17 @@ class BackupScheduler {
     }
   }
 
-  onNotification(callback: BackupNotificationCallback): void {
+  onNotification(callback: BackupSchedulerNotificationCallback): void {
     this.notificationCallbacks.push(callback)
   }
 
-  offNotification(callback: BackupNotificationCallback): void {
+  offNotification(callback: BackupSchedulerNotificationCallback): void {
     this.notificationCallbacks = this.notificationCallbacks.filter(
       (cb) => cb !== callback,
     )
   }
 
-  getScheduledBackup(): ScheduledBackup | null {
+  getScheduledBackup(): BackupSchedulerConfig | null {
     try {
       if (typeof window === 'undefined') {
         return null
@@ -181,7 +159,7 @@ class BackupScheduler {
   }
 
   private async startScheduler(
-    scheduledBackup: ScheduledBackup,
+    scheduledBackup: BackupSchedulerConfig,
   ): Promise<void> {
     try {
       if (this.intervalId) {
@@ -215,7 +193,7 @@ class BackupScheduler {
   }
 
   private async checkAndRunBackup(
-    scheduledBackup: ScheduledBackup,
+    scheduledBackup: BackupSchedulerConfig,
   ): Promise<void> {
     try {
       const now = new Date()
@@ -247,7 +225,7 @@ class BackupScheduler {
   }
 
   private async runBackup(
-    scheduledBackup: ScheduledBackup,
+    scheduledBackup: BackupSchedulerConfig,
   ): Promise<void> {
     try {
       const lastFullBackup = await this.getLastFullBackup()
@@ -465,7 +443,7 @@ class BackupScheduler {
     return `scheduler-${timestamp}-${random}`
   }
 
-  private notify(notification: BackupNotification): void {
+  private notify(notification: BackupSchedulerNotification): void {
     this.notificationCallbacks.forEach((callback) => {
       try {
         callback(notification)
@@ -479,6 +457,13 @@ class BackupScheduler {
 const backupScheduler = BackupScheduler.getInstance()
 
 export default backupScheduler
+export { BackupScheduler }
+export type {
+  BackupSchedulerConfig,
+  BackupSchedulerNotification,
+  BackupSchedulerNotificationCallback,
+  IBackupScheduler,
+} from '@/types/backup'
 
 export const scheduleBackup = backupScheduler.scheduleBackup.bind(backupScheduler)
 export const cancelScheduledBackup = backupScheduler.cancelScheduledBackup.bind(backupScheduler)
