@@ -1,4 +1,26 @@
+import type { APMTransaction, APMError, APMUser, APMPerformanceMetrics } from '@/utils/apm/types';
+
 export type APMProviderType = 'console' | 'sentry' | 'none';
+
+export interface IAPMManager {
+  configure(config: Partial<APMConfig>): void;
+  captureError(error: APMError): void;
+  captureException(error: Error): void;
+  startTransaction(name: string, op?: string): APMTransaction | undefined;
+  finishTransaction(transaction: APMTransaction): void;
+  setUser(user: APMUser): void;
+  setTag(key: string, value: string): void;
+  setContext(key: string, context: Record<string, unknown>): void;
+  addBreadcrumb(message: string, category?: string, level?: 'info' | 'warning' | 'error'): void;
+  trackPerformance(metric: APMPerformanceMetrics): void;
+  flush(): Promise<void>;
+  isEnabled(): boolean;
+  getProviderType(): APMProviderType;
+  getConfig(): APMConfig;
+  getFailureStats(): { consecutiveFailures: number; lastFailureTime: number };
+  resetFailures(): void;
+  restoreOriginalProvider(): void;
+}
 
 export interface APMConfig {
   provider: APMProviderType;

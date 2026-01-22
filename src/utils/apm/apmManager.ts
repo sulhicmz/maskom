@@ -1,7 +1,8 @@
-import type { IAPMProvider, APMTransaction, APMError, APMUser, APMPerformanceMetrics, APMConfig, APMProviderType } from './types';
+import type { IAPMProvider, APMTransaction, APMError, APMUser, APMPerformanceMetrics } from './types';
+import type { APMConfig, APMProviderType, IAPMManager } from '@/types/apm';
 import { ConsoleAPMProvider } from './consoleProvider';
 
-class APMManager {
+class APMManager implements IAPMManager {
   private provider: IAPMProvider;
   private providerType: APMProviderType;
   private config: APMConfig;
@@ -220,5 +221,6 @@ class APMManager {
   }
 }
 
+export { APMManager };
 export const apmManager = new APMManager();
 export default apmManager;
