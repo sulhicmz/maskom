@@ -4,7 +4,7 @@ export type ABTestType = 'headline' | 'content' | 'layout' | 'image';
 
 export type ABTestStatus = 'draft' | 'running' | 'completed' | 'paused';
 
-export type ABTestSuccessMetric = 'views' | 'clicks' | 'engagement' | 'timeOnPage';
+export type ABTestSuccessMetric = 'views' | 'clicks' | 'engagement' | 'timeOnPage' | 'conversions';
 
 export interface ABTestVariant {
   id: string;
@@ -60,4 +60,35 @@ export interface ABTestStats {
   averageDuration: number;
   totalVariants: number;
   winnersDeclared: number;
+}
+
+export interface IAbTestEngine {
+  loadTests(): void;
+  saveTests(): void;
+  loadUserAssignments(): void;
+  saveUserAssignments(): void;
+  createTest(test: Omit<ABTest, 'id' | 'createdAt'>): ABTest;
+  startTest(testId: string): boolean;
+  pauseTest(testId: string): boolean;
+  completeTest(testId: string): boolean;
+  deleteTest(testId: string): boolean;
+  getTest(testId: string): ABTest | undefined;
+  getAllTests(): ABTest[];
+  getTestsByPostId(postId: number): ABTest[];
+  getTestsByStatus(status: ABTestStatus): ABTest[];
+  assignVariant(testId: string): ABTestVariant | null;
+  trackMetric(testId: string, variantId: string, metric: keyof ABTestVariant['metrics']): void;
+  trackViews(testId: string, variantId: string, count?: number): void;
+  trackClicks(testId: string, variantId: string, count?: number): void;
+  trackEngagement(testId: string, variantId: string, score: number): void;
+  calculateWinner(test: ABTest): ABTestResult | null;
+  getStatistics(): {
+    totalTests: number;
+    runningTests: number;
+    completedTests: number;
+    averageDuration: number;
+  };
+  getTestsRequiringAttention(): ABTest[];
+  clearUserAssignments(): void;
+  resetAll(): void;
 }

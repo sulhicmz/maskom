@@ -1,9 +1,9 @@
-import { ABTest, ABTestVariant, ABTestResult, ABTestStatus, ABTestSuccessMetric } from '@/types/abTest';
+import { ABTest, ABTestVariant, ABTestResult, ABTestStatus, ABTestSuccessMetric, IAbTestEngine } from '@/types/abTest';
 
 const STORAGE_KEY = 'ab_tests';
 const USER_ASSIGNMENT_KEY = 'ab_test_assignments';
 
-export class ABTestEngine {
+export class ABTestEngine implements IAbTestEngine {
   private tests: Map<string, ABTest> = new Map();
   private userAssignments: Map<string, string> = new Map();
 
@@ -427,3 +427,4 @@ export class ABTestEngine {
 }
 
 export const abTestEngine = new ABTestEngine();
+export type { IAbTestEngine } from '@/types/abTest';
