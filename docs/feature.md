@@ -3092,3 +3092,246 @@ As a Content Creator, I want to publish content across multiple platforms (websi
 ---
 
 **Last Updated**: 2026-01-21
+---
+
+## [FEATURE-077] Automated Test Coverage & Health Reporting
+
+**Status**: Pending
+**Priority**: P2
+**Type**: QA/Maintenance
+
+### User Story
+
+As a Quality Assurance Engineer, I want automated test coverage and health reports, so that I can identify skipped tests, coverage gaps, and test suite health trends without manual inspection.
+
+### Acceptance Criteria
+
+- [ ] Create test coverage data structure (TestCoverageReport, TestSuiteHealth, CoverageGap)
+- [ ] Implement automated coverage analysis for all test suites
+- [ ] Add skipped test categorization (timeout, pending, fixture issues, dependency issues)
+- [ ] Implement test health dashboard at /qa/test-health
+- [ ] Display coverage metrics (line coverage, branch coverage, function coverage)
+- [ ] Show test health trends over time (pass rate, skip rate, failure rate)
+- [ ] Add coverage gap identification (untested functions, uncovered branches)
+- [ ] Implement automated test health reports (weekly, monthly)
+- [ ] Add test coverage trend visualization (charts/graphs)
+- [ ] Implement coverage thresholds with alerts (minimum coverage requirements)
+- [ ] Create test suite health score calculation (based on coverage, pass rate, skip rate)
+- [ ] Add coverage export (PDF, CSV for compliance)
+- [ ] Integrate with existing Skipped Test Diagnostic Dashboard (FEATURE-073)
+- [ ] Create comprehensive tests for coverage reporting utilities
+- [ ] Update docs/blueprint.md with coverage reporting architecture
+
+**Implementation Notes**:
+- Extends FEATURE-073 (Skipped Test Diagnostic Dashboard) with coverage metrics
+- Leverages existing Jest test runner infrastructure
+- Coverage data from Jest coverage reports (--coverage flag)
+- Health score calculation: (coverage × 0.4) + (pass_rate × 0.4) + (1 - skip_rate × 0.2)
+- Automated report scheduling: Weekly reports to QA team, monthly reports to management
+- Coverage thresholds: Configurable per module (e.g., utils 90%, components 80%)
+- Integration with APM for test performance tracking
+- Privacy-first: No external test tracking, all data stored locally
+- RBAC integration: QA engineers and admins only
+
+**Completion Date**: TBD
+**Related Task**: Task 397 - Automated Test Coverage & Health Reporting
+
+---
+
+## [FEATURE-078] Intelligent Code Quality Alerts
+
+**Status**: Pending
+**Priority**: P2
+**Type**: Developer Experience/Quality Assurance
+
+### User Story
+
+As a Developer, I want intelligent code quality alerts during development, so that I can catch code smells, anti-patterns, and potential bugs before they reach production.
+
+### Acceptance Criteria
+
+- [ ] Create code quality alert data structure (CodeQualityIssue, AlertRule, AlertSeverity)
+- [ ] Implement code quality scanning (lint rules, TypeScript errors, code complexity)
+- [ ] Add real-time quality alerts in VS Code/IDE (linting integration)
+- [ ] Implement quality dashboard at /admin/code-quality
+- [ ] Display code quality metrics (maintainability index, cyclomatic complexity, code duplication)
+- [ ] Show quality trends over time (improvement/degradation)
+- [ ] Add code smell detection (long functions, duplicated code, magic numbers)
+- [ ] Implement automated code quality reports (weekly, monthly)
+- [ ] Add quality score calculation (based on multiple metrics)
+- [ ] Implement quality alert rules (e.g., complexity > 10, duplication > 5%)
+- [ ] Create code quality trend visualization (charts/graphs)
+- [ ] Add quality suggestions (refactor suggestions, modernization recommendations)
+- [ ] Implement quality gate enforcement (prevent low-quality code from merging)
+- [ ] Add quality export (PDF, CSV for management reports)
+- [ ] Create comprehensive tests for quality scanning utilities
+- [ ] Update docs/blueprint.md with code quality architecture
+
+**Implementation Notes**:
+- Extends ESLint configuration with custom quality rules
+- Integrates with TypeScript compiler for type error detection
+- Code complexity calculation: Cyclomatic complexity, maintainability index
+- Code duplication detection: Copy-paste detection across codebase
+- Quality score calculation: (lint × 0.3) + (complexity × 0.3) + (duplication × 0.2) + (coverage × 0.2)
+- Real-time alerts: Webhook notifications to Slack/Microsoft Teams
+- Quality gate: Pre-commit hooks, CI/CD pipeline integration
+- Integration with Git for per-commit quality tracking
+- Integration with APM for code quality impact monitoring
+- RBAC integration: Developers can view, admins can configure rules
+- Privacy-first: No external code quality services, all analysis local
+
+**Completion Date**: TBD
+**Related Task**: Task 398 - Intelligent Code Quality Alerts
+
+---
+
+## [FEATURE-079] Real-Time Performance Monitoring Dashboard
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Performance/Analytics
+
+### User Story
+
+As a Site Administrator, I want a real-time performance monitoring dashboard, so that I can identify performance bottlenecks and UX issues as they occur and take immediate action.
+
+### Acceptance Criteria
+
+- [ ] Create real-time performance data structure (RealTimeMetrics, PerformanceAlert, PerformanceBaseline)
+- [ ] Implement real-time Web Vitals tracking (LCP, FID, CLS, INP, FCP, TTFB)
+- [ ] Add real-time performance dashboard at /admin/performance-realtime
+- [ ] Display live performance metrics with auto-refresh (every 30 seconds)
+- [ ] Show performance alerts when thresholds exceeded (LCP > 2.5s, CLS > 0.1)
+- [ ] Implement performance trend visualization (live charts/graphs)
+- [ ] Add page-level performance breakdown (slowest pages, fastest pages)
+- [ ] Implement device-level performance comparison (desktop, mobile, tablet)
+- [ ] Add user session performance tracking (per-session metrics)
+- [ ] Create performance baseline comparison (current vs historical averages)
+- [ ] Implement performance anomaly detection (sudden degradation alerts)
+- [ ] Add performance drill-down (click page to see detailed metrics)
+- [ ] Create performance export (PDF, CSV for analysis)
+- [ ] Integrate with existing Web Vitals API tracking (FEATURE-038)
+- [ ] Integrate with existing APM system (FEATURE-022)
+- [ ] Create comprehensive tests for performance monitoring utilities
+- [ ] Update docs/blueprint.md with real-time performance architecture
+
+**Implementation Notes**:
+- Extends FEATURE-038 (Real-Time Core Web Vitals Monitoring) with real-time dashboard
+- Leverages existing Web Vitals API integration
+- Real-time data collection: Web Vitals API with performance observer
+- Alert thresholds: Configurable per metric (LCP, FID, CLS, INP)
+- Live charts: Chart.js or similar for real-time visualization
+- Performance anomaly detection: Statistical analysis (z-score, moving average)
+- Baseline comparison: 7-day, 30-day, 90-day rolling averages
+- Session tracking: localStorage-based session metrics with automatic cleanup
+- Integration with APM: Push metrics to APM for correlation with errors
+- Privacy-first: Performance data anonymized (no user tracking)
+- RBAC integration: Admins and QA engineers only
+- Dark mode support via ThemeContext
+
+**Completion Date**: TBD
+**Related Task**: Task 399 - Real-Time Performance Monitoring Dashboard
+
+---
+
+## [FEATURE-080] Dependency Health & Security Scanner
+
+**Status**: Pending
+**Priority**: P1
+**Type**: Security/Maintenance
+
+### User Story
+
+As a DevOps Engineer, I want automated dependency health and security scanning, so that I can identify vulnerable, outdated, or deprecated dependencies before they cause production issues.
+
+### Acceptance Criteria
+
+- [ ] Create dependency health data structure (DependencyHealth, SecurityVulnerability, DependencyUpdate)
+- [ ] Implement automated dependency scanning (npm audit, npm outdated)
+- [ ] Add security vulnerability detection (CVEs, severity levels)
+- [ ] Implement dependency health dashboard at /admin/dependencies
+- [ ] Display dependency health metrics (vulnerable count, outdated count, deprecated count)
+- [ ] Show security vulnerabilities by severity (critical, high, moderate, low)
+- [ ] Add dependency update recommendations (major, minor, patch updates)
+- [ ] Implement automated security scanning (daily, weekly, manual trigger)
+- [ ] Create security vulnerability reports (PDF, CSV for compliance)
+- [ ] Add dependency health trend visualization (vulnerability count over time)
+- [ ] Implement automated dependency update testing (test before merge)
+- [ ] Add dependency remediation suggestions (upgrade commands, replacement packages)
+- [ ] Create dependency health alerts (email, APM, dashboard notifications)
+- [ ] Implement dependency lifecycle tracking (age, last updated, maintenance status)
+- [ ] Add dependency license compliance checking (MIT, Apache, GPL licenses)
+- [ ] Integrate with existing Node.js Compatibility Verification (FEATURE-074)
+- [ ] Create comprehensive tests for dependency scanning utilities
+- [ ] Update docs/blueprint.md with dependency health architecture
+
+**Implementation Notes**:
+- Extends FEATURE-074 (Node.js Compatibility Verification Tool) with security scanning
+- Integrates with FEATURE-075 (Automated Dependency Update Management) for remediation
+- Security scanning: npm audit, npm outdated, GitHub Security Advisory API (if available)
+- Vulnerability severity: CVE scoring, CVSS score calculation
+- Dependency health score: (vulnerability_count × 0.4) + (outdated_count × 0.3) + (deprecated_count × 0.2) + (license_issues × 0.1)
+- Automated scanning: Daily scans for critical/high vulnerabilities, weekly full scans
+- Update testing: Automated PRs with dependency updates, run test suite
+- Remediation suggestions: npm update commands, alternative package recommendations
+- License compliance: SPDX license identifier checking, policy enforcement
+- Integration with APM: Vulnerability events pushed to APM for alerting
+- Privacy-first: No external dependency tracking, all scanning local
+- RBAC integration: DevOps engineers and admins only
+- Indonesian UI text for accessibility
+
+**Completion Date**: TBD
+**Related Task**: Task 400 - Dependency Health & Security Scanner
+
+---
+
+## [FEATURE-081] Developer Onboarding Assistant
+
+**Status**: Pending
+**Priority**: P3
+**Type**: Developer Experience/Documentation
+
+### User Story
+
+As a New Developer, I want an interactive developer onboarding assistant, so that I can quickly understand codebase structure, setup process, and development workflows without extensive manual reading.
+
+### Acceptance Criteria
+
+- [ ] Create onboarding assistant data structure (OnboardingStep, DeveloperProfile, OnboardingProgress)
+- [ ] Implement interactive onboarding flow (step-by-step guidance)
+- [ ] Add codebase structure explorer (visual component tree, file navigation)
+- [ ] Create setup checklist with verification (Node.js version, dependencies, environment variables)
+- [ ] Implement code pattern examples (common patterns with live code snippets)
+- [ ] Add development workflow tutorials (creating components, adding features, running tests)
+- [ ] Create onboarding dashboard at /onboarding
+- [ ] Display onboarding progress tracking (completed steps, remaining steps)
+- [ ] Add interactive code explorer (hover components to see relationships)
+- [ ] Implement quick reference guides (API reference, component catalog, utility functions)
+- [ ] Add environment verification tool (check Node.js, npm, dependencies)
+- [ ] Create troubleshooting assistant (common issues with solutions)
+- [ ] Implement onboarding completion certificate
+- [ ] Add personalized recommendations based on developer role (frontend, backend, fullstack)
+- [ ] Integrate with existing documentation (AGENTS.md, blueprint.md, README.md)
+- [ ] Create comprehensive tests for onboarding utilities
+- [ ] Update docs/blueprint.md with onboarding architecture
+
+**Implementation Notes**:
+- Leverages existing documentation: AGENTS.md, blueprint.md, README.md, testing-guide.md
+- Visual code explorer: Interactive tree view with search and filtering
+- Setup checklist: Automated verification of Node.js version, npm install status, environment variables
+- Code pattern examples: Extracted from existing well-structured code
+- Interactive tutorials: Live code editing environment (monaco-editor or similar)
+- Progress tracking: localStorage-based with export/import functionality
+- Troubleshooting assistant: FAQ system with common issues and solutions
+- Personalized recommendations: Role-based learning paths (frontend: React/Next.js, backend: API/Database, fullstack: all)
+- Integration with existing code examples from docs/
+- Dark mode support via ThemeContext
+- Responsive design for mobile/tablet learning
+- Privacy-first: No developer data tracking, all progress stored locally
+
+**Completion Date**: TBD
+**Related Task**: Task 401 - Developer Onboarding Assistant
+
+---
+
+**Last Updated**: 2026-01-22
