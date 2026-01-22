@@ -99,12 +99,10 @@ export class ABTestEngine implements IAbTestEngine {
     }
     test.status = 'completed';
     test.completedAt = new Date().toISOString();
-    
+
     const result = this.calculateWinner(test);
-    if (result) {
-      test.winner = result;
-    }
-    
+    test.winner = result || null;
+
     this.saveTests();
     return true;
   }
@@ -194,11 +192,11 @@ export class ABTestEngine implements IAbTestEngine {
     this.saveTests();
   }
 
-  trackViews(testId: string, variantId: string, count: number = 1): void {
+  trackViews(testId: string, variantId: string): void {
     this.trackMetric(testId, variantId, 'views');
   }
 
-  trackClicks(testId: string, variantId: string, count: number = 1): void {
+  trackClicks(testId: string, variantId: string): void {
     this.trackMetric(testId, variantId, 'clicks');
   }
 
@@ -222,15 +220,6 @@ export class ABTestEngine implements IAbTestEngine {
       return null;
     }
 
-    const metricMap = {
-      views: 0,
-      clicks: 1,
-      engagement: 2,
-      timeOnPage: 3,
-      conversions: 4
-    };
-
-    const metricIndex = metricMap[test.successMetric];
     const sortedVariants = [...test.variants].sort((a, b) => {
       const aScore = this.calculateVariantScore(a, test.successMetric);
       const bScore = this.calculateVariantScore(b, test.successMetric);
@@ -338,7 +327,12 @@ export class ABTestEngine implements IAbTestEngine {
       return { lower: value, upper: value };
     }
 
-    const z = 1.96;
+    const zScores: { [key: number]: number } = {
+      0.90: 1.645,
+      0.95: 1.96,
+      0.99: 2.576
+    };
+    const z = zScores[confidenceLevel] || 1.96;
     const standardError = Math.sqrt((value * (1 - (value / n))) / n);
     const margin = z * standardError;
 

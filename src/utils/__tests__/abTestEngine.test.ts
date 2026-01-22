@@ -1,5 +1,4 @@
-import { abTestEngine } from '@/abTestEngine';
-import { ABTest, ABTestVariant, ABTestStatus, ABTestSuccessMetric } from '@/types/abTest';
+import { abTestEngine } from '@/utils/abTestEngine';
 
 describe('ABTestEngine', () => {
   beforeEach(() => {

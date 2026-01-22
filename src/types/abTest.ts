@@ -34,7 +34,7 @@ export interface ABTest {
   trafficSplit: number;
   successMetric: ABTestSuccessMetric;
   variants: ABTestVariant[];
-  winner?: ABTestResult;
+  winner: ABTestResult | null;
   minSampleSize: number;
   confidenceLevel: number;
 }

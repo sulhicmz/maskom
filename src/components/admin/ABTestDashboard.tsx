@@ -7,8 +7,6 @@ import { useRouter } from 'next/navigation'
 import { abTestEngine } from '@/utils/abTestEngine'
 import { ABTest, ABTestStatus, ABTestSuccessMetric, ABTestType } from '@/types/abTest'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { Permission } from '@/types/permission'
-import ProtectedRoute from '@/components/common/ProtectedRoute'
 
 interface TestFormData {
   postId: number
@@ -41,7 +39,7 @@ const ABTestDashboard: React.FC = () => {
     headline1: '',
     headline2: ''
   })
-  const [selectedTest, setSelectedTest] = useState<ABTest | null>(null)
+  const [selectedTest] = useState<ABTest | null>(null)
 
   useEffect(() => {
     setIsClient(true)
@@ -321,9 +319,9 @@ const ABTestDashboard: React.FC = () => {
                                 </button>
                               )}
                               {test.status === 'completed' && test.winner && (
-                                <button 
+                                <button
                                   className="btn btn-sm btn-success me-1"
-                                  onClick={() => handleApplyWinner(test.id, test.winner.winnerId)}
+                                  onClick={() => handleApplyWinner(test.id, test.winner!.winnerId)}
                                 >
                                   Terapkan Pemenang
                                 </button>
