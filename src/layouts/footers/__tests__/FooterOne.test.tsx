@@ -158,7 +158,7 @@ describe('FooterOne', () => {
 
     if (externalLinks.length > 0) {
       externalLinks.forEach(link => {
-        expect(link).toHaveAttribute('rel', 'noreferrer');
+        expect(link.getAttribute('rel')).toContain('noreferrer');
       });
     }
   });

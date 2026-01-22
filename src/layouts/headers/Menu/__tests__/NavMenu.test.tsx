@@ -29,7 +29,8 @@ describe("NavMenu Component", () => {
       ];
 
       menuItems.forEach((item) => {
-        expect(screen.getByText(item)).toBeInTheDocument();
+        const menuLinks = screen.getAllByText(item);
+        expect(menuLinks.length).toBeGreaterThan(0);
       });
     });
 
@@ -60,7 +61,10 @@ describe("NavMenu Component", () => {
 
       render(<NavMenu />);
 
-      const contactLink = screen.getByText("Kontak").closest("a");
+      const contactLinks = screen.getAllByText("Kontak");
+      const contactLink = contactLinks
+        .map(link => link.closest("a"))
+        .find(anchor => anchor?.getAttribute("href") === "/contact");
       expect(contactLink).toHaveClass("active");
     });
 
@@ -176,7 +180,10 @@ describe("NavMenu Component", () => {
 
       render(<NavMenu />);
 
-      const contactLink = screen.getByText("Kontak").closest("a");
+      const contactLinks = screen.getAllByText("Kontak");
+      const contactLink = contactLinks
+        .map(link => link.closest("a"))
+        .find(anchor => anchor?.getAttribute("href") === "/contact");
       expect(contactLink).not.toHaveClass("active");
     });
 
@@ -186,7 +193,8 @@ describe("NavMenu Component", () => {
       render(<NavMenu />);
 
       expect(screen.getByText("Beranda")).toBeInTheDocument();
-      expect(screen.getByText("Kontak")).toBeInTheDocument();
+      const contactLinks = screen.getAllByText("Kontak");
+      expect(contactLinks.length).toBeGreaterThan(0);
     });
   });
 });

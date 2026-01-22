@@ -19,8 +19,7 @@ export interface MigrationResult {
   error?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface MigrationOptions<T = unknown> {
+export interface MigrationOptions {
   storageKey: string;
   currentVersion: string;
   migrations: Migration[];
@@ -35,7 +34,7 @@ export class StorageMigration<T = unknown> {
   private migrations: Map<string, Migration>;
   private logMigrations: boolean;
 
-  constructor(options: MigrationOptions<T>) {
+  constructor(options: MigrationOptions) {
     this.storageKey = options.storageKey;
     this.currentVersion = options.currentVersion;
     this.migrations = new Map();
@@ -50,7 +49,7 @@ export class StorageMigration<T = unknown> {
     const history = this.loadHistory();
     const entry = history.find(h => h.storageKey === this.storageKey);
     const lastMigratedVersion = entry?.migrations?.[entry.migrations.length - 1] || '0.0.0';
-    const dataVersion = data !== null && typeof data === 'object' && 'version' in data ? this.normalizeVersion((data as Record<string, unknown>).version as string | number) : undefined;
+    const dataVersion = typeof data === 'object' && 'version' in data ? this.normalizeVersion((data as Record<string, unknown>).version) : undefined;
     
     if (this.compareVersions(lastMigratedVersion, this.currentVersion) === 0) {
       return {
@@ -310,6 +309,6 @@ export class StorageMigration<T = unknown> {
   }
 }
 
-export function createMigration<T>(options: MigrationOptions<T>): StorageMigration<T> {
+export function createMigration<T>(options: MigrationOptions): StorageMigration<T> {
   return new StorageMigration(options);
 }

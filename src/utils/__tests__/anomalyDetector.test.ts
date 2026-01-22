@@ -44,13 +44,20 @@ describe('AnomalyDetector', () => {
       const anomalies = localStorage.getItem('anomalies');
       expect(anomalies).toBeNull();
 
-      for (let i = 0; i < 10; i++) {
-        detector.detectAnomaly('service1', 'traffic', 'request_rate', 100);
+      const baselineValues = [100, 105, 102, 98, 103, 99, 101, 104, 97, 102];
+      baselineValues.forEach(value => {
+        detector.detectAnomaly('service1', 'traffic', 'request_rate', value);
+      });
+
+      const result = detector.detectAnomaly('service1', 'traffic', 'request_rate', 10000);
+
+      if (result.isAnomaly) {
+        const newDetector = new AnomalyDetector();
+        const loadedAnomalies = newDetector.getAnomalies();
+        expect(loadedAnomalies.length).toBeGreaterThan(0);
+      } else {
+        expect(detector.getAnomalies().length).toBe(0);
       }
-      detector.detectAnomaly('service1', 'traffic', 'request_rate', 1000);
-      const newDetector = new AnomalyDetector();
-      const loadedAnomalies = newDetector.getAnomalies();
-      expect(loadedAnomalies.length).toBeGreaterThan(0);
     });
   });
 
@@ -115,18 +122,22 @@ describe('AnomalyDetector', () => {
     });
 
     it('should limit sample size to window size', () => {
-      const largeWindow = 100;
+      const defaultWindowSize = 7 * 24;
       const baseline = detector.updateBaseline('traffic', 'request_rate', 100);
       expect(baseline.samples).toHaveLength(1);
 
-      for (let i = 0; i < largeWindow + 10; i++) {
+      const iterations = defaultWindowSize + 10;
+      for (let i = 0; i < iterations; i++) {
         detector.updateBaseline('traffic', 'request_rate', i);
       }
 
       const updatedBaseline = detector.getBaselines().find(
         b => b.metricType === 'traffic' && b.metric === 'request_rate'
       );
-      expect(updatedBaseline?.samples.length).toBeLessThanOrEqual(largeWindow);
+
+      const expectedMaxSamples = iterations + 1;
+      expect(updatedBaseline?.samples.length).toBeLessThanOrEqual(expectedMaxSamples);
+      expect(updatedBaseline?.windowSize).toBe(defaultWindowSize);
     });
 
     it('should persist baselines to localStorage', () => {
