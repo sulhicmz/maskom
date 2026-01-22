@@ -2,6 +2,8 @@ import '@testing-library/jest-dom';
 
 import './src/test-utils/customMatchers';
 
+localStorage.clear();
+
 global.TextEncoder = class TextEncoder {
   encode(input) {
     const str = typeof input === 'string' ? input : String(input);

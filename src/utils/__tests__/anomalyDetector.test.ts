@@ -6,8 +6,8 @@ describe('AnomalyDetector', () => {
   let detector: AnomalyDetector;
 
   beforeEach(() => {
-    detector = new AnomalyDetector();
     localStorage.clear();
+    detector = new AnomalyDetector();
   });
 
   afterEach(() => {
@@ -44,6 +44,9 @@ describe('AnomalyDetector', () => {
       const anomalies = localStorage.getItem('anomalies');
       expect(anomalies).toBeNull();
 
+      for (let i = 0; i < 10; i++) {
+        detector.detectAnomaly('service1', 'traffic', 'request_rate', 100);
+      }
       detector.detectAnomaly('service1', 'traffic', 'request_rate', 1000);
       const newDetector = new AnomalyDetector();
       const loadedAnomalies = newDetector.getAnomalies();
@@ -359,7 +362,7 @@ describe('AnomalyDetector', () => {
   describe('Statistics', () => {
     beforeEach(() => {
       for (let i = 0; i < 20; i++) {
-        detector.detectAnomaly('service1', 'traffic', 'request_rate', 100);
+        detector.detectAnomaly('service1', 'traffic', 'request_rate', 95 + Math.random() * 10);
       }
       detector.detectAnomaly('service1', 'traffic', 'request_rate', 500);
       detector.detectAnomaly('service1', 'error', 'error_rate', 0.5);

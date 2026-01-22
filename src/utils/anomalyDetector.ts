@@ -147,7 +147,11 @@ class AnomalyDetector implements IAnomalyDetector {
       const stored = localStorage.getItem(STORAGE_KEYS.ANOMALIES);
       if (stored) {
         const anomalies: Anomaly[] = JSON.parse(stored);
-        anomalies.forEach(anomaly => this.anomalies.set(anomaly.id, anomaly));
+        anomalies.forEach(anomaly => {
+          if (anomaly && anomaly.id) {
+            this.anomalies.set(anomaly.id, anomaly);
+          }
+        });
       }
     } catch (error) {
       console.error('Failed to load anomalies:', error);
@@ -478,6 +482,10 @@ class AnomalyDetector implements IAnomalyDetector {
 
   async sendAlert(anomaly: Anomaly, channels: AlertChannel[]): Promise<AnomalyAlert[]> {
     const alerts: AnomalyAlert[] = [];
+
+    if (!anomaly || !anomaly.id) {
+      return alerts;
+    }
 
     for (const channel of channels) {
       const alert: AnomalyAlert = {
