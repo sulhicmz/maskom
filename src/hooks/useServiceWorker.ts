@@ -32,8 +32,7 @@ export function useServiceWorker() {
       const reg = await navigator.serviceWorker.register('/sw.js');
       setRegistration(reg);
       setStatus('activated');
-      console.log('[Service Worker] Registered successfully:', reg.scope);
-
+      
       reg.addEventListener('updatefound', handleUpdateFound);
 
       if (reg.waiting) {

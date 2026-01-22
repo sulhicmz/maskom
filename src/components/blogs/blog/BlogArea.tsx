@@ -130,9 +130,7 @@ const BlogArea = React.memo(() => {
                                 />
                                 <SavePresetButton
                                   filterCriteria={filterCriteria}
-                                  onPresetSaved={(presetName) => {
-                                    console.log(`Preset "${presetName}" saved`);
-                                  }}
+                                  onPresetSaved={() => {}}
                                   buttonClassName="save-preset-btn"
                                 />
                                 <ExportButton

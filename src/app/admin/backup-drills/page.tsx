@@ -19,15 +19,13 @@ export default function AdminBackupDrillsPage() {
   const [selectedDrillId, setSelectedDrillId] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const handleRunDrill = (drillId: string, backupId: string) => {
-    console.log('Running drill:', drillId, 'on backup:', backupId)
+  const handleRunDrill = (drillId: string) => {
     alert(`Menjalankan latihan ulang untuk drill ${drillId}`)
     setRefreshKey(prev => prev + 1)
   }
 
   const handleCancelDrill = (drillId: string) => {
     if (confirm('Apakah Anda yakin ingin membatalkan latihan ini?')) {
-      console.log('Cancelling drill:', drillId)
       alert(`Latihan ${drillId} telah dibatalkan`)
       setRefreshKey(prev => prev + 1)
     }
