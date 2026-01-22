@@ -2,13 +2,11 @@ import {
   BackupDrill,
   DrillType,
   DrillStatus,
-  DrillResults,
   DrillConfig,
   DrillStatistics,
   DrillFilters,
   DrillScheduleDetails,
   DrillSchedule,
-  DrillProgress,
   DrillProgressCallback,
   DrillExecutionContext,
   IDrillEngine
