@@ -40,6 +40,9 @@ export * from './apm';
 // SEO types (SeoProps, BlogPostSchema, etc.)
 export * from './seo';
 
+// SEO Monitoring types (SEOAudit, SEOMetrics, SEOIssue, etc.)
+export * from './seoMonitor';
+
 // Backup types (BackupConfig, BackupMetadata, DisasterRecoveryPlan, etc.)
 export * from './backup';
 
