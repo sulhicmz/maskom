@@ -4,31 +4,19 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { Permission } from '@/types/permission';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import type {
   SEOIssue,
   SEOAudit,
   SEOIssueSeverity,
   SEOIssueCategory,
   SEOIssueStatus,
-  SEOMetrics,
-  SEOScoreTrend,
-  KeywordRanking,
-  OrganicTrafficMetrics,
   SEORecommendation,
 } from '@/types/seoMonitor';
 import {
   runSEOAudit,
-  loadSEOAuditHistory,
   loadCurrentSEOAudit,
   updateSEOIssueStatus,
-  generateSEOScoreTrend,
-  generateSEOReport,
-  generateKeywordRankings,
-  generateOrganicTrafficMetrics,
   generateSEORecommendations,
-  getSEOConfig,
-  saveSEOConfig,
   clearSEOAuditData,
 } from '@/utils/seoMonitor';
 
@@ -79,7 +67,6 @@ const formatDateTime = (isoString: string): string => {
 
 const SEOMonitoringDashboard: React.FC = () => {
   const { theme } = useTheme();
-  const [audits, setAudits] = useState<SEOAudit[]>([]);
   const [currentAudit, setCurrentAudit] = useState<SEOAudit | null>(null);
   const [loading, setLoading] = useState(true);
   const [runningAudit, setRunningAudit] = useState(false);
@@ -88,22 +75,8 @@ const SEOMonitoringDashboard: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<SEOIssueStatus | ''>('');
   const [selectedIssue, setSelectedIssue] = useState<SEOIssue | null>(null);
   const [showIssueDetail, setShowIssueDetail] = useState(false);
-  const [scoreTrend, setScoreTrend] = useState<SEOScoreTrend[]>([]);
-  const [keywordRankings, setKeywordRankings] = useState<KeywordRanking[]>([]);
-  const [organicTraffic, setOrganicTraffic] = useState<OrganicTrafficMetrics[]>([]);
   const [recommendations, setRecommendations] = useState<SEORecommendation[]>([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
-
-  const loadAuditHistory = useCallback(() => {
-    try {
-      const stored = loadSEOAuditHistory();
-      if (stored) {
-        setAudits(stored);
-      }
-    } catch (error) {
-      console.error('Error loading audit history:', error);
-    }
-  }, []);
 
   const loadCurrentAudit = useCallback(() => {
     try {
@@ -118,16 +91,10 @@ const SEOMonitoringDashboard: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    loadAuditHistory();
     loadCurrentAudit();
 
-    // Load trend data
-    setScoreTrend(generateSEOScoreTrend(30));
-    setKeywordRankings(generateKeywordRankings());
-    setOrganicTraffic(generateOrganicTrafficMetrics(30));
-
     setLoading(false);
-  }, [loadAuditHistory, loadCurrentAudit]);
+  }, [loadCurrentAudit]);
 
   const handleRunAudit = useCallback(async () => {
     setRunningAudit(true);
@@ -138,17 +105,13 @@ const SEOMonitoringDashboard: React.FC = () => {
       const pages = ['/', '/about', '/blog', '/contact', '/pricing'];
       const audit = runSEOAudit(pages);
       setCurrentAudit(audit);
-      loadAuditHistory();
-
-      // Refresh data
-      setScoreTrend(generateSEOScoreTrend(30));
       setRecommendations(generateSEORecommendations(audit));
     } catch (error) {
       console.error('Error running SEO audit:', error);
     } finally {
       setRunningAudit(false);
     }
-  }, [loadAuditHistory]);
+  }, []);
 
   const handleUpdateIssueStatus = useCallback((issueId: string, status: SEOIssueStatus) => {
     const success = updateSEOIssueStatus(issueId, status);
@@ -160,12 +123,10 @@ const SEOMonitoringDashboard: React.FC = () => {
   const handleClearData = useCallback(() => {
     if (confirm('Apakah Anda yakin ingin menghapus semua data audit SEO?')) {
       clearSEOAuditData();
-      setAudits([]);
       setCurrentAudit(null);
-      loadAuditHistory();
       loadCurrentAudit();
     }
-  }, [loadAuditHistory, loadCurrentAudit]);
+  }, [loadCurrentAudit]);
 
   const filteredIssues = currentAudit?.issues.filter(issue => {
     if (filterSeverity && issue.severity !== filterSeverity) return false;
@@ -178,8 +139,10 @@ const SEOMonitoringDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container py-5">
-        <LoadingSpinner />
+      <div className="container py-5 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Memuat...</span>
+        </div>
       </div>
     );
   }
@@ -211,8 +174,8 @@ const SEOMonitoringDashboard: React.FC = () => {
               >
                 {runningAudit ? (
                   <>
-                    <LoadingSpinner size="sm" />
-                    <span className="ms-2">Menjalankan Audit...</span>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Menjalankan Audit...</span>
                   </>
                 ) : (
                   <>
