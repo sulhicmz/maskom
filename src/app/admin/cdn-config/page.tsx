@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { CDNConfig } from '@/types/cdn';
 import CDNConfigForm from '@/components/admin/CDNConfigForm';
 import CDNHealthIndicator from '@/components/admin/CDNHealthIndicator';
 
@@ -16,8 +15,7 @@ export default function CDNConfigPage() {
     redirect('/login');
   }
 
-  const handleSave = (config: CDNConfig) => {
-    console.log('CDN configuration saved:', config);
+  const handleSave = () => {
   };
 
   return (

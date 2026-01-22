@@ -77,3 +77,24 @@ export interface CollaborativeEvent {
 }
 
 export type CollaborationEventType = CollaborativeEvent['type']
+
+export interface ISessionManager {
+  createSession(postId: number, initialContent: DraftContent, creatorId: number, creatorName: string): string
+  getSession(sessionId: string): CollaborativeSession | undefined
+  getSessionByPostId(postId: number): CollaborativeSession | undefined
+  updateSessionContent(sessionId: string, content: DraftContent): boolean
+  addEditor(sessionId: string, userId: number, username: string): boolean
+  removeEditor(sessionId: string, userId: number): boolean
+  updateEditorCursor(
+    sessionId: string,
+    userId: number,
+    cursorPosition: CursorPosition,
+    selection?: { start: CursorPosition; end: CursorPosition }
+  ): boolean
+  getActiveEditors(sessionId: string): ActiveEditor[]
+  getEditor(sessionId: string, userId: number): ActiveEditor | undefined
+  closeSession(sessionId: string): boolean
+  getActiveSessions(): CollaborativeSession[]
+  getSessionCount(): number
+  getTotalEditorCount(): number
+}

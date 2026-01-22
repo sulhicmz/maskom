@@ -1,7 +1,7 @@
-import { BackupDrill, DrillConfig, DrillScheduleDetails, DEFAULT_DRILL_CONFIG } from '@/types/drill'
+import { BackupDrill, DrillConfig, DrillScheduleDetails, DEFAULT_DRILL_CONFIG, IDrillStorage } from '@/types/drill'
 import { DRILL_STORAGE_KEY, DRILL_DATA_KEY, DRILL_SCHEDULE_KEY } from '@/types/drill'
 
-class DrillStorage {
+class DrillStorage implements IDrillStorage {
   private static instance: DrillStorage
 
   private constructor() {}
@@ -102,4 +102,5 @@ class DrillStorage {
   }
 }
 
+export { DrillStorage, type IDrillStorage }
 export default DrillStorage

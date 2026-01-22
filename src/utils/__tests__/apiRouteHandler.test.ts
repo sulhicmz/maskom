@@ -449,7 +449,7 @@ describe('apiRouteHandler', () => {
                     operationName: 'TestService.failureReset',
                     handler: mockHandler
                 });
-            } catch (_) { // eslint-disable-line @typescript-eslint/no-unused-vars
+            } catch (_) {
                 // Expected failures
             }
 

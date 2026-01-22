@@ -79,22 +79,26 @@ describe('AboutArea', () => {
     });
 
     it('should set correct alt text on about images', () => {
-      render(<AboutArea />);
-      
-      const aboutImages = screen.getAllByAltText('about image', { exact: true });
-      expect(aboutImages.length).toBeGreaterThanOrEqual(3);
+      const { container } = render(<AboutArea />);
+
+      const images = container.querySelectorAll('img[data-testid="next-image"]');
+      const descriptiveImages = Array.from(images).filter(img => {
+        const alt = (img as HTMLElement).getAttribute('alt');
+        return alt && alt.trim().length > 10;
+      });
+      expect(descriptiveImages.length).toBeGreaterThanOrEqual(3);
     });
 
     it('should set correct alt text on author image', () => {
       render(<AboutArea />);
-      
-      expect(screen.getByAltText('Author image')).toBeInTheDocument();
+
+      expect(screen.getByAltText('Foto profil tim Maskom Network')).toBeInTheDocument();
     });
 
     it('should set correct alt text on signature', () => {
       render(<AboutArea />);
-      
-      expect(screen.getByAltText('author sign')).toBeInTheDocument();
+
+      expect(screen.getByAltText('Tanda tangan resmi Tim Maskom Network')).toBeInTheDocument();
     });
   });
 
@@ -224,13 +228,13 @@ describe('AboutArea', () => {
 
   describe('Accessibility', () => {
     it('should have descriptive alt text for all images', () => {
-      render(<AboutArea />);
-      
-      const aboutImages = screen.getAllByAltText('about image');
-      expect(aboutImages).toHaveLength(3);
-      
-      expect(screen.getByAltText('Author image')).toBeInTheDocument();
-      expect(screen.getByAltText('author sign')).toBeInTheDocument();
+      const { container } = render(<AboutArea />);
+
+      const images = container.querySelectorAll('img[data-testid="next-image"]');
+      expect(images).toHaveLength(5);
+
+      expect(screen.getByAltText('Foto profil tim Maskom Network')).toBeInTheDocument();
+      expect(screen.getByAltText('Tanda tangan resmi Tim Maskom Network')).toBeInTheDocument();
     });
 
     it('should use semantic HTML structure', () => {

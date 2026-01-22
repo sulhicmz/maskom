@@ -50,7 +50,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | [Data File Guide](docs/data-file-creation-guide.md) | Static data management and validation | 🇬🇧 Developers |
 | [API Documentation](docs/api.md) | Service layer API (EmailService, AuthService) | 🇬🇧 Developers |
 | [Troubleshooting](docs/troubleshooting-guide.md) | Common issues and solutions | 🇬🇧 Developers |
-| [Feature Guides](docs/features/) | Feature usage (Dark Mode, Blog, SEO) | 🇬🇧 Developers |
+| [Feature Guides](docs/features/) | Feature usage (Dark Mode, Blog, SEO, Anomaly Detection, Email Scheduler) | 🇬🇧 Developers |
 | [Roadmap](docs/roadmap.md) | Feature development roadmap | 🇬🇧 All |
 
 ---

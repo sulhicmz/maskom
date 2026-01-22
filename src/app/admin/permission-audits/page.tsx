@@ -6,7 +6,7 @@ import { Permission } from '@/types/permission';
 import { AuditReportGenerator } from '@/components/admin/AuditReportGenerator';
 import { AuditReportDashboard } from '@/components/admin/AuditReportDashboard';
 import { SuspiciousChangeAlerts } from '@/components/admin/SuspiciousChangeAlerts';
-import { PermissionAuditReport, AuditFilters } from '@/types/audit';
+import { PermissionAuditReport } from '@/types/audit';
 
 const PermissionAuditsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'generate' | 'alerts'>('dashboard');
@@ -16,8 +16,7 @@ const PermissionAuditsPage: React.FC = () => {
         setReport(newReport);
     };
 
-    const handleFilterChange = (filters: AuditFilters) => {
-        console.log('Filter changed:', filters);
+    const handleFilterChange = () => {
     };
 
     return (

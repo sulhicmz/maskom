@@ -1,4 +1,5 @@
-import type { IAPMProvider, APMTransaction, APMError, APMUser, APMPerformanceMetrics, APMConfig } from './types';
+import type { IAPMProvider, APMConfig } from './types';
+import type { APMTransaction, APMError, APMUser, APMPerformanceMetrics } from '@/types/apm';
 
 export class SentryAPMProvider implements IAPMProvider {
   private config: APMConfig;

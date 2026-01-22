@@ -2,6 +2,8 @@ import '@testing-library/jest-dom';
 
 import './src/test-utils/customMatchers';
 
+localStorage.clear();
+
 global.TextEncoder = class TextEncoder {
   encode(input) {
     const str = typeof input === 'string' ? input : String(input);
@@ -60,3 +62,38 @@ global.crypto.getRandomValues = jest.fn().mockImplementation((array) => {
   }
   return array;
 });
+
+global.Request = class Request {
+  constructor(input, init = {}) {
+    const url = typeof input === 'string' ? new URL(input) : input;
+    this.url = url.href;
+    this.method = init.method || 'GET';
+    this.headers = new Headers(init.headers || {});
+    this.body = init.body || null;
+    this.signal = init.signal;
+  }
+}
+
+global.Response = class Response {
+  constructor(body = null, init = {}) {
+    this.status = init.status || 200;
+    this.statusText = init.statusText || 'OK';
+    this.headers = new Headers(init.headers || {});
+    this.body = body;
+    this.ok = this.status >= 200 && this.status < 300;
+  }
+
+  static json(data, init = {}) {
+    const body = JSON.stringify(data);
+    return new Response(body, init);
+  }
+
+  async json() {
+    if (typeof this.body === 'string') {
+      return JSON.parse(this.body);
+    }
+    return this.body;
+  }
+}
+
+global.fetch = jest.fn();

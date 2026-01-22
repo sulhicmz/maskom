@@ -40,13 +40,18 @@ const FooterOne = memo(({ style, style_2 }: FooterOneProps) => {
                               <div key={index} className="col-md-6">
                                  <h4 className="footer-title">{section.title}</h4>
                                  <ul className="mb-30">
-                                    {section.items.map((item, itemIndex) => (
-                                       <li key={itemIndex}>
-                                          <Link href={item.url} target={item.target || '_self'} rel={item.target === '_blank' ? 'noreferrer' : undefined}>
-                                             {item.label}
-                                          </Link>
-                                        </li>
-                                    ))}
+                                     {section.items.map((item, itemIndex) => (
+                                        <li key={itemIndex}>
+                                           <Link 
+                                              href={item.url} 
+                                              target={item.target || '_self'} 
+                                              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                                              aria-label={item.target === '_blank' ? `${item.label} (buka di tab baru)` : item.label}
+                                           >
+                                              {item.label}
+                                           </Link>
+                                         </li>
+                                     ))}
                                  </ul>
                               </div>
                            ))}

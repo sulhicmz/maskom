@@ -1,10 +1,10 @@
-import { CollaborativeSession, ActiveEditor, CursorPosition, DraftContent } from '@/types/collaboration'
+import { CollaborativeSession, ActiveEditor, CursorPosition, DraftContent, ISessionManager } from '@/types/collaboration'
 
 interface SessionStorage {
   [sessionId: string]: CollaborativeSession
 }
 
-export class SessionManager {
+export class SessionManager implements ISessionManager {
   private sessions: SessionStorage = {}
   private heartbeatInterval = 30000 // 30 seconds
 
@@ -204,3 +204,5 @@ export class SessionManager {
 }
 
 export const sessionManager = new SessionManager()
+
+export type { ISessionManager } from '@/types/collaboration'

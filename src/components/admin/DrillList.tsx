@@ -343,4 +343,4 @@ const DrillList: React.FC<DrillListProps> = ({
   )
 }
 
-export default DrillList
+export default React.memo(DrillList)

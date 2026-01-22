@@ -29,3 +29,17 @@ export interface CDNMetrics {
   cachedRequests: number;
   lastUpdated: string;
 }
+
+export interface ICDNConfigManager {
+  getConfig(): CDNConfig
+  updateConfig(updates: Partial<CDNConfig>): CDNConfig
+  setProvider(provider: CDNProvider): void
+  setEnabled(enabled: boolean): void
+  setBaseUrl(baseUrl: string): void
+  setCredentials(apiKey?: string, zoneId?: string, accountId?: string): void
+  getCachePolicy(assetType: string): CachePolicy
+  isCDNEnabled(): boolean
+  saveConfig(): void
+  resetConfig(): void
+  validateConfig(): { valid: boolean; errors: string[] }
+}

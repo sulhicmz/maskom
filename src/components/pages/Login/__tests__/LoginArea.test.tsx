@@ -36,8 +36,8 @@ describe('LoginArea', () => {
   it('renders login images', () => {
     render(<LoginArea />);
     
-    const robotImage = screen.getByAltText('Ilustrasi robot layanan digital Maskom');
-    const baseImage = screen.getByAltText('Base ilustrasi platform digital');
+    const robotImage = screen.getByAltText('Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi');
+    const baseImage = screen.getByAltText('Platform digital Maskom dengan antarmuka modern');
     
     expect(robotImage).toBeInTheDocument();
     expect(baseImage).toBeInTheDocument();
@@ -159,8 +159,8 @@ describe('LoginArea', () => {
     const { container } = render(<LoginArea />);
     
     const imageBox = container.querySelector('.signup-image-box');
-    const robotImage = screen.getByAltText('Ilustrasi robot layanan digital Maskom');
-    const baseImage = screen.getByAltText('Base ilustrasi platform digital');
+    const robotImage = screen.getByAltText('Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi');
+    const baseImage = screen.getByAltText('Platform digital Maskom dengan antarmuka modern');
     
     expect(imageBox).toContainElement(robotImage);
     expect(imageBox).toContainElement(baseImage);
@@ -211,8 +211,8 @@ describe('LoginArea', () => {
   it('renders images with descriptive alt text', () => {
     render(<LoginArea />);
     
-    const robotImage = screen.getByAltText('Ilustrasi robot layanan digital Maskom');
-    const baseImage = screen.getByAltText('Base ilustrasi platform digital');
+    const robotImage = screen.getByAltText('Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi');
+    const baseImage = screen.getByAltText('Platform digital Maskom dengan antarmuka modern');
     
     expect(robotImage).toBeInTheDocument();
     expect(baseImage).toBeInTheDocument();

@@ -87,12 +87,12 @@ export default function SavePresetButton({
       </button>
 
       {showModal && (
-        <div 
-          className="modal-overlay" 
-          role="dialog" 
-          aria-modal="true" 
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
           aria-labelledby="preset-modal-title"
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
         >
           <div className="modal-content">
             <div className="modal-header">

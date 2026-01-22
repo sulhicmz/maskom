@@ -82,6 +82,7 @@ export function middleware(request: NextRequest) {
   }
 
   return NextResponse.next({
+    headers: responseHeaders,
     request: {
       headers: requestHeaders,
     },

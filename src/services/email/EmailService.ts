@@ -1,5 +1,6 @@
 import type { IEmailService, EmailSendParams, EmailSendOptions, ServiceMetrics } from './types';
 import type { ServiceResult } from '@/types/common';
+import type { IEmailQueue } from '@/types/emailQueue';
 import { withTimeout, CircuitBreaker } from '@/utils/resilience';
 import { emailRateLimiter } from '@/utils/rateLimiter';
 import metricsCollector from '@/utils/metrics';
@@ -13,7 +14,7 @@ import {
      createErrorResult,
      executeWithResilience,
      RateLimitExceededError
-} from '@/services/common';
+ } from '@/services/common';
 import { TIMEOUTS, CIRCUIT_BREAKER_CONFIG } from '@/constants';
 import email_template_data from '@/data/EmailTemplateData';
 import emailQueue from '@/utils/emailQueue';
@@ -24,8 +25,9 @@ class EmailService implements IEmailService {
     private publicKey: string;
     private circuitBreaker: CircuitBreaker;
     private emailjsModule: typeof import('@emailjs/browser') | null = null;
+    private emailQueue: IEmailQueue;
 
-    constructor() {
+    constructor(emailQueueInstance?: IEmailQueue) {
         this.serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
         this.templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '';
         this.publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
@@ -35,6 +37,7 @@ class EmailService implements IEmailService {
         }
 
         this.circuitBreaker = new CircuitBreaker(CIRCUIT_BREAKER_CONFIG.EMAIL_SERVICE);
+        this.emailQueue = emailQueueInstance ?? emailQueue;
     }
 
     async sendEmail(params: EmailSendParams, options?: EmailSendOptions): Promise<ServiceResult<{ text: string }>> {
@@ -66,7 +69,7 @@ class EmailService implements IEmailService {
             const isNetworkError = error instanceof Error && (error.message.includes('network') || error.message.includes('timeout'));
             
             if (isCircuitOpen || isNetworkError) {
-                const queued = emailQueue.enqueue(params.templateParams);
+                const queued = this.emailQueue.enqueue(params.templateParams);
                 if (queued) {
                     logServiceWarning('EmailService', 'sendEmail', `Email queued due to ${isCircuitOpen ? 'circuit breaker' : 'network error'}`);
                     return createSuccessResult<{ text: string }>('Email queued for later delivery', { text: 'Queued' }, { queued: true });
@@ -119,8 +122,8 @@ class EmailService implements IEmailService {
     async processQueue(): Promise<ServiceResult<{ processed: number; failed: number }>> {
         let processed = 0;
         let failed = 0;
-        const queueSize = emailQueue.getQueueSize();
-        
+        const queueSize = this.emailQueue.getQueueSize();
+
         if (queueSize === 0) {
             return createSuccessResult('No emails in queue', { processed: 0, failed: 0 });
         }
@@ -130,14 +133,14 @@ class EmailService implements IEmailService {
             return createErrorResult('Circuit breaker is open, cannot process queue');
         }
 
-        while (emailQueue.getQueueSize() > 0 && !cbState.isOpen) {
-            const queuedEmail = emailQueue.peek();
+        while (this.emailQueue.getQueueSize() > 0 && !cbState.isOpen) {
+            const queuedEmail = this.emailQueue.peek();
             if (!queuedEmail) {
                 break;
             }
 
             try {
-                emailQueue.markAttempt(queuedEmail.id);
+                this.emailQueue.markAttempt(queuedEmail.id);
 
                 await executeWithResilience<{ text: string }>(
                     {
@@ -157,16 +160,16 @@ class EmailService implements IEmailService {
                     })
                 );
 
-                emailQueue.remove(queuedEmail.id);
+                this.emailQueue.remove(queuedEmail.id);
                 processed++;
                 metricsCollector.recordCall('EmailService.processQueue', true);
             } catch (error) {
                 if (queuedEmail.attempts >= queuedEmail.maxAttempts) {
-                    emailQueue.remove(queuedEmail.id);
+                    this.emailQueue.remove(queuedEmail.id);
                     failed++;
                     metricsCollector.recordCall('EmailService.processQueue', false, 'max_attempts_reached');
-                    logServiceError(error as Error, { 
-                        service: 'EmailService', 
+                    logServiceError(error as Error, {
+                        service: 'EmailService',
                         operation: 'processQueue',
                         includeDetails: true
                     });
@@ -181,8 +184,8 @@ class EmailService implements IEmailService {
 
     getQueueStatus(): { queueSize: number; expired: number } {
         return {
-            queueSize: emailQueue.getQueueSize(),
-            expired: emailQueue.getExpiredEmails().length
+            queueSize: this.emailQueue.getQueueSize(),
+            expired: this.emailQueue.getExpiredEmails().length
         };
     }
 
@@ -243,4 +246,5 @@ class EmailService implements IEmailService {
 }
 
 const emailServiceInstance = new EmailService();
+export { EmailService };
 export default emailServiceInstance;

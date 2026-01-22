@@ -1,18 +1,6 @@
-export interface QueuedEmail {
-    id: string;
-    params: Record<string, unknown>;
-    timestamp: number;
-    attempts: number;
-    maxAttempts: number;
-}
+import { QueuedEmail, EmailQueueConfig, IEmailQueue } from '@/types/emailQueue';
 
-export interface EmailQueueConfig {
-    maxQueueSize: number;
-    maxRetentionMs: number;
-    maxAttempts: number;
-}
-
-export class EmailQueue {
+export class EmailQueue implements IEmailQueue {
     private queue: QueuedEmail[] = [];
     private config: EmailQueueConfig;
     private storageKey: string;

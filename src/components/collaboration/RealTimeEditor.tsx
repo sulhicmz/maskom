@@ -70,11 +70,9 @@ export default function RealTimeEditor({
         pollInterval: 1000,
         onEvent: handleEvent,
         onJoin: (editors) => {
-          console.log('Users joined:', editors)
           setEditors(editors)
         },
         onLeave: (editors) => {
-          console.log('Users left:', editors)
           setEditors(editors)
         },
         onDisconnect: handleDisconnect,
@@ -87,7 +85,6 @@ export default function RealTimeEditor({
 
       if (joined) {
         setIsConnected(true)
-        console.log('Joined collaboration session successfully')
       } else {
         console.error('Failed to join session')
       }
@@ -169,7 +166,6 @@ export default function RealTimeEditor({
 
   const handleDisconnect = useCallback(() => {
     setIsConnected(false)
-    console.log('Disconnected from session')
   }, [])
 
   const handleError = useCallback((error: Error) => {
@@ -182,8 +178,6 @@ export default function RealTimeEditor({
   }, [])
 
   const handleEvent = useCallback((event: CollaborativeEvent) => {
-    console.log('Received event:', event)
-
     switch (event.type) {
       case 'edit_applied':
         handleIncomingEdit(event)
@@ -197,7 +191,7 @@ export default function RealTimeEditor({
         break
 
       default:
-        console.log('Unhandled event type:', event.type)
+        break
     }
   }, [handleIncomingEdit, handleIncomingComment])
 
@@ -264,8 +258,7 @@ export default function RealTimeEditor({
     setVersion(version + 1)
   }, [client, isConnected, version])
 
-  const handleResolveComment = useCallback((commentId: string) => {
-    console.log('Resolve comment:', commentId)
+  const handleResolveComment = useCallback(() => {
   }, [])
 
   const handlePositionClick = useCallback((position: CursorPosition) => {
@@ -361,7 +354,7 @@ export default function RealTimeEditor({
         <ActiveEditorsIndicator
           editors={editors}
           currentUserId={userId}
-          onEditorClick={(editorId) => console.log('Editor clicked:', editorId)}
+          onEditorClick={() => {}}
         />
       )}
 

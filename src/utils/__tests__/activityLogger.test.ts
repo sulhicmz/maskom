@@ -32,7 +32,6 @@ import {
 } from '@/types/audit'
 
 global.Blob = class Blob {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(_content: any[], _options: any) {}
 } as any
 

@@ -4,3 +4,4 @@ export * from './apmManager';
 export { default as apmManager } from './apmManager';
 export { default } from './apmManager';
 export { ConsoleAPMProvider } from './consoleProvider';
+export type { IAPMManager } from '@/types/apm';
