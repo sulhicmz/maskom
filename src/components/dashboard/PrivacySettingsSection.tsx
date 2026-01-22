@@ -5,7 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { toast } from 'react-toastify'
 
 const PrivacySettingsSection: React.FC = () => {
-    const { theme } = useTheme()
+    useTheme()
     const [deleting, setDeleting] = useState(false)
     const [exporting, setExporting] = useState(false)
 

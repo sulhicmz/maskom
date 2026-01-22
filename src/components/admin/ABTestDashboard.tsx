@@ -94,7 +94,8 @@ const ABTestDashboard: React.FC = () => {
         successMetric: formData.successMetric,
         variants: [variant1, variant2],
         minSampleSize: 1000,
-        confidenceLevel: 0.95
+        confidenceLevel: 0.95,
+        winner: null
       })
 
       setShowModal(false)

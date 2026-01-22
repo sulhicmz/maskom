@@ -109,7 +109,7 @@ const EmailSchedulerDashboard: React.FC = () => {
     const maxOpenRate = Math.max(...(insights?.dayOfWeekData.flatMap((d) => d.hourlyData.map((h) => h.openRate)) || [0]), 1);
 
     return (
-        <ProtectedRoute permission={Permission.MANAGE_CAMPAIGNS}>
+        <ProtectedRoute requiredPermission={Permission.MANAGE_CONTENT}>
             <div className={`container mt-4 ${theme === 'dark' ? 'dark-mode' : ''}`}>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h2>Intelligent Email Scheduler</h2>
@@ -309,7 +309,7 @@ const EmailSchedulerDashboard: React.FC = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {insights.optimalWindows.slice(0, 10).map((window, index) => (
+                                        {insights && insights.optimalWindows.slice(0, 10).map((window, index) => (
                                             <tr key={index}>
                                                 <td>#{index + 1}</td>
                                                 <td>{DAYS_IN_INDONESIAN[window.dayOfWeek]}</td>

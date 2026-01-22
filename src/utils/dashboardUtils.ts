@@ -32,8 +32,8 @@ export const calculateEngagementStats = (readingHistory: ReadingHistoryEntry[]):
         .reverse();
     
     let currentStreak = 0;
-    let today = new Date();
-    let checkDate = new Date(today);
+    const today = new Date();
+    const checkDate = new Date(today);
     
     for (const dateStr of completedDates) {
         if (dateStr === checkDate.toDateString()) {
@@ -116,9 +116,11 @@ export const trackReadingProgress = (
 export const addBookmark = (postId: string): void => {
     const dashboardData = loadDashboardData();
     if (!dashboardData) return;
-    
-    if (!dashboardData.bookmarks.includes(postId)) {
-        dashboardData.bookmarks.push(parseInt(postId));
+
+    const postNumberId = parseInt(postId);
+
+    if (!dashboardData.bookmarks.includes(postNumberId)) {
+        dashboardData.bookmarks.push(postNumberId);
         dashboardData.engagementStatistics.totalBookmarksCreated++;
         saveDashboardData(dashboardData);
     }

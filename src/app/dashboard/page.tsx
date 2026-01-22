@@ -1,5 +1,5 @@
 import React from 'react'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import ProtectedRoute from '@/components/common/ProtectedRoute'
 import PersonalDashboard from '@/components/dashboard/PersonalDashboard'
 import { Metadata } from 'next'
 

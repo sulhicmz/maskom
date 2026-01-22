@@ -85,12 +85,12 @@ describe('SocialLinks', () => {
     });
   });
 
-  it('adds rel="noreferrer" when target="_blank"', () => {
+  it('adds rel="noopener noreferrer" when target="_blank"', () => {
     render(<SocialLinks links={mockLinks} />);
-
+    
     const links = screen.getAllByRole('link');
     links.forEach(link => {
-      expect(link).toHaveAttribute('rel', 'noreferrer');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
   });
 

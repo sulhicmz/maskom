@@ -217,15 +217,15 @@ describe('SignUpArea', () => {
       expect(section).toHaveClass('pb-70');
     });
 
-    it('renders images with descriptive alt text', () => {
-      render(<SignUpArea />);
-      
-      const robotImage = screen.getByAltText('Ilustrasi robot layanan digital Maskom');
-      const baseImage = screen.getByAltText('Base ilustrasi platform digital');
-      
-      expect(robotImage).toBeInTheDocument();
-      expect(baseImage).toBeInTheDocument();
-    });
+     it('renders images with descriptive alt text', () => {
+       render(<SignUpArea />);
+       
+       const robotImage = screen.getByAltText('Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi');
+       const baseImage = screen.getByAltText('Platform digital Maskom dengan antarmuka modern');
+       
+       expect(robotImage).toBeInTheDocument();
+       expect(baseImage).toBeInTheDocument();
+     });
 
     it('has consistent margin classes', () => {
       const { container } = render(<SignUpArea />);

@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { toast } from 'react-toastify'
 
 const ActivityFeedSection: React.FC = () => {
-    const { theme } = useTheme()
+    useTheme()
     const [activities, setActivities] = useState<ActivityEvent[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -92,7 +92,7 @@ const ActivityFeedSection: React.FC = () => {
                                     <strong>{getActivityLabel(activity.type)}</strong>
                                     {activity.postTitle && (
                                         <>
-                                            {' '}postingan "{activity.postTitle}"
+                                            {' '}postingan &ldquo;{activity.postTitle}&rdquo;
                                         </>
                                     )}
                                 </p>

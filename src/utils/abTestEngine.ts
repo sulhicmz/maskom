@@ -133,7 +133,8 @@ export class ABTestEngine implements IAbTestEngine {
       createdAt: new Date().toISOString(),
       status: 'draft',
       minSampleSize: test.minSampleSize || 1000,
-      confidenceLevel: test.confidenceLevel || 0.95
+      confidenceLevel: test.confidenceLevel || 0.95,
+      winner: null
     };
     this.tests.set(id, newTest);
     this.saveTests();

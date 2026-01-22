@@ -11,7 +11,7 @@ interface AccessibilitySettingsSectionProps {
 }
 
 const AccessibilitySettingsSection: React.FC<AccessibilitySettingsSectionProps> = ({ settings: initialSettings }) => {
-    const { theme } = useTheme()
+    useTheme()
     const [settings, setSettings] = useState<AccessibilitySettings>(initialSettings)
     const [saving, setSaving] = useState(false)
 

@@ -47,31 +47,39 @@ export class StorageMigration<T = unknown> {
 
   migrate(data: unknown): MigrationResult {
     const history = this.loadHistory();
-    const lastMigratedVersion = this.getLastMigratedVersion(history);
-
-    if (lastMigratedVersion === this.currentVersion) {
+    const entry = history.find(h => h.storageKey === this.storageKey);
+    const lastMigratedVersion = entry?.migrations?.[entry.migrations.length - 1] || '0.0.0';
+    const dataVersion = typeof data === 'object' && 'version' in data ? this.normalizeVersion((data as Record<string, unknown>).version) : undefined;
+    
+    if (this.compareVersions(lastMigratedVersion, this.currentVersion) === 0) {
       return {
         success: true,
         migrated: false,
       };
     }
-
+    
+    if (dataVersion !== undefined && this.compareVersions(dataVersion, this.currentVersion) >= 0) {
+      return {
+        success: true,
+        migrated: false,
+      };
+    }
+    
     try {
       let result: unknown = data;
       const migrationPath = this.getMigrationPath(lastMigratedVersion);
-
+      
       for (const migration of migrationPath) {
         if (this.logMigrations) {
           console.info(
             `[StorageMigration:${this.storageKey}] Migrating from ${lastMigratedVersion} to ${migration.version}: ${migration.description}`
           );
         }
-
+        
         result = migration.up(result as T);
+        this.updateHistory(history, migration.version);
       }
-
-      this.updateHistory(history, this.currentVersion);
-
+      
       return {
         success: true,
         migrated: true,
@@ -85,7 +93,7 @@ export class StorageMigration<T = unknown> {
         `[StorageMigration:${this.storageKey}] Migration failed:`,
         errorMessage
       );
-
+      
       return {
         success: false,
         migrated: false,
@@ -96,15 +104,16 @@ export class StorageMigration<T = unknown> {
 
   rollback(data: unknown, targetVersion?: string): MigrationResult {
     const history = this.loadHistory();
-    const currentVersion = this.getLastMigratedVersion(history);
-
+    const entry = history.find(h => h.storageKey === this.storageKey);
+    const currentVersion = entry?.migrations?.[entry.migrations.length - 1] || this.currentVersion;
+    
     if (!targetVersion || targetVersion === currentVersion) {
       return {
         success: true,
         migrated: false,
       };
     }
-
+    
     const migrationPath = this.getRollbackPath(currentVersion, targetVersion);
 
     if (migrationPath.length === 0) {
@@ -188,13 +197,13 @@ export class StorageMigration<T = unknown> {
     if (!entry || entry.migrations.length === 0) {
       return '0.0.0';
     }
-
-    return entry.migrations[entry.migrations.length - 1] || '0.0.0';
+    
+    return entry.migrations[entry.migrations.length - 1];
   }
 
   private updateHistory(history: MigrationHistory[], version: string): void {
     let entry = history.find(h => h.storageKey === this.storageKey);
-
+    
     if (!entry) {
       entry = {
         storageKey: this.storageKey,
@@ -203,19 +212,21 @@ export class StorageMigration<T = unknown> {
       };
       history.push(entry);
     } else {
-      entry.migrations.push(version);
+      if (!entry.migrations.includes(version)) {
+        entry.migrations.push(version);
+      }
       entry.lastMigratedAt = new Date().toISOString();
     }
-
+    
     this.saveHistory(history);
   }
 
   private getMigrationPath(fromVersion: string): Migration[] {
     const path: Migration[] = [];
     const versions = this.getSortedVersions();
-
+    
     for (const version of versions) {
-      if (this.compareVersions(version, fromVersion) <= 0) {
+      if (this.compareVersions(version, fromVersion) < 0) {
         continue;
       }
 
@@ -235,26 +246,26 @@ export class StorageMigration<T = unknown> {
   private getRollbackPath(fromVersion: string, toVersion: string): Migration[] {
     const path: Migration[] = [];
     const versions = this.getSortedVersions();
-
+    
     for (let i = versions.length - 1; i >= 0; i--) {
       const version = versions[i];
       
       if (this.compareVersions(version, toVersion) <= 0) {
         break;
       }
-
-      if (this.compareVersions(version, fromVersion) <= 0) {
-        continue;
-      }
-
+      
       const migration = this.migrations.get(version);
       if (migration) {
         path.push(migration);
       }
-    }
-
-    return path;
-  }
+      
+      if (this.compareVersions(version, fromVersion) <= 0) {
+        break;
+      }
+       }
+     
+     return path;
+   }
 
   private getSortedVersions(): string[] {
     return Array.from(this.migrations.keys()).sort((a, b) =>
@@ -262,18 +273,28 @@ export class StorageMigration<T = unknown> {
     );
   }
 
-  private compareVersions(a: string, b: string): number {
-    const partsA = a.split('.').map(Number);
-    const partsB = b.split('.').map(Number);
-
+  private normalizeVersion(version: string | number): string {
+    if (typeof version === 'number') {
+      return `${version}.0.0`;
+    }
+    return version;
+  }
+  
+  private compareVersions(a: string | number, b: string | number): number {
+    const normalizedA = this.normalizeVersion(a as string);
+    const normalizedB = this.normalizeVersion(b as string);
+    
+    const partsA = normalizedA.split('.').map(Number);
+    const partsB = normalizedB.split('.').map(Number);
+    
     for (let i = 0; i < 3; i++) {
       const partA = partsA[i] ?? 0;
       const partB = partsB[i] ?? 0;
-
+      
       if (partA < partB) return -1;
       if (partA > partB) return 1;
     }
-
+    
     return 0;
   }
 
@@ -289,5 +310,5 @@ export class StorageMigration<T = unknown> {
 }
 
 export function createMigration<T>(options: MigrationOptions<T>): StorageMigration<T> {
-  return new StorageMigration<T>(options);
+  return new StorageMigration(options);
 }

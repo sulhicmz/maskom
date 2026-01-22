@@ -4,7 +4,7 @@ import { Permission } from '@/types/permission';
 
 export default function EmailSchedulerPage() {
     return (
-        <ProtectedRoute permission={Permission.MANAGE_CAMPAIGNS}>
+        <ProtectedRoute requiredPermission={Permission.MANAGE_CONTENT}>
             <EmailSchedulerDashboard />
         </ProtectedRoute>
     );

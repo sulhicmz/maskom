@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import { UserPreferences } from '@/types/dashboard'
 import { loadDashboardData, saveDashboardData } from '@/utils/dashboardUtils'
@@ -11,7 +11,7 @@ interface AccountSettingsSectionProps {
 }
 
 const AccountSettingsSection: React.FC<AccountSettingsSectionProps> = ({ preferences: initialPreferences }) => {
-    const { theme, setTheme } = useTheme()
+    const { setTheme } = useTheme()
     const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences)
     const [saving, setSaving] = useState(false)
 
@@ -20,7 +20,9 @@ const AccountSettingsSection: React.FC<AccountSettingsSectionProps> = ({ prefere
             ...prev,
             theme: newTheme
         }))
-        setTheme(newTheme)
+        if (newTheme !== 'auto') {
+            setTheme(newTheme)
+        }
     }
 
     const handleLanguageChange = (newLanguage: 'en' | 'id') => {
