@@ -1,5 +1,161 @@
 # Architecture Task Tracking
 
+## Task 403: [CODE ARCHITECT] Interface Definition - DrillStorage Interface Abstraction (Jan 22, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Architecture - Interface Definition
+**Effort**: Medium (1 hour)
+
+### Purpose
+
+Create IDrillStorage interface to enable dependency injection, improve testability, and follow Dependency Inversion Principle for drill data persistence.
+
+### Problem Identified
+
+**Missing Interface Abstraction**:
+- `DrillStorage` class (106 lines) has no interface definition
+- Singleton pattern prevents dependency injection
+- Tight coupling to concrete implementation in DrillEngine and DrillScheduler
+- Violates Dependency Inversion Principle (DIP)
+- No contract for drill storage operations
+- Direct singleton instance import in consumers
+
+**Why This Matters**:
+1. **Testability**: Interface enables mock implementations for unit testing
+2. **Dependency Injection**: Allows swapping implementations without changing consuming code
+3. **Code Reusability**: Interface can be implemented by multiple concrete classes (localStorage, sessionStorage, in-memory)
+4. **Architectural Principle**: Follows Dependency Inversion Principle (SOLID)
+5. **Contract Definition**: Clear interface defines expected behavior
+
+### Solution
+
+**Interface-First Architecture**:
+
+```
+IDrillStorage Interface (Contract)
+    ↓
+DrillStorage Implementation
+    ↓
+Component Usage (DrillEngine, DrillScheduler)
+```
+
+**Interface Definition** (`src/types/drill.ts`):
+```typescript
+export interface IDrillStorage {
+  getDrillConfig(): Promise<DrillConfig>
+  saveDrillConfig(config: DrillConfig): Promise<void>
+  saveDrill(drill: BackupDrill): Promise<void>
+  loadDrillsFromStorage(): Promise<BackupDrill[]>
+  getDrillSchedules(): Promise<DrillScheduleDetails[]>
+  saveDrillSchedules(schedules: DrillScheduleDetails[]): Promise<void>
+}
+```
+
+**Implementation Changes**:
+1. Import `IDrillStorage` from `@/types/drill`
+2. Add `implements IDrillStorage` to DrillStorage class declaration
+3. Export `DrillStorage` class for dependency injection support
+4. Re-export `IDrillStorage` type for consumer use
+
+### Implementation
+
+- [x] Create IDrillStorage interface in src/types/drill.ts
+- [x] Update DrillStorage class to implement IDrillStorage
+- [x] Export DrillStorage class from drillStorage.ts
+- [x] Re-export IDrillStorage type from drillStorage.ts
+- [x] Export IDrillStorage from drill/index.ts
+- [x] Verify existing DrillEngine imports still work (default import maintained)
+- [x] Verify no breaking changes to existing functionality
+
+### Success Criteria
+
+- [x] IDrillStorage interface created in src/types/drill.ts
+- [x] 6 interface methods defined with proper signatures
+- [x] DrillStorage class implements IDrillStorage
+- [x] DrillStorage exported for dependency injection support
+- [x] IDrillStorage re-exported from drillStorage.ts
+- [x] IDrillStorage exported from drill/index.ts
+- [x] Backward compatible (no changes required to existing usage)
+- [x] Existing DrillEngine imports still work (default import maintained)
+- [x] Zero breaking changes to existing functionality
+
+### Related Files
+
+- ✅ Modified: `src/types/drill.ts` - Add IDrillStorage interface (+12 lines)
+- ✅ Modified: `src/utils/drill/drillStorage.ts` - Implement IDrillStorage, export class (+2 lines)
+- ✅ Modified: `src/utils/drill/index.ts` - Export IDrillStorage type (+1 line)
+
+### Implementation Summary
+
+**Files Modified**: 3 files
+**Lines Added**: ~15 lines (interface + exports)
+**Lines Removed**: 0 lines
+**Methods Defined**: 6 interface methods
+**Total LOC Covered**: 107 lines (DrillStorage)
+
+**Key Features**:
+1. **Interface Contract**: IDrillStorage defines all drill storage operations
+2. **Dependency Injection**: Exported class enables mock implementations
+3. **Type Safety**: TypeScript ensures contract compliance
+4. **Backward Compatible**: No breaking changes to existing code
+5. **Test-Friendly**: Mock implementations can be easily created
+
+**Usage Pattern**:
+
+```typescript
+// Production (default behavior)
+import DrillStorage from '@/utils/drill/drillStorage'
+const storage = DrillStorage.getInstance()
+await storage.saveDrill(drill)
+
+// Testing (with mock implementation)
+import { type IDrillStorage } from '@/types/drill'
+const mockStorage: IDrillStorage = {
+  getDrillConfig: async () => mockConfig,
+  saveDrillConfig: async (config) => {},
+  saveDrill: async (drill) => {},
+  loadDrillsFromStorage: async () => mockDrills,
+  getDrillSchedules: async () => mockSchedules,
+  saveDrillSchedules: async (schedules) => {}
+}
+```
+
+### Notes
+
+- Follows Code Architect principles:
+  - **Interface First**: Defined IDrillStorage before refactoring implementation ✅
+  - **Dependency Inversion**: Dependencies flow from high-level modules to abstractions ✅
+  - **Open/Closed**: Open for extension (mock implementations), closed for modification ✅
+  - **Backward Compatible**: No breaking changes to existing code ✅
+  - **Zero Regressions**: All existing functionality preserved ✅
+
+- **Design Decision**:
+  - DrillEngine and DrillScheduler maintain singleton pattern
+  - No runtime dependency injection added (minimal viable approach)
+  - Module-level mocking available for Jest tests
+  - Consistent with BackupScheduler pattern
+
+- **Test Status**:
+  - TypeScript compilation: ✅ Pass (IDrillStorage interface properly defined)
+  - Backward compatibility: ✅ Maintained (default import still works)
+  - No new tests added (interface abstraction primarily enables testing, not requires it)
+
+- **Future Enhancement Opportunities**:
+  - Create useDrillStorage hook for better state management
+  - Implement MockDrillStorage for comprehensive unit tests
+  - Create SessionDrillStorage for session-based storage
+  - Create InMemoryDrillStorage for testing
+  - Consider removing singleton pattern entirely in favor of dependency injection throughout app
+
+### Related Tasks
+
+- Task 402 (Interface Definition - DrillEngine Interface Abstraction) - Related drill system interface work
+- Task 396 (Interface Definition - BackupScheduler Interface Abstraction) - Related storage interface work
+- Task 366 (DrillEngine Module Extraction) - Related disaster recovery work
+
+---
+
 ## Task 402: [CODE ARCHITECT] Interface Definition - DrillEngine Interface Abstraction (Jan 22, 2026)
 
 **Status**: ✅ Completed
