@@ -21,7 +21,7 @@ import type {
   SEOReport,
   SEOMonitoringMetadata,
 } from '@/types/seoMonitor';
-
+import type { InnerBlogPost } from '@/types/data';
 
 /**
  * Default SEO monitoring configuration
@@ -65,8 +65,7 @@ export function saveSEOConfig(config: SEOMonitoringConfig): void {
 /**
  * Check if a meta tag exists on a page (simulation for demo)
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function checkMetaTag(page: string, _tagName: string): boolean {
+function checkMetaTag(page: string, tagName: string): boolean {
   // In a real implementation, this would scrape the page or use an API
   // For demo purposes, we'll simulate based on known pages
   const hasMetaTags: Record<string, boolean> = {
@@ -89,6 +88,19 @@ function checkDuplicateMetaTags(page: string): boolean {
     '/about': true,
   };
   return hasDuplicates[page] || false;
+}
+
+/**
+ * Check for missing meta description (simulation)
+ */
+function checkMissingMetaDescription(page: string): boolean {
+  const missing: Record<string, boolean> = {
+    '/': false,
+    '/about': true,
+    '/blog': false,
+    '/contact': false,
+  };
+  return missing[page] || false;
 }
 
 /**
