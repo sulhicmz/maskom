@@ -98,6 +98,35 @@ export interface DrillScheduleDetails {
   enabled: boolean
 }
 
+export interface DrillProgress {
+  current: number
+  total: number
+  message: string
+}
+
+export type DrillProgressCallback = (progress: DrillProgress) => void
+
+export interface DrillExecutionContext {
+  drillType: DrillType
+  backupId: string
+  executeDrill: (onProgress?: DrillProgressCallback) => Promise<DrillResults>
+  onProgress?: DrillProgressCallback
+  initialProgressMessage: string
+  totalSteps: number
+}
+
+export interface IDrillEngine {
+  executeFullRestoreDrill(backupId: string, onProgress?: DrillProgressCallback, isolated?: boolean): Promise<BackupDrill>
+  executePartialRestoreDrill(backupId: string, onProgress?: DrillProgressCallback, isolated?: boolean): Promise<BackupDrill>
+  executeIntegrityCheckDrill(backupId: string, onProgress?: DrillProgressCallback): Promise<BackupDrill>
+  scheduleDrill(drillType: DrillType, backupId: string, scheduledFor: string, recurrence: DrillSchedule): Promise<DrillScheduleDetails>
+  cancelDrill(drillId: string): Promise<void>
+  getDrills(filters?: DrillFilters): Promise<BackupDrill[]>
+  getDrillStatistics(): Promise<DrillStatistics>
+  getDrillConfig(): Promise<DrillConfig>
+  saveDrillConfig(config: DrillConfig): Promise<void>
+}
+
 export const DEFAULT_DRILL_CONFIG: DrillConfig = {
   enabled: true,
   schedule: DrillSchedule.WEEKLY,
@@ -105,7 +134,7 @@ export const DEFAULT_DRILL_CONFIG: DrillConfig = {
   autoRemediate: false,
   notificationEnabled: true,
   retentionDays: 90,
-  maxConsecutiveFailures: 3,
+  maxConsecutiveFailures:3,
   notificationEmails: [],
   time: '03:00'
 }

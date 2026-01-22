@@ -8,7 +8,7 @@ import {
   DrillConfig,
   DEFAULT_DRILL_CONFIG
 } from '@/types/drill'
-import DrillEngine from '@/utils/drillEngine'
+import { DrillEngine } from '@/utils/drillEngine'
 import { BackupMetadata } from '@/types/backup'
 import { BackupEngine } from '@/utils/backupEngine'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
