@@ -47,12 +47,24 @@ const menu_data: MenuItem[] = [
     },
     {
         id: 7,
+        title: "Dashboard",
+        link: "/dashboard",
+        has_dropdown: false,
+    },
+    {
+        id: 7,
         has_dropdown: false,
         title: "Kontak",
         link: "/contact",
     },
     {
         id: 8,
+        has_dropdown: false,
+        title: "Kontak",
+        link: "/contact",
+    },
+    {
+        id: 9,
         has_dropdown: false,
         title: "Tandai",
         link: "/bookmarks",
