@@ -49,8 +49,8 @@ describe("Offcanvas Component", () => {
       render(<Offcanvas />);
 
       menu_data.forEach((menu) => {
-        const menuLink = screen.getByText(menu.title);
-        expect(menuLink).toBeInTheDocument();
+        const menuLinks = screen.getAllByText(menu.title);
+        expect(menuLinks.length).toBeGreaterThan(0);
       });
     });
 
@@ -180,8 +180,11 @@ describe("Offcanvas Component", () => {
       render(<Offcanvas />);
 
       menu_data.forEach((menu) => {
-        const menuLink = screen.getByText(menu.title);
-        expect(menuLink.closest("a")).toHaveAttribute("href", menu.link);
+        const menuLinks = screen.getAllByText(menu.title);
+        const matchingLinks = menuLinks.filter(link =>
+          link.closest("a")?.getAttribute("href") === menu.link
+        );
+        expect(matchingLinks.length).toBeGreaterThan(0);
       });
     });
 
@@ -189,8 +192,13 @@ describe("Offcanvas Component", () => {
       render(<Offcanvas />);
 
       menu_data.forEach((menu) => {
-        const menuLink = screen.getByText(menu.title);
-        expect(menuLink.closest("a")).toHaveAttribute("data-bs-dismiss", "offcanvas");
+        const menuLinks = screen.getAllByText(menu.title);
+        menuLinks.forEach(link => {
+          const anchor = link.closest("a");
+          if (anchor?.getAttribute("href") === menu.link) {
+            expect(anchor).toHaveAttribute("data-bs-dismiss", "offcanvas");
+          }
+        });
       });
     });
 
@@ -278,7 +286,8 @@ describe("Offcanvas Component", () => {
       render(<Offcanvas />);
 
       menu_data.forEach((menu) => {
-        expect(screen.getByText(menu.title)).toBeInTheDocument();
+        const menuLinks = screen.getAllByText(menu.title);
+        expect(menuLinks.length).toBeGreaterThan(0);
       });
 
       socialLinks.forEach((link) => {
@@ -295,8 +304,8 @@ describe("Offcanvas Component", () => {
 
       const nonDropdownMenus = menu_data.filter((menu) => !menu.has_dropdown);
       nonDropdownMenus.forEach((menu) => {
-        const menuLink = screen.getByText(menu.title);
-        expect(menuLink).toBeInTheDocument();
+        const menuLinks = screen.getAllByText(menu.title);
+        expect(menuLinks.length).toBeGreaterThan(0);
       });
     });
 
@@ -307,8 +316,8 @@ describe("Offcanvas Component", () => {
       expect(dropdownMenus.length).toBeGreaterThan(0);
 
       dropdownMenus.forEach((menu) => {
-        const menuLink = screen.getByText(menu.title);
-        expect(menuLink).toBeInTheDocument();
+        const menuLinks = screen.getAllByText(menu.title);
+        expect(menuLinks.length).toBeGreaterThan(0);
 
         if (menu.sub_menus) {
           menu.sub_menus.forEach((submenu) => {

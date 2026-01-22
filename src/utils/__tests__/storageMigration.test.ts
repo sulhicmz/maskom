@@ -16,7 +16,7 @@ describe('StorageMigration', () => {
           newField: 'default',
         }),
         down: (data: any) => {
-          const { newField, ...rest } = data;
+          const { newField: _newField, ...rest } = data;
           return rest;
         },
       },
@@ -28,7 +28,7 @@ describe('StorageMigration', () => {
           version: 2,
         }),
         down: (data: any) => {
-          const { version, ...rest } = data;
+          const { version: _version, ...rest } = data;
           return rest;
         },
       },
@@ -63,7 +63,7 @@ describe('StorageMigration', () => {
 
       it('should apply all migrations in order', () => {
         const initialData = { id: 'test', name: 'Test' };
-        const result = migration.migrate(initialData);
+        migration.migrate(initialData);
 
         const history = JSON.parse(localStorage.getItem('maskom_migration_history') || '[]');
         const entry = history.find((h: any) => h.storageKey === 'test_storage');

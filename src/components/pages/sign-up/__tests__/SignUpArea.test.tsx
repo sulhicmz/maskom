@@ -44,10 +44,10 @@ describe('SignUpArea', () => {
 
     it('renders signup images', () => {
       render(<SignUpArea />);
-      
-      const robotImage = screen.getByAltText('Ilustrasi robot layanan digital Maskom');
-      const baseImage = screen.getByAltText('Base ilustrasi platform digital');
-      
+
+      const robotImage = screen.getByAltText('Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi');
+      const baseImage = screen.getByAltText('Platform digital Maskom dengan antarmuka modern');
+
       expect(robotImage).toBeInTheDocument();
       expect(baseImage).toBeInTheDocument();
     });
@@ -166,11 +166,11 @@ describe('SignUpArea', () => {
 
     it('renders signup images in image box', () => {
       const { container } = render(<SignUpArea />);
-      
+
       const imageBox = container.querySelector('.signup-image-box');
-      const robotImage = screen.getByAltText('Ilustrasi robot layanan digital Maskom');
-      const baseImage = screen.getByAltText('Base ilustrasi platform digital');
-      
+      const robotImage = screen.getByAltText('Robot pintar Maskom yang menggambarkan layanan digital dan otomatisasi');
+      const baseImage = screen.getByAltText('Platform digital Maskom dengan antarmuka modern');
+
       expect(imageBox).toContainElement(robotImage);
       expect(imageBox).toContainElement(baseImage);
     });

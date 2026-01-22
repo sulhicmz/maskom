@@ -19,7 +19,7 @@ export interface MigrationResult {
   error?: string;
 }
 
-export interface MigrationOptions<T = unknown> {
+export interface MigrationOptions {
   storageKey: string;
   currentVersion: string;
   migrations: Migration[];
@@ -34,7 +34,7 @@ export class StorageMigration<T = unknown> {
   private migrations: Map<string, Migration>;
   private logMigrations: boolean;
 
-  constructor(options: MigrationOptions<T>) {
+  constructor(options: MigrationOptions) {
     this.storageKey = options.storageKey;
     this.currentVersion = options.currentVersion;
     this.migrations = new Map();
@@ -309,6 +309,6 @@ export class StorageMigration<T = unknown> {
   }
 }
 
-export function createMigration<T>(options: MigrationOptions<T>): StorageMigration<T> {
+export function createMigration<T>(options: MigrationOptions): StorageMigration<T> {
   return new StorageMigration(options);
 }
