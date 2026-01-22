@@ -84,6 +84,15 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
               isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
             } cursor-pointer transition-colors`}
             onClick={() => onEditorClick?.(editor.userId)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onEditorClick?.(editor.userId);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Editor ${editor.username}, ${formatLastSeen(editor.lastSeen)}`}
           >
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${getAvatarColor(

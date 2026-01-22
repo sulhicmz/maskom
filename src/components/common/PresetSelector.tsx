@@ -45,9 +45,25 @@ export default function PresetSelector({
     loadPresets();
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setIsOpen(false);
+      return;
+    }
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const items = Array.from(document.querySelectorAll('[role="option"]')) as HTMLElement[];
+      const currentIndex = items.findIndex(item => item === document.activeElement);
+      const direction = e.key === 'ArrowDown' ? 1 : -1;
+      const nextIndex = (currentIndex + direction + items.length) % items.length;
+      items[nextIndex]?.focus();
+    }
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const target = e.currentTarget as HTMLElement;
+      target.querySelector('button')?.click();
     }
   };
 
@@ -71,10 +87,10 @@ export default function PresetSelector({
       </button>
 
       {isOpen && (
-        <div 
-          className="preset-dropdown" 
-          role="listbox" 
-          onKeyPress={handleKeyPress}
+        <div
+          className="preset-dropdown"
+          role="listbox"
+          onKeyDown={handleKeyDown}
         >
           {presets.length === 0 ? (
             <div className="preset-dropdown-empty">
@@ -84,14 +100,21 @@ export default function PresetSelector({
           ) : (
             <ul className="preset-dropdown-list">
               {presets.map((preset) => (
-                <li 
-                  key={preset.id} 
+                <li
+                  key={preset.id}
                   role="option"
                   aria-selected="false"
                   className="preset-dropdown-item"
+                  tabIndex={-1}
                 >
                   <button
                     onClick={() => handlePresetClick(preset)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handlePresetClick(preset);
+                      }
+                    }}
                     className="preset-dropdown-btn"
                     aria-label={`Terapkan preset: ${preset.name}`}
                     type="button"
