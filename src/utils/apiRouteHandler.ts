@@ -1,5 +1,5 @@
 import type { NextResponse } from 'next/server';
-import { CircuitBreaker, withRetry, type RetryOptions } from '@/utils/resilience';
+import { CircuitBreaker, withRetry, type RetryOptions, type CircuitBreakerOptions } from '@/utils/resilience';
 import metricsCollector from '@/utils/metrics';
 import { logServiceError, logServiceSuccess } from '@/services/common/logger';
 import { RateLimitExceededError } from '@/services/common/resilience';
@@ -9,7 +9,7 @@ import { CIRCUIT_BREAKER_CONFIG, RETRY_CONFIG } from '@/constants';
 export interface ApiRouteHandler<T = unknown> {
     operationName: string;
     handler: () => Promise<NextResponse<T>>;
-    circuitBreakerConfig?: typeof CIRCUIT_BREAKER_CONFIG.API_ROUTES[keyof typeof CIRCUIT_BREAKER_CONFIG.API_ROUTES];
+    circuitBreakerConfig?: CircuitBreakerOptions | typeof CIRCUIT_BREAKER_CONFIG.API_ROUTES[keyof typeof CIRCUIT_BREAKER_CONFIG.API_ROUTES];
     timeoutMs?: number;
     retryOptions?: RetryOptions;
 }
@@ -26,11 +26,13 @@ const circuitBreakers = new Map<string, CircuitBreaker>();
 
 function getCircuitBreaker(routeName: string, config: ApiRouteHandler['circuitBreakerConfig']): CircuitBreaker {
     if (!circuitBreakers.has(routeName)) {
-        const cbConfig = config || {
-            failureThreshold: 3,
-            resetTimeoutMs: 30000,
-            monitoringPeriodMs: 60000
-        };
+        const cbConfig: CircuitBreakerOptions = config && 'failureThreshold' in config
+            ? config
+            : {
+                failureThreshold: 3,
+                resetTimeoutMs: 30000,
+                monitoringPeriodMs: 60000
+            };
         circuitBreakers.set(routeName, new CircuitBreaker(cbConfig));
     }
     return circuitBreakers.get(routeName)!;

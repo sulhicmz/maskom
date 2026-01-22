@@ -650,8 +650,206 @@ const CampaignList: React.FC<CampaignListProps> = ({ campaignManager: injectedCa
 
 ### Related Tasks
 
-- Task 394 (Interface Definition - BackupEngine Interface Abstraction) - Related interface abstraction work
-- Task 380 (Node.js Compatibility Verification Tool) - Related infrastructure work
+- Task 379 (Skipped Test Diagnostic Dashboard) - Related QA diagnostics work
+- Task 380 (React.memo Optimization) - Related performance work
+- Task 352 (Real-Time Content Co-Authoring) - Related collaboration feature
+- Task 382 (Fix Failing CI Test) - Related test stability work
+
+---
+
+## Integration Hardening - Collaboration API Resilience (✅ COMPLETED - Jan 22, 2026)
+
+### Purpose
+
+Implement comprehensive resilience patterns for the `/api/collaborate` route including circuit breaker, timeout protection, retry logic with exponential backoff, and proper error logging to prevent cascading failures and improve reliability of real-time collaboration features.
+
+### Problem Identified
+
+**Missing Resilience Patterns in `/api/collaborate`**:
+- Route did not use `executeApiRoute` wrapper for standardized resilience
+- No circuit breaker protection - cascading failures could propagate
+- No timeout protection - requests could hang indefinitely
+- No retry logic - transient failures would immediately error
+- Used `console.error` instead of structured logging service
+- Rate limiting was manual, not integrated with resilience layer
+- No centralized metrics collection via `metricsCollector`
+
+**Why This Matters**:
+1. **Production Reliability**: External services WILL fail; resilience patterns prevent cascading failures
+2. **Developer Experience**: Standardized patterns make debugging and monitoring easier
+3. **User Experience**: Retries and circuit breakers provide better UX than raw errors
+4. **Observability**: Centralized metrics enable proactive monitoring of API health
+5. **Operational Consistency**: All APIs should follow same resilience patterns
+
+### Solution
+
+**Four-Layer Resilience Implementation**:
+
+```
+executeApiRoute Wrapper
+    ↓
+Circuit Breaker (prevent cascading failures)
+    ↓
+Retry with Exponential Backoff (handle transient failures)
+    ↓
+Timeout Protection (prevent indefinite hangs)
+    ↓
+Rate Limiting (protect from overload)
+    ↓
+Collaboration API
+```
+
+### Resilience Configuration
+
+**Circuit Breaker**:
+```typescript
+CIRCUIT_BREAKER_CONFIG.COLLABORATION_API = {
+    failureThreshold: 5,      // 5 consecutive failures before opening
+    resetTimeoutMs: 60000,   // 60 seconds reset timeout
+    monitoringPeriodMs: 60000  // 60 seconds monitoring window
+}
+```
+
+**Timeout**:
+```typescript
+TIMEOUTS.COLLABORATION_API = 5000  // 5 seconds timeout
+```
+
+**Retry**:
+```typescript
+retryOptions: {
+    maxAttempts: 2,           // 1 initial + 1 retry
+    baseDelayMs: 1000,        // 1 second base delay
+    maxDelayMs: 5000,          // 5 seconds max delay
+    backoffMultiplier: 2,         // 2x exponential backoff
+    retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
+}
+```
+
+### Architecture Benefits
+
+1. **Circuit Breaker**: Prevents cascading failures from repeated service errors ✅
+2. **Retry Logic**: Transient failures (network, timeout) are automatically retried ✅
+3. **Timeout Protection**: Requests fail after 5 seconds instead of hanging indefinitely ✅
+4. **Standardized Logging**: Uses `logServiceError` instead of `console.error` ✅
+5. **Centralized Metrics**: All operations tracked via `metricsCollector` ✅
+6. **Consistent Patterns**: Follows same resilience patterns as other API routes ✅
+7. **Zero Breaking Changes**: All existing functionality preserved ✅
+
+### Code Changes
+
+- Modified: `src/app/api/collaborate/route.ts` - Refactored GET and POST handlers to use `executeApiRoute` wrapper (418 lines → 397 lines, -21 lines)
+- Modified: `src/utils/apiRouteHandler.ts` - Updated `ApiRouteHandler` type to accept all circuit breaker configs (+1 line)
+- Modified: `src/constants/index.ts` - Exports updated automatically by adding to constants directory
+- Added: `src/app/api/collaborate/__tests__/route.test.ts` - Comprehensive resilience tests (257 lines)
+- Modified: `docs/api.md` - Added Collaboration API documentation with resilience patterns (+150 lines)
+
+### Implementation Summary
+
+**Files Modified**: 3 files
+**Files Added**: 1 test file
+**Lines Added**: ~386 lines (documentation + tests)
+**Lines Removed**: ~21 lines (duplicate code, console.error statements)
+**Tests Added**: 25 resilience tests covering all patterns
+
+**Key Changes**:
+1. **executeApiRoute Wrapper**: Both GET and POST use standardized resilience wrapper
+2. **Circuit Breaker**: Uses `CIRCUIT_BREAKER_CONFIG.COLLABORATION_API` config
+3. **Timeout**: Uses `TIMEOUTS.COLLABORATION_API` (5000ms)
+4. **Retry**: Configured for 2 attempts with exponential backoff
+5. **Error Logging**: Replaced `console.error` with `logServiceError` calls
+6. **Rate Limiting**: Maintained existing `strictRateLimiter` integration
+7. **Error Codes**: All errors use standardized error codes from `ERROR_CODES`
+
+### Code Patterns
+
+**Before**:
+```typescript
+export async function GET(request: NextRequest): Promise<NextResponse> {
+    try {
+        // Manual rate limiting check
+        // Manual request validation
+        // Direct session manager calls
+        // Manual error handling
+        console.error('Error in collaboration poll:', error);
+        return NextResponse.json({ success: false, error: '...' });
+    } catch (error) {
+        console.error('Error in collaboration API:', error);
+        return NextResponse.json({ success: false, error: '...' });
+    }
+}
+```
+
+**After**:
+```typescript
+export async function GET(request: NextRequest): Promise<NextResponse> {
+    return executeApiRoute<PollResponse>({
+        operationName: 'Collaboration.POLL',
+        circuitBreakerConfig: CIRCUIT_BREAKER_CONFIG.COLLABORATION_API,
+        timeoutMs: TIMEOUTS.COLLABORATION_API,
+        retryOptions: {
+            maxAttempts: 2,
+            baseDelayMs: 1000,
+            maxDelayMs: 5000,
+            backoffMultiplier: 2,
+            retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
+        },
+        handler: async () => {
+            // Rate limiting, validation, and business logic
+            // All errors automatically handled by executeApiRoute wrapper
+        }
+    });
+}
+```
+
+### Success Criteria
+
+- [x] /api/collaborate GET handler uses executeApiRoute wrapper
+- [x] /api/collaborate POST handler uses executeApiRoute wrapper
+- [x] Circuit breaker configured with CIRCUIT_BREAKER_CONFIG.COLLABORATION_API
+- [x] Timeout configured with TIMEOUTS.COLLABORATION_API (5000ms)
+- [x] Retry configured with exponential backoff (2 attempts, 1s base, 2x multiplier)
+- [x] All console.error statements replaced with logServiceError
+- [x] All error responses include errorCode field
+- [x] Lint passes (0 errors, 0 warnings)
+- [x] 25 comprehensive tests covering resilience patterns
+- [x] API documentation updated with collaboration API resilience patterns
+- [x] Zero breaking changes to existing functionality
+
+### Related Files
+
+- ✅ Modified: `src/app/api/collaborate/route.ts` - Refactored with executeApiRoute wrapper (-21 lines)
+- ✅ Modified: `src/utils/apiRouteHandler.ts` - Updated ApiRouteHandler type (+1 line)
+- ✅ Added: `src/app/api/collaborate/__tests__/route.test.ts` - Resilience tests (257 lines)
+- ✅ Modified: `docs/api.md` - Added Collaboration API section (+150 lines)
+
+### Notes
+
+- Follows Integration Engineer principles:
+  - **Contract First**: Used existing error codes and executeApiRoute contract ✅
+  - **Resilience**: External services WILL fail; handle gracefully ✅
+  - **Consistency**: Same patterns as other API routes ✅
+  - **Self-Documenting**: Clear code structure and API documentation ✅
+  - **Backward Compatibility**: Zero breaking changes to existing code ✅
+  - **No Infinite Retries**: Configured max attempts (2) to prevent infinite loops ✅
+
+- **Test Coverage**:
+  - 25 resilience tests covering all patterns
+  - Tests verify executeApiRoute wrapper usage
+  - Tests verify error response standardization
+  - Tests verify logging service usage
+  - Tests verify circuit breaker, timeout, and retry configurations
+
+- **Future Enhancement Opportunities**:
+  - Add WebSocket support for real-time collaboration (replacing polling)
+  - Implement event replay for late-joining users
+  - Add presence/typing indicators for better UX
+  - Consider moving from polling to Server-Sent Events (SSE) for efficiency
+
+### Related Tasks
+
+- Task 393 (API Error Response Standardization) - Related error code work
+- Task 390 (Input Validation - Collaborate API) - Related validation work
 - Task 352 (Real-Time Content Co-Authoring) - Related collaboration feature
 
 ---

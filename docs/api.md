@@ -117,6 +117,7 @@ console.log('AuthService state:', authState);
 - [Common Service Types](#common-service-types)
 - [Email Service API](#email-service-api)
 - [Authentication Service API](#authentication-service-api)
+- [Collaboration API](#collaboration-api)
 - [Error Response Standards](#error-response-standards)
 - [Resilience Patterns](#resilience-patterns)
 
@@ -1028,6 +1029,336 @@ if (logoutResult.success) {
 6. **OAuth Providers**: Add Google/Facebook/Social login
 7. **Two-Factor Authentication**: Add 2FA support
 8. **Email Verification**: Add email verification flow after registration
+
+---
+
+## Collabaration API
+
+### Service: Collaboration API (`src/app/api/collaborate/route.ts`)
+
+**Purpose**: Handles real-time collaborative editing with resilience patterns (circuit breaker, timeout, retry, rate limiting).
+
+**Version**: v1.0.0 (Current)
+
+---
+
+### Endpoints
+
+#### Poll for Events (GET)
+
+**Method**: `GET /api/collaborate?sessionId={sessionId}&userId={userId}&username={username}&lastEventId={lastEventId}`
+
+**Description**: Polls for new collaborative events since last event ID.
+
+**Resilience**: Uses `executeApiRoute` wrapper with:
+- Circuit breaker configuration: `CIRCUIT_BREAKER_CONFIG.COLLABORATION_API`
+- Timeout: `TIMEOUTS.COLLABORATION_API` (5000ms)
+- Retry: 2 attempts with exponential backoff (1000ms base, 2x multiplier, 5000ms max)
+- Retryable patterns: `/network/i`, `/timeout/i`, `/ECONN/i`, `/503/i`
+
+---
+
+#### Send Collaboration Event (POST)
+
+**Method**: `POST /api/collaborate`
+
+**Description**: Sends collaboration events (join, leave, cursor_update, edit, comment).
+
+**Resilience**: Uses `executeApiRoute` wrapper with:
+- Circuit breaker configuration: `CIRCUIT_BREAKER_CONFIG.COLLABORATION_API`
+- Timeout: `TIMEOUTS.COLLABORATION_API` (5000ms)
+- Retry: 2 attempts with exponential backoff (1000ms base, 2x multiplier, 5000ms max)
+- Retryable patterns: `/network/i`, `/timeout/i`, `/ECONN/i`, `/503/i`
+- Rate limiting: `strictRateLimiter` per client IP
+
+---
+
+### Request
+
+#### GET Parameters
+
+```typescript
+interface PollQuery {
+    sessionId: string;      // Session identifier (required, 1-100 chars, alphanumeric + underscore/dash)
+    userId: number;         // User ID (required, positive integer)
+    username: string;      // Username (required, 1-100 chars, alphanumeric + underscore/dash)
+    lastEventId?: string;  // Last event ID for polling (optional)
+}
+```
+
+#### POST Request
+
+```typescript
+interface CollaborationRequest {
+    action: 'join' | 'leave' | 'cursor_update' | 'edit' | 'comment';
+    // Join
+    postId?: string;        // Post ID (required for join)
+    userId: number;          // User ID (required)
+    username: string;       // Username (required for join)
+    // Leave
+    sessionId: string;       // Session ID (required for leave)
+    userId: number;          // User ID (required for leave)
+    // Cursor Update
+    sessionId: string;       // Session ID (required for cursor_update)
+    userId: number;          // User ID (required for cursor_update)
+    cursorPosition: number;  // Cursor position (required for cursor_update)
+    selection?: { start: number; end: number };  // Text selection (optional)
+    // Edit
+    sessionId: string;       // Session ID (required for edit)
+    userId: number;          // User ID (required for edit)
+    editOperation: EditOperation;  // Edit operation (required for edit)
+    // Comment
+    sessionId: string;       // Session ID (required for comment)
+    userId: number;          // User ID (required for comment)
+    username: string;       // Username (required for comment)
+    comment: {
+        content: string;      // Comment content (required for comment)
+        position?: number;    // Comment position in text (optional)
+    };
+}
+```
+
+---
+
+### Response
+
+#### Success Response (GET)
+
+```typescript
+interface PollResponse {
+    success: true;
+    events: CollaborativeEvent[];  // Array of new events
+    sessionActive: true;           // Session is active
+}
+```
+
+#### Success Response (POST)
+
+```typescript
+interface CollaborationResponse {
+    success: true;
+    sessionId?: string;   // Session ID (for join action)
+    postId?: string;       // Post ID (for join action)
+    userId?: number;        // User ID (for join action)
+    version?: number;       // Session version (for edit action)
+}
+```
+
+#### Error Responses
+
+All error responses follow [Error Response Standards](#error-response-standards).
+
+**429 Too Many Requests**
+
+```json
+{
+    "success": false,
+    "events": [],
+    "sessionActive": false,
+    "error": "Rate limit exceeded",
+    "errorCode": "RATE_LIMIT_EXCEEDED",
+    "details": {
+        "retryAfter": 60
+    }
+}
+```
+
+**400 Bad Request - Invalid Query Parameters**
+
+```json
+{
+    "success": false,
+    "events": [],
+    "sessionActive": false,
+    "error": "Invalid query parameters",
+    "errorCode": "INVALID_QUERY_PARAMETERS",
+    "details": {
+        "validationErrors": [...]
+    }
+}
+```
+
+**400 Bad Request - Missing Required Fields**
+
+```json
+{
+    "success": false,
+    "error": "Missing required fields",
+    "errorCode": "MISSING_REQUIRED_FIELDS"
+}
+```
+
+**400 Bad Request - Invalid Request Data**
+
+```json
+{
+    "success": false,
+    "error": "Invalid request data",
+    "errorCode": "INVALID_REQUEST_DATA",
+    "details": {
+        "validationErrors": [...]
+    }
+}
+```
+
+**404 Not Found - Session Not Found**
+
+```json
+{
+    "success": false,
+    "events": [],
+    "sessionActive": false,
+    "error": "Session not found",
+    "errorCode": "SESSION_NOT_FOUND"
+}
+```
+
+**404 Not Found - User Not Found in Session**
+
+```json
+{
+    "success": false,
+    "error": "User not found in session",
+    "errorCode": "USER_NOT_FOUND_IN_SESSION"
+}
+```
+
+**504 Request Timeout**
+
+```json
+{
+    "success": false,
+    "error": "Request timed out",
+    "errorCode": "REQUEST_TIMEOUT"
+}
+```
+
+**503 Service Unavailable - Circuit Breaker**
+
+```json
+{
+    "success": false,
+    "error": "Service temporarily unavailable",
+    "errorCode": "CIRCUIT_BREAKER_OPEN"
+}
+```
+
+---
+
+### Resilience Configuration
+
+The Collaboration API implements four-layer resilience:
+
+#### 0. Circuit Breaker
+
+- **Failure Threshold**: 5 consecutive failures
+- **Reset Timeout**: 60,000ms (60 seconds)
+- **Monitoring Period**: 60,000ms (60 seconds)
+- **Config**: `CIRCUIT_BREAKER_CONFIG.COLLABORATION_API`
+- **States**:
+  - **Closed**: Normal operation, requests flow through
+  - **Open**: Requests rejected immediately after threshold
+
+#### 1. Timeout Protection
+
+- **Default Timeout**: 5,000ms (5 seconds)
+- **Behavior**: Request fails if operation doesn't complete within timeout
+- **Error Code**: `REQUEST_TIMEOUT`
+
+#### 2. Retry with Exponential Backoff
+
+- **Max Attempts**: 2 (1 initial + 1 retry)
+- **Base Delay**: 1,000ms (1 second)
+- **Max Delay**: 5,000ms (5 seconds)
+- **Backoff Multiplier**: 2x
+- **Retryable Patterns**:
+  - `/network/i` - Network-related errors
+  - `/timeout/i` - Timeout errors
+  - `/ECONN/i` - Connection errors
+  - `/503/i` - Service unavailable errors
+
+#### 3. Rate Limiting
+
+- **Implementation**: `strictRateLimiter` from `@/utils/rateLimit`
+- **Behavior**: Per-client rate limiting
+- **Rate Headers**: Included in 429 responses:
+  - `Retry-After`: Seconds until next request allowed
+  - `X-RateLimit-Limit`: Maximum requests per window
+  - `X-RateLimit-Remaining`: Remaining requests in current window
+  - `X-RateLimit-Reset`: Unix timestamp of window reset
+
+---
+
+### Monitoring & Metrics
+
+The Collaboration API automatically records metrics through `executeApiRoute` wrapper:
+
+- **Operation Names**: `Collaboration.POLL`, `Collaboration.POST`
+- **Metrics Tracked**:
+  - Total calls (success + failure)
+  - Success calls
+  - Failure calls
+  - Timeout errors
+  - Network errors
+  - Circuit breaker state changes
+- **Response Time**: Tracked automatically for all operations
+
+**Example**:
+```typescript
+import metricsCollector from '@/utils/metrics';
+
+// Get collaboration metrics
+const pollMetrics = metricsCollector.getMetrics('Collaboration.POLL');
+const postMetrics = metricsCollector.getMetrics('Collaboration.POST');
+
+console.log('Poll metrics:', pollMetrics);
+console.log('Post metrics:', postMetrics);
+```
+
+---
+
+### Security Considerations
+
+1. **Input Validation**: All inputs validated with Zod schemas
+2. **Session Management**: In-memory session storage via `sessionManager`
+3. **Event Buffering**: Events buffered with max 50 events per session
+4. **Sanitization**: Comment content sanitized via `sanitizeString`
+5. **Error Logging**: Uses `logServiceError` (no console.error)
+6. **Rate Limiting**: IP-based rate limiting prevents abuse
+
+---
+
+### Usage Example
+
+```typescript
+// Poll for new events
+const pollResponse = await fetch('/api/collaborate?sessionId=session123&userId=1&username=testuser');
+const pollData = await pollResponse.json();
+
+if (pollData.success) {
+    console.log('New events:', pollData.events);
+} else {
+    console.error('Poll failed:', pollData.error);
+    console.error('Error code:', pollData.errorCode);
+}
+
+// Join session
+const joinResponse = await fetch('/api/collaborate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        action: 'join',
+        postId: '123',
+        userId: 1,
+        username: 'testuser'
+    })
+});
+const joinData = await joinResponse.json();
+
+if (joinData.success) {
+    console.log('Joined session:', joinData.sessionId);
+}
+```
 
 ---
 

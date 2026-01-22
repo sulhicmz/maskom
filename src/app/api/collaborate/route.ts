@@ -12,7 +12,9 @@ import {
   type CommentRequest
 } from '@/utils/collaboration/validation'
 import { z } from 'zod'
-import { ERROR_CODES, createApiError } from '@/constants'
+import { ERROR_CODES, createApiError, CIRCUIT_BREAKER_CONFIG, TIMEOUTS } from '@/constants'
+import { executeApiRoute } from '@/utils/apiRouteHandler'
+import { logServiceError } from '@/services/common/logger'
 
 const MAX_EVENTS_PER_POLL = 50
 
@@ -55,125 +57,135 @@ function bufferEvent(event: CollaborativeEvent): void {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  try {
-    const clientIdentifier = getClientIdentifier(request)
-    const rateLimitResult = strictRateLimiter(clientIdentifier)
+  return executeApiRoute<PollResponse>({
+    operationName: 'Collaboration.POLL',
+    circuitBreakerConfig: CIRCUIT_BREAKER_CONFIG.COLLABORATION_API,
+    timeoutMs: TIMEOUTS.COLLABORATION_API,
+    retryOptions: {
+      maxAttempts: 2,
+      baseDelayMs: 1000,
+      maxDelayMs: 5000,
+      backoffMultiplier: 2,
+      retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
+    },
+    handler: async () => {
+      const clientIdentifier = getClientIdentifier(request)
+      const rateLimitResult = strictRateLimiter(clientIdentifier)
 
-    if (!rateLimitResult.success) {
-      const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
-      return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
-        { status: 429, headers: {
-          'Retry-After': rateLimitResult.resetTime.toString(),
-          'X-RateLimit-Limit': rateLimitResult.limit.toString(),
-          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-          'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
-        }}
-      )
+      if (!rateLimitResult.success) {
+        const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
+        return NextResponse.json<PollResponse>(
+          { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
+          { status: 429, headers: {
+            'Retry-After': rateLimitResult.resetTime.toString(),
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
+          }}
+        )
+      }
+
+      const searchParams = request.nextUrl.searchParams
+      const queryParams = {
+        sessionId: searchParams.get('sessionId') || '',
+        userId: searchParams.get('userId') || '0',
+        username: searchParams.get('username') || '',
+        lastEventId: searchParams.get('lastEventId')
+      }
+
+      const validationResult = PollQuerySchema.safeParse(queryParams)
+
+      if (!validationResult.success) {
+        const apiError = createApiError(ERROR_CODES.INVALID_QUERY_PARAMETERS, validationResult.error.issues)
+        return NextResponse.json<PollResponse>(
+          { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
+          { status: 400 }
+        )
+      }
+
+      const { sessionId, lastEventId } = validationResult.data
+
+      const session = sessionManager.getSession(sessionId)
+
+      if (!session) {
+        const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
+        return NextResponse.json<PollResponse>(
+          { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
+          { status: 404 }
+        )
+      }
+
+      const bufferedEvents = eventBuffer.get(sessionId) || []
+      const newEvents = lastEventId
+        ? bufferedEvents.filter(event => event.data?.eventId === undefined || event.data?.eventId > lastEventId)
+        : bufferedEvents
+
+      return NextResponse.json<PollResponse>({
+        success: true,
+        events: newEvents,
+        sessionActive: true
+      })
     }
-
-    const searchParams = request.nextUrl.searchParams
-    const queryParams = {
-      sessionId: searchParams.get('sessionId') || '',
-      userId: searchParams.get('userId') || '0',
-      username: searchParams.get('username') || '',
-      lastEventId: searchParams.get('lastEventId')
-    }
-
-    const validationResult = PollQuerySchema.safeParse(queryParams)
-
-    if (!validationResult.success) {
-      const apiError = createApiError(ERROR_CODES.INVALID_QUERY_PARAMETERS, validationResult.error.issues)
-      return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
-        { status: 400 }
-      )
-    }
-
-    const { sessionId, lastEventId } = validationResult.data
-
-    const session = sessionManager.getSession(sessionId)
-
-    if (!session) {
-      const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
-      return NextResponse.json<PollResponse>(
-        { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
-        { status: 404 }
-      )
-    }
-
-    const bufferedEvents = eventBuffer.get(sessionId) || []
-    const newEvents = lastEventId
-      ? bufferedEvents.filter(event => event.data?.eventId === undefined || event.data?.eventId > lastEventId)
-      : bufferedEvents
-
-    return NextResponse.json<PollResponse>({
-      success: true,
-      events: newEvents,
-      sessionActive: true
-    })
-  } catch (error) {
-    console.error('Error in collaboration poll:', error)
-    const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, error instanceof Error ? error.message : 'Unknown error')
-    return NextResponse.json<PollResponse>(
-      { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
-      { status: 500 }
-    )
-  }
+  })
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  try {
-    const clientIdentifier = getClientIdentifier(request)
-    const rateLimitResult = strictRateLimiter(clientIdentifier)
+  return executeApiRoute({
+    operationName: 'Collaboration.POST',
+    circuitBreakerConfig: CIRCUIT_BREAKER_CONFIG.COLLABORATION_API,
+    timeoutMs: TIMEOUTS.COLLABORATION_API,
+    retryOptions: {
+      maxAttempts: 2,
+      baseDelayMs: 1000,
+      maxDelayMs: 5000,
+      backoffMultiplier: 2,
+      retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
+    },
+    handler: async () => {
+      const clientIdentifier = getClientIdentifier(request)
+      const rateLimitResult = strictRateLimiter(clientIdentifier)
 
-    if (!rateLimitResult.success) {
-      const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
-      return NextResponse.json(
-        { success: false, error: apiError.message, errorCode: apiError.code },
-        { status: 429, headers: {
-          'Retry-After': rateLimitResult.resetTime.toString(),
-          'X-RateLimit-Limit': rateLimitResult.limit.toString(),
-          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-          'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
-        }}
-      )
+      if (!rateLimitResult.success) {
+        const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
+        return NextResponse.json(
+          { success: false, error: apiError.message, errorCode: apiError.code },
+          { status: 429, headers: {
+            'Retry-After': rateLimitResult.resetTime.toString(),
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
+          }}
+        )
+      }
+
+      const body = await request.json()
+
+      const validationResult = CollaborationRequestSchema.safeParse(body)
+
+      if (!validationResult.success) {
+        const apiError = createApiError(ERROR_CODES.INVALID_REQUEST_DATA, validationResult.error.issues)
+        return NextResponse.json(
+          { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
+          { status: 400 }
+        )
+      }
+
+      const validatedRequest = validationResult.data
+
+      switch (validatedRequest.action) {
+        case 'join':
+          return handleJoin(validatedRequest)
+        case 'leave':
+          return handleLeave(validatedRequest)
+        case 'cursor_update':
+          return handleCursorUpdate(validatedRequest)
+        case 'edit':
+          return handleEdit(validatedRequest)
+        case 'comment':
+          return handleComment(validatedRequest)
+      }
     }
-
-    const body = await request.json()
-
-    const validationResult = CollaborationRequestSchema.safeParse(body)
-
-    if (!validationResult.success) {
-      const apiError = createApiError(ERROR_CODES.INVALID_REQUEST_DATA, validationResult.error.issues)
-      return NextResponse.json(
-        { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
-        { status: 400 }
-      )
-    }
-
-    const validatedRequest = validationResult.data
-
-    switch (validatedRequest.action) {
-      case 'join':
-        return handleJoin(validatedRequest)
-      case 'leave':
-        return handleLeave(validatedRequest)
-      case 'cursor_update':
-        return handleCursorUpdate(validatedRequest)
-      case 'edit':
-        return handleEdit(validatedRequest)
-      case 'comment':
-        return handleComment(validatedRequest)
-    }
-  } catch (error) {
-    console.error('Error in collaboration API:', error)
-    const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, error instanceof Error ? error.message : 'Unknown error')
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
-      { status: 500 }
-    )
-  }
+  })
 }
 
 async function handleJoin(request: JoinRequest): Promise<NextResponse> {
@@ -190,6 +202,7 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
   const session = sessionManager.getSessionByPostId(postId)
 
   if (!session) {
+    logServiceError(new Error('No session exists for this post'), { service: 'Collaboration', operation: 'join' })
     const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND, 'No session exists for this post. Start a new collaboration session.')
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
@@ -200,6 +213,7 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
   const added = sessionManager.addEditor(session.sessionId, userId, username)
 
   if (!added) {
+    logServiceError(new Error('Failed to join session'), { service: 'Collaboration', operation: 'join' })
     const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, 'Failed to join session')
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
@@ -243,6 +257,7 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'leave' })
     const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
@@ -253,6 +268,7 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
   const removed = sessionManager.removeEditor(sessionId, userId)
 
   if (!removed) {
+    logServiceError(new Error('User not found in session'), { service: 'Collaboration', operation: 'leave' })
     const apiError = createApiError(ERROR_CODES.USER_NOT_FOUND_IN_SESSION)
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
@@ -292,6 +308,7 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'cursor_update' })
     const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
@@ -302,6 +319,7 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   const updated = sessionManager.updateEditorCursor(sessionId, userId, cursorPosition, selection)
 
   if (!updated) {
+    logServiceError(new Error('User not found in session'), { service: 'Collaboration', operation: 'cursor_update' })
     const apiError = createApiError(ERROR_CODES.USER_NOT_FOUND_IN_SESSION)
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
@@ -343,6 +361,7 @@ async function handleEdit(request: EditRequest): Promise<NextResponse> {
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'edit' })
     const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
@@ -357,7 +376,7 @@ async function handleEdit(request: EditRequest): Promise<NextResponse> {
     userId,
     timestamp: Date.now(),
     data: {
-      eventId: getEventId(sessionId),
+      eventId: getEventId(session.sessionId),
       ...editOperation,
       authorId: userId
     }
@@ -385,6 +404,7 @@ async function handleComment(request: CommentRequest): Promise<NextResponse> {
   const session = sessionManager.getSession(sessionId)
 
   if (!session) {
+    logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'comment' })
     const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
     return NextResponse.json(
       { success: false, error: apiError.message, errorCode: apiError.code },
