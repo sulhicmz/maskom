@@ -52,6 +52,9 @@ export type { User } from '../services/auth/types';
 // Campaign types (EmailCampaign, CampaignMetrics, etc.)
 export * from './campaign';
 
+// Email Queue types (IEmailQueue, QueuedEmail, EmailQueueConfig, etc.)
+export * from './emailQueue';
+
 // A/B Test types (ABTest, ABTestVariant, etc.)
 export * from './abTest';
 

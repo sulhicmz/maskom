@@ -1,5 +1,182 @@
 # Architecture Task Tracking
 
+## Task 431: [CODE ARCHITECT] Interface Definition - EmailQueue Interface Abstraction (Jan 22, 2026)
+
+**Status**: ✅ Completed
+**Priority**: HIGH
+**Type**: Architecture - Interface Definition
+**Effort**: Low (1 hour)
+
+### Purpose
+
+Create IEmailQueue interface to enable dependency injection, improve testability, and follow Dependency Inversion Principle.
+
+### Problem Identified
+
+**Missing Interface Abstraction**:
+- `EmailQueue` class (175 lines) had no interface definition
+- `EmailService` directly imported and used `emailQueue` singleton instance
+- Tight coupling to concrete implementation throughout codebase
+- Violated Dependency Inversion Principle (DIP)
+- No contract for email queue operations
+- Internal types (QueuedEmail, EmailQueueConfig) defined in implementation layer
+
+**Why This Matters**:
+1. **Testability**: Interface enables mock implementations for unit testing
+2. **Dependency Injection**: Allows swapping implementations without changing consuming code
+3. **Code Reusability**: Interface can be implemented by multiple concrete classes
+4. **Architectural Principle**: Follows Dependency Inversion Principle (SOLID)
+5. **Contract Definition**: Clear interface defines expected behavior
+6. **Type Safety**: Internal types imported from correct location (types/emailQueue.ts)
+
+### Solution
+
+**Interface-First Architecture**:
+
+```
+IEmailQueue Interface (Contract)
+    ↓
+EmailQueue Implementation
+    ↓
+Component Usage (EmailService)
+```
+
+**Interface Definition** (`src/types/emailQueue.ts`):
+```typescript
+export interface IEmailQueue {
+  enqueue(params: Record<string, unknown>): boolean;
+  dequeue(): QueuedEmail | null;
+  peek(): QueuedEmail | null;
+  getQueueSize(): number;
+  markAttempt(emailId: string): boolean;
+  remove(emailId: string): boolean;
+  clear(): void;
+  getExpiredEmails(): QueuedEmail[];
+  removeExpired(): number;
+  getRetryableEmails(): QueuedEmail[];
+  destroy(): void;
+}
+```
+
+**Implementation Changes**:
+1. Added IEmailQueue interface to types layer (11 methods)
+2. Created src/types/emailQueue.ts with QueuedEmail, EmailQueueConfig, IEmailQueue
+3. Moved type definitions from utils layer to types layer
+4. Updated EmailQueue class to implement IEmailQueue
+5. Refactored EmailService constructor to accept IEmailQueue via dependency injection
+6. Exported EmailQueue class for dependency injection support
+7. Re-exported IEmailQueue type for consumer use
+8. Updated all internal emailQueue references to use this.emailQueue
+
+### Architecture Benefits
+
+1. **Dependency Injection**: EmailService can receive mock implementations for testing ✅
+2. **Testability**: Mock IEmailQueue implementations enable isolated unit tests ✅
+3. **Type Safety**: TypeScript ensures all implementations match interface contract ✅
+4. **Contract Definition**: Clear interface defines expected behavior ✅
+5. **Backward Compatible**: Default parameter maintains existing singleton behavior ✅
+6. **Zero Breaking Changes**: All existing functionality preserved ✅
+
+### Code Changes
+
+- Added: `src/types/emailQueue.ts` - Interface and type definitions (38 lines)
+- Modified: `src/utils/emailQueue.ts` - Implement IEmailQueue, import types, export class (+1 import)
+- Modified: `src/services/email/EmailService.ts` - Dependency injection support (+8 lines)
+- Modified: `src/types/index.ts` - Export emailQueue types (+2 lines)
+
+### Success Criteria
+
+- [x] IEmailQueue interface created in src/types/emailQueue.ts
+- [x] 11 interface methods defined with proper signatures
+- [x] EmailQueue class implements IEmailQueue
+- [x] EmailQueue exported for dependency injection support
+- [x] EmailService refactored to accept IEmailQueue via constructor injection
+- [x] All internal emailQueue references updated to use this.emailQueue
+- [x] IEmailQueue re-exported from types/index.ts
+- [x] TypeScript compilation passes (no emailQueue-related errors)
+- [x] Lint passes (0 emailQueue-related errors)
+- [x] EmailService tests pass (15/15)
+- [x] EmailQueue tests pass (48/48)
+- [x] Zero breaking changes to existing functionality
+
+### Related Files
+
+- ✅ Added: `src/types/emailQueue.ts` - Interface and type definitions (38 lines)
+- ✅ Modified: `src/utils/emailQueue.ts` - Implement IEmailQueue (+1 import)
+- ✅ Modified: `src/services/email/EmailService.ts` - Dependency injection (+8 lines)
+- ✅ Modified: `src/types/index.ts` - Export types (+2 lines)
+
+### Implementation Summary
+
+**Files Added**: 1 file
+**Files Modified**: 3 files
+**Lines Added**: ~49 lines (interface, types, dependency injection)
+**Lines Removed**: ~0 lines
+**Methods Defined**: 11 interface methods
+**Total LOC Covered**: 175 lines (EmailQueue) + 247 lines (EmailService)
+
+**Key Features**:
+1. **Interface Contract**: IEmailQueue defines all queue operations
+2. **Dependency Injection**: EmailService accepts IEmailQueue in constructor
+3. **Type Safety**: TypeScript ensures contract compliance
+4. **Backward Compatible**: Default parameter maintains existing behavior
+5. **Test-Friendly**: Mock implementations can be easily created
+
+### Usage Pattern
+
+```typescript
+// Production (default behavior)
+import emailService from '@/services/email/EmailService'
+emailService.sendEmail(params)
+
+// Testing (with dependency injection)
+import { EmailService, type IEmailQueue } from '@/services/email/EmailService'
+const mockQueue: IEmailQueue = {
+  enqueue: vi.fn().mockReturnValue(true),
+  dequeue: vi.fn(),
+  peek: vi.fn(),
+  getQueueSize: vi.fn().mockReturnValue(0),
+  markAttempt: vi.fn(),
+  remove: vi.fn(),
+  clear: vi.fn(),
+  getExpiredEmails: vi.fn().mockReturnValue([]),
+  removeExpired: vi.fn().mockReturnValue(0),
+  getRetryableEmails: vi.fn().mockReturnValue([]),
+  destroy: vi.fn()
+}
+const emailService = new EmailService(mockQueue)
+// Use emailService with mock queue
+```
+
+### Notes
+
+- Follows Code Architect principles:
+  - **Interface First**: Defined IEmailQueue before refactoring implementation ✅
+  - **Dependency Inversion**: Dependencies flow from high-level modules to abstractions ✅
+  - **Open/Closed**: Open for extension (mock implementations), closed for modification ✅
+  - **Backward Compatible**: No breaking changes to existing code ✅
+  - **Zero Regressions**: All existing tests pass ✅
+
+- **Test Status**:
+  - TypeScript compilation: ✅ Pass (no emailQueue-related errors)
+  - Lint: ✅ Pass (0 emailQueue-related errors, 8 pre-existing warnings)
+  - EmailService Tests: ✅ Pass (15/15)
+  - EmailQueue Tests: ✅ Pass (48/48)
+
+- **Future Enhancement Opportunities**:
+  - Consider removing singleton pattern entirely from EmailQueue
+  - Create useEmailQueue hook for better state management
+  - Implement MockEmailQueue for comprehensive unit tests
+  - Add EmailQueue interface to service types (IEmailService.getQueueStatus)
+
+### Related Tasks
+
+- Task 418 (APMManager Interface Abstraction) - Related interface abstraction work
+- Task 430 (APM Types Layer Cleanup) - Related architecture work
+- Task 421 (LocalStorage Schema Validation) - Related data integrity work
+
+---
+
 ## Task 430: [CODE ARCHITECT] Dependency Cleanup - APM Types Layer (Jan 22, 2026)
 
 **Status**: ✅ Completed
