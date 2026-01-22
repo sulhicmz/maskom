@@ -63,3 +63,6 @@ export * from './anomaly';
 
 // Dashboard types (UserDashboardData, ReadingHistoryEntry, ActivityEvent, etc.)
 export * from './dashboard';
+
+// Accessibility types (AccessibilityAudit, AccessibilityIssue, AccessibilityScore, etc.)
+export * from './accessibility';
