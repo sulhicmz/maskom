@@ -90,7 +90,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         sessionId: searchParams.get('sessionId') || '',
         userId: searchParams.get('userId') || '0',
         username: searchParams.get('username') || '',
-        lastEventId: searchParams.get('lastEventId')
+        lastEventId: searchParams.get('lastEventId') || undefined
       }
 
       const validationResult = PollQuerySchema.safeParse(queryParams)

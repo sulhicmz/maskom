@@ -1,6 +1,14 @@
 jest.mock('@/utils/collaboration/sessionManager');
 jest.mock('@/utils/rateLimit');
 jest.mock('@/services/common/logger');
+jest.mock('@/utils/metrics', () => ({
+    __esModule: true,
+    default: {
+        recordCall: jest.fn(),
+        recordLatency: jest.fn(),
+        recordError: jest.fn()
+    }
+}));
 
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../route';
@@ -58,10 +66,10 @@ describe('/api/collaborate - Integration Resilience', () => {
     describe('POST - Resilience Patterns', () => {
         it('should use executeApiRoute wrapper for resilience', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'join', postId: '123', userId: 1, username: 'testuser' })
+                json: jest.fn().mockResolvedValue({ action: 'join', postId: 123, userId: 1, username: 'testuser' })
             } as unknown as NextRequest;
 
-            (sessionManager.getSessionByPostId as jest.Mock).mockReturnValue({ sessionId: 'session-123', postId: '123' });
+            (sessionManager.getSessionByPostId as jest.Mock).mockReturnValue({ sessionId: 'session-123', postId: 123 });
             (sessionManager.addEditor as jest.Mock).mockReturnValue(true);
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
@@ -78,10 +86,10 @@ describe('/api/collaborate - Integration Resilience', () => {
 
         it('should use configured retry options for network errors', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'join', postId: '123', userId: 1, username: 'testuser' })
+                json: jest.fn().mockResolvedValue({ action: 'join', postId: 123, userId: 1, username: 'testuser' })
             } as unknown as NextRequest;
 
-            (sessionManager.getSessionByPostId as jest.Mock).mockReturnValue({ sessionId: 'session-123', postId: '123' });
+            (sessionManager.getSessionByPostId as jest.Mock).mockReturnValue({ sessionId: 'session-123', postId: 123 });
             (sessionManager.addEditor as jest.Mock).mockReturnValue(true);
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
@@ -155,7 +163,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await POST(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('MISSING_REQUIRED_FIELDS');
+            expect(resultJson.errorCode).toBe('INVALID_REQUEST_DATA');
             expect(resultJson.error).toBeDefined();
             expect(result.status).toBe(400);
         });
@@ -181,7 +189,7 @@ describe('/api/collaborate - Integration Resilience', () => {
     describe('Logging - No console.error', () => {
         it('should use logServiceError for session not found errors', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'join', postId: '123', userId: 1, username: 'testuser' })
+                json: jest.fn().mockResolvedValue({ action: 'join', postId: 123, userId: 1, username: 'testuser' })
             } as unknown as NextRequest;
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
@@ -223,7 +231,7 @@ describe('/api/collaborate - Integration Resilience', () => {
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
             strictRateLimiter.mockReturnValue({ success: true, limit: 100, remaining: 99, resetTime: Date.now() + 60000 });
-            (sessionManager.getSession as jest.Mock).mockReturnValue({ sessionId: 'test123', postId: '123' });
+            (sessionManager.getSession as jest.Mock).mockReturnValue({ sessionId: 'test123', postId: 123 });
 
             const result = await GET(mockRequest);
 
@@ -236,12 +244,12 @@ describe('/api/collaborate - Integration Resilience', () => {
 
         it('should successfully handle join action', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'join', postId: '123', userId: 1, username: 'testuser' })
+                json: jest.fn().mockResolvedValue({ action: 'join', postId: 123, userId: 1, username: 'testuser' })
             } as unknown as NextRequest;
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
             strictRateLimiter.mockReturnValue({ success: true, limit: 100, remaining: 99, resetTime: Date.now() + 60000 });
-            (sessionManager.getSessionByPostId as jest.Mock).mockReturnValue({ sessionId: 'session-123', postId: '123' });
+            (sessionManager.getSessionByPostId as jest.Mock).mockReturnValue({ sessionId: 'session-123', postId: 123 });
             (sessionManager.addEditor as jest.Mock).mockReturnValue(true);
 
             const result = await POST(mockRequest);
@@ -249,7 +257,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const resultJson = await result.json();
             expect(resultJson.success).toBe(true);
             expect(resultJson.sessionId).toBe('session-123');
-            expect(resultJson.postId).toBe('123');
+            expect(resultJson.postId).toBe(123);
             expect(result.status).toBe(200);
         });
 
@@ -272,7 +280,7 @@ describe('/api/collaborate - Integration Resilience', () => {
 
         it('should successfully handle cursor_update action', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'cursor_update', sessionId: 'test123', userId: 1, cursorPosition: 100 })
+                json: jest.fn().mockResolvedValue({ action: 'cursor_update', sessionId: 'test123', userId: 1, cursorPosition: { line: 10, column: 0 } })
             } as unknown as NextRequest;
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
@@ -289,7 +297,7 @@ describe('/api/collaborate - Integration Resilience', () => {
 
         it('should successfully handle edit action', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'edit', sessionId: 'test123', userId: 1, editOperation: { type: 'insert', position: 0, text: 'test' } })
+                json: jest.fn().mockResolvedValue({ action: 'edit', sessionId: 'test123', userId: 1, editOperation: { type: 'insert', position: { line: 0, column: 0 }, content: 'test' } })
             } as unknown as NextRequest;
 
             getClientIdentifier.mockReturnValue('127.0.0.1');
@@ -306,7 +314,7 @@ describe('/api/collaborate - Integration Resilience', () => {
 
         it('should successfully handle comment action', async () => {
             const mockRequest = {
-                json: jest.fn().mockResolvedValue({ action: 'comment', sessionId: 'test123', userId: 1, username: 'testuser', comment: { content: 'test comment', position: 0 } })
+                json: jest.fn().mockResolvedValue({ action: 'comment', sessionId: 'test123', userId: 1, username: 'testuser', comment: { content: 'test comment', position: { line: 0, column: 0 } } })
             } as unknown as NextRequest;
 
             getClientIdentifier.mockReturnValue('127.0.0.1');

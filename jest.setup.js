@@ -80,6 +80,18 @@ global.Response = class Response {
     this.body = body;
     this.ok = this.status >= 200 && this.status < 300;
   }
+
+  static json(data, init = {}) {
+    const body = JSON.stringify(data);
+    return new Response(body, init);
+  }
+
+  async json() {
+    if (typeof this.body === 'string') {
+      return JSON.parse(this.body);
+    }
+    return this.body;
+  }
 }
 
 global.fetch = jest.fn();
