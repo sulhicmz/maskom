@@ -2,7 +2,7 @@
  * SEO Monitor Utility Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import {
   runSEOAudit,
   saveSEOAudit,
@@ -19,7 +19,7 @@ import {
   clearSEOAuditData,
   getSEOMetadata,
 } from '@/utils/seoMonitor';
-import type { SEOIssue, SEOAudit, SEOIssueStatus } from '@/types/seoMonitor';
+import type { _SEOIssue, _SEOAudit, _SEOIssueStatus } from '@/types/seoMonitor';
 
 describe('SEO Monitor', () => {
   beforeEach(() => {
