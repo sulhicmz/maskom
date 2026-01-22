@@ -51,6 +51,14 @@ export const DATA_RELATIONSHIPS: DataRelationship[] = [
       type: "many-to-one",
       optional: false,
     },
+    {
+      sourceCollection: "SupportTicketData",
+      targetCollection: "TeamData",
+      sourceField: "assignedTo",
+      targetField: "id",
+      type: "many-to-one",
+      optional: true,
+    },
   ];
 
 export function isValidPage(page: string): page is ValidPage {

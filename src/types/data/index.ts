@@ -247,15 +247,56 @@ export interface TemplateVariable {
 }
 
 export interface EmailTemplate {
-    id: number;
-    name: string;
-    subject: string;
-    body: string;
-    category: string;
-    tags: string[];
-    variables: TemplateVariable[];
-    createdAt: string;
-    updatedAt: string;
-    sentCount?: number;
+     id: number;
+     name: string;
+     subject: string;
+     body: string;
+     category: string;
+     tags: string[];
+     variables: TemplateVariable[];
+     createdAt: string;
+     updatedAt: string;
+     sentCount?: number;
+ }
+
+export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+
+export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
+
+export type TicketCategory = 'technical' | 'billing' | 'feature_request' | 'bug_report' | 'general_inquiry' | 'account_issue';
+
+export interface TicketComment {
+   id: number;
+   ticketId: number;
+   authorName: string;
+   authorEmail: string;
+   authorRole?: 'user' | 'support' | 'admin';
+   content: string;
+   isInternal: boolean;
+   createdAt: string;
+   attachments?: string[];
+}
+
+export interface SupportTicket {
+   id: number;
+   ticketNumber: string;
+   title: string;
+   description: string;
+   status: TicketStatus;
+   priority: TicketPriority;
+   category: TicketCategory;
+   requesterName: string;
+   requesterEmail: string;
+   requesterPhone?: string;
+   assignedTo?: number;
+   createdAt: string;
+   updatedAt: string;
+   resolvedAt?: string;
+   closedAt?: string;
+   dueDate?: string;
+   tags?: string[];
+   attachments?: string[];
+   satisfactionRating?: number;
+   comments?: TicketComment[];
 }
 
