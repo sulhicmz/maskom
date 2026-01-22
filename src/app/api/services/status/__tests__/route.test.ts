@@ -14,14 +14,17 @@ import emailService from '@/services/email/EmailService';
 import authService from '@/services/auth/AuthService';
 import metricsCollector from '@/utils/metrics';
 import { CIRCUIT_BREAKER_CONFIG } from '@/constants';
+import { resetAllCircuitBreakers } from '@/utils/apiRouteHandler';
 
 describe('/api/services/status - Critical Path Testing', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        resetAllCircuitBreakers();
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+        resetAllCircuitBreakers();
     });
 
     describe('Happy Path - Successful Status Retrieval', () => {
@@ -192,7 +195,7 @@ describe('/api/services/status - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.error).toBe('Circuit breaker state unavailable');
+            expect(resultJson.error).toBe('Service temporarily unavailable');
         });
     });
 

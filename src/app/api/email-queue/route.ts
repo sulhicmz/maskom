@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import emailService from '@/services/email/EmailService';
 import { createServiceResponse } from '@/utils/apiResponse';
 import { executeApiRoute } from '@/utils/apiRouteHandler';
@@ -45,11 +46,26 @@ export async function POST() {
         handler: async () => {
             const result = await emailService.processQueue();
 
-            return createServiceResponse({
-                data: result.data,
-                message: result.success ? 'Email queue processed' : 'Failed to process email queue',
-                status: result.success ? 200 : 503
-            });
+            if (!result) {
+                throw new Error('Email queue processing returned null');
+            }
+
+            if (result.success) {
+                return createServiceResponse({
+                    data: result.data,
+                    message: 'Email queue processed',
+                    status: 200
+                });
+            }
+
+            return NextResponse.json(
+                {
+                    success: false,
+                    data: result.data,
+                    message: 'Failed to process email queue'
+                },
+                { status: 503 }
+            );
         }
     });
 }

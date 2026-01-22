@@ -12,14 +12,17 @@ import { GET, POST } from '../route';
 import emailService from '@/services/email/EmailService';
 import metricsCollector from '@/utils/metrics';
 import { CIRCUIT_BREAKER_CONFIG } from '@/constants';
+import { resetAllCircuitBreakers } from '@/utils/apiRouteHandler';
 
 describe('/api/email-queue - Critical Path Testing', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        resetAllCircuitBreakers();
     });
 
     afterEach(() => {
         jest.clearAllMocks();
+        resetAllCircuitBreakers();
     });
 
     describe('GET - Happy Path - Successful Queue Status Retrieval', () => {
@@ -202,7 +205,7 @@ describe('/api/email-queue - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.errorCode).toBeDefined();
+            expect(resultJson.error).toBeDefined();
             expect(result.status).not.toBe(200);
         });
 
@@ -218,7 +221,7 @@ describe('/api/email-queue - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.errorCode).toBeDefined();
+            expect(resultJson.error).toBeDefined();
         });
 
         it('should handle getMetrics error gracefully', async () => {
@@ -235,7 +238,7 @@ describe('/api/email-queue - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.errorCode).toBeDefined();
+            expect(resultJson.error).toBeDefined();
         });
     });
 
@@ -341,7 +344,7 @@ describe('/api/email-queue - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.errorCode).toBeDefined();
+            expect(resultJson.error).toBeDefined();
             expect(result.status).not.toBe(200);
         });
 
@@ -352,7 +355,7 @@ describe('/api/email-queue - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.errorCode).toBeDefined();
+            expect(resultJson.error).toBeDefined();
         });
     });
 
