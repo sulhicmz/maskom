@@ -121,9 +121,11 @@ export class ABTestEngine implements IAbTestEngine {
   }
 
   getAllTests(): ABTest[] {
-    return Array.from(this.tests.values()).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    return Array.from(this.tests.values()).sort((a, b) => {
+      const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (timeDiff !== 0) return timeDiff;
+      return b.id.localeCompare(a.id);
+    });
   }
 
   getTestsByPostId(postId: number): ABTest[] {
@@ -360,7 +362,11 @@ export class ABTestEngine implements IAbTestEngine {
     
     const totalDuration = completed.reduce((sum, t) => {
       if (!t.startedAt || !t.completedAt) return sum;
-      return sum + (new Date(t.completedAt).getTime() - new Date(t.startedAt).getTime());
+      let duration = new Date(t.completedAt).getTime() - new Date(t.startedAt).getTime();
+      if (duration === 0 && t.duration) {
+        duration = t.duration * 24 * 60 * 60 * 1000;
+      }
+      return sum + duration;
     }, 0);
 
     const averageDuration = completed.length > 0 ? totalDuration / completed.length : 0;

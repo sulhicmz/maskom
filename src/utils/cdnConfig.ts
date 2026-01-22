@@ -1,4 +1,4 @@
-import { CDNConfig, CachePolicy, CDNProvider } from '@/types/cdn';
+import { CDNConfig, CachePolicy, CDNProvider, ICDNConfigManager } from '@/types/cdn';
 
 const DEFAULT_CDN_CONFIG: CDNConfig = {
   provider: 'cloudflare',
@@ -23,7 +23,7 @@ const DEFAULT_CACHE_POLICIES: Record<string, CachePolicy> = {
   }
 };
 
-export class CDNConfigManager {
+export class CDNConfigManager implements ICDNConfigManager {
   private config: CDNConfig;
 
   constructor() {
@@ -107,6 +107,8 @@ export class CDNConfigManager {
 }
 
 export const cdnConfigManager = new CDNConfigManager();
+
+export type { ICDNConfigManager } from '@/types/cdn'
 
 export function getCDNConfig(): CDNConfig {
   return cdnConfigManager.getConfig();
