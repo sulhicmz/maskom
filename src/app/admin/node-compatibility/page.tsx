@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
+import { Permission } from '@/types/permission';
 import NodeCompatibilityDashboard from '@/components/admin/NodeCompatibilityDashboard';
 
 export const metadata: Metadata = {
@@ -8,11 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function NodeCompatibilityPage() {
-  const isAuthenticated = false;
-
-  if (!isAuthenticated) {
-    redirect('/login');
-  }
-
-  return <NodeCompatibilityDashboard />;
+  return (
+    <ProtectedRoute requiredPermission={Permission.MANAGE_SETTINGS}>
+      <NodeCompatibilityDashboard />
+    </ProtectedRoute>
+  );
 }
