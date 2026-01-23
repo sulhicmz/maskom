@@ -12,9 +12,9 @@ import {
   type CommentRequest
 } from '@/utils/collaboration/validation'
 import { z } from 'zod'
-import { ERROR_CODES, createApiError, CIRCUIT_BREAKER_CONFIG, TIMEOUTS } from '@/constants'
+import { CIRCUIT_BREAKER_CONFIG, TIMEOUTS } from '@/constants'
 import { executeApiRoute } from '@/utils/apiRouteHandler'
-import { logServiceError } from '@/services/common/logger'
+import { logServiceError, ServiceErrorCode, type ServiceResult } from '@/services/common'
 
 const MAX_EVENTS_PER_POLL = 50
 
@@ -27,13 +27,9 @@ const PollQuerySchema = z.object({
   lastEventId: z.string().optional()
 })
 
-interface PollResponse {
-  success: boolean
+interface PollData {
   events: CollaborativeEvent[]
   sessionActive: boolean
-  error?: string
-  errorCode?: string
-  details?: unknown
 }
 
 const eventBuffer = new Map<string, CollaborativeEvent[]>()
@@ -57,7 +53,7 @@ function bufferEvent(event: CollaborativeEvent): void {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  return executeApiRoute<PollResponse>({
+  return executeApiRoute<PollData>({
     operationName: 'Collaboration.POLL',
     circuitBreakerConfig: CIRCUIT_BREAKER_CONFIG.COLLABORATION_API,
     timeoutMs: TIMEOUTS.COLLABORATION_API,
@@ -73,9 +69,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const rateLimitResult = strictRateLimiter(clientIdentifier)
 
       if (!rateLimitResult.success) {
-        const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
-        return NextResponse.json<PollResponse>(
-          { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
+        return NextResponse.json<ServiceResult<PollData>>(
+          { success: false, error: 'Rate limit exceeded', errorCode: ServiceErrorCode.RATE_LIMIT },
           { status: 429, headers: {
             'Retry-After': rateLimitResult.resetTime.toString(),
             'X-RateLimit-Limit': rateLimitResult.limit.toString(),
@@ -96,9 +91,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const validationResult = PollQuerySchema.safeParse(queryParams)
 
       if (!validationResult.success) {
-        const apiError = createApiError(ERROR_CODES.INVALID_QUERY_PARAMETERS, validationResult.error.issues)
-        return NextResponse.json<PollResponse>(
-          { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
+        return NextResponse.json<ServiceResult<PollData>>(
+          { success: false, error: 'Invalid query parameters', errorCode: ServiceErrorCode.VALIDATION, metadata: { details: validationResult.error.issues } },
           { status: 400 }
         )
       }
@@ -108,9 +102,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       const session = sessionManager.getSession(sessionId)
 
       if (!session) {
-        const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
-        return NextResponse.json<PollResponse>(
-          { success: false, events: [], sessionActive: false, error: apiError.message, errorCode: apiError.code },
+        return NextResponse.json<ServiceResult<PollData>>(
+          { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
           { status: 404 }
         )
       }
@@ -120,17 +113,19 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         ? bufferedEvents.filter(event => event.data?.eventId === undefined || event.data?.eventId > lastEventId)
         : bufferedEvents
 
-      return NextResponse.json<PollResponse>({
+      return NextResponse.json<ServiceResult<PollData>>({
         success: true,
-        events: newEvents,
-        sessionActive: true
+        data: {
+          events: newEvents,
+          sessionActive: true
+        }
       })
     }
   })
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  return executeApiRoute({
+  return executeApiRoute<unknown>({
     operationName: 'Collaboration.POST',
     circuitBreakerConfig: CIRCUIT_BREAKER_CONFIG.COLLABORATION_API,
     timeoutMs: TIMEOUTS.COLLABORATION_API,
@@ -146,9 +141,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const rateLimitResult = strictRateLimiter(clientIdentifier)
 
       if (!rateLimitResult.success) {
-        const apiError = createApiError(ERROR_CODES.RATE_LIMIT_EXCEEDED)
-        return NextResponse.json(
-          { success: false, error: apiError.message, errorCode: apiError.code },
+        return NextResponse.json<ServiceResult<unknown>>(
+          { success: false, error: 'Rate limit exceeded', errorCode: ServiceErrorCode.RATE_LIMIT },
           { status: 429, headers: {
             'Retry-After': rateLimitResult.resetTime.toString(),
             'X-RateLimit-Limit': rateLimitResult.limit.toString(),
@@ -163,9 +157,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const validationResult = CollaborationRequestSchema.safeParse(body)
 
       if (!validationResult.success) {
-        const apiError = createApiError(ERROR_CODES.INVALID_REQUEST_DATA, validationResult.error.issues)
-        return NextResponse.json(
-          { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
+        return NextResponse.json<ServiceResult<unknown>>(
+          { success: false, error: 'Invalid request data', errorCode: ServiceErrorCode.VALIDATION, metadata: { details: validationResult.error.issues } },
           { status: 400 }
         )
       }
@@ -174,27 +167,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       switch (validatedRequest.action) {
         case 'join':
-          return handleJoin(validatedRequest)
+          return await handleJoin(validatedRequest)
         case 'leave':
-          return handleLeave(validatedRequest)
+          return await handleLeave(validatedRequest)
         case 'cursor_update':
-          return handleCursorUpdate(validatedRequest)
+          return await handleCursorUpdate(validatedRequest)
         case 'edit':
-          return handleEdit(validatedRequest)
+          return await handleEdit(validatedRequest)
         case 'comment':
-          return handleComment(validatedRequest)
+          return await handleComment(validatedRequest)
       }
+
+      return NextResponse.json<ServiceResult<unknown>>(
+        { success: false, error: 'Unknown action', errorCode: ServiceErrorCode.VALIDATION },
+        { status: 400 }
+      )
     }
   })
 }
 
-async function handleJoin(request: JoinRequest): Promise<NextResponse> {
+async function handleJoin(request: JoinRequest): Promise<NextResponse<ServiceResult<unknown>>> {
   const { postId, userId, username } = request
 
   if (!postId || !userId || !username) {
-    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
       { status: 400 }
     )
   }
@@ -203,9 +200,8 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
 
   if (!session) {
     logServiceError(new Error('No session exists for this post'), { service: 'Collaboration', operation: 'join' })
-    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND, 'No session exists for this post. Start a new collaboration session.')
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code, details: apiError.details },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'No session exists for this post. Start a new collaboration session.', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }
@@ -214,9 +210,8 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
 
   if (!added) {
     logServiceError(new Error('Failed to join session'), { service: 'Collaboration', operation: 'join' })
-    const apiError = createApiError(ERROR_CODES.INTERNAL_ERROR, 'Failed to join session')
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Failed to join session', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 500 }
     )
   }
@@ -235,21 +230,22 @@ async function handleJoin(request: JoinRequest): Promise<NextResponse> {
 
   bufferEvent(event)
 
-  return NextResponse.json({
+  return NextResponse.json<ServiceResult<unknown>>({
     success: true,
-    sessionId: session.sessionId,
-    postId,
-    userId
+    data: {
+      sessionId: session.sessionId,
+      postId,
+      userId
+    }
   })
 }
 
-async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
+async function handleLeave(request: LeaveRequest): Promise<NextResponse<ServiceResult<unknown>>> {
   const { sessionId, userId } = request
 
   if (!sessionId || !userId) {
-    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
       { status: 400 }
     )
   }
@@ -258,9 +254,8 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
 
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'leave' })
-    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }
@@ -269,9 +264,8 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
 
   if (!removed) {
     logServiceError(new Error('User not found in session'), { service: 'Collaboration', operation: 'leave' })
-    const apiError = createApiError(ERROR_CODES.USER_NOT_FOUND_IN_SESSION)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'User not found in session', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }
@@ -289,18 +283,17 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse> {
 
   bufferEvent(event)
 
-  return NextResponse.json({
+  return NextResponse.json<ServiceResult<unknown>>({
     success: true
   })
 }
 
-async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextResponse> {
+async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextResponse<ServiceResult<unknown>>> {
   const { sessionId, userId, cursorPosition, selection } = request
 
   if (!sessionId || !userId || !cursorPosition) {
-    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
       { status: 400 }
     )
   }
@@ -309,9 +302,8 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
 
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'cursor_update' })
-    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }
@@ -320,9 +312,8 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
 
   if (!updated) {
     logServiceError(new Error('User not found in session'), { service: 'Collaboration', operation: 'cursor_update' })
-    const apiError = createApiError(ERROR_CODES.USER_NOT_FOUND_IN_SESSION)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'User not found in session', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }
@@ -342,18 +333,17 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
 
   bufferEvent(event)
 
-  return NextResponse.json({
+  return NextResponse.json<ServiceResult<unknown>>({
     success: true
   })
 }
 
-async function handleEdit(request: EditRequest): Promise<NextResponse> {
+async function handleEdit(request: EditRequest): Promise<NextResponse<ServiceResult<unknown>>> {
   const { sessionId, userId, editOperation } = request
 
   if (!sessionId || !userId || !editOperation) {
-    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
       { status: 400 }
     )
   }
@@ -362,9 +352,8 @@ async function handleEdit(request: EditRequest): Promise<NextResponse> {
 
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'edit' })
-    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }
@@ -384,19 +373,20 @@ async function handleEdit(request: EditRequest): Promise<NextResponse> {
 
   bufferEvent(event)
 
-  return NextResponse.json({
+  return NextResponse.json<ServiceResult<unknown>>({
     success: true,
-    version: session.version
+    data: {
+      version: session.version
+    }
   })
 }
 
-async function handleComment(request: CommentRequest): Promise<NextResponse> {
+async function handleComment(request: CommentRequest): Promise<NextResponse<ServiceResult<unknown>>> {
   const { sessionId, userId, username, comment } = request
 
   if (!sessionId || !userId || !username || !comment) {
-    const apiError = createApiError(ERROR_CODES.MISSING_REQUIRED_FIELDS)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
       { status: 400 }
     )
   }
@@ -405,9 +395,8 @@ async function handleComment(request: CommentRequest): Promise<NextResponse> {
 
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'comment' })
-    const apiError = createApiError(ERROR_CODES.SESSION_NOT_FOUND)
-    return NextResponse.json(
-      { success: false, error: apiError.message, errorCode: apiError.code },
+    return NextResponse.json<ServiceResult<unknown>>(
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
       { status: 404 }
     )
   }

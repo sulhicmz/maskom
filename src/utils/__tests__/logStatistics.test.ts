@@ -280,8 +280,8 @@ describe('logStatistics', () => {
 
         it('should calculate last 7 days activity correctly', () => {
             const now = new Date();
-            const last7Days = new Date(now.getTime() - 604800000);
-            const last8Days = new Date(now.getTime() - 691200000);
+            const sixDaysAgo = new Date(now.getTime() - 518400000);
+            const eightDaysAgo = new Date(now.getTime() - 691200000);
 
             const logs = [
                 createMockLog({
@@ -290,11 +290,11 @@ describe('logStatistics', () => {
                 }),
                 createMockLog({
                     id: '2',
-                    timestamp: last7Days.toISOString(),
+                    timestamp: sixDaysAgo.toISOString(),
                 }),
                 createMockLog({
                     id: '3',
-                    timestamp: last8Days.toISOString(),
+                    timestamp: eightDaysAgo.toISOString(),
                 }),
             ];
 
@@ -306,8 +306,8 @@ describe('logStatistics', () => {
 
         it('should calculate last 30 days activity correctly', () => {
             const now = new Date();
-            const last30Days = new Date(now.getTime() - 2592000000);
-            const last31Days = new Date(now.getTime() - 2678400000);
+            const twentyNineDaysAgo = new Date(now.getTime() - 2505600000);
+            const thirtyOneDaysAgo = new Date(now.getTime() - 2678400000);
 
             const logs = [
                 createMockLog({
@@ -316,11 +316,11 @@ describe('logStatistics', () => {
                 }),
                 createMockLog({
                     id: '2',
-                    timestamp: last30Days.toISOString(),
+                    timestamp: twentyNineDaysAgo.toISOString(),
                 }),
                 createMockLog({
                     id: '3',
-                    timestamp: last31Days.toISOString(),
+                    timestamp: thirtyOneDaysAgo.toISOString(),
                 }),
             ];
 

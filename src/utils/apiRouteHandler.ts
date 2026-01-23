@@ -43,7 +43,7 @@ export async function executeApiRoute<T = unknown>({
     handler,
     circuitBreakerConfig,
     retryOptions = DEFAULT_RETRY_OPTIONS
-}: ApiRouteHandler<T>): Promise<NextResponse<T>> {
+}: ApiRouteHandler<T>): Promise<NextResponse<ServiceResult<T>>> {
     const startTime = Date.now();
     const routeName = operationName.split('.')[0] || 'ApiRoute';
     const circuitBreaker = getCircuitBreaker(routeName, circuitBreakerConfig);
@@ -103,7 +103,7 @@ export async function executeApiRoute<T = unknown>({
                 errorCode,
                 status,
                 retryAfter
-            }) as NextResponse<T>;
+            });
         }
 
         if (errorCode === ServiceErrorCode.REQUEST_TIMEOUT) {
@@ -113,7 +113,7 @@ export async function executeApiRoute<T = unknown>({
                 errorCode,
                 status,
                 retryAfter
-            }) as NextResponse<T>;
+            });
         }
 
         if (errorCode === ServiceErrorCode.NETWORK) {
@@ -123,7 +123,7 @@ export async function executeApiRoute<T = unknown>({
                 errorCode,
                 status,
                 retryAfter
-            }) as NextResponse<T>;
+            });
         }
 
         if (errorCode === ServiceErrorCode.RATE_LIMIT) {
@@ -136,7 +136,7 @@ export async function executeApiRoute<T = unknown>({
                 errorCode,
                 status,
                 retryAfter: retryAfterCalc
-            }) as NextResponse<T>;
+            });
         }
 
         logServiceError(errorObj, { service: routeName, operation: operationName });
@@ -145,7 +145,7 @@ export async function executeApiRoute<T = unknown>({
             error: errorObj.message || 'Internal server error',
             errorCode,
             status
-        }) as NextResponse<T>;
+        });
     }
 }
 
