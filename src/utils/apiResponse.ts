@@ -61,7 +61,7 @@ export function createServiceResponse<T>({
     });
 }
 
-export interface ServiceErrorResponseConfig {
+export interface ServiceErrorResponseConfig<T = void> {
     error: string;
     errorCode?: ServiceErrorCodeType;
     status?: number;
@@ -69,6 +69,7 @@ export interface ServiceErrorResponseConfig {
     metadata?: Record<string, unknown>;
     retryAfter?: number;
     message?: string;
+    data?: T;
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -91,15 +92,16 @@ const ERROR_MESSAGES: Record<string, string> = {
     'TEMPLATE_NOT_FOUND': 'Template not found'
 };
 
-export function createServiceErrorResponse({
+export function createServiceErrorResponse<T = void>({
     error,
     errorCode,
     status = 500,
     headers,
     metadata,
     retryAfter,
-    message
-}: ServiceErrorResponseConfig): NextResponse<ServiceResult<void>> {
+    message,
+    data
+}: ServiceErrorResponseConfig<T>): NextResponse<ServiceResult<T>> {
     const defaultHeaders: HeadersInit = {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate'
@@ -115,12 +117,13 @@ export function createServiceErrorResponse({
 
     const errorMessage = message || (errorCode ? ERROR_MESSAGES[errorCode] || 'Unknown error' : 'Unknown error');
 
-    const serviceResult: ServiceResult<void> = {
+    const serviceResult: ServiceResult<T> = {
         success: false,
         error,
         errorCode,
         message: errorMessage,
-        metadata
+        metadata,
+        data
     };
 
     return NextResponse.json(serviceResult, {

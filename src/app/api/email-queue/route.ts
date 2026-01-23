@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import emailService from '@/services/email/EmailService';
 import { createServiceResponse, createServiceErrorResponse } from '@/utils/apiResponse';
 import { executeApiRoute } from '@/utils/apiRouteHandler';
@@ -59,7 +58,8 @@ export async function POST() {
             }
 
             return createServiceErrorResponse({
-                error: 'Failed to process email queue',
+                error: (result.data as { error?: string }).error || 'Failed to process email queue',
+                data: result.data as { processed: number; failed: number },
                 status: 503
             });
         }
