@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { DraftContent, CursorPosition, CollaborativeEvent, RealTimeComment, ActiveEditor, type ICollaborationClient } from '@/types/collaboration'
-import { CollaborationClient, createCollaborationClient } from '@/utils/collaboration/collaborationClient'
+import { createCollaborationClient } from '@/utils/collaboration/collaborationClient'
 import ActiveEditorsIndicator from './ActiveEditorsIndicator'
 import RealTimeComments from './RealTimeComments'
 import HistoryVisualization from './HistoryVisualization'
