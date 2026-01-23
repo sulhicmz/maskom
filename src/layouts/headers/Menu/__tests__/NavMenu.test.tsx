@@ -54,6 +54,7 @@ describe("NavMenu Component", () => {
 
       const homeLink = screen.getByText("Beranda").closest("a");
       expect(homeLink).toHaveClass("active");
+      expect(homeLink).toHaveAttribute("aria-current", "page");
     });
 
     it("highlights menu item when on route with hash", () => {
@@ -75,6 +76,7 @@ describe("NavMenu Component", () => {
 
       const aboutLink = screen.getByText("Tentang Kami").closest("a");
       expect(aboutLink).toHaveClass("active");
+      expect(aboutLink).toHaveAttribute("aria-current", "page");
     });
 
     it("does not highlight menu item when on different route", () => {

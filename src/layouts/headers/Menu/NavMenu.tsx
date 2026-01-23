@@ -50,7 +50,7 @@ const NavMenu = memo(() => {
         <ul>
             {menu_data.map((menu) => (
                 <li key={menu.id} className={`has-dropdown ${openSubmenus[menu.id] ? "submenu-open" : ""}`}>
-                    <Link href={menu.link} className={`${(isMenuItemActive(menu.link) || (menu.sub_menus && menu.sub_menus.some((sub_m) => sub_m.link && isSubMenuItemActive(sub_m.link)))) ? "active" : ""}`}>
+                    <Link href={menu.link} className={`${(isMenuItemActive(menu.link) || (menu.sub_menus && menu.sub_menus.some((sub_m) => sub_m.link && isSubMenuItemActive(sub_m.link)))) ? "active" : ""}`} aria-current={isMenuItemActive(menu.link) ? "page" : undefined}>
                         {menu.title}
                         {menu.has_dropdown && <button
                             type="button"
@@ -77,7 +77,7 @@ const NavMenu = memo(() => {
                                 >
                                     {menu.sub_menus.map((sub_m, i) => (
                                         <li key={i}>
-                                            <Link href={sub_m.link} className={`${sub_m.link && isSubMenuItemActive(sub_m.link) ? "active" : ""}`}>
+                                            <Link href={sub_m.link} className={`${sub_m.link && isSubMenuItemActive(sub_m.link) ? "active" : ""}`} aria-current={sub_m.link && isSubMenuItemActive(sub_m.link) ? "page" : undefined}>
                                                 {sub_m.title}
                                             </Link>
                                         </li>
