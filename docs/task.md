@@ -1,5 +1,52 @@
 # Architecture Task Tracking
 
+## Task 441: [CONTENT STRATEGIST] Intelligent Content Personalization Engine (Jan 23, 2026)
+
+**Status**: 🔄 In Progress
+**Priority**: HIGH
+**Type**: Personalization/Engagement
+**Effort**: Medium (4-6 hours)
+
+### Purpose
+
+Implement AI-powered content personalization engine that dynamically adapts content based on user behavior, demographics, and preferences to increase engagement and conversion rates.
+
+### User Story
+
+As a Content Strategist, I want an AI-powered content personalization engine that dynamically adapts content based on user behavior, demographics, and preferences, so that I can increase engagement and conversion rates through tailored experiences.
+
+### Implementation Plan
+
+1. Create personalization data types (UserSegment, PersonalizationRule, PersonalizationVariant)
+2. Implement rule-based personalization engine (extensible to ML)
+3. Track user behavior signals (scroll depth, time on page, click patterns)
+4. Create content variations for different user segments
+5. Implement personalization analytics (lift metrics, conversion impact)
+6. Add personalization preview mode (view as different user segments)
+7. Create personalization rule management UI at /admin/personalization
+8. Implement user segmentation engine (behavioral, demographic, contextual)
+9. Add A/B testing integration for personalization rules
+10. Add personalization performance tracking dashboard
+
+### Architecture Considerations
+
+- Privacy-first: All data stored in localStorage, no cross-site tracking
+- Opt-out mechanism for privacy-conscious users
+- Integration with existing reading history and bookmarking features
+- Integration with existing analytics dashboard (FEATURE-009)
+- Integration with existing A/B testing framework (FEATURE-082)
+- Dark mode support via ThemeContext
+- Indonesian UI text for accessibility
+
+### Related Files
+
+- ✅ Pending: `src/types/personalization.ts` - Personalization types
+- ✅ Pending: `src/utils/personalizationEngine.ts` - Rule engine (200+ lines)
+- ✅ Pending: `src/components/admin/PersonalizationDashboard.tsx` - Admin UI (300+ lines)
+- ✅ Pending: `src/components/admin/__tests__/personalization.test.ts` - Tests (50+ lines)
+
+---
+
 ## Task 440: [TECHNICAL WRITER] Critical Documentation Fixes (Jan 23, 2026)
 
 **Status**: ✅ Completed
