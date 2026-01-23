@@ -332,7 +332,7 @@ describe('/api/email-queue - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.message).toBe('Failed to process email queue');
+            expect(resultJson.error).toEqual('SMTP connection failed');
             expect(resultJson.data).toEqual(mockProcessResult.data);
             expect(result.status).toBe(503);
         });

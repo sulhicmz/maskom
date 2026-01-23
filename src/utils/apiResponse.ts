@@ -68,7 +68,28 @@ export interface ServiceErrorResponseConfig {
     headers?: HeadersInit;
     metadata?: Record<string, unknown>;
     retryAfter?: number;
+    message?: string;
 }
+
+const ERROR_MESSAGES: Record<string, string> = {
+    'VALIDATION_ERROR': 'Validation failed',
+    'RATE_LIMIT': 'Rate limit exceeded',
+    'TIMEOUT': 'Request timed out',
+    'CIRCUIT_BREAKER': 'Circuit breaker is open',
+    'CREDENTIALS_MISSING': 'Credentials missing',
+    'NETWORK': 'Network error occurred',
+    'UNKNOWN': 'Unknown error',
+    'REQUEST_TIMEOUT': 'Request timed out',
+    'SERVICE_UNAVAILABLE': 'Service temporarily unavailable',
+    'RESOURCE_NOT_FOUND': 'Resource not found',
+    'SESSION_NOT_FOUND': 'Session not found',
+    'USER_NOT_FOUND_IN_SESSION': 'User not found in session',
+    'INVALID_REQUEST_DATA': 'Invalid request data',
+    'INVALID_QUERY_PARAMETERS': 'Invalid query parameters',
+    'MISSING_REQUIRED_FIELDS': 'Missing required fields',
+    'INVALID_CREDENTIALS': 'Invalid credentials',
+    'TEMPLATE_NOT_FOUND': 'Template not found'
+};
 
 export function createServiceErrorResponse({
     error,
@@ -76,7 +97,8 @@ export function createServiceErrorResponse({
     status = 500,
     headers,
     metadata,
-    retryAfter
+    retryAfter,
+    message
 }: ServiceErrorResponseConfig): NextResponse<ServiceResult<void>> {
     const defaultHeaders: HeadersInit = {
         'Content-Type': 'application/json',
@@ -91,10 +113,13 @@ export function createServiceErrorResponse({
         ? { ...defaultHeaders, ...headers }
         : defaultHeaders;
 
+    const errorMessage = message || (errorCode ? ERROR_MESSAGES[errorCode] || 'Unknown error' : 'Unknown error');
+
     const serviceResult: ServiceResult<void> = {
         success: false,
         error,
         errorCode,
+        message: errorMessage,
         metadata
     };
 
