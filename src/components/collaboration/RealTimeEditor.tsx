@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { DraftContent, CursorPosition, CollaborativeEvent, RealTimeComment, ActiveEditor } from '@/types/collaboration'
+import { DraftContent, CursorPosition, CollaborativeEvent, RealTimeComment, ActiveEditor, type ICollaborationClient } from '@/types/collaboration'
 import { CollaborationClient, createCollaborationClient } from '@/utils/collaboration/collaborationClient'
 import ActiveEditorsIndicator from './ActiveEditorsIndicator'
 import RealTimeComments from './RealTimeComments'
@@ -32,7 +32,7 @@ export default function RealTimeEditor({
   hasEditorRole
 }: RealTimeEditorProps) {
   const [content, setContent] = useState<DraftContent>(initialContent)
-  const [client, setClient] = useState<CollaborationClient | null>(null)
+  const [client, setClient] = useState<ICollaborationClient | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [, setSessionId] = useState<string>('')

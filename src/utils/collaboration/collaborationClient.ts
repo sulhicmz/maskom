@@ -1,4 +1,4 @@
-import { CollaborativeEvent, ActiveEditor, CursorPosition } from '@/types/collaboration'
+import { CollaborativeEvent, ActiveEditor, CursorPosition, ICollaborationClient } from '@/types/collaboration'
 import { withTimeout, CircuitBreaker } from '@/utils/resilience'
 import { withRetry } from '@/utils/resilience/retry'
 import { TIMEOUTS, SERVICE_RETRY_CONFIG } from '@/constants/timeouts'
@@ -23,7 +23,7 @@ interface PollResponse {
   error?: string
 }
 
-export class CollaborationClient {
+export class CollaborationClient implements ICollaborationClient {
   private config: CollaborationClientConfig
   private pollTimer: NodeJS.Timeout | null = null
   private lastEventId: string | undefined = undefined

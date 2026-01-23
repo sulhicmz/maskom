@@ -98,3 +98,27 @@ export interface ISessionManager {
   getSessionCount(): number
   getTotalEditorCount(): number
 }
+
+export interface ICollaborationClient {
+  join(): Promise<boolean>
+  leave(): Promise<boolean>
+  sendCursorUpdate(
+    cursorPosition: CursorPosition,
+    selection?: { start: CursorPosition; end: CursorPosition }
+  ): Promise<boolean>
+  sendEdit(editOperation: {
+    type: 'insert' | 'delete' | 'replace'
+    position: CursorPosition
+    content?: string
+    length?: number
+    version: number
+  }): Promise<boolean>
+  sendComment(comment: {
+    content: string
+    position: CursorPosition
+  }): Promise<boolean>
+  getConnectionStatus(): boolean
+  getSessionId(): string
+  getCircuitBreakerState(): unknown
+  resetCircuitBreaker(): void
+}
