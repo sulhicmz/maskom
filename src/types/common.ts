@@ -23,6 +23,7 @@ export const ServiceErrorCode = {
     CREDENTIALS_MISSING: 'CREDENTIALS_MISSING',
     UNKNOWN: 'UNKNOWN_ERROR',
     NETWORK: 'NETWORK_ERROR',
+    REQUEST_TIMEOUT: 'REQUEST_TIMEOUT',
 } as const;
 
 export type ServiceErrorCodeType = typeof ServiceErrorCode[keyof typeof ServiceErrorCode];

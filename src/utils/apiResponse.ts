@@ -61,23 +61,47 @@ export function createServiceResponse<T>({
     });
 }
 
-export interface ServiceErrorResponseConfig {
+export interface ServiceErrorResponseConfig<T = void> {
     error: string;
     errorCode?: ServiceErrorCodeType;
     status?: number;
     headers?: HeadersInit;
     metadata?: Record<string, unknown>;
     retryAfter?: number;
+    message?: string;
+    data?: T;
 }
 
-export function createServiceErrorResponse({
+const ERROR_MESSAGES: Record<string, string> = {
+    'VALIDATION_ERROR': 'Validation failed',
+    'RATE_LIMIT': 'Rate limit exceeded',
+    'TIMEOUT': 'Request timed out',
+    'CIRCUIT_BREAKER': 'Circuit breaker is open',
+    'CREDENTIALS_MISSING': 'Credentials missing',
+    'NETWORK': 'Network error occurred',
+    'UNKNOWN': 'Unknown error',
+    'REQUEST_TIMEOUT': 'Request timed out',
+    'SERVICE_UNAVAILABLE': 'Service temporarily unavailable',
+    'RESOURCE_NOT_FOUND': 'Resource not found',
+    'SESSION_NOT_FOUND': 'Session not found',
+    'USER_NOT_FOUND_IN_SESSION': 'User not found in session',
+    'INVALID_REQUEST_DATA': 'Invalid request data',
+    'INVALID_QUERY_PARAMETERS': 'Invalid query parameters',
+    'MISSING_REQUIRED_FIELDS': 'Missing required fields',
+    'INVALID_CREDENTIALS': 'Invalid credentials',
+    'TEMPLATE_NOT_FOUND': 'Template not found'
+};
+
+export function createServiceErrorResponse<T = void>({
     error,
     errorCode,
     status = 500,
     headers,
     metadata,
-    retryAfter
-}: ServiceErrorResponseConfig): NextResponse<ServiceResult<void>> {
+    retryAfter,
+    message,
+    data
+}: ServiceErrorResponseConfig<T>): NextResponse<ServiceResult<T>> {
     const defaultHeaders: HeadersInit = {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate'
@@ -91,11 +115,15 @@ export function createServiceErrorResponse({
         ? { ...defaultHeaders, ...headers }
         : defaultHeaders;
 
-    const serviceResult: ServiceResult<void> = {
+    const errorMessage = message || (errorCode ? ERROR_MESSAGES[errorCode] || 'Unknown error' : 'Unknown error');
+
+    const serviceResult: ServiceResult<T> = {
         success: false,
         error,
         errorCode,
-        metadata
+        message: errorMessage,
+        metadata,
+        data
     };
 
     return NextResponse.json(serviceResult, {

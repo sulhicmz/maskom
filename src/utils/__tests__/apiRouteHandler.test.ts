@@ -157,7 +157,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.circuitBreaker',
                 false,
-                'circuit_breaker',
+                'CIRCUIT_BREAKER_OPEN',
                 expect.any(Number)
             );
         });
@@ -200,7 +200,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.timeout',
                 false,
-                'timeout',
+                'REQUEST_TIMEOUT',
                 expect.any(Number)
             );
         });
@@ -216,7 +216,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.timeout2',
                 false,
-                'timeout',
+                'REQUEST_TIMEOUT',
                 expect.any(Number)
             );
         });
@@ -234,7 +234,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.network',
                 false,
-                'network',
+                'NETWORK_ERROR',
                 expect.any(Number)
             );
         });
@@ -250,7 +250,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.econn',
                 false,
-                'network',
+                'NETWORK_ERROR',
                 expect.any(Number)
             );
         });
@@ -266,7 +266,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.status503',
                 false,
-                'network',
+                'NETWORK_ERROR',
                 expect.any(Number)
             );
         });
@@ -284,7 +284,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.unknown',
                 false,
-                'unknown',
+                'UNKNOWN_ERROR',
                 expect.any(Number)
             );
         });
@@ -300,7 +300,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.stringError',
                 false,
-                'unknown',
+                'UNKNOWN_ERROR',
                 expect.any(Number)
             );
         });
@@ -316,7 +316,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.customError',
                 false,
-                'unknown',
+                'UNKNOWN_ERROR',
                 expect.any(Number)
             );
         });
@@ -332,7 +332,7 @@ describe('apiRouteHandler', () => {
             expect(metricsCollector.recordCall).toHaveBeenCalledWith(
                 'TestService.noMessage',
                 false,
-                'unknown',
+                'UNKNOWN_ERROR',
                 expect.any(Number)
             );
         });

@@ -27,18 +27,13 @@ export default function NodeCompatibilityDashboard() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const packageJson = await import('../../../../package.json') as { default: { engines?: { node?: string } } };
-      const engines = packageJson.default?.engines?.node;
+      const currentVersion = getCurrentNodeVersion();
+      const requirement = parseEnginesField('>=18.0.0');
+      const checkResult = checkNodeVersion(currentVersion, requirement);
+      setNodeCheck(checkResult);
 
-      if (engines) {
-        const requirement = parseEnginesField(engines);
-        const currentVersion = getCurrentNodeVersion();
-        const checkResult = checkNodeVersion(currentVersion, requirement);
-        setNodeCheck(checkResult);
-
-        const configs = generateVersionManagerConfigs(requirement.minVersion || requirement.requiredVersion || '22.0.0');
-        setVersionManagers(configs);
-      }
+      const configs = generateVersionManagerConfigs(requirement.minVersion || requirement.requiredVersion || '22.0.0');
+      setVersionManagers(configs);
 
       const deps = await scanDependencyVersions();
       setDependencies(deps);

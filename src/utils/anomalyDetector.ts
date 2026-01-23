@@ -25,6 +25,28 @@ const STORAGE_KEYS = {
   METRICS_HISTORY: 'anomaly_metrics_history',
 };
 
+const MIN_SAMPLES_FOR_BASELINE = 10;
+const MAX_CONFIDENCE_PERCENT = 95;
+const CONFIDENCE_MULTIPLIER = 20;
+const MOVING_AVERAGE_DEVIATION_THRESHOLD = 50;
+const HOURS_PER_DAY = 24;
+const DEFAULT_BASELINE_WINDOW_DAYS = 7;
+const SENSITIVITY_MULTIPLIERS = {
+  LOW: 1.5,
+  MEDIUM: 1,
+  HIGH: 0.7,
+} as const;
+const Z_SCORE_THRESHOLDS = {
+  CRITICAL: 5,
+  HIGH: 4,
+  MEDIUM: 3,
+} as const;
+const DEVIATION_THRESHOLDS = {
+  CRITICAL: 200,
+  HIGH: 150,
+  MEDIUM: 100,
+} as const;
+
 const anomalyArraySchema = z.array(
   z.object({
     id: z.string(),
@@ -344,7 +366,7 @@ class AnomalyDetector implements IAnomalyDetector {
     this.metricsHistory.addMetric(serviceName, metricType, metric, currentValue);
     const history = this.metricsHistory.getHistory(serviceName, metricType, metric);
 
-    if (!history || history.values.length < 10) {
+    if (!history || history.values.length < MIN_SAMPLES_FOR_BASELINE) {
       return {
         anomaly: null,
         baseline: {
@@ -378,7 +400,7 @@ class AnomalyDetector implements IAnomalyDetector {
 
       if (Math.abs(zScore) >= threshold.zScoreThreshold) {
         isAnomaly = true;
-        confidence = Math.min(95, Math.abs(zScore) * 20);
+        confidence = Math.min(MAX_CONFIDENCE_PERCENT, Math.abs(zScore) * CONFIDENCE_MULTIPLIER);
 
         const severity = this.calculateSeverity(zScore, threshold.sensitivityLevel);
         const description = this.generateDescription(metricType, metric, currentValue, baseline.baseline, zScore);
@@ -401,9 +423,9 @@ class AnomalyDetector implements IAnomalyDetector {
       const movingAvg = this.calculateMovingAverage(baseline.samples);
       const deviationPercent = Math.abs((currentValue - movingAvg) / movingAvg) * 100;
 
-      if (deviationPercent >= 50) {
+      if (deviationPercent >= MOVING_AVERAGE_DEVIATION_THRESHOLD) {
         isAnomaly = true;
-        confidence = Math.min(95, deviationPercent);
+        confidence = Math.min(MAX_CONFIDENCE_PERCENT, deviationPercent);
 
         const severity = this.calculateSeverityFromPercent(deviationPercent, threshold.sensitivityLevel);
         const description = this.generateDescription(
@@ -473,7 +495,7 @@ class AnomalyDetector implements IAnomalyDetector {
 
     if (existing) {
       existing.samples.push(value);
-      if (existing.samples.length > existing.windowSize * 24) {
+      if (existing.samples.length > existing.windowSize * HOURS_PER_DAY) {
         existing.samples.shift();
       }
       existing.baseline = this.calculateMovingAverage(existing.samples);
@@ -491,7 +513,7 @@ class AnomalyDetector implements IAnomalyDetector {
         baseline: value,
         samples: [value],
         sampleSize: 1,
-        windowSize: 7 * 24,
+        windowSize: DEFAULT_BASELINE_WINDOW_DAYS * HOURS_PER_DAY,
         lastUpdated: new Date().toISOString(),
         standardDeviation: 0,
       };
@@ -755,26 +777,34 @@ class AnomalyDetector implements IAnomalyDetector {
   private calculateSeverity(zScore: number, sensitivity: string): AnomalySeverity {
     const absZScore = Math.abs(zScore);
 
-    const sensitivityMultiplier = sensitivity === 'low' ? 1.5 : sensitivity === 'high' ? 0.7 : 1;
+    const sensitivityMultiplier = sensitivity === 'low'
+      ? SENSITIVITY_MULTIPLIERS.LOW
+      : sensitivity === 'high'
+      ? SENSITIVITY_MULTIPLIERS.HIGH
+      : SENSITIVITY_MULTIPLIERS.MEDIUM;
 
-    if (absZScore >= 5 * sensitivityMultiplier) {
+    if (absZScore >= Z_SCORE_THRESHOLDS.CRITICAL * sensitivityMultiplier) {
       return 'critical';
-    } else if (absZScore >= 4 * sensitivityMultiplier) {
+    } else if (absZScore >= Z_SCORE_THRESHOLDS.HIGH * sensitivityMultiplier) {
       return 'high';
-    } else if (absZScore >= 3 * sensitivityMultiplier) {
+    } else if (absZScore >= Z_SCORE_THRESHOLDS.MEDIUM * sensitivityMultiplier) {
       return 'medium';
     }
     return 'low';
   }
 
   private calculateSeverityFromPercent(deviationPercent: number, sensitivity: string): AnomalySeverity {
-    const sensitivityMultiplier = sensitivity === 'low' ? 1.5 : sensitivity === 'high' ? 0.7 : 1;
+    const sensitivityMultiplier = sensitivity === 'low'
+      ? SENSITIVITY_MULTIPLIERS.LOW
+      : sensitivity === 'high'
+      ? SENSITIVITY_MULTIPLIERS.HIGH
+      : SENSITIVITY_MULTIPLIERS.MEDIUM;
 
-    if (deviationPercent >= 200 * sensitivityMultiplier) {
+    if (deviationPercent >= DEVIATION_THRESHOLDS.CRITICAL * sensitivityMultiplier) {
       return 'critical';
-    } else if (deviationPercent >= 150 * sensitivityMultiplier) {
+    } else if (deviationPercent >= DEVIATION_THRESHOLDS.HIGH * sensitivityMultiplier) {
       return 'high';
-    } else if (deviationPercent >= 100 * sensitivityMultiplier) {
+    } else if (deviationPercent >= DEVIATION_THRESHOLDS.MEDIUM * sensitivityMultiplier) {
       return 'medium';
     }
     return 'low';

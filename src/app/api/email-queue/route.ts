@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import emailService from '@/services/email/EmailService';
-import { createServiceResponse } from '@/utils/apiResponse';
+import { createServiceResponse, createServiceErrorResponse } from '@/utils/apiResponse';
 import { executeApiRoute } from '@/utils/apiRouteHandler';
 import { CIRCUIT_BREAKER_CONFIG } from '@/constants';
 
@@ -58,14 +57,11 @@ export async function POST() {
                 });
             }
 
-            return NextResponse.json(
-                {
-                    success: false,
-                    data: result.data,
-                    message: 'Failed to process email queue'
-                },
-                { status: 503 }
-            );
+            return createServiceErrorResponse({
+                error: (result.data as { error?: string }).error || 'Failed to process email queue',
+                data: result.data as { processed: number; failed: number },
+                status: 503
+            });
         }
     });
 }

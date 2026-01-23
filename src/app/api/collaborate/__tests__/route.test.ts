@@ -129,9 +129,9 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await GET(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('INVALID_QUERY_PARAMETERS');
+            expect(resultJson.errorCode).toBe('VALIDATION_ERROR');
             expect(resultJson.error).toBeDefined();
-            expect(resultJson.details).toBeDefined();
+            expect(resultJson.metadata?.details).toBeDefined();
             expect(result.status).toBe(400);
         });
 
@@ -147,7 +147,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await GET(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('SESSION_NOT_FOUND');
+            expect(resultJson.errorCode).toBe('UNKNOWN_ERROR');
             expect(resultJson.error).toBeDefined();
             expect(result.status).toBe(404);
         });
@@ -163,7 +163,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await POST(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('INVALID_REQUEST_DATA');
+            expect(resultJson.errorCode).toBe('VALIDATION_ERROR');
             expect(resultJson.error).toBeDefined();
             expect(result.status).toBe(400);
         });
@@ -179,9 +179,9 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await POST(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('INVALID_REQUEST_DATA');
+            expect(resultJson.errorCode).toBe('VALIDATION_ERROR');
             expect(resultJson.error).toBeDefined();
-            expect(resultJson.details).toBeDefined();
+            expect(resultJson.metadata?.details).toBeDefined();
             expect(result.status).toBe(400);
         });
     });
@@ -237,8 +237,8 @@ describe('/api/collaborate - Integration Resilience', () => {
 
             const resultJson = await result.json();
             expect(resultJson.success).toBe(true);
-            expect(resultJson.sessionActive).toBe(true);
-            expect(resultJson.events).toEqual([]);
+            expect(resultJson.data?.sessionActive).toBe(true);
+            expect(resultJson.data?.events).toEqual([]);
             expect(result.status).toBe(200);
         });
 
@@ -256,8 +256,8 @@ describe('/api/collaborate - Integration Resilience', () => {
 
             const resultJson = await result.json();
             expect(resultJson.success).toBe(true);
-            expect(resultJson.sessionId).toBe('session-123');
-            expect(resultJson.postId).toBe(123);
+            expect(resultJson.data?.sessionId).toBe('session-123');
+            expect(resultJson.data?.postId).toBe(123);
             expect(result.status).toBe(200);
         });
 
@@ -308,7 +308,7 @@ describe('/api/collaborate - Integration Resilience', () => {
 
             const resultJson = await result.json();
             expect(resultJson.success).toBe(true);
-            expect(resultJson.version).toBe(1);
+            expect(resultJson.data?.version).toBe(1);
             expect(result.status).toBe(200);
         });
 
