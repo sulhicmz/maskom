@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { ruleVersionStorage, RuleVersionStorage } from '../ruleVersionStorage';
 import type { PersonalizationRuleVersion, PersonalizationRule } from '@/types/personalization';
 
@@ -20,7 +20,7 @@ const mockRule: PersonalizationRule = {
 describe('RuleVersionStorage', () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {

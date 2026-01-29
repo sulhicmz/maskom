@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { personalizationEngine } from '../personalizationEngine';
 import type {
   PersonalizationRule,

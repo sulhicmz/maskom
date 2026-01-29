@@ -273,7 +273,13 @@ class PersonalizationEngine {
 
     for (const rule of matchingRules) {
       if (this.evaluateConditions(rule.conditions, context)) {
-        const variant = this.getVariantForUser(contentId, userSegment, userId);
+        const matchingVariants = rule.variants.filter(v => v.segment === userSegment && v.isActive);
+        if (matchingVariants.length === 0) continue;
+        if (matchingVariants.length === 1) {
+          this.trackImpression(rule.id, matchingVariants[0].id, userSegment);
+          return matchingVariants[0].content;
+        }
+        const variant = this.selectVariantByWeight(matchingVariants, userId);
         if (variant) {
           this.trackImpression(rule.id, variant.id, userSegment);
           return variant.content;
@@ -481,4 +487,5 @@ class PersonalizationEngine {
 }
 
 export const personalizationEngine = new PersonalizationEngine();
+export { PersonalizationEngine };
 export default personalizationEngine;

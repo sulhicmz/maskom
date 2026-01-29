@@ -155,4 +155,5 @@ class SegmentationEngine {
 }
 
 export const segmentationEngine = new SegmentationEngine();
+export { SegmentationEngine };
 export default segmentationEngine;

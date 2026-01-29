@@ -8,6 +8,7 @@ class BehaviorTracker {
   private sessionId: string;
   private behaviorHistory: BehaviorSignal[] = [];
   private currentUserProfile: UserProfile | null = null;
+  private sessionCounter: number = 0;
 
   constructor() {
     this.sessionId = this.generateSessionId();
@@ -16,10 +17,11 @@ class BehaviorTracker {
   }
 
   private generateSessionId(): string {
-    return `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    this.sessionCounter++;
+    return `session_${Date.now()}_${this.sessionCounter}_${Math.random().toString(36).substring(2, 9)}`;
   }
 
-  private loadBehaviorHistory(): void {
+  loadBehaviorHistory(): void {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -153,14 +155,14 @@ class BehaviorTracker {
       engagementScore,
       lastActive: Date.now(),
       preferences: {
-        allowPersonalization: this.getPreference('allowPersonalization') ?? true,
-        allowTracking: this.getPreference('allowTracking') ?? true,
+        allowPersonalization: (this.getPreference('allowPersonalization') as boolean) ?? true,
+        allowTracking: (this.getPreference('allowTracking') as boolean) ?? true,
         theme: this.getPreference('theme') as 'light' | 'dark' | undefined,
         language: this.getPreference('language') as string | undefined,
       },
     };
 
-    return this.currentUserProfile;
+    return this.currentUserProfile!;
   }
 
   updateUserProfile(updates: Partial<UserProfile>): void {
@@ -356,4 +358,5 @@ class BehaviorTracker {
 }
 
 export const behaviorTracker = new BehaviorTracker();
+export { BehaviorTracker };
 export default behaviorTracker;
