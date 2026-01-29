@@ -29,6 +29,7 @@ export {
   getTopPerformingTemplates,
   getMostUsedTemplates,
 } from './templateStorage';
+export { recommendationEngine, RecommendationEngine } from './recommendationEngine';
 export type {
   BehaviorSignal,
   ContentType,
@@ -50,3 +51,12 @@ export type {
   TemplatePerformanceMetrics,
   TemplateUsageStats,
 } from '@/types/personalization';
+export type {
+  RecommendationAlgorithm,
+  RecommendationScore,
+  RecommendationExplanation,
+  RecommendationFeedback,
+  RecommendationMetrics,
+  RecommendationConfig,
+  ColdStartStrategy,
+} from '@/types/recommendation';
