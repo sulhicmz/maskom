@@ -1,12 +1,12 @@
 /**
  * Template Browser Component
- * 
+ *
  * Allows users to browse, filter, and apply personalization rule templates.
  */
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   personalizationTemplates,
@@ -19,13 +19,57 @@ import {
 } from '@/utils/personalization';
 import { getTemplateMetricsById, getTopPerformingTemplates, getMostUsedTemplates } from '@/utils/personalization/templateStorage';
 
+const CATEGORIES: Array<{ value: TemplateCategory | 'all'; label: string }> = [
+  { value: 'all', label: 'Semua' },
+  { value: 'segment-based', label: 'Berdasarkan Segmen' },
+  { value: 'behavioral', label: 'Perilaku' },
+  { value: 'engagement-based', label: 'Keterlibatan' },
+  { value: 'time-based', label: 'Waktu' },
+  { value: 'content-type', label: 'Tipe Konten' },
+  { value: 'geographic', label: 'Geografis' }
+];
+
+const DIFFICULTIES: Array<{ value: 'all' | 'beginner' | 'intermediate' | 'advanced'; label: string }> = [
+  { value: 'all', label: 'Semua Tingkat' },
+  { value: 'beginner', label: 'Pemula' },
+  { value: 'intermediate', label: 'Menengah' },
+  { value: 'advanced', label: 'Lanjutan' }
+];
+
+const getDifficultyColor = (difficulty: string, isDark: boolean): string => {
+  switch (difficulty) {
+    case 'beginner':
+      return isDark ? 'text-green-400' : 'text-green-600';
+    case 'intermediate':
+      return isDark ? 'text-yellow-400' : 'text-yellow-600';
+    case 'advanced':
+      return isDark ? 'text-red-400' : 'text-red-600';
+    default:
+      return isDark ? 'text-gray-400' : 'text-gray-600';
+  }
+};
+
+const getImpactColor = (impact: string, isDark: boolean): string => {
+  switch (impact) {
+    case 'high':
+      return isDark ? 'bg-green-500' : 'bg-green-600';
+    case 'medium':
+      return isDark ? 'bg-yellow-500' : 'bg-yellow-600';
+    case 'low':
+      return isDark ? 'bg-red-500' : 'bg-red-600';
+    default:
+      return isDark ? 'bg-gray-500' : 'bg-gray-600';
+  }
+};
+
 interface TemplateBrowserProps {
   userSegment?: string;
   onApplyTemplate: (template: PersonalizationTemplate) => void;
 }
 
-export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowserProps) {
-  const { isDark } = useTheme();
+const TemplateBrowserInternal = ({ userSegment, onApplyTemplate }: TemplateBrowserProps) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,57 +103,32 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
     return [];
   }, [userSegment]);
 
-  const categories: Array<{ value: TemplateCategory | 'all'; label: string }> = [
-    { value: 'all', label: 'Semua' },
-    { value: 'segment-based', label: 'Berdasarkan Segmen' },
-    { value: 'behavioral', label: 'Perilaku' },
-    { value: 'engagement-based', label: 'Keterlibatan' },
-    { value: 'time-based', label: 'Waktu' },
-    { value: 'content-type', label: 'Tipe Konten' },
-    { value: 'geographic', label: 'Geografis' }
-  ];
+  const templateMetrics = useMemo(() => {
+    const metricsMap = new Map<string, ReturnType<typeof getTemplateMetricsById>>();
+    filteredTemplates.forEach((template: PersonalizationTemplate) => {
+      metricsMap.set(template.id, getTemplateMetricsById(template.id));
+    });
+    return metricsMap;
+  }, [filteredTemplates]);
 
-  const difficulties: Array<{ value: 'all' | 'beginner' | 'intermediate' | 'advanced'; label: string }> = [
-    { value: 'all', label: 'Semua Tingkat' },
-    { value: 'beginner', label: 'Pemula' },
-    { value: 'intermediate', label: 'Menengah' },
-    { value: 'advanced', label: 'Lanjutan' }
-  ];
-
-  const getDifficultyColor = (difficulty: string): string => {
-    switch (difficulty) {
-      case 'beginner':
-        return isDark ? 'text-green-400' : 'text-green-600';
-      case 'intermediate':
-        return isDark ? 'text-yellow-400' : 'text-yellow-600';
-      case 'advanced':
-        return isDark ? 'text-red-400' : 'text-red-600';
-      default:
-        return isDark ? 'text-gray-400' : 'text-gray-600';
-    }
-  };
-
-  const getImpactColor = (impact: string): string => {
-    switch (impact) {
-      case 'high':
-        return isDark ? 'bg-green-500' : 'bg-green-600';
-      case 'medium':
-        return isDark ? 'bg-yellow-500' : 'bg-yellow-600';
-      case 'low':
-        return isDark ? 'bg-red-500' : 'bg-red-600';
-      default:
-        return isDark ? 'bg-gray-500' : 'bg-gray-600';
-    }
-  };
-
-  const getTemplateMetrics = (templateId: string) => {
-    return getTemplateMetricsById(templateId);
-  };
-
-  const handleApplyTemplate = (template: PersonalizationTemplate) => {
+  const handleApplyTemplate = useCallback((template: PersonalizationTemplate) => {
     setSelectedTemplate(template);
     onApplyTemplate(template);
-  };
+  }, [onApplyTemplate]);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedCategory('all');
+    setSelectedDifficulty('all');
+    setSearchQuery('');
+  }, []);
+
+  const handleSelectTemplate = useCallback((template: PersonalizationTemplate) => {
+    setSelectedTemplate(template);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedTemplate(null);
+  }, []);
 
   return (
     <div className="template-browser">
@@ -144,23 +163,23 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
         <div className="recommended-section">
           <h3 className="section-title">Direkomendasikan untuk Segmen Anda</h3>
           <div className="template-grid recommended">
-            {recommendedTemplates.slice(0, 3).map((template) => {
-              const metrics = getTemplateMetrics(template.id);
+            {recommendedTemplates.slice(0, 3).map((template: PersonalizationTemplate) => {
+              const metrics = templateMetrics.get(template.id);
               return (
                 <div
                   key={template.id}
                   className="template-card recommended"
-                  onClick={() => setSelectedTemplate(template)}
+                  onClick={() => handleSelectTemplate(template)}
                 >
                   <div className="template-card-header">
                     <div className="template-name">{template.name}</div>
-                    <div className={`template-difficulty ${getDifficultyColor(template.difficulty)}`}>
+                    <div className={`template-difficulty ${getDifficultyColor(template.difficulty, isDark)}`}>
                       {template.difficulty}
                     </div>
                   </div>
                   <p className="template-description">{template.description}</p>
                   <div className="template-tags">
-                    {template.metadata.tags.slice(0, 3).map((tag) => (
+                    {template.metadata.tags.slice(0, 3).map((tag: string) => (
                       <span key={tag} className="template-tag">
                         {tag}
                       </span>
@@ -200,7 +219,7 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
             onChange={(e) => setSelectedCategory(e.target.value as TemplateCategory | 'all')}
             className="filter-select"
           >
-            {categories.map((category) => (
+            {CATEGORIES.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.label}
               </option>
@@ -216,7 +235,7 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
             onChange={(e) => setSelectedDifficulty(e.target.value as 'all' | 'beginner' | 'intermediate' | 'advanced')}
             className="filter-select"
           >
-            {difficulties.map((difficulty) => (
+            {DIFFICULTIES.map((difficulty) => (
               <option key={difficulty.value} value={difficulty.value}>
                 {difficulty.label}
               </option>
@@ -239,26 +258,26 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
 
       {/* Template Grid */}
       <div className="template-grid">
-        {filteredTemplates.map((template) => {
-          const metrics = getTemplateMetrics(template.id);
-          const isRecommended = recommendedTemplates.some((t) => t.id === template.id);
+        {filteredTemplates.map((template: PersonalizationTemplate) => {
+          const metrics = templateMetrics.get(template.id);
+          const isRecommended = recommendedTemplates.some((t: PersonalizationTemplate) => t.id === template.id);
           return (
             <div
               key={template.id}
               className={`template-card ${isRecommended ? 'recommended' : ''}`}
-              onClick={() => setSelectedTemplate(template)}
+              onClick={() => handleSelectTemplate(template)}
             >
               <div className="template-card-header">
                 <div className="template-name">
                   {template.name}
                   {isRecommended && <span className="recommended-badge">Direkomendasikan</span>}
                 </div>
-                <div className={`template-difficulty ${getDifficultyColor(template.difficulty)}`}>
+                <div className={`template-difficulty ${getDifficultyColor(template.difficulty, isDark)}`}>
                   {template.difficulty}
                 </div>
               </div>
               <p className="template-description">{template.description}</p>
-              
+
               <div className="template-metadata">
                 <div className="metadata-item">
                   <span className="metadata-label">Kategori:</span>
@@ -266,7 +285,7 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
                 </div>
                 <div className="metadata-item">
                   <span className="metadata-label">Dampak:</span>
-                  <div className={`impact-badge ${getImpactColor(template.metadata.estimatedImpact)}`}>
+                  <div className={`impact-badge ${getImpactColor(template.metadata.estimatedImpact, isDark)}`}>
                     {template.metadata.estimatedImpact}
                   </div>
                 </div>
@@ -322,11 +341,7 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
           <p>Tidak ada template yang ditemukan</p>
           <button
             className="clear-filters-button"
-            onClick={() => {
-              setSelectedCategory('all');
-              setSelectedDifficulty('all');
-              setSearchQuery('');
-            }}
+            onClick={handleClearFilters}
           >
             Hapus Filter
           </button>
@@ -335,16 +350,18 @@ export function TemplateBrowser({ userSegment, onApplyTemplate }: TemplateBrowse
 
       {/* Template Detail Modal */}
       {selectedTemplate && (
-        <TemplateDetailModal
+        <MemoizedTemplateDetailModal
           template={selectedTemplate}
-          metrics={getTemplateMetrics(selectedTemplate.id)}
-          onClose={() => setSelectedTemplate(null)}
+          metrics={templateMetrics.get(selectedTemplate.id)}
+          onClose={handleCloseModal}
           onApply={handleApplyTemplate}
         />
       )}
     </div>
   );
-}
+};
+
+export const TemplateBrowser = memo(TemplateBrowserInternal);
 
 interface TemplateDetailModalProps {
   template: PersonalizationTemplate;
@@ -354,7 +371,6 @@ interface TemplateDetailModalProps {
 }
 
 function TemplateDetailModal({ template, metrics, onClose, onApply }: TemplateDetailModalProps) {
-  const { isDark } = useTheme();
   const [notes, setNotes] = useState('');
   const [customize, setCustomize] = useState({
     conditions: false,
@@ -475,10 +491,12 @@ function TemplateDetailModal({ template, metrics, onClose, onApply }: TemplateDe
               {template.variants.map((variant) => (
                 <div key={variant.id} className="detail-variant">
                   <div className="variant-header">
-                    <span className="variant-name">{variant.name}</span>
+                    <span className="variant-name">{variant.variantName}</span>
                     <span className="variant-weight">{variant.weight}%</span>
                   </div>
-                  <p className="variant-description">{variant.description}</p>
+                  {typeof variant.content === 'object' && 'headline' in variant.content && (
+                    <p className="variant-description">{String(variant.content.headline)}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -547,4 +565,6 @@ function TemplateDetailModal({ template, metrics, onClose, onApply }: TemplateDe
       </div>
     </div>
   );
-}
+};
+
+const MemoizedTemplateDetailModal = memo(TemplateDetailModal);

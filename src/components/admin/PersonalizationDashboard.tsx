@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, lazy, Suspense } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   personalizationEngine,
@@ -9,7 +9,6 @@ import {
   saveCustomTemplate,
 } from '@/utils/personalization';
 import RuleVersionHistoryPanel from '@/components/personalization/RuleVersionHistoryPanel';
-import { TemplateBrowser } from '@/components/personalization/TemplateBrowser';
 import type {
   PersonalizationRule,
   UserSegment,
@@ -18,6 +17,8 @@ import type {
   UserProfile,
   PersonalizationTemplate,
 } from '@/types/personalization';
+
+const LazyTemplateBrowser = lazy(() => import('@/components/personalization/TemplateBrowser').then(m => ({ default: m.TemplateBrowser })));
 
 const SEGMENT_LABELS: Record<UserSegment, string> = {
   new_visitor: 'Pengunjung Baru',
@@ -405,10 +406,19 @@ const PersonalizationDashboard = () => {
         )}
         
         {activeTab === 'templates' && (
-          <TemplateBrowser
-            userSegment={userProfile?.segment}
-            onApplyTemplate={handleApplyTemplate}
-          />
+          <Suspense fallback={
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Memuat...</span>
+              </div>
+              <p className="mt-3">Memuat pustaka template...</p>
+            </div>
+          }>
+            <LazyTemplateBrowser
+              userSegment={userProfile?.segment}
+              onApplyTemplate={handleApplyTemplate}
+            />
+          </Suspense>
         )}
 
         {selectedRule && showModal && (

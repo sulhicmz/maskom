@@ -2,7 +2,7 @@
  * Template Library Tests
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from '@jest/globals';
 import {
   personalizationTemplates,
   getTemplateById,

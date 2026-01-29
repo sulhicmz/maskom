@@ -2,7 +2,7 @@
  * Template Storage Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import {
   getTemplateMetrics,
   getTemplateMetricsById,
@@ -22,15 +22,9 @@ import {
   getTopPerformingTemplates,
   getMostUsedTemplates,
 } from '@/utils/personalization/templateStorage';
-import type { PersonalizationTemplate, TemplateUsageStats } from '@/types/personalization';
+import type { PersonalizationTemplate } from '@/types/personalization';
 
 describe('Template Storage', () => {
-  const STORAGE_KEYS = [
-    'personalization_template_metrics',
-    'personalization_template_usage',
-    'personalization_custom_templates'
-  ];
-
   beforeEach(() => {
     localStorage.clear();
   });

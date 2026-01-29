@@ -8,7 +8,7 @@ import type {
   PersonalizationTemplate,
   TemplatePerformanceMetrics,
   TemplateUsageStats
-} from '@/utils/personalization/templateLibrary';
+} from '@/types/personalization';
 
 const STORAGE_KEY_TEMPLATE_METRICS = 'personalization_template_metrics';
 const STORAGE_KEY_TEMPLATE_USAGE = 'personalization_template_usage';

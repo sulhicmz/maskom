@@ -21,7 +21,7 @@ const SEGMENT_LABELS: Record<string, string> = {
 
 const PersonalizationImpactAnalyticsDashboard = () => {
   const { theme } = useTheme();
-  const [_rules, setRules] = useState<PersonalizationRule[]>([]);
+  const [, setRules] = useState<PersonalizationRule[]>([]);
   const [analytics, setAnalytics] = useState<PersonalizationImpactAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'segments' | 'rules' | 'roi' | 'cohorts'>('overview');

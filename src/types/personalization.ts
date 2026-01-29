@@ -191,6 +191,7 @@ export interface TemplatePerformanceMetrics {
   bestLift: number;
   lastUsed: string;
   rating: number;
+  lift?: number;
 }
 
 /**
