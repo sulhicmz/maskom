@@ -166,7 +166,7 @@ describe('BehaviorTracker', () => {
 
     it('should update user profile', () => {
       behaviorTracker.trackPageView('blog_post', 'post_1');
-      const profile1 = behaviorTracker.getUserProfile();
+      behaviorTracker.getUserProfile();
 
       behaviorTracker.updateUserProfile({
         preferences: {

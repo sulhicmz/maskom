@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { personalizationEngine } from '../personalizationEngine';
-import type {
-  PersonalizationRule,
-  ContentVariant,
-  UserSegment,
-  ContentType,
-} from '@/types/personalization';
 
 describe('PersonalizationEngine', () => {
   beforeEach(() => {

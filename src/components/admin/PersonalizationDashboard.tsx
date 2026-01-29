@@ -1,18 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
   personalizationEngine,
   behaviorTracker,
-  segmentationEngine
 } from '@/utils/personalization';
 import RuleVersionHistoryPanel from '@/components/personalization/RuleVersionHistoryPanel';
 import type {
   PersonalizationRule,
-  ContentVariant,
-  RuleCondition,
   UserSegment,
   ContentType,
   PersonalizationTrigger,
@@ -43,11 +39,9 @@ const TRIGGER_LABELS: Record<PersonalizationTrigger, string> = {
   session_start: 'Awal Sesi',
 };
 
-export default function PersonalizationDashboard() {
-  const router = useRouter();
+const PersonalizationDashboard = () => {
   const { theme } = useTheme();
   const [rules, setRules] = useState<PersonalizationRule[]>([]);
-  const [variants, setVariants] = useState<ContentVariant[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [selectedRule, setSelectedRule] = useState<PersonalizationRule | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -57,7 +51,6 @@ export default function PersonalizationDashboard() {
   useEffect(() => {
     const loadData = () => {
       setRules(personalizationEngine.getAllRules());
-      setVariants(personalizationEngine.getVariantsForContent(''));
       setUserProfile(behaviorTracker.getUserProfile());
     };
 
@@ -121,11 +114,6 @@ export default function PersonalizationDashboard() {
     );
     alert(personalized ? JSON.stringify(personalized, null, 2) : 'Tidak ada konten yang dipersonalisasi untuk segmen ini');
   }, [previewSegment]);
-
-  const handleOptOut = useCallback((optedOut: boolean) => {
-    behaviorTracker.setOptOut(optedOut);
-    setUserProfile(behaviorTracker.getUserProfile());
-  }, []);
 
   return (
     <div className={`min-vh-100 py-4 ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}>
@@ -483,3 +471,5 @@ export default function PersonalizationDashboard() {
     </div>
   );
 }
+
+export default memo(PersonalizationDashboard)

@@ -310,7 +310,7 @@ class BehaviorTracker {
         const user = JSON.parse(userStr);
         return user.id;
       }
-    } catch (error) {
+    } catch {
       // Ignore
     }
     return undefined;
@@ -323,7 +323,7 @@ class BehaviorTracker {
         const parsed = JSON.parse(prefs);
         return parsed[key];
       }
-    } catch (error) {
+    } catch {
       // Ignore
     }
     return null;

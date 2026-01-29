@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import {
   SkippedTestInfo,
   SkipCategory,
@@ -567,4 +567,4 @@ const SkippedTestDashboard = () => {
   );
 };
 
-export default SkippedTestDashboard;
+export default memo(SkippedTestDashboard);

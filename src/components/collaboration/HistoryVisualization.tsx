@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { DraftContent } from '@/types/collaboration'
 import {
   CollaborativeHistoryEntry,
@@ -18,11 +18,11 @@ interface HistoryVisualizationProps {
   onRollback: (content: DraftContent, entry: CollaborativeHistoryEntry) => void
 }
 
-export default function HistoryVisualization({
+const HistoryVisualization = ({
   postId,
   currentContent,
   onRollback
-}: HistoryVisualizationProps) {
+}: HistoryVisualizationProps) => {
   const [history, setHistory] = useState<CollaborativeHistoryEntry[]>([])
   const [selectedEntry, setSelectedEntry] = useState<CollaborativeHistoryEntry | null>(null)
   const [showConfirmRollback, setShowConfirmRollback] = useState(false)
@@ -271,3 +271,5 @@ function HistoryEntryItem({
     </div>
   )
 }
+
+export default memo(HistoryVisualization)

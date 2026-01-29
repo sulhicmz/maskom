@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { DraftContent, CursorPosition, CollaborativeEvent, RealTimeComment, ActiveEditor, type ICollaborationClient } from '@/types/collaboration'
 import { createCollaborationClient } from '@/utils/collaboration/collaborationClient'
 import ActiveEditorsIndicator from './ActiveEditorsIndicator'
@@ -23,14 +23,14 @@ interface ConflictInfo {
   canResolve: boolean
 }
 
-export default function RealTimeEditor({
+const RealTimeEditor = ({
   postId,
   initialContent,
   userId,
   username,
   onSave,
   hasEditorRole
-}: RealTimeEditorProps) {
+}: RealTimeEditorProps) => {
   const [content, setContent] = useState<DraftContent>(initialContent)
   const [client, setClient] = useState<ICollaborationClient | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -465,3 +465,5 @@ export default function RealTimeEditor({
     </div>
   )
 }
+
+export default memo(RealTimeEditor)

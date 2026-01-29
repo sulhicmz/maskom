@@ -58,13 +58,6 @@ export default function RuleVersionHistoryPanel({ rule, onRestore, onClose }: Ru
     }
   }, [versions, rule.id]);
 
-  const handleCompare = useCallback((version1: PersonalizationRuleVersion, version2: PersonalizationRuleVersion) => {
-    setSelectedVersions([version1, version2]);
-    setShowDiff(true);
-    const comparison = personalizationEngine.compareRuleVersions(rule.id, version1.id, version2.id);
-    setDiffs(comparison || []);
-  }, [rule.id]);
-
   return (
     <div className={`card ${theme === 'dark' ? 'bg-secondary text-light' : ''}`}>
       <div className="card-header d-flex justify-content-between align-items-center">
