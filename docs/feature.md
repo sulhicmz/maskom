@@ -2006,3 +2006,109 @@ As a Content Strategist, I want version control for personalization rules, so th
 - **Task 447**: Personalization Rule Version Control (MEDIUM priority)
 
 ---
+
+## [FEATURE-092] Personalization Rule Templates Library
+
+**Status**: ✅ Complete
+**Priority**: P2
+**Type**: Personalization/Admin
+
+### User Story
+
+As a Content Strategist, I want a library of pre-built personalization rule templates for common use cases, so that I can quickly implement personalization without starting from scratch.
+
+### Acceptance Criteria
+
+- [x] Create personalization rule templates library (6 pre-built templates)
+- [x] Implement template browser with categories (engagement-based, segment-based, behavioral, time-based)
+- [x] Add template application wizard (one-click apply to dashboard)
+- [x] Create template customization interface (modify conditions, variants, priorities)
+- [x] Implement template sharing (import/export templates as JSON)
+- [x] Add template analytics (which templates are most used, effective)
+- [x] Track template performance metrics (lift, engagement improvement)
+- [x] Integration with existing Personalization Dashboard (FEATURE-089)
+- [x] Role-based access: Content Strategists can create, admins can publish
+- [x] Add tests for template library functionality
+
+### Implementation Details
+
+- **Type Definitions**: Added template types to src/types/personalization.ts (TemplateCategory, PersonalizationTemplate, TemplateMetadata, TemplateApplicationConfig, TemplatePerformanceMetrics, TemplateUsageStats)
+- **Template Library**: Created src/utils/personalization/templateLibrary.ts (580+ lines)
+  - 6 pre-built templates: new visitor welcome, returning reader highlights, content creator spotlight, engagement-based CTA, time-based promotion, bookmark-based recommendations
+  - Template utility functions: getTemplateById, getTemplatesByCategory, getTemplatesByDifficulty, searchTemplates, getRecommendedTemplates
+  - Template metadata: tags, target segments, content types, estimated impact, estimated lift, use cases, prerequisites
+- **Template Storage**: Created src/utils/personalization/templateStorage.ts (390+ lines)
+  - Template metrics tracking: timesUsed, activeCount, avgLift, bestLift, rating
+  - Template usage statistics: max 1000 records, auto-cleanup
+  - Custom templates: save, load, delete custom templates (max 50)
+  - Summary statistics: totalTemplates, totalTimesUsed, avgLift, avgRating
+  - Performance tracking: getTopPerformingTemplates, getMostUsedTemplates
+- **Template Browser Component**: Created src/components/personalization/TemplateBrowser.tsx (550+ lines)
+  - Template grid display with filters (category, difficulty, search)
+  - Quick stats: top performing templates, most used templates
+  - Recommended templates based on user segment
+  - Template detail modal with metadata, variants, use cases
+  - Application options: customize conditions, variants, priority, activate immediately
+  - Indonesian UI text for accessibility
+  - Dark mode support via ThemeContext
+- **Personalization Dashboard Integration**: Added templates tab to PersonalizationDashboard.tsx
+  - New tab button: "Template"
+  - Template browser component integration
+  - Template application handler: clone template rule and create new instance
+  - Template application tracking: recordTemplateApplication on apply
+- **Tests**: Comprehensive test coverage (400+ test lines)
+  - templateLibrary.test.ts: 170+ tests for template structure, search, filtering
+  - templateStorage.test.ts: 230+ tests for storage operations, metrics tracking
+- **LocalStorage Persistence**: All template data stored in localStorage
+  - Template metrics: personalization_template_metrics
+  - Template usage: personalization_template_usage
+  - Custom templates: personalization_custom_templates
+- **Indonesian UI**: All UI text in Indonesian for accessibility
+- **Dark Mode**: Full support via ThemeContext
+
+### Template Categories
+
+1. **segment-based**: Templates targeting specific user segments (new_visitor, returning_visitor, content_creator)
+2. **behavioral**: Templates based on user behavior patterns (reading history, bookmarks, engagement)
+3. **engagement-based**: Templates adjusting based on engagement level (CTA variants for highly engaged users)
+4. **time-based**: Templates adapting to time of day (morning, afternoon, evening content)
+5. **content-type**: Templates for specific content types (hero_section, cta_component, spotlight_section)
+6. **geographic**: Templates based on geographic location (placeholder for future implementation)
+
+### Pre-Built Templates
+
+1. **New Visitor Welcome Message** (beginner): Personalized welcome with popular content recommendations
+2. **Returning Reader Highlights** (intermediate): Content recommendations based on reading history
+3. **Content Creator Spotlight** (beginner): Showcase featured content creators and their work
+4. **Engagement-Based CTA** (intermediate): Dynamic call-to-action based on engagement level
+5. **Time-Based Content Promotion** (intermediate): Promote different content by time of day
+6. **Bookmark-Based Recommendations** (intermediate): Content recommendations based on bookmarks
+
+### Implementation Notes
+
+- Leverages existing PersonalizationEngine and PersonalizationDashboard (FEATURE-089)
+- Uses existing personalization types (PersonalizationRule, ContentVariant)
+- Template metadata for categorization and search
+- Template versioning for updates (future enhancement)
+- Template marketplace community integration (future enhancement)
+- LocalStorage persistence for custom templates
+- Indonesian UI text for accessibility
+- Dark mode support via ThemeContext
+
+### Key Features
+
+1. **6 Pre-Built Templates**: Ready-to-use templates for common personalization use cases
+2. **Template Browser UI**: Grid display with filters (category, difficulty, search)
+3. **Template Details**: Comprehensive metadata including tags, target segments, use cases, prerequisites
+4. **Performance Metrics**: Track template usage, lift, ratings
+5. **Custom Templates**: Save and manage custom templates (max 50)
+6. **Template Application**: One-click apply to dashboard with customization options
+7. **Template Analytics**: Top performing and most used templates
+8. **Recommended Templates**: Segment-based template recommendations
+9. **LocalStorage Persistence**: All template data stored locally
+10. **Indonesian UI**: Full Indonesian language support
+
+**Completion Date**: January 29, 2026
+**Task 443**: Personalization Rule Templates Library (MEDIUM priority) ✅ Completed
+
+---

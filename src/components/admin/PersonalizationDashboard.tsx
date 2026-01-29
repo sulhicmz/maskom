@@ -5,14 +5,18 @@ import { useTheme } from '@/contexts/ThemeContext';
 import {
   personalizationEngine,
   behaviorTracker,
+  recordTemplateApplication,
+  saveCustomTemplate,
 } from '@/utils/personalization';
 import RuleVersionHistoryPanel from '@/components/personalization/RuleVersionHistoryPanel';
+import { TemplateBrowser } from '@/components/personalization/TemplateBrowser';
 import type {
   PersonalizationRule,
   UserSegment,
   ContentType,
   PersonalizationTrigger,
   UserProfile,
+  PersonalizationTemplate,
 } from '@/types/personalization';
 
 const SEGMENT_LABELS: Record<UserSegment, string> = {
@@ -45,7 +49,7 @@ const PersonalizationDashboard = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [selectedRule, setSelectedRule] = useState<PersonalizationRule | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'rules' | 'analytics' | 'preview' | 'versions'>('rules');
+  const [activeTab, setActiveTab] = useState<'rules' | 'analytics' | 'preview' | 'versions' | 'templates'>('rules');
   const [previewSegment, setPreviewSegment] = useState<UserSegment>('new_visitor');
 
   useEffect(() => {
@@ -103,6 +107,37 @@ const PersonalizationDashboard = () => {
     }
   }, [rules, handleUpdateRule]);
 
+  const handleApplyTemplate = useCallback((template: PersonalizationTemplate) => {
+    // Clone the template's rule and create a new instance
+    const newRule = personalizationEngine.createRule({
+      ...template.rule,
+      name: `${template.name} (diterapkan ${new Date().toLocaleDateString('id-ID')})`,
+      description: template.description,
+      variants: template.variants.map((variant, index) => ({
+        ...variant,
+        id: `${template.id}-variant-${Date.now()}-${index}`,
+        contentId: template.id
+      })),
+      isActive: true
+    });
+
+    if (newRule) {
+      setRules([...rules, newRule]);
+      recordTemplateApplication(template.id, newRule.id);
+      alert(`Template "${template.name}" berhasil diterapkan!`);
+      setActiveTab('rules');
+    }
+  }, [rules]);
+
+  const handleSaveCustomTemplate = useCallback((template: PersonalizationTemplate) => {
+    const saved = saveCustomTemplate(template);
+    if (saved) {
+      alert('Template kustom berhasil disimpan!');
+    } else {
+      alert('Gagal menyimpan template kustom');
+    }
+  }, []);
+
   const analytics = personalizationEngine.getAnalytics();
 
   const handlePersonalizePreview = useCallback(() => {
@@ -157,6 +192,12 @@ const PersonalizationDashboard = () => {
               onClick={() => setActiveTab('versions')}
             >
               Versi
+            </button>
+            <button
+              className={`btn ${activeTab === 'templates' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setActiveTab('templates')}
+            >
+              Template
             </button>
           </div>
         </div>
@@ -361,6 +402,13 @@ const PersonalizationDashboard = () => {
               </div>
             </div>
           </div>
+        )}
+        
+        {activeTab === 'templates' && (
+          <TemplateBrowser
+            userSegment={userProfile?.segment}
+            onApplyTemplate={handleApplyTemplate}
+          />
         )}
 
         {selectedRule && showModal && (

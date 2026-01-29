@@ -126,3 +126,82 @@ export interface RuleVersionDiff {
   newValue: unknown;
   type: 'added' | 'removed' | 'changed';
 }
+
+// ============================================================================
+// TEMPLATE TYPES
+// ============================================================================
+
+/**
+ * Template categories for organizing rule templates
+ */
+export type TemplateCategory =
+  | 'engagement-based'
+  | 'segment-based'
+  | 'behavioral'
+  | 'content-type'
+  | 'time-based'
+  | 'geographic';
+
+/**
+ * Personalization template metadata
+ */
+export interface PersonalizationTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: TemplateCategory;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  rule: PersonalizationRule;
+  variants: ContentVariant[];
+  metadata: TemplateMetadata;
+}
+
+/**
+ * Template metadata for categorization and search
+ */
+export interface TemplateMetadata {
+  tags: string[];
+  targetSegments: string[];
+  contentType: string[];
+  estimatedImpact: 'low' | 'medium' | 'high';
+  estimatedLift: number;
+  useCases: string[];
+  prerequisites: string[];
+}
+
+/**
+ * Template application configuration
+ */
+export interface TemplateApplicationConfig {
+  customizeConditions?: boolean;
+  customizeVariants?: boolean;
+  customizePriority?: boolean;
+  activateImmediately?: boolean;
+  notes?: string;
+}
+
+/**
+ * Template performance metrics
+ */
+export interface TemplatePerformanceMetrics {
+  templateId: string;
+  timesUsed: number;
+  activeCount: number;
+  avgLift: number;
+  bestLift: number;
+  lastUsed: string;
+  rating: number;
+}
+
+/**
+ * Template usage statistics
+ */
+export interface TemplateUsageStats {
+  templateId: string;
+  appliedAt: string;
+  ruleId: string;
+  isActive: boolean;
+  impressions: number;
+  lift: number;
+  rating?: number;
+}
