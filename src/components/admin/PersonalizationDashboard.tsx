@@ -18,6 +18,7 @@ import type {
 } from '@/types/personalization';
 
 const LazyTemplateBrowser = lazy(() => import('@/components/personalization/TemplateBrowser').then(m => ({ default: m.TemplateBrowser })));
+import PersonalizationPreview from '@/components/personalization/PersonalizationPreview';
 
 const SEGMENT_LABELS: Record<UserSegment, string> = {
   new_visitor: 'Pengunjung Baru',
@@ -50,7 +51,6 @@ const PersonalizationDashboard = () => {
   const [selectedRule, setSelectedRule] = useState<PersonalizationRule | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'rules' | 'analytics' | 'preview' | 'versions' | 'templates'>('rules');
-  const [previewSegment, setPreviewSegment] = useState<UserSegment>('new_visitor');
 
   useEffect(() => {
     const loadData = () => {
@@ -130,16 +130,6 @@ const PersonalizationDashboard = () => {
   }, [rules]);
 
   const analytics = personalizationEngine.getAnalytics();
-
-  const handlePersonalizePreview = useCallback(() => {
-    const personalized = personalizationEngine.personalizeContent(
-      'post_1',
-      previewSegment,
-      'blog_post',
-      {}
-    );
-    alert(personalized ? JSON.stringify(personalized, null, 2) : 'Tidak ada konten yang dipersonalisasi untuk segmen ini');
-  }, [previewSegment]);
 
   return (
     <div className={`min-vh-100 py-4 ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}>
@@ -323,44 +313,10 @@ const PersonalizationDashboard = () => {
         )}
 
         {activeTab === 'preview' && (
-          <div className={`card ${theme === 'dark' ? 'bg-secondary text-light' : ''}`}>
-            <div className="card-body">
-              <h5 className="card-title mb-3">Pratinjau Personalisasi</h5>
-              <div className="mb-3">
-                <label className="form-label">Lihat sebagai Segmen:</label>
-                <select
-                  className="form-select"
-                  value={previewSegment}
-                  onChange={(e) => setPreviewSegment(e.target.value as UserSegment)}
-                >
-                  {Object.entries(SEGMENT_LABELS).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button
-                className="btn btn-primary"
-                onClick={handlePersonalizePreview}
-              >
-                Uji Personalisasi
-              </button>
-              <hr />
-              <h6>Aturan Personalisasi untuk Segmen Ini:</h6>
-              {rules.filter(r => r.segment === previewSegment).length === 0 ? (
-                <p className="text-muted">Tidak ada aturan untuk segmen ini</p>
-              ) : (
-                <ul>
-                  {rules.filter(r => r.segment === previewSegment).map(rule => (
-                    <li key={rule.id}>
-                      <strong>{rule.name}</strong> - {rule.description}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
+          <PersonalizationPreview
+            rules={rules}
+            userProfileSegment={userProfile?.segment}
+          />
         )}
 
         {activeTab === 'versions' && selectedRule && (

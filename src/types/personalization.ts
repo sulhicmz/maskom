@@ -351,3 +351,54 @@ export interface ChartData {
     backgroundColor?: string;
   }[];
 }
+
+// ============================================================================
+// PREVIEW TYPES
+// ============================================================================
+
+/**
+ * Device types for preview mode
+ */
+export type PreviewDeviceType = 'desktop' | 'tablet' | 'mobile';
+
+/**
+ * Preview session history
+ */
+export interface PreviewHistory {
+  id: string;
+  ruleId: string;
+  ruleName: string;
+  segment: UserSegment;
+  device: PreviewDeviceType;
+  contentType: ContentType;
+  personalizedContent: Record<string, unknown> | null;
+  timestamp: string;
+  validationResults: PreviewValidationResult;
+}
+
+/**
+ * Validation result for preview
+ */
+export interface PreviewValidationResult {
+  isValid: boolean;
+  errors: ValidationError[];
+  warnings: ValidationWarning[];
+}
+
+/**
+ * Validation error (blocks preview)
+ */
+export interface ValidationError {
+  field: string;
+  message: string;
+  code: string;
+}
+
+/**
+ * Validation warning (doesn't block preview)
+ */
+export interface ValidationWarning {
+  field: string;
+  message: string;
+  code: string;
+}
