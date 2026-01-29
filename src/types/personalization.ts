@@ -205,3 +205,148 @@ export interface TemplateUsageStats {
   lift: number;
   rating?: number;
 }
+
+// ============================================================================
+// IMPACT ANALYTICS TYPES
+// ============================================================================
+
+export interface ImpactMetrics {
+  totalImpressions: number;
+  totalConversions: number;
+  conversionRate: number;
+  totalEngagements: number;
+  engagementRate: number;
+  avgLift: number;
+  conversionLift: number;
+  engagementLift: number;
+  revenueGenerated: number;
+  revenueLift: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface SegmentPerformance {
+  segment: UserSegment;
+  totalImpressions: number;
+  totalConversions: number;
+  conversionRate: number;
+  totalEngagements: number;
+  engagementRate: number;
+  avgLift: number;
+  topPerformingRule: string;
+  revenueGenerated: number;
+  revenueLift: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+export interface RuleEffectiveness {
+  ruleId: string;
+  ruleName: string;
+  segment: UserSegment;
+  totalImpressions: number;
+  totalConversions: number;
+  conversionRate: number;
+  totalEngagements: number;
+  engagementRate: number;
+  liftPercentage: number;
+  conversionLift: number;
+  engagementLift: number;
+  revenueGenerated: number;
+  roi: number;
+  effectivenessScore: number;
+  startDate: string;
+  endDate: string;
+  trend: 'up' | 'down' | 'stable';
+}
+
+export interface ROICalculator {
+  totalInvestment: number;
+  revenueGenerated: number;
+  profit: number;
+  roi: number;
+  roiPercentage: number;
+  paybackPeriod: number;
+  breakEvenPoint: number;
+  costPerAcquisition: number;
+  lifetimeValue: number;
+  ltvToCacRatio: number;
+}
+
+export interface CohortData {
+  cohortName: string;
+  cohortDate: string;
+  users: number;
+  conversions: number;
+  conversionRate: number;
+  lift: number;
+  retention: number[];
+  avgLiftOverTime: number[];
+}
+
+export interface CohortAnalysis {
+  cohorts: CohortData[];
+  startDate: string;
+  endDate: string;
+  periodType: 'daily' | 'weekly' | 'monthly';
+}
+
+export interface PersonalizationImpactAnalytics {
+  impactMetrics: ImpactMetrics;
+  segmentPerformance: SegmentPerformance[];
+  ruleEffectiveness: RuleEffectiveness[];
+  roiCalculator: ROICalculator;
+  cohortAnalysis: CohortAnalysis;
+  topPerformingRules: RuleEffectiveness[];
+  worstPerformingRules: RuleEffectiveness[];
+  summary: {
+    totalRules: number;
+    activeRules: number;
+    totalImpressions: number;
+    totalConversions: number;
+    overallLift: number;
+    overallROI: number;
+    bestSegment: string;
+    worstSegment: string;
+  };
+}
+
+export interface ABTestMetrics {
+  testName: string;
+  startDate: string;
+  endDate: string;
+  controlGroup: {
+    size: number;
+    conversions: number;
+    conversionRate: number;
+    engagementRate: number;
+    revenue: number;
+  };
+  treatmentGroup: {
+    size: number;
+    conversions: number;
+    conversionRate: number;
+    engagementRate: number;
+    revenue: number;
+  };
+  lift: number;
+  statisticalSignificance: number;
+  isSignificant: boolean;
+  confidenceLevel: string;
+  pValue: number;
+}
+
+export interface TimeSeriesData {
+  date: string;
+  value: number;
+  label?: string;
+}
+
+export interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor?: string;
+    backgroundColor?: string;
+  }[];
+}
