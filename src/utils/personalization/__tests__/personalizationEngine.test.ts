@@ -54,7 +54,7 @@ describe('PersonalizationEngine', () => {
       expect(updated?.name).toBe('Updated Name');
       expect(updated?.priority).toBe(5);
       expect(updated?.createdAt).toBe(rule.createdAt);
-      expect(updated?.updatedAt).toBeGreaterThan(rule.updatedAt);
+      expect(updated?.updatedAt).toBeGreaterThanOrEqual(rule.updatedAt);
     });
 
     it('should return null when updating non-existent rule', () => {

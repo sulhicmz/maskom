@@ -100,7 +100,8 @@ export function updateTemplateMetrics(templateId: string, update: Partial<Templa
 /**
  * Record template application
  */
-export function recordTemplateApplication(templateId: string, ruleId: string): boolean {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function recordTemplateApplication(templateId: string, _ruleId: string): boolean {
   try {
     const metrics = getTemplateMetrics();
     const existing = metrics.get(templateId) || {
@@ -342,7 +343,7 @@ export function getTemplateSummaryStats() {
 /**
  * Get top performing templates
  */
-export function getTopPerformingTemplates(limit: number = 5): Array<{
+export function getTopPerformingTemplates(limit: number = 3): Array<{
   templateId: string;
   metrics: TemplatePerformanceMetrics;
 }> {

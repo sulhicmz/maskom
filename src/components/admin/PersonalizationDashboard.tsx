@@ -6,7 +6,6 @@ import {
   personalizationEngine,
   behaviorTracker,
   recordTemplateApplication,
-  saveCustomTemplate,
 } from '@/utils/personalization';
 import RuleVersionHistoryPanel from '@/components/personalization/RuleVersionHistoryPanel';
 import type {
@@ -129,15 +128,6 @@ const PersonalizationDashboard = () => {
       setActiveTab('rules');
     }
   }, [rules]);
-
-  const handleSaveCustomTemplate = useCallback((template: PersonalizationTemplate) => {
-    const saved = saveCustomTemplate(template);
-    if (saved) {
-      alert('Template kustom berhasil disimpan!');
-    } else {
-      alert('Gagal menyimpan template kustom');
-    }
-  }, []);
 
   const analytics = personalizationEngine.getAnalytics();
 

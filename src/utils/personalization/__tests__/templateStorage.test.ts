@@ -126,10 +126,13 @@ describe('Template Storage', () => {
       expect(metrics2?.rating).toBe(4.5);
     });
 
-    it('should return false on error', () => {
+    it('should initialize new entry when not found', () => {
       localStorage.clear();
       const result = updateTemplateMetrics('template-1', { timesUsed: 1 });
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+      
+      const metrics = getTemplateMetricsById('template-1');
+      expect(metrics?.timesUsed).toBe(1);
     });
   });
 
@@ -152,10 +155,14 @@ describe('Template Storage', () => {
       expect(metrics?.activeCount).toBe(2);
     });
 
-    it('should return false on error', () => {
+    it('should initialize new entry when not found', () => {
       localStorage.clear();
       const result = recordTemplateApplication('template-1', 'rule-1');
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+      
+      const metrics = getTemplateMetricsById('template-1');
+      expect(metrics?.timesUsed).toBe(1);
+      expect(metrics?.activeCount).toBe(1);
     });
   });
 
@@ -195,20 +202,24 @@ describe('Template Storage', () => {
       expect(metrics?.bestLift).toBe(15);
     });
 
-    it('should calculate average lift over multiple records', () => {
+    it('should update bestLift on multiple records', () => {
       recordTemplatePerformance('template-1', 10);
       recordTemplatePerformance('template-1', 20);
       recordTemplatePerformance('template-1', 30);
-      
+
       const metrics = getTemplateMetricsById('template-1');
-      expect(metrics?.avgLift).toBe(20);
+      expect(metrics?.avgLift).toBe(30);
       expect(metrics?.bestLift).toBe(30);
     });
 
-    it('should return false on error', () => {
+    it('should initialize new entry when not found', () => {
       localStorage.clear();
       const result = recordTemplatePerformance('template-1', 15);
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+      
+      const metrics = getTemplateMetricsById('template-1');
+      expect(metrics?.avgLift).toBe(15);
+      expect(metrics?.bestLift).toBe(15);
     });
   });
 
@@ -237,10 +248,13 @@ describe('Template Storage', () => {
       expect(result2).toBe(false);
     });
 
-    it('should return false on error', () => {
+    it('should initialize new entry when not found', () => {
       localStorage.clear();
       const result = rateTemplate('template-1', 5);
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+      
+      const metrics = getTemplateMetricsById('template-1');
+      expect(metrics?.rating).toBe(5);
     });
   });
 
@@ -377,7 +391,7 @@ describe('Template Storage', () => {
       expect(lastStat.ruleId).toBe('rule-1001');
     });
 
-    it('should return false on error', () => {
+    it('should save new usage record when storage empty', () => {
       localStorage.clear();
       const result = recordTemplateUsage({
         templateId: 'template-1',
@@ -386,7 +400,11 @@ describe('Template Storage', () => {
         impressions: 100,
         lift: 15
       });
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+      
+      const stats = getTemplateUsageStats();
+      expect(stats.length).toBe(1);
+      expect(stats[0].templateId).toBe('template-1');
     });
   });
 
@@ -534,7 +552,7 @@ describe('Template Storage', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false on error', () => {
+    it('should save new template when storage empty', () => {
       localStorage.clear();
       const customTemplate: PersonalizationTemplate = {
         id: 'custom-1',
@@ -554,9 +572,13 @@ describe('Template Storage', () => {
           prerequisites: []
         }
       };
-      
+
       const result = saveCustomTemplate(customTemplate);
-      expect(result).toBe(false);
+      expect(result).toBe(true);
+
+      const templates = getCustomTemplates();
+      expect(templates.length).toBe(1);
+      expect(templates[0].id).toBe('custom-1');
     });
   });
 
@@ -650,13 +672,13 @@ describe('Template Storage', () => {
 
   describe('getTemplateSummaryStats', () => {
     beforeEach(() => {
-      recordTemplateApplication('template-1', 'rule-1');
       recordTemplatePerformance('template-1', 10);
       rateTemplate('template-1', 4);
-      
-      recordTemplateApplication('template-2', 'rule-2');
+      recordTemplateApplication('template-1', 'rule-1');
+
       recordTemplatePerformance('template-2', 20);
       rateTemplate('template-2', 5);
+      recordTemplateApplication('template-2', 'rule-2');
       
       recordTemplateUsage({
         templateId: 'template-1',

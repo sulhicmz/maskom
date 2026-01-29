@@ -9,6 +9,7 @@ describe('Permission Types', () => {
   describe('Permission enum', () => {
     it('should have all required permissions', () => {
       expect(Permission.VIEW_ANALYTICS).toBe('view_analytics')
+      expect(Permission.MANAGE_ANALYTICS).toBe('manage_analytics')
       expect(Permission.MANAGE_USERS).toBe('manage_users')
       expect(Permission.MANAGE_ROLES).toBe('manage_roles')
       expect(Permission.MANAGE_CONTENT).toBe('manage_content')
@@ -20,9 +21,9 @@ describe('Permission Types', () => {
       expect(Permission.VIEW_QA).toBe('view_qa')
     })
 
-    it('should have 10 permissions total', () => {
+    it('should have 11 permissions total', () => {
       const permissions = Object.values(Permission)
-      expect(permissions).toHaveLength(10)
+      expect(permissions).toHaveLength(11)
     })
   })
 
