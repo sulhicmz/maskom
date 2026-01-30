@@ -2,33 +2,33 @@
 import menu_data from "@/data/MenuData";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, memo, useRef, useEffect } from "react";
+import { useState, memo, useRef, useEffect, useCallback } from "react";
 
 const NavMenu = memo(() => {
     const currentRoute = usePathname();
     const [openSubmenus, setOpenSubmenus] = useState<{ [key: number]: boolean }>({});
     const dropdownRefs = useRef<{ [key: number]: HTMLUListElement | null }>({});
 
-    const toggleSubMenu = (id: number) => {
+    const toggleSubMenu = useCallback((id: number) => {
         setOpenSubmenus((prev) => ({
             ...prev,
             [id]: !prev[id],
         }));
-    };
+    }, []);
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, id: number) => {
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>, id: number) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             toggleSubMenu(id);
         }
-    };
+    }, [toggleSubMenu]);
 
-    const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLUListElement>, menuId: number) => {
+    const handleMenuKeyDown = useCallback((e: React.KeyboardEvent<HTMLUListElement>, menuId: number) => {
         if (e.key === 'Escape' && openSubmenus[menuId]) {
             e.preventDefault();
             setOpenSubmenus((prev) => ({ ...prev, [menuId]: false }));
         }
-    };
+    }, [openSubmenus]);
 
     useEffect(() => {
         const openMenuId = Object.keys(openSubmenus).find(id => openSubmenus[id as unknown as number]);
@@ -38,13 +38,13 @@ const NavMenu = memo(() => {
         }
     }, [openSubmenus]);
 
-    const isMenuItemActive = (menuLink: string) => {
+    const isMenuItemActive = useCallback((menuLink: string) => {
         return currentRoute === menuLink;
-    };
+    }, [currentRoute]);
 
-    const isSubMenuItemActive = (subMenuLink: string) => {
+    const isSubMenuItemActive = useCallback((subMenuLink: string) => {
         return currentRoute === subMenuLink;
-    };
+    }, [currentRoute]);
 
     return (
         <ul>

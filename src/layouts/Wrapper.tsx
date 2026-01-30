@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, memo } from "react";
 import { I18nProvider } from "@/contexts/I18nContext";
 
 const ToastContainer = dynamic(
@@ -14,7 +14,7 @@ interface WrapperProps {
     children: ReactNode;
 }
 
-const Wrapper = ({ children }: WrapperProps) => {
+const Wrapper = memo(({ children }: WrapperProps) => {
     useEffect(() => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
@@ -39,6 +39,8 @@ const Wrapper = ({ children }: WrapperProps) => {
             <ToastContainer position="top-center" />
         </ErrorBoundary>
     </I18nProvider>;
-}
+});
+
+Wrapper.displayName = "Wrapper";
 
 export default Wrapper

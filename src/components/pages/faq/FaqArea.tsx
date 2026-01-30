@@ -1,10 +1,10 @@
 "use client";
 
 import inner_faq_data from "@/data/InnerFaqData";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useTabs } from "@/hooks/useTabs";
 import { useAccordion } from "@/hooks/useAccordion";
-import React, { useCallback } from "react";
+import React from "react";
 
 const tab_title: string[] = ["Layanan Konektivitas", "Operasional & Dukungan", "Administrasi & Kontrak"];
 
@@ -12,33 +12,41 @@ const FaqArea = React.memo(() => {
   const { activeId, toggle, setActiveId } = useAccordion({ initialId: null });
   const { activeTab, handleTabClick } = useTabs({ tabCount: tab_title.length });
 
+  const handleTabClickCallback = useCallback((index: number) => {
+    handleTabClick(index);
+  }, [handleTabClick]);
+
+  const toggleCallback = useCallback((itemId: number) => {
+    toggle(itemId);
+  }, [toggle]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
     switch (e.key) {
       case 'ArrowRight':
       case 'ArrowDown':
         e.preventDefault();
-        handleTabClick((index + 1) % tab_title.length);
+        handleTabClickCallback((index + 1) % tab_title.length);
         break;
       case 'ArrowLeft':
       case 'ArrowUp':
         e.preventDefault();
-        handleTabClick((index - 1 + tab_title.length) % tab_title.length);
+        handleTabClickCallback((index - 1 + tab_title.length) % tab_title.length);
         break;
       case 'Home':
         e.preventDefault();
-        handleTabClick(0);
+        handleTabClickCallback(0);
         break;
       case 'End':
         e.preventDefault();
-        handleTabClick(tab_title.length - 1);
+        handleTabClickCallback(tab_title.length - 1);
         break;
       case 'Enter':
       case ' ':
         e.preventDefault();
-        handleTabClick(index);
+        handleTabClickCallback(index);
         break;
     }
-  }, [handleTabClick]);
+  }, [handleTabClickCallback]);
 
   useEffect(() => {
     if (inner_faq_data[activeTab]?.faq_details?.length) {
@@ -61,7 +69,7 @@ const FaqArea = React.memo(() => {
                     <button
                       id={`faq-tab-${index}`}
                       className={`nav-link ${activeTab === index ? "active" : ""}`}
-                      onClick={() => handleTabClick(index)}
+                      onClick={() => handleTabClickCallback(index)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
                       role="tab"
                       aria-selected={activeTab === index}
@@ -91,7 +99,7 @@ const FaqArea = React.memo(() => {
                           <div className="accordion-header">
                             <button
                               id={`faq-item-button-${item.id}`}
-                              onClick={() => toggle(item.id)}
+                              onClick={() => toggleCallback(item.id)}
                               className={`accordion-title ${activeId === item.id ? "" : "collapsed"}`}
                               aria-expanded={activeId === item.id}
                               aria-controls={`collapse${item.id}`}
