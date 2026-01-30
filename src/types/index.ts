@@ -81,3 +81,6 @@ export * from './recommendation';
 
 // Storage Validator types (IStorageValidator, ValidationResult, etc.)
 export * from './storageValidator';
+
+// Version Storage types (IVersionStorage, etc.)
+export * from './versionStorage';
