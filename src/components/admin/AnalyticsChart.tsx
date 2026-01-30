@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { memo } from 'react'
 import { FormSubmissionMetrics, PageViewMetrics, DateSubmission, DatePageView } from '@/types/analytics'
 import { formatNumber } from '@/utils/analytics'
 import { formatAsPercentage } from '@/utils/formatPercentage'
@@ -74,4 +74,4 @@ const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data, type }) =>
   )
 }
 
-export default AnalyticsChart
+export default memo(AnalyticsChart)

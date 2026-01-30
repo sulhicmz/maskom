@@ -72,3 +72,6 @@ export * from './dashboard';
 
 // Accessibility types (AccessibilityAudit, AccessibilityIssue, AccessibilityScore, etc.)
 export * from './accessibility';
+
+// Personalization types (BehaviorSignal, UserProfile, PersonalizationRule, etc.)
+export * from './personalization';

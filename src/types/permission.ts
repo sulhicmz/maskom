@@ -1,5 +1,6 @@
 export enum Permission {
   VIEW_ANALYTICS = 'view_analytics',
+  MANAGE_ANALYTICS = 'manage_analytics',
   MANAGE_USERS = 'manage_users',
   MANAGE_ROLES = 'manage_roles',
   MANAGE_CONTENT = 'manage_content',
@@ -23,6 +24,12 @@ export const PERMISSION_CONFIGS: Record<Permission, PermissionConfig> = {
     id: Permission.VIEW_ANALYTICS,
     name: 'View Analytics',
     description: 'Access analytics dashboard and reports',
+    category: 'analytics'
+  },
+  [Permission.MANAGE_ANALYTICS]: {
+    id: Permission.MANAGE_ANALYTICS,
+    name: 'Manage Analytics',
+    description: 'Full access to manage analytics and reports',
     category: 'analytics'
   },
   [Permission.MANAGE_USERS]: {

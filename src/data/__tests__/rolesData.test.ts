@@ -13,10 +13,11 @@ describe('Roles Data', () => {
   describe('ROLE_PERMISSIONS', () => {
     it('should have permissions for admin role', () => {
       const adminPermissions = ROLE_PERMISSIONS.find(r => r.role === 'admin')
-      
+
       expect(adminPermissions).toBeDefined()
-      expect(adminPermissions?.permissions).toHaveLength(10)
+      expect(adminPermissions?.permissions).toHaveLength(11)
       expect(adminPermissions?.permissions).toContain(Permission.VIEW_ANALYTICS)
+      expect(adminPermissions?.permissions).toContain(Permission.MANAGE_ANALYTICS)
       expect(adminPermissions?.permissions).toContain(Permission.MANAGE_USERS)
       expect(adminPermissions?.permissions).toContain(Permission.MANAGE_ROLES)
       expect(adminPermissions?.permissions).toContain(Permission.MANAGE_SETTINGS)
@@ -47,9 +48,10 @@ describe('Roles Data', () => {
   describe('getPermissionsByRole', () => {
     it('should return all permissions for admin', () => {
       const permissions = getPermissionsByRole('admin')
-      
-      expect(permissions).toHaveLength(10)
+
+      expect(permissions).toHaveLength(11)
       expect(permissions).toContain(Permission.VIEW_ANALYTICS)
+      expect(permissions).toContain(Permission.MANAGE_ANALYTICS)
       expect(permissions).toContain(Permission.MANAGE_USERS)
       expect(permissions).toContain(Permission.VIEW_ADMIN_DASHBOARD)
     })

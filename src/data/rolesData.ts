@@ -10,6 +10,7 @@ export const ROLE_PERMISSIONS: RolePermissions[] = [
     role: 'admin',
     permissions: [
       Permission.VIEW_ANALYTICS,
+      Permission.MANAGE_ANALYTICS,
       Permission.MANAGE_USERS,
       Permission.MANAGE_ROLES,
       Permission.MANAGE_CONTENT,
