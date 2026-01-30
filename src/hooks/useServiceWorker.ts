@@ -46,7 +46,7 @@ export function useServiceWorker() {
 
   useEffect(() => {
     if (!('serviceWorker' in navigator)) {
-      setStatus('unsupported');
+      setStatus(() => 'unsupported');
       return;
     }
 

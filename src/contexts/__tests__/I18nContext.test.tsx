@@ -64,15 +64,13 @@ describe("I18nContext", () => {
     });
 
     it("should handle language switching", async () => {
-      let changeLanguage: (lang: "en" | "id") => void = () => {};
-
       const TestComponent = () => {
         const { language, setLanguage, t } = useTranslation();
-        changeLanguage = setLanguage;
         return (
           <div>
             <span data-testid="language">{language}</span>
             <span data-testid="translation">{t("common.loading")}</span>
+            <button onClick={() => setLanguage("en")}>Switch to English</button>
           </div>
         );
       };
@@ -87,7 +85,8 @@ describe("I18nContext", () => {
         expect(screen.getByTestId("language")).toHaveTextContent("id");
       });
 
-      changeLanguage("en");
+      const button = screen.getByText("Switch to English");
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("language")).toHaveTextContent("en");
@@ -96,15 +95,13 @@ describe("I18nContext", () => {
     });
 
     it("should handle language toggling", async () => {
-      let toggleFn: () => void = () => {};
-
       const TestComponent = () => {
         const { language, toggleLanguage, t } = useTranslation();
-        toggleFn = toggleLanguage;
         return (
           <div>
             <span data-testid="language">{language}</span>
             <span data-testid="translation">{t("common.loading")}</span>
+            <button onClick={toggleLanguage}>Toggle Language</button>
           </div>
         );
       };
@@ -119,14 +116,15 @@ describe("I18nContext", () => {
         expect(screen.getByTestId("language")).toHaveTextContent("id");
       });
 
-      toggleFn();
+      const button = screen.getByText("Toggle Language");
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("language")).toHaveTextContent("en");
         expect(screen.getByTestId("translation")).toHaveTextContent("Loading...");
       });
 
-      toggleFn();
+      fireEvent.click(button);
 
       await waitFor(() => {
         expect(screen.getByTestId("language")).toHaveTextContent("id");
