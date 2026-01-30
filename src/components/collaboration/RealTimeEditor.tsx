@@ -288,7 +288,7 @@ const RealTimeEditor = ({
   }
 
   const replaceAtPosition = (str: string, pos: number, replace: string): string => {
-    return replace
+    return str.substring(0, pos) + replace + str.substring(pos + 1)
   }
 
   useEffect(() => {

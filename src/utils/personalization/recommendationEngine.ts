@@ -453,7 +453,7 @@ class RecommendationEngine {
     content: InnerBlogPost,
     score: number,
     algorithm: RecommendationAlgorithm,
-    coldStartStrategy: ColdStartStrategy | RecommendationAlgorithm,
+    _coldStartStrategy: ColdStartStrategy | RecommendationAlgorithm,
     reasons: string[]
   ): Recommendation {
     const category = blogCategoryById.get(content.categoryId);

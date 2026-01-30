@@ -52,24 +52,6 @@ export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnal
     }
   }
 
-  private saveToStorage(): void {
-    try {
-      const metrics: Record<string, PersonalizationMetrics> = {};
-      this.personalizationMetrics.forEach((value, key) => {
-        metrics[key] = value;
-      });
-      localStorage.setItem(PERSONALIZATION_METRICS_KEY, JSON.stringify(metrics));
-
-      const history: Record<string, ImpactMetrics[]> = {};
-      this.analyticsHistory.forEach((value, key) => {
-        history[key] = value;
-      });
-      localStorage.setItem(ANALYTICS_HISTORY_KEY, JSON.stringify(history));
-    } catch (error) {
-      console.error('Failed to save analytics to storage:', error);
-    }
-  }
-
   calculateImpactMetrics(rules: PersonalizationRule[]): ImpactMetrics {
     let totalImpressions = 0;
     let totalConversions = 0;

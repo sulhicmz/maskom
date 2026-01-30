@@ -161,12 +161,6 @@ class CampaignManager implements ICampaignManager {
 
         if (!campaign) return null;
 
-        /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-        const totalRecipients = campaign.recipientLists.reduce(
-            (sum, list) => sum + list.totalRecipients,
-            0
-        );
-
         const openRate = campaign.sentCount > 0 ? (campaign.openCount / campaign.sentCount) * 100 : 0;
         const clickRate = campaign.sentCount > 0 ? (campaign.clickCount / campaign.sentCount) * 100 : 0;
         const bounceRate = campaign.sentCount > 0 ? (campaign.bounceCount / campaign.sentCount) * 100 : 0;
@@ -294,10 +288,6 @@ class CampaignManager implements ICampaignManager {
         const queue = this.storage.loadSendQueue();
         queue.push({ id, timestamp: new Date().toISOString() });
         this.storage.saveSendQueue(queue);
-    }
-
-    private getSendQueue(): Array<{ id: string; timestamp: string }> {
-        return this.storage.loadSendQueue();
     }
 
     updateCampaignMetrics(

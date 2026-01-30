@@ -192,15 +192,6 @@ export class StorageMigration<T = unknown> {
     }
   }
 
-  private getLastMigratedVersion(history: MigrationHistory[]): string {
-    const entry = history.find(h => h.storageKey === this.storageKey);
-    if (!entry || entry.migrations.length === 0) {
-      return '0.0.0';
-    }
-    
-    return entry.migrations[entry.migrations.length - 1];
-  }
-
   private updateHistory(history: MigrationHistory[], version: string): void {
     let entry = history.find(h => h.storageKey === this.storageKey);
     
