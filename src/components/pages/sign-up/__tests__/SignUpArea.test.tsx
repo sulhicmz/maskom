@@ -14,7 +14,6 @@ jest.mock('next/dynamic', () => () => {
 });
 
 jest.mock('@/components/common/AnimationWrapper', () => {
-  // eslint-disable-next-line react/display-name
   return ({ children, animation, className }: { children: React.ReactNode; animation?: string; className?: string }) => (
     <div className={className} data-animation={animation}>
       {children}

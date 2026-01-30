@@ -195,7 +195,7 @@ describe('/api/services/status - Critical Path Testing', () => {
             const resultJson = await result.json();
 
             expect(resultJson.success).toBe(false);
-            expect(resultJson.error).toBe('Service temporarily unavailable');
+            expect(resultJson.error).toBe('Circuit breaker state unavailable');
         });
     });
 

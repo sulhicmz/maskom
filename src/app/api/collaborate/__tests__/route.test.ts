@@ -129,7 +129,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await GET(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('VALIDATION_ERROR');
+            expect(resultJson.errorCode).toBe('INVALID_QUERY_PARAMETERS');
             expect(resultJson.error).toBeDefined();
             expect(resultJson.metadata?.details).toBeDefined();
             expect(result.status).toBe(400);
@@ -147,7 +147,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await GET(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('UNKNOWN_ERROR');
+            expect(resultJson.errorCode).toBe('SESSION_NOT_FOUND');
             expect(resultJson.error).toBeDefined();
             expect(result.status).toBe(404);
         });
@@ -163,7 +163,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await POST(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('VALIDATION_ERROR');
+            expect(resultJson.errorCode).toBe('INVALID_REQUEST_DATA');
             expect(resultJson.error).toBeDefined();
             expect(result.status).toBe(400);
         });
@@ -179,7 +179,7 @@ describe('/api/collaborate - Integration Resilience', () => {
             const result = await POST(mockRequest);
 
             const resultJson = await result.json();
-            expect(resultJson.errorCode).toBe('VALIDATION_ERROR');
+            expect(resultJson.errorCode).toBe('INVALID_REQUEST_DATA');
             expect(resultJson.error).toBeDefined();
             expect(resultJson.metadata?.details).toBeDefined();
             expect(result.status).toBe(400);
