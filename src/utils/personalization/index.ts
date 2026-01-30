@@ -30,6 +30,7 @@ export {
   getMostUsedTemplates,
 } from './templateStorage';
 export { recommendationEngine, RecommendationEngine } from './recommendationEngine';
+export { performanceAlerts, PersonalizationPerformanceAlerts } from './performanceAlerts';
 export type {
   BehaviorSignal,
   ContentType,

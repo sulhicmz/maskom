@@ -458,3 +458,143 @@ export interface IPersonalizationImpactAnalyzer {
   generateMultiSeriesChartData(data: Record<string, TimeSeriesData[]>): ChartData;
   exportToCSV(data: unknown[], filename: string): void;
 }
+
+// ============================================================================
+// PERFORMANCE ALERTS TYPES
+// ============================================================================
+
+/**
+ * Alert severity levels for personalization performance alerts
+ */
+export type AlertSeverity = 'critical' | 'warning' | 'info';
+
+/**
+ * Alert status tracking
+ */
+export type AlertStatus = 'active' | 'acknowledged' | 'resolved';
+
+/**
+ * Alert channel for sending notifications
+ */
+export type AlertChannel = 'dashboard' | 'email' | 'webhook';
+
+/**
+ * Performance alert types
+ */
+export type PerformanceAlertType = 
+  | 'conversion_drop'
+  | 'engagement_drop'
+  | 'lift_degradation'
+  | 'rule_underperforming'
+  | 'zero_lift'
+  | 'negative_lift';
+
+/**
+ * Alert resolution action taken
+ */
+export type AlertResolution = 
+  | 'rule_disabled'
+  | 'variants_adjusted'
+  | 'conditions_modified'
+  | 'threshold_updated'
+  | 'ignored'
+  | 'monitoring_continued';
+
+/**
+ * Performance alert configuration
+ */
+export interface PerformanceAlertConfig {
+  alertType: PerformanceAlertType;
+  enabled: boolean;
+  severity: AlertSeverity;
+  thresholdValue: number;
+  thresholdUnit: 'percent' | 'absolute';
+  checkInterval: number; // minutes
+  slidingWindowHours: number;
+  alertChannels: AlertChannel[];
+  webhookUrl?: string;
+  emailAddress?: string;
+}
+
+/**
+ * Performance alert instance
+ */
+export interface PerformanceAlert {
+  id: string;
+  alertType: PerformanceAlertType;
+  severity: AlertSeverity;
+  status: AlertStatus;
+  ruleId: string;
+  ruleName: string;
+  segment?: UserSegment;
+  currentValue: number;
+  previousValue: number;
+  thresholdValue: number;
+  thresholdUnit: 'percent' | 'absolute';
+  percentChange: number;
+  detectedAt: string;
+  acknowledgedAt?: string;
+  resolvedAt?: string;
+  acknowledgedBy?: string;
+  resolution?: AlertResolution;
+  resolutionNotes?: string;
+  message: string;
+  recommendations: string[];
+  channels: AlertChannel[];
+}
+
+/**
+ * Alert history with resolution tracking
+ */
+export interface AlertHistory {
+  alertId: string;
+  ruleId: string;
+  alertType: PerformanceAlertType;
+  severity: AlertSeverity;
+  detectedAt: string;
+  resolvedAt?: string;
+  timeToResolve?: number; // minutes
+  resolution?: AlertResolution;
+  impactAssessment: string;
+}
+
+/**
+ * Performance alert statistics
+ */
+export interface PerformanceAlertStatistics {
+  totalAlerts: number;
+  activeAlerts: number;
+  acknowledgedAlerts: number;
+  resolvedAlerts: number;
+  alertsByType: Record<PerformanceAlertType, number>;
+  alertsBySeverity: Record<AlertSeverity, number>;
+  avgResolutionTime: number;
+  alertsByRule: Record<string, number>;
+  topFailingRules: Array<{ ruleId: string; ruleName: string; alertCount: number }>;
+}
+
+/**
+ * Interface for personalization performance alerts system
+ */
+export interface IPersonalizationPerformanceAlerts {
+  checkRulePerformance(ruleId: string): PerformanceAlert | null;
+  checkAllRules(): PerformanceAlert[];
+  updateAlertConfig(alertType: PerformanceAlertType, config: Partial<PerformanceAlertConfig>): PerformanceAlertConfig;
+  getAlertConfig(alertType: PerformanceAlertType): PerformanceAlertConfig | null;
+  getAlerts(filters?: {
+    type?: PerformanceAlertType;
+    severity?: AlertSeverity;
+    status?: AlertStatus;
+    ruleId?: string;
+    startDate?: string;
+    endDate?: string;
+  }): PerformanceAlert[];
+  acknowledgeAlert(alertId: string, userId: string): boolean;
+  resolveAlert(alertId: string, resolution: AlertResolution, notes?: string): boolean;
+  getAlertHistory(ruleId?: string): AlertHistory[];
+  getStatistics(): PerformanceAlertStatistics;
+  sendAlert(alert: PerformanceAlert): Promise<void>;
+  schedulePeriodicChecks(): void;
+  clearResolvedAlerts(olderThanDays?: number): void;
+  reset(): void;
+}
