@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { abTestEngine } from '@/utils/abTestEngine'
 import { ABTest, ABTestStatus, ABTestSuccessMetric, ABTestType } from '@/types/abTest'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { logServiceInfo } from '@/services/common/logger'
 
 interface TestFormData {
   postId: number
@@ -145,7 +146,7 @@ const ABTestDashboard: React.FC = () => {
     const test = abTestEngine.getTest(testId)
     if (test) {
       const winner = test.variants.find(v => v.id === winnerId)
-      console.log('Applying winner:', winner)
+      logServiceInfo('ABTestDashboard', 'applyWinner', `Applying winner: ${winner?.variantName}`)
       alert(`Winner "${winner?.variantName}" has been applied!`)
     }
   }
