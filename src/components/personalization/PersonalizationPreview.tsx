@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, memo } from 'react';
+import Image from 'next/image';
 import { useTheme } from '@/contexts/ThemeContext';
 import { personalizationEngine } from '@/utils/personalization';
 import type {
@@ -159,11 +160,14 @@ const PersonalizationPreview: React.FC<PersonalizationPreviewProps> = memo(({ ru
           </p>
         )}
         {content.imageUrl != null && (
-          <img
+          <Image
             src={String(content.imageUrl)}
             alt="Preview"
-            className="preview-image mb-3 img-fluid rounded"
-            style={{ maxHeight: '300px', objectFit: 'cover' }}
+            width={0}
+            height={0}
+            sizes="100vw"
+            style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }}
+            className="preview-image mb-3 rounded"
           />
         )}
         {content.body != null && (

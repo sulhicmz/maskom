@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import type { Recommendation } from '@/types/recommendation';
 import { useTheme } from '@/contexts/ThemeContext';
 import RecommendationExplanation from './RecommendationExplanation';
@@ -27,9 +28,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     <div className={`recommendation-card ${theme === 'dark' ? 'dark-mode' : 'light-mode'}`}>
       <div className="card-header">
         {content.thumb && (
-          <img
+          <Image
             src={content.thumb.src}
             alt={content.title}
+            fill
             className="card-thumb"
           />
         )}
