@@ -8,6 +8,7 @@ import { abTestEngine } from '@/utils/abTestEngine'
 import { ABTest, ABTestStatus, ABTestSuccessMetric, ABTestType } from '@/types/abTest'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { logServiceInfo } from '@/services/common/logger'
+import { logComponentError } from '@/utils/errorHandler'
 
 interface TestFormData {
   postId: number
@@ -58,7 +59,7 @@ const ABTestDashboard: React.FC = () => {
       const allTests = abTestEngine.getAllTests()
       setTests(allTests)
     } catch (error) {
-      console.error('Failed to load A/B tests:', error)
+      logComponentError({ componentName: 'ABTestDashboard', operation: 'load A/B tests', error })
     } finally {
       setLoading(false)
     }
@@ -102,7 +103,7 @@ const ABTestDashboard: React.FC = () => {
       setShowModal(false)
       loadTests()
     } catch (error) {
-      console.error('Failed to create A/B test:', error)
+      logComponentError({ componentName: 'ABTestDashboard', operation: 'create A/B test', error })
     }
   }
 
@@ -111,7 +112,7 @@ const ABTestDashboard: React.FC = () => {
       abTestEngine.startTest(testId)
       loadTests()
     } catch (error) {
-      console.error('Failed to start test:', error)
+      logComponentError({ componentName: 'ABTestDashboard', operation: 'start test', error })
     }
   }
 
@@ -120,7 +121,7 @@ const ABTestDashboard: React.FC = () => {
       abTestEngine.pauseTest(testId)
       loadTests()
     } catch (error) {
-      console.error('Failed to pause test:', error)
+      logComponentError({ componentName: 'ABTestDashboard', operation: 'pause test', error })
     }
   }
 
@@ -129,7 +130,7 @@ const ABTestDashboard: React.FC = () => {
       abTestEngine.completeTest(testId)
       loadTests()
     } catch (error) {
-      console.error('Failed to complete test:', error)
+      logComponentError({ componentName: 'ABTestDashboard', operation: 'complete test', error })
     }
   }
 
@@ -138,7 +139,7 @@ const ABTestDashboard: React.FC = () => {
       abTestEngine.deleteTest(testId)
       loadTests()
     } catch (error) {
-      console.error('Failed to delete test:', error)
+      logComponentError({ componentName: 'ABTestDashboard', operation: 'delete test', error })
     }
   }
 
