@@ -104,3 +104,25 @@ export interface PersonalizationConfig {
   abTestIntegration: boolean;
   minSampleSize: number; // for statistical significance
 }
+
+export interface PersonalizationRuleVersion {
+  id: string;
+  ruleId: string;
+  content: PersonalizationRule;
+  timestamp: string;
+  notes: string;
+  author: string;
+  performanceMetrics?: {
+    views?: number;
+    clicks?: number;
+    conversions?: number;
+    liftPercentage?: number;
+  };
+}
+
+export interface RuleVersionDiff {
+  field: string;
+  oldValue: unknown;
+  newValue: unknown;
+  type: 'added' | 'removed' | 'changed';
+}

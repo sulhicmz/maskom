@@ -5,7 +5,9 @@ import {
   PersonalizationMetrics,
   ContentType,
   UserSegment,
+  PersonalizationRuleVersion,
 } from '@/types/personalization';
+import { ruleVersionStorage } from './ruleVersionStorage';
 
 const RULES_STORAGE_KEY = 'personalization_rules';
 const METRICS_STORAGE_KEY = 'personalization_metrics';
@@ -105,6 +107,10 @@ class PersonalizationEngine {
   updateRule(id: string, updates: Partial<PersonalizationRule>): PersonalizationRule | null {
     const index = this.rules.findIndex((r) => r.id === id);
     if (index === -1) return null;
+
+    const oldRule = this.rules[index];
+
+    this.createRuleVersion(oldRule, 'Update rule');
 
     this.rules[index] = {
       ...this.rules[index],
@@ -392,6 +398,71 @@ class PersonalizationEngine {
     localStorage.removeItem(RULES_STORAGE_KEY);
     localStorage.removeItem(VARIANT_STORAGE_KEY);
     localStorage.removeItem(METRICS_STORAGE_KEY);
+  }
+
+  getRuleVersions(ruleId: string): PersonalizationRuleVersion[] {
+    return ruleVersionStorage.getRuleVersions(ruleId);
+  }
+
+  createRuleVersion(rule: PersonalizationRule, notes: string = ''): PersonalizationRuleVersion | null {
+    if (typeof window === 'undefined') return null;
+
+    const version: PersonalizationRuleVersion = {
+      id: `${rule.id}_${Date.now()}`,
+      ruleId: rule.id,
+      content: { ...rule },
+      timestamp: new Date().toISOString(),
+      notes,
+      author: 'system',
+      performanceMetrics: this.getMetrics(rule.id)
+        ? {
+            views: this.getMetrics(rule.id)?.views,
+            clicks: this.getMetrics(rule.id)?.clicks,
+            conversions: this.getMetrics(rule.id)?.conversions,
+            liftPercentage: this.getMetrics(rule.id)?.liftPercentage,
+          }
+        : undefined,
+    };
+
+    ruleVersionStorage.saveVersion(version);
+    return version;
+  }
+
+  restoreRuleVersion(ruleId: string, versionId: string): PersonalizationRule | null {
+    const versions = this.getRuleVersions(ruleId);
+    const versionToRestore = versions.find(v => v.id === versionId);
+
+    if (!versionToRestore) return null;
+
+    const restoredRule = {
+      ...versionToRestore.content,
+      updatedAt: Date.now(),
+    };
+
+    const index = this.rules.findIndex((r) => r.id === ruleId);
+    if (index !== -1) {
+      this.rules[index] = restoredRule;
+    } else {
+      this.rules.push(restoredRule);
+    }
+
+    this.saveRules();
+    return restoredRule;
+  }
+
+  deleteRuleVersion(ruleId: string, versionId: string): boolean {
+    ruleVersionStorage.deleteVersion(ruleId, versionId);
+    return true;
+  }
+
+  compareRuleVersions(ruleId: string, version1Id: string, version2Id: string) {
+    const versions = this.getRuleVersions(ruleId);
+    const version1 = versions.find(v => v.id === version1Id);
+    const version2 = versions.find(v => v.id === version2Id);
+
+    if (!version1 || !version2) return null;
+
+    return ruleVersionStorage.compareVersions(version1, version2);
   }
 
   private generateId(): string {

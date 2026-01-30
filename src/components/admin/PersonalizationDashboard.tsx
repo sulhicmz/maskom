@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/contexts/ThemeContext';
-import { 
-  personalizationEngine, 
+import {
+  personalizationEngine,
   behaviorTracker,
-  segmentationEngine 
+  segmentationEngine
 } from '@/utils/personalization';
+import RuleVersionHistoryPanel from '@/components/personalization/RuleVersionHistoryPanel';
 import type {
   PersonalizationRule,
   ContentVariant,
@@ -50,7 +51,7 @@ export default function PersonalizationDashboard() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [selectedRule, setSelectedRule] = useState<PersonalizationRule | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'rules' | 'analytics' | 'preview'>('rules');
+  const [activeTab, setActiveTab] = useState<'rules' | 'analytics' | 'preview' | 'versions'>('rules');
   const [previewSegment, setPreviewSegment] = useState<UserSegment>('new_visitor');
 
   useEffect(() => {
@@ -162,6 +163,12 @@ export default function PersonalizationDashboard() {
               onClick={() => setActiveTab('preview')}
             >
               Pratinjau
+            </button>
+            <button
+              className={`btn ${activeTab === 'versions' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setActiveTab('versions')}
+            >
+              Versi
             </button>
           </div>
         </div>
@@ -332,6 +339,38 @@ export default function PersonalizationDashboard() {
                   ))}
                 </ul>
               )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'versions' && selectedRule && (
+          <RuleVersionHistoryPanel
+            rule={selectedRule}
+            onRestore={(restoredRule) => {
+              handleUpdateRule(restoredRule.id, restoredRule);
+              setActiveTab('rules');
+            }}
+            onClose={() => setSelectedRule(null)}
+          />
+        )}
+
+        {activeTab === 'versions' && !selectedRule && (
+          <div className={`card ${theme === 'dark' ? 'bg-secondary text-light' : ''}`}>
+            <div className="card-body">
+              <h5 className="card-title mb-3">Riwayat Versi</h5>
+              <p className="text-muted">Pilih aturan untuk melihat riwayat versi</p>
+              <div className="list-group">
+                {rules.map(rule => (
+                  <div
+                    key={rule.id}
+                    className={`list-group-item ${theme === 'dark' ? 'bg-dark border-secondary' : ''} cursor-pointer`}
+                    onClick={() => setSelectedRule(rule)}
+                  >
+                    <h6 className="mb-1">{rule.name}</h6>
+                    <small className="text-muted">{rule.description}</small>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
