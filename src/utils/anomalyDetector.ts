@@ -6,7 +6,7 @@ import {
   AnomalyStatus,
   AnomalyThreshold,
   AnomalyType,
-  AlertChannel,
+  AnomalyAlertChannel,
   BaselineData,
   MetricsHistory,
   AnomalyDetectionResult,
@@ -594,7 +594,7 @@ class AnomalyDetector implements IAnomalyDetector {
     return true;
   }
 
-  async sendAlert(anomaly: Anomaly, channels: AlertChannel[]): Promise<AnomalyAlert[]> {
+  async sendAlert(anomaly: Anomaly, channels: AnomalyAlertChannel[]): Promise<AnomalyAlert[]> {
     const alerts: AnomalyAlert[] = [];
 
     if (!anomaly || !anomaly.id) {
