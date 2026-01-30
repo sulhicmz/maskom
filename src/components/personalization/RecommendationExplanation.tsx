@@ -1,5 +1,5 @@
-import React from 'react';
-import type { Recommendation, RecommendationFeedback } from '@/types/recommendation';
+import React, { useState } from 'react';
+import type { Recommendation } from '@/types/recommendation';
 import { recommendationEngine } from '@/utils/personalization/recommendationEngine';
 import { useTheme } from '@/contexts/ThemeContext';
 

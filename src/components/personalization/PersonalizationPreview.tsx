@@ -6,7 +6,6 @@ import { personalizationEngine } from '@/utils/personalization';
 import type {
   PersonalizationRule,
   UserSegment,
-  ContentType,
   PreviewDeviceType,
   PreviewValidationResult,
   PreviewHistory,
@@ -149,17 +148,17 @@ const PersonalizationPreview: React.FC<PersonalizationPreviewProps> = memo(({ ru
   const renderContent = useCallback((content: Record<string, unknown>) => {
     return (
       <div className="preview-content">
-        {content.headline && (
+        {content.headline != null && (
           <h2 className="preview-headline mb-3">
             {String(content.headline)}
           </h2>
         )}
-        {content.subheadline && (
+        {content.subheadline != null && (
           <p className="preview-subheadline mb-3 text-muted">
             {String(content.subheadline)}
           </p>
         )}
-        {content.imageUrl && (
+        {content.imageUrl != null && (
           <img
             src={String(content.imageUrl)}
             alt="Preview"
@@ -167,7 +166,7 @@ const PersonalizationPreview: React.FC<PersonalizationPreviewProps> = memo(({ ru
             style={{ maxHeight: '300px', objectFit: 'cover' }}
           />
         )}
-        {content.body && (
+        {content.body != null && (
           <div className="preview-body mb-3">
             {String(content.body).split('\n').map((paragraph, index) => (
               <p key={index} className="mb-2">
@@ -176,12 +175,12 @@ const PersonalizationPreview: React.FC<PersonalizationPreviewProps> = memo(({ ru
             ))}
           </div>
         )}
-        {content.cta && (
+        {content.cta != null && (
           <button className="preview-cta btn btn-primary">
             {String(content.cta)}
           </button>
         )}
-        {content.ctaSecondary && (
+        {content.ctaSecondary != null && (
           <button className="preview-cta-secondary btn btn-outline-primary ms-2">
             {String(content.ctaSecondary)}
           </button>
@@ -343,7 +342,7 @@ const PersonalizationPreview: React.FC<PersonalizationPreviewProps> = memo(({ ru
         <div className={`card ${theme === 'dark' ? 'bg-secondary text-light' : ''}`}>
           <div className="card-body text-center py-5">
             <p className="text-muted mb-0">
-              Pilih aturan dan klik "Pratinjau Konten" untuk melihat konten yang dipersonalisasi
+              Pilih aturan dan klik &quot;Pratinjau Konten&quot; untuk melihat konten yang dipersonalisasi
             </p>
           </div>
         </div>

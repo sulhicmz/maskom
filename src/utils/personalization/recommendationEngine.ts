@@ -1,13 +1,12 @@
-import { BehaviorSignal, ContentType, UserProfile, UserSegment } from '@/types/personalization';
+import { BehaviorSignal, UserProfile, UserSegment } from '@/types/personalization';
 import { BehaviorTracker } from './behaviorTracker';
 import { InnerBlogPost } from '@/types/data';
 import inner_blog_data from '@/data/InnerBlogData';
-import blog_categories_data, { blogCategoryById } from '@/data/BlogCategoryData';
-import tags, { tagsById } from '@/data/BlogTagData';
+import { blogCategoryById } from '@/data/BlogCategoryData';
+import { tagsById } from '@/data/BlogTagData';
 import type {
   Recommendation,
   RecommendationAlgorithm,
-  RecommendationConfig,
   RecommendationExplanation,
   RecommendationFeedback,
   RecommendationMetrics,
@@ -219,7 +218,6 @@ class RecommendationEngine {
     count: number,
     excludeContentIds: number[]
   ): Recommendation[] {
-    const userInterests = userProfile.interests;
     const scores: RecommendationScore[] = [];
 
     for (const post of inner_blog_data) {
@@ -258,7 +256,6 @@ class RecommendationEngine {
     const contentScores = new Map<number, { score: number; reasons: string[] }>();
 
       for (const user of similarUsers) {
-        const userBehaviors = this.behaviorTracker.getBehaviorHistory();
         const userInterests = user.behaviorHistory.filter((b) => b.type === 'page_view').map((b) => parseInt(b.contentId || '0', 10));
 
         for (const contentId of userInterests) {

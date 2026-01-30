@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Recommendation, RecommendationAlgorithm } from '@/types/recommendation';
 import { recommendationEngine } from '@/utils/personalization/recommendationEngine';
 import RecommendationCard from './RecommendationCard';
@@ -24,11 +24,7 @@ const RecommendationList: React.FC<RecommendationListProps> = ({
   const [loading, setLoading] = useState(true);
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<RecommendationAlgorithm>(algorithm);
 
-  useEffect(() => {
-    loadRecommendations();
-  }, [selectedAlgorithm, count, excludeContentIds]);
-
-  const loadRecommendations = () => {
+  const loadRecommendations = useCallback(() => {
     setLoading(true);
     try {
       const recs = recommendationEngine.getRecommendations(
@@ -43,7 +39,11 @@ const RecommendationList: React.FC<RecommendationListProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedAlgorithm, count, excludeContentIds]);
+
+  useEffect(() => {
+    loadRecommendations();
+  }, [loadRecommendations]);
 
   const handleRefresh = () => {
     loadRecommendations();

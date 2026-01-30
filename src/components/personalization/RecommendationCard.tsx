@@ -15,7 +15,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   showFeedback = true
 }) => {
   const { theme } = useTheme();
-  const { content, explanation } = recommendation;
+  const { content } = recommendation;
 
   const handleClick = () => {
     if (onClick) {
