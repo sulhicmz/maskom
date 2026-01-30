@@ -75,3 +75,9 @@ export * from './accessibility';
 
 // Personalization types (BehaviorSignal, UserProfile, PersonalizationRule, etc.)
 export * from './personalization';
+
+// Recommendation types (RecommendationEngine, RecommendationResult, etc.)
+export * from './recommendation';
+
+// Storage Validator types (IStorageValidator, ValidationResult, etc.)
+export * from './storageValidator';

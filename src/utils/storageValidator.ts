@@ -1,10 +1,8 @@
 import { z } from 'zod';
-
-export interface ValidationResult<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+import type {
+  IStorageValidator,
+  ValidationResult
+} from '@/types/storageValidator';
 
 export interface StorageValidatorOptions<T> {
   schema: z.ZodSchema<T>;
@@ -13,19 +11,19 @@ export interface StorageValidatorOptions<T> {
   logErrors?: boolean;
 }
 
-export class StorageValidator<T = unknown> {
+export class StorageValidator<T = unknown> implements IStorageValidator<T> {
   private schema: z.ZodSchema<T>;
   private defaultValue: T;
   private storageKey: string;
   private logErrors: boolean;
-
+ 
   constructor(options: StorageValidatorOptions<T>) {
     this.schema = options.schema;
     this.defaultValue = options.defaultValue;
     this.storageKey = options.storageKey;
     this.logErrors = options.logErrors ?? true;
   }
-
+ 
   parse(data: unknown): ValidationResult<T> {
     try {
       const result = this.schema.safeParse(data);
@@ -136,3 +134,5 @@ export function validateObject<T>(
   console.error('Object validation error:', result.error.flatten());
   return defaultValue;
 }
+
+export type { ValidationResult } from '@/types/storageValidator';
