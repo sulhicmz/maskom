@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useFormSubmission, type BaseResult } from '../useFormSubmission';
 

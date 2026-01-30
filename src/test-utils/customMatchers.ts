@@ -3,7 +3,6 @@
  * Import this file in jest.setup.js to enable these matchers
  */
 
-/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace jest {
     interface Matchers {
@@ -18,7 +17,6 @@ declare global {
     }
   }
 }
-/* eslint-enable @typescript-eslint/no-namespace */
 
 expect.extend({
   toHaveAriaLabel(received: HTMLElement, expected: string) {

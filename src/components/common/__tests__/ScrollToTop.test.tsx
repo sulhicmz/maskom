@@ -9,7 +9,6 @@ jest.mock("@/hooks/UseSticky", () => ({
 
 describe("ScrollToTop Component", () => {
   let mockScrollTo: jest.SpyInstance;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mockUseSticky = jest.mocked(require("@/hooks/UseSticky").default);
 
   beforeEach(() => {

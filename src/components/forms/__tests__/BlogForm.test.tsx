@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 jest.mock('react-toastify', () => ({
   toast: {
     success: jest.fn(() => ({ __t: Date.now() })),
