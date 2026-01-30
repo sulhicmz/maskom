@@ -199,6 +199,7 @@ class SecurityAuditScanner implements ISecurityAuditScanner {
     knownVulnerabilities.forEach((vuln, index) => {
       vulnerabilities.push({
         id: `dep-vuln-${Date.now()}-${index}`,
+        auditId: '',
         type: vuln.type,
         severity: vuln.severity,
         cveId: vuln.cveId,
@@ -252,6 +253,7 @@ class SecurityAuditScanner implements ISecurityAuditScanner {
     codeIssues.forEach((issue, index) => {
       vulnerabilities.push({
         id: `code-vuln-${Date.now()}-${index}`,
+        auditId: '',
         type: issue.type,
         severity: issue.severity,
         title: issue.title,
@@ -267,34 +269,6 @@ class SecurityAuditScanner implements ISecurityAuditScanner {
 
   async scanSecrets(): Promise<SecurityVulnerability[]> {
     const vulnerabilities: SecurityVulnerability[] = [];
-
-    const secretPatterns = [
-      {
-        name: 'API Key',
-        pattern: /(?:api[_-]?key|apikey)\s*[:=]\s*['"]?([a-zA-Z0-9_\-]{20,})['"]?/gi,
-        severity: 'critical' as SecuritySeverity,
-      },
-      {
-        name: 'Bearer Token',
-        pattern: /bearer\s+([a-zA-Z0-9_\-\.]{20,})/gi,
-        severity: 'critical' as SecuritySeverity,
-      },
-      {
-        name: 'JWT Token',
-        pattern: /eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+/g,
-        severity: 'critical' as SecuritySeverity,
-      },
-      {
-        name: 'AWS Access Key',
-        pattern: /(?:aws[_-]?(?:access)?_?[_-]?key|key[_-]?id)\s*[:=]\s*['"]?([A-Z0-9]{20})['"]?/gi,
-        severity: 'critical' as SecuritySeverity,
-      },
-      {
-        name: 'Password in URL',
-        pattern: /:\/\/([^:@]+):([^@]+)@/g,
-        severity: 'high' as SecuritySeverity,
-      },
-    ];
 
     const mockSecrets = [
       {
@@ -316,6 +290,7 @@ class SecurityAuditScanner implements ISecurityAuditScanner {
     mockSecrets.forEach((secret, index) => {
       vulnerabilities.push({
         id: `secret-vuln-${Date.now()}-${index}`,
+        auditId: '',
         type: secret.type,
         severity: secret.severity,
         title: secret.title,
