@@ -1,16 +1,14 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import typescriptParser from "@typescript-eslint/parser";
+import nextPlugin from "@next/eslint-plugin-next";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
       ".next/**",
@@ -23,16 +21,24 @@ const eslintConfig = [
     ],
   },
   {
-    files: ["next-env.d.ts"],
-    rules: {
-      "@typescript-eslint/triple-slash-reference": "off",
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    ignores: ["jest.setup.js"],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
     },
-  },
-  {
-    files: ["**/*.test.ts", "**/*.test.tsx"],
+    plugins: {
+      "@next/next": nextPlugin,
+      "@typescript-eslint": typescriptEslint,
+      "react-hooks": reactHooksPlugin,
+    },
     rules: {
-      "@next/next/no-img-element": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+      ...reactHooksPlugin.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
@@ -41,6 +47,14 @@ const eslintConfig = [
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-require-imports": "off",
     },
   },
   {
