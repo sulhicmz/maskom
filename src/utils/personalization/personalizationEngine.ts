@@ -258,7 +258,7 @@ class PersonalizationEngine {
   }
 
   personalizeContent(
-    contentId: string,
+    _contentId: string,
     userSegment: UserSegment,
     contentType: ContentType,
     context: Record<string, unknown>,

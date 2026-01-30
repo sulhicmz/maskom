@@ -48,18 +48,15 @@ export class SentryAPMProvider implements IAPMProvider {
     console.log('[Sentry APM] User set:', user.id);
   }
 
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  setTag(key: string, value: string): void {
+  setTag(_key: string, _value: string): void {
     if (!this.enabled) return;
   }
 
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  setContext(key: string, context: Record<string, unknown>): void {
+  setContext(_key: string, _context: Record<string, unknown>): void {
     if (!this.enabled) return;
   }
 
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  addBreadcrumb(message: string, category?: string, level?: 'info' | 'warning' | 'error'): void {
+  addBreadcrumb(_message: string, _category?: string, _level?: 'info' | 'warning' | 'error'): void {
     if (!this.enabled) return;
   }
 

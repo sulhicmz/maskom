@@ -34,9 +34,11 @@ class RecommendationEngine {
 
   constructor() {
     this.behaviorTracker = new BehaviorTracker();
-    this.loadRecommendations();
-    this.loadFeedbackHistory();
-    this.loadMetrics();
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      this.loadRecommendations();
+      this.loadFeedbackHistory();
+      this.loadMetrics();
+    }
   }
 
   private loadRecommendations(): void {
@@ -54,6 +56,7 @@ class RecommendationEngine {
   }
 
   private saveRecommendations(): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
     try {
       const cached = Array.from(this.recommendationsCache.entries()).slice(0, MAX_CACHE_SIZE);
       localStorage.setItem(RECOMMENDATION_STORAGE_KEY, JSON.stringify(cached));
@@ -75,6 +78,7 @@ class RecommendationEngine {
   }
 
   private saveFeedbackHistory(): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
     try {
       localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(this.feedbackHistory));
     } catch (error) {
@@ -94,6 +98,7 @@ class RecommendationEngine {
   }
 
   private saveMetrics(): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
     if (!this.recommendationMetrics) return;
 
     try {
@@ -448,7 +453,7 @@ class RecommendationEngine {
     content: InnerBlogPost,
     score: number,
     algorithm: RecommendationAlgorithm,
-    coldStartStrategy: ColdStartStrategy | RecommendationAlgorithm,
+    _coldStartStrategy: ColdStartStrategy | RecommendationAlgorithm,
     reasons: string[]
   ): Recommendation {
     const category = blogCategoryById.get(content.categoryId);

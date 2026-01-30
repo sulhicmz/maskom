@@ -1,4 +1,4 @@
-import { PersonalizationRuleVersion, RuleVersionDiff } from '@/types/personalization';
+import { PersonalizationRuleVersion, RuleVersionDiff, IRuleVersionStorage } from '@/types/personalization';
 
 const STORAGE_KEY_PREFIX = 'personalization_rule_version_';
 const VERSION_LIST_KEY = 'personalization_rule_version_list';
@@ -8,7 +8,7 @@ export interface RuleVersionStorageConfig {
   maxVersions?: number;
 }
 
-export class RuleVersionStorage {
+export class RuleVersionStorage implements IRuleVersionStorage {
   private maxVersions: number;
 
   constructor(config: RuleVersionStorageConfig = {}) {
@@ -169,3 +169,5 @@ export class RuleVersionStorage {
 }
 
 export const ruleVersionStorage = new RuleVersionStorage();
+
+export type { IRuleVersionStorage } from '@/types/personalization';

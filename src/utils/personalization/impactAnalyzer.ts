@@ -15,6 +15,11 @@ import type {
   IPersonalizationImpactAnalyzer,
 } from '@/types/personalization';
 
+const PERSONALIZATION_METRICS_KEY = 'personalizationMetrics';
+const ANALYTICS_HISTORY_KEY = 'analyticsHistory';
+const RULE_HOURS_KEY_PREFIX = 'rule_';
+const RULE_HOURS_KEY_SUFFIX = '_hours';
+
 export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnalyzer {
   private personalizationMetrics: Map<string, PersonalizationMetrics>;
   private analyticsHistory: Map<string, ImpactMetrics[]>;
@@ -27,7 +32,7 @@ export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnal
 
   private loadFromStorage(): void {
     try {
-      const metrics = localStorage.getItem('personalizationMetrics');
+      const metrics = localStorage.getItem(PERSONALIZATION_METRICS_KEY);
       if (metrics) {
         const parsed = JSON.parse(metrics);
         Object.entries(parsed).forEach(([key, value]) => {
@@ -35,7 +40,7 @@ export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnal
         });
       }
 
-      const history = localStorage.getItem('analyticsHistory');
+      const history = localStorage.getItem(ANALYTICS_HISTORY_KEY);
       if (history) {
         const parsed = JSON.parse(history);
         Object.entries(parsed).forEach(([key, value]) => {
@@ -44,24 +49,6 @@ export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnal
       }
     } catch (error) {
       console.error('Failed to load analytics from storage:', error);
-    }
-  }
-
-  private saveToStorage(): void {
-    try {
-      const metrics: Record<string, PersonalizationMetrics> = {};
-      this.personalizationMetrics.forEach((value, key) => {
-        metrics[key] = value;
-      });
-      localStorage.setItem('personalizationMetrics', JSON.stringify(metrics));
-
-      const history: Record<string, ImpactMetrics[]> = {};
-      this.analyticsHistory.forEach((value, key) => {
-        history[key] = value;
-      });
-      localStorage.setItem('analyticsHistory', JSON.stringify(history));
-    } catch (error) {
-      console.error('Failed to save analytics to storage:', error);
     }
   }
 
@@ -219,7 +206,7 @@ export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnal
   }
 
   calculateInvestment(ruleId: string): number {
-    const hoursSpent = parseFloat(localStorage.getItem(`rule_${ruleId}_hours`) || '2');
+    const hoursSpent = parseFloat(localStorage.getItem(`${RULE_HOURS_KEY_PREFIX}${ruleId}${RULE_HOURS_KEY_SUFFIX}`) || '2');
     const hourlyRate = 50;
     return hoursSpent * hourlyRate;
   }

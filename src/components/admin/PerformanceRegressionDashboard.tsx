@@ -5,7 +5,7 @@
  */
 
 'use client';
-
+ 
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
@@ -21,6 +21,7 @@ import {
 } from '@/utils/webVitals';
 import { WebVitalsEntry } from '@/types/analytics';
 import apmManager from '@/utils/apm';
+import { logComponentError } from '@/utils/errorHandler';
 
 const REGRESSION_ALERTS_KEY = 'regression_alerts'
 const BASELINES_KEY = 'performance_baselines'
@@ -48,7 +49,7 @@ function PerformanceRegressionDashboard() {
       try {
         loadedAlerts = JSON.parse(storedAlerts);
       } catch (error) {
-        console.error('Failed to parse stored alerts:', error);
+        logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'parse stored alerts', error });
       }
     }
     
@@ -59,7 +60,7 @@ function PerformanceRegressionDashboard() {
           loadedBaselines.set(baseline.metric as WebVitalMetric, baseline);
         }
       } catch (error) {
-        console.error('Failed to parse stored baselines:', error);
+        logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'parse stored baselines', error });
       }
     }
     
@@ -138,7 +139,7 @@ function PerformanceRegressionDashboard() {
     try {
       localStorage.setItem(REGRESSION_ALERTS_KEY, JSON.stringify(alerts));
     } catch (error) {
-      console.error('Failed to save alerts:', error);
+      logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'save alerts', error });
     }
   };
 
@@ -147,7 +148,7 @@ function PerformanceRegressionDashboard() {
       const baselinesArray = Array.from(baselines.values());
       localStorage.setItem(BASELINES_KEY, JSON.stringify(baselinesArray));
     } catch (error) {
-      console.error('Failed to save baselines:', error);
+      logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'save baselines', error });
     }
   };
 

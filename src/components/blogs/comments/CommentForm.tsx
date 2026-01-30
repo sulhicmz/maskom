@@ -20,8 +20,7 @@ interface CommentFormProps {
   onCancelReply?: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CommentForm = ({ blogId, parentId, onSubmitSuccess, onCancelReply }: CommentFormProps) => {
+const CommentForm = ({ onSubmitSuccess, onCancelReply }: CommentFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const schema = createCommentFormSchema();

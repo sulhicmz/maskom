@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { BlogCommentItem } from "@/types/data";
 import { formatCommentDate } from "@/utils/dateFormat";
-import CommentForm, { CommentFormData } from "./CommentForm";
+import CommentForm from "./CommentForm";
 import { memo } from "react";
 
 interface CommentListProps {
@@ -69,8 +69,7 @@ const CommentList = ({ comments, blogId }: CommentListProps) => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleReplySuccess = (data: CommentFormData) => {
+  const handleReplySuccess = () => {
     setReplyingTo(null);
   };
 

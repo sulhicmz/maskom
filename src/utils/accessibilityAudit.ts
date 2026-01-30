@@ -155,7 +155,7 @@ function convertAxeResultToIssue(
  * Calculate accessibility score from audit results
  */
 export function calculateScore(
-  totalIssues: number,
+  _totalIssues: number,
   criticalIssues: number,
   seriousIssues: number,
   moderateIssues: number,
@@ -269,8 +269,7 @@ export function getDeviceType(width: number): 'desktop' | 'mobile' | 'tablet' {
  */
 export async function runAccessibilityAudit(
   url: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  context?: {
+  _context?: {
     include?: string[];
     exclude?: string[];
   }

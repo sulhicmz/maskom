@@ -127,6 +127,15 @@ export interface RuleVersionDiff {
   type: 'added' | 'removed' | 'changed';
 }
 
+export interface IRuleVersionStorage {
+  getRuleVersions(ruleId: string): PersonalizationRuleVersion[];
+  saveVersion(version: PersonalizationRuleVersion): void;
+  deleteVersion(ruleId: string, versionId: string): void;
+  clearRuleVersions(ruleId: string): void;
+  compareVersions(version1: PersonalizationRuleVersion, version2: PersonalizationRuleVersion): RuleVersionDiff[];
+  getVersionCount(ruleId: string): number;
+}
+
 // ============================================================================
 // TEMPLATE TYPES
 // ============================================================================

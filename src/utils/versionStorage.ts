@@ -1,4 +1,5 @@
 import { BlogPostVersion, VersionDiff } from '@/types/blog';
+import type { IVersionStorage } from '@/types/versionStorage';
 
 const STORAGE_KEY_PREFIX = 'blog_version_';
 const VERSION_LIST_KEY = 'blog_version_list';
@@ -8,7 +9,7 @@ export interface VersionStorageConfig {
    maxVersions?: number;
 }
 
-export class VersionStorage {
+export class VersionStorage implements IVersionStorage {
    private maxVersions: number;
 
    constructor(config: VersionStorageConfig = {}) {
@@ -169,3 +170,5 @@ export class VersionStorage {
 }
 
 export const versionStorage = new VersionStorage();
+
+export type { IVersionStorage } from '@/types/versionStorage';

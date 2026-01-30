@@ -1,5 +1,5 @@
 "use client"
-
+ 
 import React, { useState, useEffect, memo, useCallback, useMemo } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/types/drill'
 import StatusBadge from '@/components/ui/StatusBadge'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { logComponentError } from '@/utils/errorHandler'
 
 interface DrillListProps {
   onRunDrill: (drillId: string, backupId: string, drillType: DrillType) => void
@@ -160,7 +161,7 @@ const DrillList: React.FC<DrillListProps> = ({
         const dataModule = await import('@/data/DrillData')
         setDrillData(dataModule.default as BackupDrill[])
       } catch (error) {
-        console.error('Failed to load drill data:', error)
+        logComponentError({ componentName: 'DrillList', operation: 'load drill data', error })
       } finally {
         setDataLoading(false)
       }
@@ -173,7 +174,7 @@ const DrillList: React.FC<DrillListProps> = ({
     try {
       setDrills(drillData)
     } catch (error) {
-      console.error('Error loading drills:', error)
+      logComponentError({ componentName: 'DrillList', operation: 'load drills', error })
     } finally {
       setLoading(false)
     }
