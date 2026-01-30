@@ -1,13 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { logComponentError, logServiceError, logAPICallError, handleAsyncError } from '../../errorHandler'
 
 describe('errorHandler', () => {
   beforeEach(() => {
-    vi.spyOn(console, 'error').mockImplementation(() => {})
+    jest.spyOn(console, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    jest.restoreAllMocks()
   })
 
   describe('logComponentError', () => {
@@ -87,7 +86,8 @@ describe('errorHandler', () => {
       logServiceError('TestService', 'test operation', error)
 
       expect(console.error).toHaveBeenCalledWith(
-        '[TestService] Service error during test operation: Service error'
+        '[TestService] Service error during test operation:',
+        'Service error'
       )
     })
 
@@ -95,7 +95,8 @@ describe('errorHandler', () => {
       logServiceError('TestService', 'test operation', 'String error')
 
       expect(console.error).toHaveBeenCalledWith(
-        '[TestService] Service error during test operation: String error'
+        '[TestService] Service error during test operation:',
+        'String error'
       )
     })
 
@@ -103,7 +104,8 @@ describe('errorHandler', () => {
       logServiceError('TestService', 'test operation', { code: 500 })
 
       expect(console.error).toHaveBeenCalledWith(
-        '[TestService] Service error during test operation: [object Object]'
+        '[TestService] Service error during test operation:',
+        '[object Object]'
       )
     })
   })
@@ -114,7 +116,8 @@ describe('errorHandler', () => {
       logAPICallError('/api/test', 'GET', error)
 
       expect(console.error).toHaveBeenCalledWith(
-        '[API] GET /api/test failed: API error'
+        '[API] GET /api/test failed:',
+        'API error'
       )
     })
 
@@ -122,7 +125,8 @@ describe('errorHandler', () => {
       logAPICallError('/api/test', 'POST', 'String error')
 
       expect(console.error).toHaveBeenCalledWith(
-        '[API] POST /api/test failed: String error'
+        '[API] POST /api/test failed:',
+        'String error'
       )
     })
 
@@ -130,7 +134,8 @@ describe('errorHandler', () => {
       logAPICallError('/api/test', 'DELETE', { status: 404 })
 
       expect(console.error).toHaveBeenCalledWith(
-        '[API] DELETE /api/test failed: [object Object]'
+        '[API] DELETE /api/test failed:',
+        '[object Object]'
       )
     })
   })
