@@ -1,38 +1,38 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { PersonalizationPerformanceAlerts } from '../performanceAlerts';
 import type { 
   PerformanceAlert, 
   PerformanceAlertConfig,
-} from '../../../../../types/personalization';
+} from '@/types/personalization';
 
 describe('PersonalizationPerformanceAlerts', () => {
   let performanceAlerts: PersonalizationPerformanceAlerts;
   let mockImpactAnalyzer: any;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
     localStorage.clear();
 
     mockImpactAnalyzer = {
-      calculateImpactMetrics: vi.fn(),
-      calculateSegmentPerformance: vi.fn(),
-      calculateRuleEffectiveness: vi.fn(),
-      calculateROI: vi.fn(),
-      calculateInvestment: vi.fn(),
-      calculateRevenue: vi.fn(),
-      calculateRevenueLift: vi.fn(),
-      calculateEffectivenessScore: vi.fn(),
-      calculateTrend: vi.fn(),
-      calculateTrendForRule: vi.fn(),
-      calculateROIMetrics: vi.fn(),
-      calculateCohortAnalysis: vi.fn(),
-      calculateABTestMetrics: vi.fn(),
-      calculatePValue: vi.fn(),
-      normalCDF: vi.fn(),
-      getComprehensiveAnalytics: vi.fn(),
-      generateChartData: vi.fn(),
-      generateMultiSeriesChartData: vi.fn(),
-      exportToCSV: vi.fn(),
+      calculateImpactMetrics: jest.fn(),
+      calculateSegmentPerformance: jest.fn(),
+      calculateRuleEffectiveness: jest.fn(),
+      calculateROI: jest.fn(),
+      calculateInvestment: jest.fn(),
+      calculateRevenue: jest.fn(),
+      calculateRevenueLift: jest.fn(),
+      calculateEffectivenessScore: jest.fn(),
+      calculateTrend: jest.fn(),
+      calculateTrendForRule: jest.fn(),
+      calculateROIMetrics: jest.fn(),
+      calculateCohortAnalysis: jest.fn(),
+      calculateABTestMetrics: jest.fn(),
+      calculatePValue: jest.fn(),
+      normalCDF: jest.fn(),
+      getComprehensiveAnalytics: jest.fn(),
+      generateChartData: jest.fn(),
+      generateMultiSeriesChartData: jest.fn(),
+      exportToCSV: jest.fn(),
     };
 
     performanceAlerts = new PersonalizationPerformanceAlerts(mockImpactAnalyzer);
@@ -683,7 +683,7 @@ describe('PersonalizationPerformanceAlerts', () => {
         channels: ['dashboard'],
       };
 
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
       performanceAlerts.sendAlert(alert);
 

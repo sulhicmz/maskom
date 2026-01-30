@@ -358,7 +358,7 @@ class PersonalizationPerformanceAlerts implements IPersonalizationPerformanceAle
         previousValue = previousMetrics.liftPercentage;
         const percentChange = ((currentValue - previousValue) / Math.abs(previousValue || 1)) * 100;
 
-        if (percentChange <= -config.thresholdValue) {
+        if (currentValue !== 0 && Math.abs(currentValue) >= 0.1 && percentChange <= -config.thresholdValue) {
           shouldAlert = true;
           message = `Lift degraded by ${Math.abs(percentChange).toFixed(1)}% for rule "${ruleName}"`;
           recommendations = [
