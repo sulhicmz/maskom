@@ -2,7 +2,6 @@ import { z } from 'zod';
 import {
   AlertSeverity,
   AlertStatus,
-  AlertChannel,
   PerformanceAlertType,
   PerformanceAlertConfig,
   PerformanceAlert,
@@ -10,9 +9,7 @@ import {
   PerformanceAlertStatistics,
   AlertResolution,
   IPersonalizationPerformanceAlerts,
-  PersonalizationRule,
   RuleEffectiveness,
-  UserSegment,
 } from '@/types/personalization';
 import { StorageValidator } from '@/utils/storageValidator';
 import type { IPersonalizationImpactAnalyzer } from '@/types/personalization';
@@ -26,8 +23,8 @@ const STORAGE_KEYS = {
 
 const DEFAULT_CHECK_INTERVAL = 10; // minutes
 const DEFAULT_SLIDING_WINDOW = 24; // hours
-const MAX_ALERTS = 1000;
-const MAX_HISTORY = 500;
+const _MAX_ALERTS = 1000;
+const _MAX_HISTORY = 500;
 
 const performanceAlertArraySchema = z.array(
   z.object({

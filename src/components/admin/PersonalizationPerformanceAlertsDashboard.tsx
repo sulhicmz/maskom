@@ -49,7 +49,7 @@ const STATUS_LABELS: Record<AlertStatus, string> = {
   resolved: 'Diselesaikan',
 };
 
-const CHANNEL_LABELS: Record<AlertChannel, string> = {
+const _CHANNEL_LABELS: Record<AlertChannel, string> = {
   dashboard: 'Dasbor',
   email: 'Email',
   webhook: 'Webhook',
@@ -75,12 +75,6 @@ const PersonalizationPerformanceAlertsDashboard = () => {
   const [filterType, setFilterType] = useState<PerformanceAlertType | 'all'>('all');
   const [filterSeverity, setFilterSeverity] = useState<AlertSeverity | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<AlertStatus | 'all'>('all');
-
-  useEffect(() => {
-    loadData();
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const loadData = useCallback(() => {
     const allAlerts = performanceAlerts.getAlerts();
@@ -109,6 +103,12 @@ const PersonalizationPerformanceAlertsDashboard = () => {
     setAlertConfigs(configs);
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 10000);
+    return () => clearInterval(interval);
+  }, [loadData]);
 
   const filteredAlerts = useMemo(() => {
     return alerts.filter(alert => {
@@ -473,9 +473,9 @@ const PersonalizationPerformanceAlertsDashboard = () => {
                               checked={config.alertChannels.includes('dashboard')}
                               onChange={(e) => {
                                 const channels = e.target.checked
-                                  ? [...config.alertChannels, 'dashboard']
+                                  ? [...config.alertChannels, 'dashboard' as const]
                                   : config.alertChannels.filter(c => c !== 'dashboard');
-                                handleUpdateConfig(alertType, { alertChannels: channels });
+                                handleUpdateConfig(alertType, { alertChannels: channels as AlertChannel[] });
                               }}
                             />
                             <label className="form-check-label small" htmlFor={`dashboard-${alertType}`}>
@@ -490,9 +490,9 @@ const PersonalizationPerformanceAlertsDashboard = () => {
                               checked={config.alertChannels.includes('email')}
                               onChange={(e) => {
                                 const channels = e.target.checked
-                                  ? [...config.alertChannels, 'email']
+                                  ? [...config.alertChannels, 'email' as const]
                                   : config.alertChannels.filter(c => c !== 'email');
-                                handleUpdateConfig(alertType, { alertChannels: channels });
+                                handleUpdateConfig(alertType, { alertChannels: channels as AlertChannel[] });
                               }}
                             />
                             <label className="form-check-label small" htmlFor={`email-${alertType}`}>
@@ -747,7 +747,6 @@ const PersonalizationPerformanceAlertsDashboard = () => {
                   )}
                 </div>
               </div>
-            </div>
             </div>
           </div>
            <div className="modal-backdrop fade show" style={{ display: 'block' }} onClick={() => setSelectedAlert(null)}></div>

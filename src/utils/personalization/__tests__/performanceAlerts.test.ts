@@ -2,9 +2,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PersonalizationPerformanceAlerts } from '../performanceAlerts';
 import type { 
   PerformanceAlert, 
-  AlertSeverity,
-  PerformanceAlertType,
-  AlertChannel,
   PerformanceAlertConfig,
 } from '../../../../../types/personalization';
 
