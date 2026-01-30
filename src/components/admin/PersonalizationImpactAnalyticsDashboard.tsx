@@ -8,7 +8,7 @@ import SegmentPerformanceTracker from '@/components/personalization/SegmentPerfo
 import RuleEffectivenessChart from '@/components/personalization/RuleEffectivenessChart';
 import ROICalculatorCard from '@/components/personalization/ROICalculatorCard';
 import CohortAnalysisChart from '@/components/personalization/CohortAnalysisChart';
-import type { PersonalizationRule, PersonalizationImpactAnalytics } from '@/types/personalization';
+import type { PersonalizationRule, PersonalizationImpactAnalytics, IPersonalizationImpactAnalyzer } from '@/types/personalization';
 
 const SEGMENT_LABELS: Record<string, string> = {
   new_visitor: 'Pengunjung Baru',

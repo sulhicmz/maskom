@@ -402,3 +402,50 @@ export interface ValidationWarning {
   message: string;
   code: string;
 }
+
+// ============================================================================
+// IMPACT ANALYZER INTERFACE
+// ============================================================================
+
+/**
+ * Interface for personalization impact analyzer
+ * Provides methods for calculating impact metrics, segment performance,
+ * rule effectiveness, ROI, cohort analysis, and A/B test metrics
+ */
+export interface IPersonalizationImpactAnalyzer {
+  calculateImpactMetrics(rules: PersonalizationRule[]): ImpactMetrics;
+  calculateSegmentPerformance(rules: PersonalizationRule[]): SegmentPerformance[];
+  calculateRuleEffectiveness(rules: PersonalizationRule[]): RuleEffectiveness[];
+  calculateROI(ruleId: string): number;
+  calculateInvestment(ruleId: string): number;
+  calculateRevenue(conversions: number, liftPercentage: number): number;
+  calculateRevenueLift(conversions: number, liftPercentage: number): number;
+  calculateEffectivenessScore(
+    conversionRate: number,
+    engagementRate: number,
+    liftPercentage: number,
+    roi: number
+  ): number;
+  calculateTrend(segment: UserSegment): 'up' | 'down' | 'stable';
+  calculateTrendForRule(ruleId: string): 'up' | 'down' | 'stable';
+  calculateROIMetrics(rules: PersonalizationRule[]): ROICalculator;
+  calculateCohortAnalysis(periodType?: 'daily' | 'weekly' | 'monthly'): CohortAnalysis;
+  calculateABTestMetrics(
+    testName: string,
+    controlConversions: number,
+    controlSize: number,
+    treatmentConversions: number,
+    treatmentSize: number
+  ): ABTestMetrics;
+  calculatePValue(
+    controlConversions: number,
+    controlSize: number,
+    treatmentConversions: number,
+    treatmentSize: number
+  ): number;
+  normalCDF(x: number): number;
+  getComprehensiveAnalytics(rules: PersonalizationRule[]): PersonalizationImpactAnalytics;
+  generateChartData(data: TimeSeriesData[]): ChartData;
+  generateMultiSeriesChartData(data: Record<string, TimeSeriesData[]>): ChartData;
+  exportToCSV(data: unknown[], filename: string): void;
+}

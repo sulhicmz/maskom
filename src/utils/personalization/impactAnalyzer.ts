@@ -12,9 +12,10 @@ import type {
   ABTestMetrics,
   TimeSeriesData,
   ChartData,
+  IPersonalizationImpactAnalyzer,
 } from '@/types/personalization';
 
-export class PersonalizationImpactAnalyzer {
+export class PersonalizationImpactAnalyzer implements IPersonalizationImpactAnalyzer {
   private personalizationMetrics: Map<string, PersonalizationMetrics>;
   private analyticsHistory: Map<string, ImpactMetrics[]>;
 
@@ -531,3 +532,4 @@ export class PersonalizationImpactAnalyzer {
 const personalizationImpactAnalyzer = new PersonalizationImpactAnalyzer();
 
 export default personalizationImpactAnalyzer;
+export type { IPersonalizationImpactAnalyzer } from '@/types/personalization';
