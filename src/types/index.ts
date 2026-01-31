@@ -87,3 +87,6 @@ export * from './versionStorage';
 
 // Security Audit types (SecurityAudit, SecurityVulnerability, etc.)
 export * from './securityAudit';
+
+// Publishing Pipeline types (PublishingWorkflow, PublishingMetrics, etc.)
+export * from './publishing';
