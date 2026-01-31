@@ -25,3 +25,10 @@ export interface MigrationOptions {
   migrations: Migration[];
   logMigrations?: boolean;
 }
+
+export interface IStorageMigration<T = unknown> {
+  migrate(data: unknown): MigrationResult;
+  rollback(data: unknown, targetVersion?: string): MigrationResult;
+  getCurrentVersion(): string;
+  resetHistory(): void;
+}

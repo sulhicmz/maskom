@@ -1,8 +1,8 @@
-import type { Migration, MigrationHistory, MigrationResult, MigrationOptions } from '@/types/storageMigration';
+import type { Migration, MigrationHistory, MigrationResult, MigrationOptions, IStorageMigration } from '@/types/storageMigration';
 
 const HISTORY_KEY = 'maskom_migration_history';
 
-export class StorageMigration<T = unknown> {
+export class StorageMigration<T = unknown> implements IStorageMigration<T> {
   private storageKey: string;
   private currentVersion: string;
   private migrations: Map<string, Migration>;
