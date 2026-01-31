@@ -28,6 +28,9 @@ export default memo(function BookmarkButton({
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
     const bookmarked = bookmarkExists(postId);
     setIsBookmarked(bookmarked);
   }, [postId]);

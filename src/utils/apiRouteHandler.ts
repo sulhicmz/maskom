@@ -22,6 +22,23 @@ const DEFAULT_RETRY_OPTIONS: RetryOptions = {
     retryableErrors: [/network/i, /timeout/i, /ECONN/i, /503/i]
 };
 
+const ERROR_CODE_MAPPING: Record<string, ServiceErrorCodeType> = {
+    'timeout': ServiceErrorCode.REQUEST_TIMEOUT,
+    'timed out': ServiceErrorCode.REQUEST_TIMEOUT,
+    'circuit breaker': ServiceErrorCode.CIRCUIT_BREAKER,
+    'open': ServiceErrorCode.CIRCUIT_BREAKER,
+    'network': ServiceErrorCode.NETWORK,
+    'econn': ServiceErrorCode.NETWORK,
+    '503': ServiceErrorCode.NETWORK,
+    'rate limit': ServiceErrorCode.RATE_LIMIT,
+    'session not found': ServiceErrorCode.SESSION_NOT_FOUND,
+    'user not found in session': ServiceErrorCode.USER_NOT_FOUND_IN_SESSION,
+    'no session exists': ServiceErrorCode.SESSION_NOT_FOUND,
+    'failed to join session': ServiceErrorCode.UNKNOWN,
+    'invalid credentials': ServiceErrorCode.INVALID_CREDENTIALS,
+    'template not found': ServiceErrorCode.TEMPLATE_NOT_FOUND
+};
+
 const circuitBreakers = new Map<string, CircuitBreaker>();
 
 function getCircuitBreaker(routeName: string, config: ApiRouteHandler['circuitBreakerConfig']): CircuitBreaker {
@@ -74,77 +91,44 @@ export async function executeApiRoute<T = unknown>({
         const errorObj = error instanceof Error ? error : new Error('Unknown error');
         const lowerMessage = errorObj.message.toLowerCase();
 
-        if (lowerMessage.indexOf('timeout') !== -1 || lowerMessage.indexOf('timed out') !== -1) {
-            errorCode = ServiceErrorCode.REQUEST_TIMEOUT;
-            status = 504;
-            retryAfter = 30;
-        } else if (lowerMessage.indexOf('circuit breaker') !== -1 || lowerMessage.indexOf('open') !== -1) {
-            errorCode = ServiceErrorCode.CIRCUIT_BREAKER;
-            status = 503;
-            retryAfter = 60;
-        } else if (lowerMessage.indexOf('network') !== -1 || lowerMessage.indexOf('econn') !== -1 || lowerMessage.indexOf('503') !== -1) {
-            errorCode = ServiceErrorCode.NETWORK;
-            status = 503;
-            retryAfter = 10;
-        } else if (lowerMessage.indexOf('rate limit') !== -1 || error instanceof RateLimitExceededError) {
+        if (error instanceof RateLimitExceededError) {
             errorCode = ServiceErrorCode.RATE_LIMIT;
             status = 429;
-            retryAfter = error instanceof RateLimitExceededError && error.limitCheck?.resetTime
+            retryAfter = error.limitCheck?.resetTime
                 ? Math.max(0, Math.ceil((error.limitCheck.resetTime - Date.now()) / 1000))
                 : 60;
-        }
-
-        metricsCollector.recordCall(operationName, false, errorCode, responseTime);
-
-        if (errorCode === ServiceErrorCode.CIRCUIT_BREAKER) {
-            logServiceError(errorObj, { service: routeName, operation: operationName });
-            return createServiceErrorResponse({
-                error: 'Service temporarily unavailable',
-                errorCode,
-                status,
-                retryAfter
-            });
+        } else {
+            for (const [key, code] of Object.entries(ERROR_CODE_MAPPING)) {
+                if (lowerMessage.includes(key)) {
+                    errorCode = code;
+                    break;
+                }
+            }
         }
 
         if (errorCode === ServiceErrorCode.REQUEST_TIMEOUT) {
-            logServiceError(errorObj, { service: routeName, operation: operationName });
-            return createServiceErrorResponse({
-                error: 'Request timed out',
-                errorCode,
-                status,
-                retryAfter
-            });
+            status = 504;
+            retryAfter = retryAfter ?? 30;
+        } else if (errorCode === ServiceErrorCode.CIRCUIT_BREAKER) {
+            status = 503;
+            retryAfter = retryAfter ?? 60;
+        } else if (errorCode === ServiceErrorCode.NETWORK) {
+            status = 503;
+            retryAfter = retryAfter ?? 10;
+        } else if (errorCode === ServiceErrorCode.RATE_LIMIT) {
+            status = 429;
+            retryAfter = retryAfter ?? 60;
         }
 
-        if (errorCode === ServiceErrorCode.NETWORK) {
-            logServiceError(errorObj, { service: routeName, operation: operationName });
-            return createServiceErrorResponse({
-                error: 'Network error occurred',
-                errorCode,
-                status,
-                retryAfter
-            });
-        }
-
-        if (errorCode === ServiceErrorCode.RATE_LIMIT) {
-            const retryAfterCalc = error instanceof RateLimitExceededError && error.limitCheck?.resetTime
-                ? Math.max(0, Math.ceil((error.limitCheck.resetTime - Date.now()) / 1000))
-                : 60;
-
-            return createServiceErrorResponse({
-                error: errorObj.message || 'Rate limit exceeded',
-                errorCode,
-                status,
-                retryAfter: retryAfterCalc
-            });
-        }
+        metricsCollector.recordCall(operationName, false, errorCode, responseTime);
 
         logServiceError(errorObj, { service: routeName, operation: operationName });
 
         return createServiceErrorResponse({
             error: errorObj.message || 'Internal server error',
             errorCode,
-            status
+            status,
+            retryAfter
         });
     }
 }

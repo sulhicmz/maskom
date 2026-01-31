@@ -65,7 +65,7 @@ export function saveSEOConfig(config: SEOMonitoringConfig): void {
 /**
  * Check if a meta tag exists on a page (simulation for demo)
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 function checkMetaTag(page: string, _tagName: string): boolean {
   // In a real implementation, this would scrape the page or use an API
   // For demo purposes, we'll simulate based on known pages

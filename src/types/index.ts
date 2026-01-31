@@ -82,5 +82,17 @@ export * from './recommendation';
 // Storage Validator types (IStorageValidator, ValidationResult, etc.)
 export * from './storageValidator';
 
+// Storage types (IStorage, StorageConfig, etc.)
+export * from './storage';
+
+// Storage Migration types (Migration, MigrationResult, etc.)
+export * from './storageMigration';
+
 // Version Storage types (IVersionStorage, etc.)
 export * from './versionStorage';
+
+// Security Audit types (SecurityAudit, SecurityVulnerability, etc.)
+export * from './securityAudit';
+
+// Publishing Pipeline types (PublishingWorkflow, PublishingMetrics, etc.)
+export * from './publishing';

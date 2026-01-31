@@ -27,7 +27,7 @@ describe('EmailService', () => {
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID = 'test_template_id';
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY = 'test_public_key';
 
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+         
         emailServiceInstance = require('../EmailService').default;
     });
 
@@ -216,7 +216,7 @@ describe('EmailService', () => {
             process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY = '';
 
             jest.resetModules();
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
+             
             const freshInstance = require('../EmailService').default;
 
             const result = await freshInstance.sendEmail(validParams);

@@ -4,9 +4,7 @@ interface SidebarProps {
   onModuleChange: (module: string) => void;
 }
 
-const Sidebar = React.memo(({ onModuleChange }: SidebarProps) => {
-  Sidebar.displayName = "Sidebar";
-  
+const SidebarComponent = ({ onModuleChange }: SidebarProps) => {
   const handleWiFiClick = useCallback(() => {
     onModuleChange("wifi");
   }, [onModuleChange]);
@@ -41,6 +39,9 @@ const Sidebar = React.memo(({ onModuleChange }: SidebarProps) => {
       </ul>
     </div>
   );
-});
+};
+
+const Sidebar = React.memo(SidebarComponent);
+Sidebar.displayName = "Sidebar";
 
 export default Sidebar;

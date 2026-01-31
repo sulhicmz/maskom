@@ -10,12 +10,6 @@ export const SuspiciousChangeAlerts: React.FC = () => {
     const [selectedAlert, setSelectedAlert] = useState<SuspiciousActivityAlert | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        loadAlerts();
-        const interval = setInterval(loadAlerts, 60000);
-        return () => clearInterval(interval);
-    }, []);
-
     const loadAlerts = () => {
         setIsLoading(true);
         try {
@@ -27,6 +21,12 @@ export const SuspiciousChangeAlerts: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadAlerts();
+        const interval = setInterval(loadAlerts, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handleResolveAlert = (alertId: string) => {
         if (confirm('Apakah Anda yakin ingin menyelesaikan peringatan ini?')) {

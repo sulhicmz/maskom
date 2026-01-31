@@ -1,22 +1,10 @@
 import { z } from 'zod';
+import type { StorageConfig, StorageOperationResult, IStorage } from '@/types/storage';
+import type { MigrationResult } from '@/types/storageMigration';
 import { StorageValidator, ValidationResult } from './storageValidator';
-import { StorageMigration, Migration, MigrationResult } from './storageMigration';
+import { StorageMigration } from './storageMigration';
 
-export interface StorageConfig<T> {
-  key: string;
-  schema: z.ZodSchema<T>;
-  defaultValue: T;
-  version?: string;
-  migrations?: Migration[];
-  logErrors?: boolean;
-}
-
-export interface StorageOperationResult {
-  success: boolean;
-  error?: string;
-}
-
-export class Storage<T = unknown> {
+export class Storage<T = unknown> implements IStorage<T> {
   private key: string;
   private schema: z.ZodSchema<T>;
   private defaultValue: T;
@@ -236,3 +224,6 @@ export function removeStorageValue(key: string): void {
 export function clearStorage(): void {
   localStorage.clear();
 }
+
+export type { IStorage, StorageConfig, StorageOperationResult } from '@/types/storage';
+export type { Migration, MigrationResult } from '@/types/storageMigration';

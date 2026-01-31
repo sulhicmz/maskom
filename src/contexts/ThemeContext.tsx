@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 type Theme = "light" | "dark";
 
@@ -45,16 +45,13 @@ function applyThemeToDOM(theme: Theme): void {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-
-  useEffect(() => {
+  const [theme, setThemeState] = useState<Theme>(() => {
     const stored = getStoredTheme();
     const system = getSystemTheme();
     const initialTheme = stored || system;
-
-    setThemeState(initialTheme);
     applyThemeToDOM(initialTheme);
-  }, []);
+    return initialTheme;
+  });
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

@@ -92,7 +92,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       if (!validationResult.success) {
         return NextResponse.json<ServiceResult<PollData>>(
-          { success: false, error: 'Invalid query parameters', errorCode: ServiceErrorCode.VALIDATION, metadata: { details: validationResult.error.issues } },
+          { success: false, error: 'Invalid query parameters', errorCode: ServiceErrorCode.INVALID_QUERY_PARAMETERS, metadata: { details: validationResult.error.issues } },
           { status: 400 }
         )
       }
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       if (!session) {
         return NextResponse.json<ServiceResult<PollData>>(
-          { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
+          { success: false, error: 'Session not found', errorCode: ServiceErrorCode.SESSION_NOT_FOUND },
           { status: 404 }
         )
       }
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       if (!validationResult.success) {
         return NextResponse.json<ServiceResult<unknown>>(
-          { success: false, error: 'Invalid request data', errorCode: ServiceErrorCode.VALIDATION, metadata: { details: validationResult.error.issues } },
+          { success: false, error: 'Invalid request data', errorCode: ServiceErrorCode.INVALID_REQUEST_DATA, metadata: { details: validationResult.error.issues } },
           { status: 400 }
         )
       }
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
 
       return NextResponse.json<ServiceResult<unknown>>(
-        { success: false, error: 'Unknown action', errorCode: ServiceErrorCode.VALIDATION },
+        { success: false, error: 'Unknown action', errorCode: ServiceErrorCode.INVALID_REQUEST_DATA },
         { status: 400 }
       )
     }
@@ -189,19 +189,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 async function handleJoin(request: JoinRequest): Promise<NextResponse<ServiceResult<unknown>>> {
   const { postId, userId, username } = request
 
-  if (!postId || !userId || !username) {
-    return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
-      { status: 400 }
-    )
-  }
+      if (!postId || !userId || !username) {
+        return NextResponse.json<ServiceResult<unknown>>(
+          { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.MISSING_REQUIRED_FIELDS },
+          { status: 400 }
+        )
+      }
 
   const session = sessionManager.getSessionByPostId(postId)
 
   if (!session) {
     logServiceError(new Error('No session exists for this post'), { service: 'Collaboration', operation: 'join' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'No session exists for this post. Start a new collaboration session.', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'No session exists for this post. Start a new collaboration session.', errorCode: ServiceErrorCode.SESSION_NOT_FOUND },
       { status: 404 }
     )
   }
@@ -245,7 +245,7 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse<ServiceR
 
   if (!sessionId || !userId) {
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.MISSING_REQUIRED_FIELDS },
       { status: 400 }
     )
   }
@@ -255,7 +255,7 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse<ServiceR
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'leave' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.SESSION_NOT_FOUND },
       { status: 404 }
     )
   }
@@ -265,7 +265,7 @@ async function handleLeave(request: LeaveRequest): Promise<NextResponse<ServiceR
   if (!removed) {
     logServiceError(new Error('User not found in session'), { service: 'Collaboration', operation: 'leave' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'User not found in session', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'User not found in session', errorCode: ServiceErrorCode.USER_NOT_FOUND_IN_SESSION },
       { status: 404 }
     )
   }
@@ -293,7 +293,7 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
 
   if (!sessionId || !userId || !cursorPosition) {
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.MISSING_REQUIRED_FIELDS },
       { status: 400 }
     )
   }
@@ -303,7 +303,7 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'cursor_update' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.SESSION_NOT_FOUND },
       { status: 404 }
     )
   }
@@ -313,7 +313,7 @@ async function handleCursorUpdate(request: CursorUpdateRequest): Promise<NextRes
   if (!updated) {
     logServiceError(new Error('User not found in session'), { service: 'Collaboration', operation: 'cursor_update' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'User not found in session', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'User not found in session', errorCode: ServiceErrorCode.USER_NOT_FOUND_IN_SESSION },
       { status: 404 }
     )
   }
@@ -343,7 +343,7 @@ async function handleEdit(request: EditRequest): Promise<NextResponse<ServiceRes
 
   if (!sessionId || !userId || !editOperation) {
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.MISSING_REQUIRED_FIELDS },
       { status: 400 }
     )
   }
@@ -353,7 +353,7 @@ async function handleEdit(request: EditRequest): Promise<NextResponse<ServiceRes
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'edit' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.SESSION_NOT_FOUND },
       { status: 404 }
     )
   }
@@ -386,7 +386,7 @@ async function handleComment(request: CommentRequest): Promise<NextResponse<Serv
 
   if (!sessionId || !userId || !username || !comment) {
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.VALIDATION },
+      { success: false, error: 'Missing required fields', errorCode: ServiceErrorCode.MISSING_REQUIRED_FIELDS },
       { status: 400 }
     )
   }
@@ -396,7 +396,7 @@ async function handleComment(request: CommentRequest): Promise<NextResponse<Serv
   if (!session) {
     logServiceError(new Error('Session not found'), { service: 'Collaboration', operation: 'comment' })
     return NextResponse.json<ServiceResult<unknown>>(
-      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.UNKNOWN },
+      { success: false, error: 'Session not found', errorCode: ServiceErrorCode.SESSION_NOT_FOUND },
       { status: 404 }
     )
   }

@@ -47,6 +47,27 @@ export function middleware(request: NextRequest) {
     responseHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
   }
 
+  if (!responseHeaders.has('Content-Security-Policy')) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://maskom.co.id';
+    responseHeaders.set(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+        "style-src 'self' 'unsafe-inline'",
+        `img-src 'self' data: blob: ${siteUrl}`,
+        "font-src 'self' data:",
+        "connect-src 'self'",
+        "frame-src 'none'",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "upgrade-insecure-requests"
+      ].join('; ')
+    );
+  }
+
   const origin = requestHeaders.get('origin');
 
   if (origin) {

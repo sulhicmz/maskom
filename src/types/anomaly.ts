@@ -4,7 +4,7 @@ export type AnomalySeverity = 'low' | 'medium' | 'high' | 'critical';
 
 export type AnomalyStatus = 'detected' | 'confirmed' | 'false_positive' | 'investigating';
 
-export type AlertChannel = 'dashboard' | 'email' | 'webhook' | 'sms';
+export type AnomalyAlertChannel = 'dashboard' | 'email' | 'webhook' | 'sms';
 
 export type ThresholdMethod = 'z_score' | 'moving_average' | 'isolation_forest';
 
@@ -31,7 +31,7 @@ export interface Anomaly {
 export interface AnomalyAlert {
   id: string;
   anomalyId: string;
-  channels: AlertChannel[];
+  channels: AnomalyAlertChannel[];
   sentAt: string;
   acknowledgedAt?: string;
   status: 'sent' | 'acknowledged' | 'failed';
@@ -46,7 +46,7 @@ export interface AnomalyThreshold {
   sensitivityLevel: 'low' | 'medium' | 'high';
   zScoreThreshold: number;
   movingAverageWindow: number;
-  alertChannels: AlertChannel[];
+  alertChannels: AnomalyAlertChannel[];
   webhookUrl?: string;
   emailAddress?: string;
   enabled: boolean;
@@ -137,7 +137,7 @@ export interface IAnomalyDetector {
   confirmAnomaly(id: string): boolean;
   markFalsePositive(id: string): boolean;
   acknowledgeAnomaly(id: string, userId: string): boolean;
-  sendAlert(anomaly: Anomaly, channels: AlertChannel[]): Promise<AnomalyAlert[]>;
+  sendAlert(anomaly: Anomaly, channels: AnomalyAlertChannel[]): Promise<AnomalyAlert[]>;
   getAlerts(anomalyId?: string): AnomalyAlert[];
   getThreshold(metricType: AnomalyType): AnomalyThreshold | null;
   updateThreshold(metricType: AnomalyType, threshold: Partial<AnomalyThreshold>): AnomalyThreshold;

@@ -2,6 +2,7 @@ import emailService from '@/services/email/EmailService';
 import { createServiceResponse, createServiceErrorResponse } from '@/utils/apiResponse';
 import { executeApiRoute } from '@/utils/apiRouteHandler';
 import { CIRCUIT_BREAKER_CONFIG } from '@/constants';
+import { ServiceErrorCode } from '@/services/common';
 
 export async function GET() {
     return executeApiRoute({
@@ -59,6 +60,7 @@ export async function POST() {
 
             return createServiceErrorResponse({
                 error: (result.data as { error?: string }).error || 'Failed to process email queue',
+                errorCode: ServiceErrorCode.NETWORK,
                 data: result.data as { processed: number; failed: number },
                 status: 503
             });

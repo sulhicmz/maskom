@@ -10,6 +10,43 @@ export interface CtaImage {
     className?: string
 }
 
+const ContentRendererWithAnimation = (animation: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none" | undefined, contentClassName: string | undefined, id: string | undefined) => {
+    const Component = animation !== undefined && animation !== "none" ? AnimationWrapper : 'div';
+
+    return Component === AnimationWrapper
+        ? ({ children }: { children: React.ReactNode }) => (
+            <AnimationWrapper animation={animation || "none"} className={contentClassName} id={id}>
+                {children}
+            </AnimationWrapper>
+        )
+        : ({ children }: { children: React.ReactNode }) => {
+            const animationClass = animation && animation !== "none" ? `wow ${animation}` : animation || '';
+            return (
+                <div id={id} className={`${contentClassName} ${animationClass}`}>
+                    {children}
+                </div>
+            );
+        };
+};
+
+const ImageRendererWithAnimation = (_animation: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none" | undefined, _className: string | undefined) => {
+    return ({ className }: { className?: string }) => (
+        <div className={className}>
+            {(className || '').match(/image-(\d+)/g)?.map((match, index) => {
+                const num = parseInt(match.replace('image-', ''));
+                return (
+                    <Image
+                        key={index}
+                        src={className?.match(/image-(\d+)/g)?.[1]?.split(' ')[0] || ''}
+                        alt={`image ${num}`}
+                        className={className}
+                    />
+                );
+            })}
+        </div>
+    );
+};
+
 export interface CtaProps {
     heading: string
     description: string
@@ -39,23 +76,12 @@ const CtaWrapper = React.memo<CtaProps>(({
     imageBoxClassName = "cta-one_image-box p-r z-1 text-xl-end",
     backgroundImage,
     animation = "fadeInLeft",
-    animationType = "animation-wrapper",
     shapes = false,
     paddingBottom,
     extraElements,
     id
 }) => {
-    const ContentRenderer = animationType === 'animation-wrapper'
-        ? ({ children }: { children: React.ReactNode }) => (
-            <AnimationWrapper animation={animation} className={contentClassName} id={id}>
-                {children}
-            </AnimationWrapper>
-        )
-        : ({ children }: { children: React.ReactNode }) => (
-            <div id={id} className={`${contentClassName} wow ${animation}`}>
-                {children}
-            </div>
-        )
+    const ContentRenderer = ContentRendererWithAnimation(animation, contentClassName, id);
 
     const contentWrapper = (
         <ContentRenderer>
@@ -65,33 +91,17 @@ const CtaWrapper = React.memo<CtaProps>(({
         </ContentRenderer>
     )
 
-    const ImageRenderer = animationType === 'animation-wrapper'
-        ? ({ className }: { className?: string }) => (
-            <div className={className}>
-                {images.map((img, index) => (
-                    <Image
-                        key={index}
-                        src={img.src}
-                        alt={img.alt}
-                        className={img.className || `image-${index + 1}`}
-                    />
-                ))}
-            </div>
-        )
-        : ({ className }: { className?: string }) => (
-            <div className={`${className} wow fadeInRight`}>
-                {images.map((img, index) => (
-                    <Image
-                        key={index}
-                        src={img.src}
-                        alt={img.alt}
-                    />
-                ))}
-            </div>
-        )
-
     const imageWrapper = (
-        <ImageRenderer className={imageBoxClassName} />
+        <div className={imageBoxClassName}>
+            {images.map((image, index) => (
+                <Image
+                    key={index}
+                    src={image.src}
+                    alt={image.alt}
+                    className={image.className || `image-${index + 1}`}
+                />
+            ))}
+        </div>
     )
 
     return (

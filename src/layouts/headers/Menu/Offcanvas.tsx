@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { memo } from "react";
 
 import menu_data from "@/data/MenuData";
 import { socialLinks } from "@/data/SocialMediaData";
 import { PHONE_DISPLAY } from "@/data/ContactData";
 import logo from "@/assets/images/logo/logo_02.svg";
 
-const Offcanvas = () => {
+const Offcanvas = memo(() => {
    return (
       <>
          <div className="offcanvas offcanvas-end sidebar-nav" tabIndex={-1} id="sideNav" aria-labelledby="staticBackdropLabel">
@@ -56,12 +57,14 @@ const Offcanvas = () => {
                             </Link>
                          </li>
                       ))}
-                   </ul>
+                  </ul>
                </div>
             </div>
          </div>
       </>
    );
-}
+});
+
+Offcanvas.displayName = "Offcanvas";
 
 export default Offcanvas;

@@ -6,6 +6,8 @@ import SkipToMainContent from "@/components/common/SkipToMainContent";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import ServiceWorkerUpdate from "@/components/common/ServiceWorkerUpdate";
 import WebVitalsReporter from "@/components/common/WebVitalsReporter";
+import { OfflineIndicator } from "@/components/pwa";
+import { AddToHomeScreen } from "@/components/pwa";
 
 const splineSans = Spline_Sans({
   weight: ["400", "500", "600", "700"],
@@ -44,6 +46,8 @@ export default function RootLayout({
           <I18nProvider>
             <ErrorBoundary>
               {children}
+              <OfflineIndicator />
+              <AddToHomeScreen />
               <ServiceWorkerUpdate />
               <WebVitalsReporter />
             </ErrorBoundary>

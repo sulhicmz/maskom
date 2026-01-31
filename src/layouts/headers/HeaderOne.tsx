@@ -2,7 +2,7 @@
 import NavMenu from "./Menu/NavMenu"
 import Link from "next/link"
 import Image from "next/image"
-import { useState, memo, useRef, useEffect } from "react";
+import { useState, memo, useRef, useEffect, useCallback } from "react";
 import UseSticky, { useBreakpoint } from "@/hooks/UseSticky";
 import ThemeToggle from "@/components/common/ThemeToggle";
 import { LanguageSwitcher } from "@/components/common/i18n/LanguageSwitcher";
@@ -22,6 +22,14 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
    const navMenuRef = useRef<HTMLDivElement>(null);
    const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
+   const handleCloseOffCanvas = useCallback(() => {
+      setOffCanvas(false);
+   }, []);
+
+   const handleToggleOffCanvas = useCallback(() => {
+      setOffCanvas(prev => !prev);
+   }, []);
+
    useFocusTrap(navMenuRef, { isActive: offCanvas, returnFocus: true });
 
    useEffect(() => {
@@ -38,7 +46,7 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
           <header className={`transparent-header ${style ? "navigation-white" : ""}`}>
              <div className={`header-navigation navigation-default ${isBreakpointOn ? "breakpoint-on d-block d-xl-none" : ""} ${sticky ? "sticky" : ""}`} >
                 <button
-                  onClick={() => setOffCanvas(false)}
+                  onClick={handleCloseOffCanvas}
                   className={`nav-overlay ${offCanvas ? "active" : ""} `}
                   aria-label="Close navigation menu"
                   aria-hidden={!offCanvas}
@@ -64,31 +72,31 @@ const HeaderOne = memo(({ style }: HeaderOneProps) => {
                                   <div className="nav-button d-block d-xl-none mt-30">
                                      <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
                                   </div>
-                               </div>
-                                <div className="ac-header-one__right-btn style-one d-flex align-items-center">
-                                   <div className="ac-header-bnt-1">
-                                      <Link href="/login">Portal Pelanggan</Link>
-                                   </div>
-                                    <div className="ac-header-bnt-2 d-none d-md-block">
-                                       <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
-                                    </div>
-                                    <ThemeToggle />
-                                    <LanguageSwitcher variant="minimal" />
-                                     <button
-                                       onClick={() => setOffCanvas(!offCanvas)}
-                                       className={`navbar-toggler ${offCanvas ? "active" : ""}`}
-                                       aria-label="Toggle navigation menu"
-                                       aria-expanded={offCanvas}
-                                       aria-controls="primary-nav"
-                                       ref={toggleButtonRef}
-                                     >
-                                      <span></span>
-                                      <span></span>
-                                      <span></span>
-                                   </button>
                                 </div>
-                           </div>
-                        </div>
+                                 <div className="ac-header-one__right-btn style-one d-flex align-items-center">
+                                    <div className="ac-header-bnt-1">
+                                       <Link href="/login">Portal Pelanggan</Link>
+                                    </div>
+                                     <div className="ac-header-bnt-2 d-none d-md-block">
+                                        <Link href="/contact" className="theme-btn gradient-btn">Konsultasi Gratis</Link>
+                                     </div>
+                                     <ThemeToggle />
+                                     <LanguageSwitcher variant="minimal" />
+                                      <button
+                                        onClick={handleToggleOffCanvas}
+                                        className={`navbar-toggler ${offCanvas ? "active" : ""}`}
+                                        aria-label="Toggle navigation menu"
+                                        aria-expanded={offCanvas}
+                                        aria-controls="primary-nav"
+                                        ref={toggleButtonRef}
+                                      >
+                                       <span></span>
+                                       <span></span>
+                                       <span></span>
+                                    </button>
+                                 </div>
+                            </div>
+                         </div>
                      </div>
                   </div>
                </div>

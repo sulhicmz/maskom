@@ -105,7 +105,7 @@ const DisasterRecoveryPlanComponent: React.FC<DisasterRecoveryPlanProps> = ({
       setCurrentPlan(plan)
       setValidationChecklist(plan.validationChecklist)
     }
-  }, [plan])
+  }, [plan, plan?.validationChecklist])
 
   const handleToggleStep = (stepNumber: number) => {
     const newCompleted = new Set(completedSteps)

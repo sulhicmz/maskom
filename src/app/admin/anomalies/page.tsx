@@ -1,7 +1,18 @@
 "use client";
 
-import AnomalyDashboard from '@/components/admin/AnomalyDashboard';
+import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const AnomalyDashboard = dynamic(
+  () => import('@/components/admin/AnomalyDashboard'),
+  { loading: () => <LoadingSpinner /> }
+);
 
 export default function AnomaliesPage() {
-  return <AnomalyDashboard />;
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <AnomalyDashboard />
+    </Suspense>
+  );
 }

@@ -460,185 +460,141 @@ export interface IPersonalizationImpactAnalyzer {
 }
 
 // ============================================================================
-// EXPERIMENT AUTOMATION TYPES
+// PERFORMANCE ALERTS TYPES
 // ============================================================================
 
 /**
- * Experiment automation status
+ * Alert severity levels for personalization performance alerts
  */
-export type ExperimentStatus = 'draft' | 'scheduled' | 'running' | 'paused' | 'completed' | 'failed';
+export type AlertSeverity = 'critical' | 'warning' | 'info';
 
 /**
- * Experiment automation configuration
+ * Alert status tracking
  */
-export type ExperimentScheduleMode = 'sequential' | 'parallel' | 'manual';
+export type AlertStatus = 'active' | 'acknowledged' | 'resolved';
 
 /**
- * Experiment success metric for auto-winner declaration
+ * Alert channel for sending notifications
  */
-export type ExperimentSuccessMetric = 'conversion_rate' | 'engagement_rate' | 'lift' | 'revenue';
+export type AlertChannel = 'dashboard' | 'email' | 'webhook';
 
 /**
- * Experiment template type
+ * Performance alert types
  */
-export type ExperimentTemplateType = 'headline_test' | 'cta_test' | 'layout_test' | 'content_test';
+export type PerformanceAlertType = 
+  | 'conversion_drop'
+  | 'engagement_drop'
+  | 'lift_degradation'
+  | 'rule_underperforming'
+  | 'zero_lift'
+  | 'negative_lift';
 
 /**
- * Personalization experiment variant with automation tracking
+ * Alert resolution action taken
  */
-export interface ExperimentVariant {
+export type AlertResolution = 
+  | 'rule_disabled'
+  | 'variants_adjusted'
+  | 'conditions_modified'
+  | 'threshold_updated'
+  | 'ignored'
+  | 'monitoring_continued';
+
+/**
+ * Performance alert configuration
+ */
+export interface PerformanceAlertConfig {
+  alertType: PerformanceAlertType;
+  enabled: boolean;
+  severity: AlertSeverity;
+  thresholdValue: number;
+  thresholdUnit: 'percent' | 'absolute';
+  checkInterval: number; // minutes
+  slidingWindowHours: number;
+  alertChannels: AlertChannel[];
+  webhookUrl?: string;
+  emailAddress?: string;
+}
+
+/**
+ * Performance alert instance
+ */
+export interface PerformanceAlert {
   id: string;
-  experimentId: string;
-  variantName: string;
+  alertType: PerformanceAlertType;
+  severity: AlertSeverity;
+  status: AlertStatus;
   ruleId: string;
-  weight: number;
-  isControl: boolean;
-  metrics: {
-    impressions: number;
-    conversions: number;
-    engagement: number;
-    revenue: number;
-  };
-  assignedUsers: string[];
-}
-
-/**
- * Personalization experiment with automation support
- */
-export interface PersonalizationExperiment {
-  id: string;
-  name: string;
-  description: string;
-  status: ExperimentStatus;
-  scheduleMode: ExperimentScheduleMode;
-  successMetric: ExperimentSuccessMetric;
-  variants: ExperimentVariant[];
-  rules: PersonalizationRule[];
-  automationConfig: ExperimentAutomationConfig;
-  createdAt: string;
-  scheduledAt?: string;
-  startedAt?: string;
-  completedAt?: string;
-  winner?: ExperimentResult;
-  alerts: ExperimentAlert[];
-}
-
-/**
- * Experiment automation configuration
- */
-export interface ExperimentAutomationConfig {
-  autoStart: boolean;
-  autoStop: boolean;
-  autoWinnerDeclaration: boolean;
-  minSampleSize: number;
-  minDuration: number;
-  maxDuration: number;
-  confidenceThreshold: number;
-  sampleSizeThreshold: number;
-  durationThreshold: number;
-  stopOnNegativeLift: boolean;
-  rollbackOnFailure: boolean;
-}
-
-/**
- * Experiment result with statistical significance
- */
-export interface ExperimentResult {
-  experimentId: string;
-  winnerId: string;
-  winnerName: string;
-  loserId: string;
-  loserName: string;
-  statisticalSignificance: boolean;
-  pValue: number;
-  confidenceLevel: number;
-  confidenceInterval: {
-    winner: { lower: number; upper: number };
-    loser: { lower: number; upper: number };
-  };
-  lift: number;
-  declaredAt: string;
-}
-
-/**
- * Experiment alert for notifications
- */
-export interface ExperimentAlert {
-  id: string;
-  experimentId: string;
-  type: 'info' | 'warning' | 'critical';
+  ruleName: string;
+  segment?: UserSegment;
+  currentValue: number;
+  previousValue: number;
+  thresholdValue: number;
+  thresholdUnit: 'percent' | 'absolute';
+  percentChange: number;
+  detectedAt: string;
+  acknowledgedAt?: string;
+  resolvedAt?: string;
+  acknowledgedBy?: string;
+  resolution?: AlertResolution;
+  resolutionNotes?: string;
   message: string;
-  createdAt: string;
-  acknowledged: boolean;
+  recommendations: string[];
+  channels: AlertChannel[];
 }
 
 /**
- * Experiment template for quick setup
+ * Alert history with resolution tracking
  */
-export interface ExperimentTemplate {
-  id: string;
-  name: string;
-  description: string;
-  type: ExperimentTemplateType;
-  category: 'engagement' | 'conversion' | 'retention';
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  config: ExperimentAutomationConfig;
-  variants: Omit<ExperimentVariant, 'experimentId' | 'id' | 'assignedUsers' | 'metrics'>[];
-  useCases: string[];
-  expectedDuration: number;
-  estimatedLift: number;
+export interface AlertHistory {
+  alertId: string;
+  ruleId: string;
+  alertType: PerformanceAlertType;
+  severity: AlertSeverity;
+  detectedAt: string;
+  resolvedAt?: string;
+  timeToResolve?: number; // minutes
+  resolution?: AlertResolution;
+  impactAssessment: string;
 }
 
 /**
- * Experiment scheduling queue
+ * Performance alert statistics
  */
-export interface ExperimentQueue {
-  experiments: PersonalizationExperiment[];
-  currentExperiment?: string;
-  mode: ExperimentScheduleMode;
+export interface PerformanceAlertStatistics {
+  totalAlerts: number;
+  activeAlerts: number;
+  acknowledgedAlerts: number;
+  resolvedAlerts: number;
+  alertsByType: Record<PerformanceAlertType, number>;
+  alertsBySeverity: Record<AlertSeverity, number>;
+  avgResolutionTime: number;
+  alertsByRule: Record<string, number>;
+  topFailingRules: Array<{ ruleId: string; ruleName: string; alertCount: number }>;
 }
 
 /**
- * Experiment history and statistics
+ * Interface for personalization performance alerts system
  */
-export interface ExperimentHistory {
-  experimentId: string;
-  statusChanges: {
-    from: ExperimentStatus;
-    to: ExperimentStatus;
-    timestamp: string;
-  }[];
-  metricsSnapshots: {
-    timestamp: string;
-    variantId: string;
-    metrics: ExperimentVariant['metrics'];
-  }[];
-  alerts: ExperimentAlert[];
-}
-
-/**
- * Interface for personalization experiment automation engine
- */
-export interface IPersonalizationExperimentAutomation {
-  createExperiment(config: Omit<PersonalizationExperiment, 'id' | 'createdAt' | 'alerts'>): PersonalizationExperiment;
-  startExperiment(experimentId: string): boolean;
-  stopExperiment(experimentId: string, reason?: string): boolean;
-  pauseExperiment(experimentId: string): boolean;
-  resumeExperiment(experimentId: string): boolean;
-  deleteExperiment(experimentId: string): boolean;
-  getExperiment(experimentId: string): PersonalizationExperiment | undefined;
-  getAllExperiments(): PersonalizationExperiment[];
-  getExperimentsByStatus(status: ExperimentStatus): PersonalizationExperiment[];
-  scheduleExperiment(experimentId: string, scheduledAt: string): boolean;
-  declareWinner(experimentId: string): ExperimentResult | null;
-  rollbackExperiment(experimentId: string): boolean;
-  getExperimentHistory(experimentId: string): ExperimentHistory | undefined;
-  getAvailableTemplates(): ExperimentTemplate[];
-  applyTemplate(templateId: string, config: Partial<ExperimentAutomationConfig>): PersonalizationExperiment;
-  trackMetric(experimentId: string, variantId: string, metric: keyof ExperimentVariant['metrics'], value: number): void;
-  processAutomationRules(): void;
-  checkAlerts(): ExperimentAlert[];
-  getExperimentQueue(): ExperimentQueue;
-  addExperimentToQueue(experimentId: string): void;
-  removeExperimentFromQueue(experimentId: string): void;
+export interface IPersonalizationPerformanceAlerts {
+  checkRulePerformance(ruleId: string): PerformanceAlert | null;
+  checkAllRules(): PerformanceAlert[];
+  updateAlertConfig(alertType: PerformanceAlertType, config: Partial<PerformanceAlertConfig>): PerformanceAlertConfig;
+  getAlertConfig(alertType: PerformanceAlertType): PerformanceAlertConfig | null;
+  getAlerts(filters?: {
+    type?: PerformanceAlertType;
+    severity?: AlertSeverity;
+    status?: AlertStatus;
+    ruleId?: string;
+    startDate?: string;
+    endDate?: string;
+  }): PerformanceAlert[];
+  acknowledgeAlert(alertId: string, userId: string): boolean;
+  resolveAlert(alertId: string, resolution: AlertResolution, notes?: string): boolean;
+  getAlertHistory(ruleId?: string): AlertHistory[];
+  getStatistics(): PerformanceAlertStatistics;
+  sendAlert(alert: PerformanceAlert): Promise<void>;
+  schedulePeriodicChecks(): void;
+  clearResolvedAlerts(olderThanDays?: number): void;
+  reset(): void;
 }

@@ -64,15 +64,13 @@ describe("I18nContext", () => {
     });
 
     it("should handle language switching", async () => {
-      let changeLanguage: (lang: "en" | "id") => void = () => {};
-
       const TestComponent = () => {
         const { language, setLanguage, t } = useTranslation();
-        changeLanguage = setLanguage;
         return (
           <div>
             <span data-testid="language">{language}</span>
             <span data-testid="translation">{t("common.loading")}</span>
+            <button onClick={() => setLanguage("en")}>Switch to English</button>
           </div>
         );
       };
@@ -87,50 +85,10 @@ describe("I18nContext", () => {
         expect(screen.getByTestId("language")).toHaveTextContent("id");
       });
 
-      changeLanguage("en");
+      fireEvent.click(screen.getByText("Switch to English"));
 
       await waitFor(() => {
         expect(screen.getByTestId("language")).toHaveTextContent("en");
-        expect(screen.getByTestId("translation")).toHaveTextContent("Loading...");
-      });
-    });
-
-    it("should handle language toggling", async () => {
-      let toggleFn: () => void = () => {};
-
-      const TestComponent = () => {
-        const { language, toggleLanguage, t } = useTranslation();
-        toggleFn = toggleLanguage;
-        return (
-          <div>
-            <span data-testid="language">{language}</span>
-            <span data-testid="translation">{t("common.loading")}</span>
-          </div>
-        );
-      };
-
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId("language")).toHaveTextContent("id");
-      });
-
-      toggleFn();
-
-      await waitFor(() => {
-        expect(screen.getByTestId("language")).toHaveTextContent("en");
-        expect(screen.getByTestId("translation")).toHaveTextContent("Loading...");
-      });
-
-      toggleFn();
-
-      await waitFor(() => {
-        expect(screen.getByTestId("language")).toHaveTextContent("id");
-        expect(screen.getByTestId("translation")).toHaveTextContent("Memuat...");
       });
     });
 

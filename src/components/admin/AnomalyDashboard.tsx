@@ -12,7 +12,7 @@ import type {
   AnomalySeverity,
   AnomalyStatus,
   AnomalyThreshold,
-  AlertChannel,
+  AnomalyAlertChannel,
   AnomalyStatistics,
 } from '@/types/anomaly';
 
@@ -43,7 +43,7 @@ const STATUS_LABELS: Record<AnomalyStatus, string> = {
   investigating: 'Diselidiki',
 };
 
-const ALERT_CHANNEL_LABELS: Record<AlertChannel, string> = {
+const ALERT_CHANNEL_LABELS: Record<AnomalyAlertChannel, string> = {
   dashboard: 'Dasbor',
   email: 'Email',
   webhook: 'Webhook',
@@ -232,7 +232,7 @@ const AnomalyDashboard: React.FC = () => {
                         </div>
                         <div className="mb-3">
                           <label className="form-label">Saluran Peringatan</label>
-                          {(['dashboard', 'email', 'webhook', 'sms'] as AlertChannel[]).map(
+                          {(['dashboard', 'email', 'webhook', 'sms'] as AnomalyAlertChannel[]).map(
                             (channel) => (
                               <div key={channel} className="form-check">
                                 <input
