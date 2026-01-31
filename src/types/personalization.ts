@@ -136,6 +136,47 @@ export interface IRuleVersionStorage {
   getVersionCount(ruleId: string): number;
 }
 
+export interface IPersonalizationEngine {
+  isEnabled(): boolean;
+  setEnabled(enabled: boolean): void;
+  createRule(rule: Omit<PersonalizationRule, 'id' | 'createdAt' | 'updatedAt'>): PersonalizationRule;
+  updateRule(id: string, updates: Partial<PersonalizationRule>): PersonalizationRule | null;
+  deleteRule(id: string): boolean;
+  getRule(id: string): PersonalizationRule | undefined;
+  getAllRules(): PersonalizationRule[];
+  getActiveRules(): PersonalizationRule[];
+  createVariant(variant: Omit<ContentVariant, 'id' | 'createdAt' | 'updatedAt'>): ContentVariant;
+  updateVariant(id: string, updates: Partial<ContentVariant>): ContentVariant | null;
+  deleteVariant(id: string): boolean;
+  getVariant(id: string): ContentVariant | undefined;
+  getVariantsForContent(contentId: string): ContentVariant[];
+  getVariantForUser(contentId: string, userSegment: UserSegment, userId?: string): ContentVariant | null;
+  evaluateConditions(conditions: RuleCondition[], context: Record<string, unknown>): boolean;
+  personalizeContent(contentId: string, userSegment: UserSegment, contentType: ContentType, context: Record<string, unknown>, userId?: string): Record<string, unknown> | null;
+  trackImpression(ruleId: string, variantId: string, segment: UserSegment): void;
+  trackClick(ruleId: string): void;
+  trackEngagement(ruleId: string, value: number): void;
+  trackConversion(ruleId: string): void;
+  getMetrics(ruleId: string): PersonalizationMetrics | undefined;
+  getAllMetrics(): PersonalizationMetrics[];
+  calculateLift(ruleId: string, baselineConversionRate: number): number;
+  getAnalytics(): {
+    totalRules: number;
+    activeRules: number;
+    totalVariants: number;
+    activeVariants: number;
+    totalImpressions: number;
+    totalEngagements: number;
+    overallLift: number;
+  };
+  reset(): void;
+  getRuleVersions(ruleId: string): PersonalizationRuleVersion[];
+  createRuleVersion(rule: PersonalizationRule, notes?: string): PersonalizationRuleVersion | null;
+  restoreRuleVersion(ruleId: string, versionId: string): PersonalizationRule | null;
+  deleteRuleVersion(ruleId: string, versionId: string): boolean;
+  compareRuleVersions(ruleId: string, version1Id: string, version2Id: string): RuleVersionDiff[] | null;
+}
+
 // ============================================================================
 // TEMPLATE TYPES
 // ============================================================================

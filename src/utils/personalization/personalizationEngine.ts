@@ -6,6 +6,7 @@ import {
   ContentType,
   UserSegment,
   PersonalizationRuleVersion,
+  IPersonalizationEngine,
 } from '@/types/personalization';
 import { ruleVersionStorage } from './ruleVersionStorage';
 
@@ -13,7 +14,7 @@ const RULES_STORAGE_KEY = 'personalization_rules';
 const METRICS_STORAGE_KEY = 'personalization_metrics';
 const VARIANT_STORAGE_KEY = 'personalization_variants';
 
-class PersonalizationEngine {
+class PersonalizationEngine implements IPersonalizationEngine {
   private rules: PersonalizationRule[] = [];
   private variants: ContentVariant[] = [];
   private metrics: Map<string, PersonalizationMetrics> = new Map();
