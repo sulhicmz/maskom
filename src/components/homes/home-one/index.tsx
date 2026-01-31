@@ -22,7 +22,7 @@ const Brand = dynamic(() => import("./Brand"), {
             </div>
           </div>
         </div>
-        <div className="clients-slider wow fadeInUp" style={{ minHeight: '100px' }}></div>
+        <div className="clients-slider wow fadeInUp skeleton skeleton-text skeleton-pulse" style={{ minHeight: '100px' }}></div>
       </div>
     </section>
   ),

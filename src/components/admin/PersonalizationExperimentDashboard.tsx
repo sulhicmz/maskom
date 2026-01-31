@@ -39,16 +39,16 @@ const PersonalizationExperimentDashboard: React.FC = () => {
     }
   }, [user, router]);
 
-  useEffect(() => {
-    loadExperiments();
-    const interval = setInterval(() => {
-      loadExperiments();
-      loadAlerts();
-    }, 30000);
-    return () => clearInterval(interval);
+  const loadAlerts = React.useCallback(() => {
+    try {
+      const allAlerts = personalizationExperimentAutomation.checkAlerts();
+      setAlerts(allAlerts);
+    } catch (error) {
+      logComponentError({ componentName: 'PersonalizationExperimentDashboard', operation: 'load alerts', error });
+    }
   }, []);
 
-  const loadExperiments = () => {
+  const loadExperiments = React.useCallback(() => {
     try {
       const allExperiments = personalizationExperimentAutomation.getAllExperiments();
       setExperiments(allExperiments);
@@ -60,16 +60,16 @@ const PersonalizationExperimentDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadAlerts]);
 
-  const loadAlerts = () => {
-    try {
-      const allAlerts = personalizationExperimentAutomation.checkAlerts();
-      setAlerts(allAlerts);
-    } catch (error) {
-      logComponentError({ componentName: 'PersonalizationExperimentDashboard', operation: 'load alerts', error });
-    }
-  };
+  useEffect(() => {
+    loadExperiments();
+    const interval = setInterval(() => {
+      loadExperiments();
+      loadAlerts();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [loadExperiments, loadAlerts]);
 
   const getStatusBadgeColor = (status: ExperimentStatus): string => {
     const colors: Record<ExperimentStatus, string> = {
