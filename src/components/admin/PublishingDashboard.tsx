@@ -24,7 +24,7 @@ const STAGE_LABELS: Record<PublishingWorkflowStage, string> = {
     published: 'Diterbitkan',
 };
 
-const ROLE_LABELS: Record<RoleType, string> = {
+const _ROLE_LABELS: Record<RoleType, string> = {
     editor: 'Editor',
     content_strategist: 'Penyusun Strategi Konten',
     admin: 'Admin',
@@ -150,7 +150,7 @@ const PublishingDashboard: React.FC = () => {
         loadData();
     }, [loadData]);
 
-    const handleConfigureDistribution = useCallback((workflow: PublishingWorkflow, channel: DistributionChannel, enabled: boolean) => {
+    const _handleConfigureDistribution = useCallback((workflow: PublishingWorkflow, channel: DistributionChannel, enabled: boolean) => {
         const workflowId = `workflow_${workflow.postId}`;
         publishingPipeline.configureDistribution(workflowId, channel, enabled);
         loadData();

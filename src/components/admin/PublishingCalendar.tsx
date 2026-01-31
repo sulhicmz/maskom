@@ -42,7 +42,7 @@ const STATUS_COLORS: Record<CalendarEvent['status'], string> = {
 const PublishingCalendar: React.FC = () => {
     const { theme } = useTheme();
     const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [workflows, setWorkflows] = useState<PublishingWorkflow[]>([]);
+    const [_workflows, _setWorkflows] = useState<PublishingWorkflow[]>([]);
     const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [loading, setLoading] = useState(true);
@@ -52,7 +52,7 @@ const PublishingCalendar: React.FC = () => {
         setLoading(true);
         setTimeout(() => {
             const allWorkflows = publishingPipeline.getWorkflows();
-            setWorkflows(allWorkflows);
+            _setWorkflows(allWorkflows);
 
             const startDate = new Date(selectedDate);
             const endDate = new Date(selectedDate);

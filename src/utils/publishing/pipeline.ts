@@ -2,13 +2,11 @@ import type {
     PublishingWorkflow,
     ApprovalAssignment,
     PublishingSchedule,
-    DistributionConfig,
     ContentQualityGate,
     PublishingMetrics,
     CalendarEvent,
     IPublishingPipeline,
     PublishingWorkflowStage,
-    ApprovalStatus,
     DistributionChannel,
     RoleType,
     BulkOperation,
@@ -122,7 +120,7 @@ class PublishingPipeline implements IPublishingPipeline {
         return workflow;
     }
 
-    advanceStage(workflowId: string, stage: PublishingWorkflowStage, userId: string): PublishingWorkflow | null {
+    advanceStage(workflowId: string, stage: PublishingWorkflowStage, _userId: string): PublishingWorkflow | null {
         const workflow = this.workflows.get(workflowId);
         if (!workflow) {
             return null;
@@ -309,7 +307,7 @@ class PublishingPipeline implements IPublishingPipeline {
                 issues.push('Tidak ada versi konten yang tersedia');
                 passed = false;
             }
-        } catch (error) {
+        } catch (_error) {
             issues.push('Gagal memeriksa kualitas konten');
             passed = false;
         }
@@ -471,8 +469,6 @@ class PublishingPipeline implements IPublishingPipeline {
         const now = Date.now();
 
         workflows.forEach((workflow) => {
-            const status: CalendarEvent['status'] = workflow.currentStage === 'published' ? 'on-time' : 'delayed';
-
             if (workflow.schedule) {
                 const scheduledAt = new Date(workflow.schedule.scheduledAt).getTime();
                 if (scheduledAt >= start && scheduledAt <= end) {

@@ -11,7 +11,7 @@ export interface CtaImage {
 }
 
 const ContentRendererWithAnimation = (animation: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none" | undefined, contentClassName: string | undefined, id: string | undefined) => {
-    const Component = animation !== undefined ? AnimationWrapper : 'div';
+    const Component = animation !== undefined && animation !== "none" ? AnimationWrapper : 'div';
 
     return Component === AnimationWrapper
         ? ({ children }: { children: React.ReactNode }) => (
@@ -19,14 +19,17 @@ const ContentRendererWithAnimation = (animation: "fadeInDown" | "fadeInUp" | "fa
                 {children}
             </AnimationWrapper>
         )
-        : ({ children }: { children: React.ReactNode }) => (
-            <div id={id} className={`${contentClassName} wow ${animation || ''}`}>
-                {children}
-            </div>
-        );
+        : ({ children }: { children: React.ReactNode }) => {
+            const animationClass = animation && animation !== "none" ? `wow ${animation}` : animation || '';
+            return (
+                <div id={id} className={`${contentClassName} ${animationClass}`}>
+                    {children}
+                </div>
+            );
+        };
 };
 
-const ImageRendererWithAnimation = (animation: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none" | undefined, className: string | undefined) => {
+const ImageRendererWithAnimation = (_animation: "fadeInDown" | "fadeInUp" | "fadeInLeft" | "fadeInRight" | "none" | undefined, _className: string | undefined) => {
     return ({ className }: { className?: string }) => (
         <div className={className}>
             {(className || '').match(/image-(\d+)/g)?.map((match, index) => {
@@ -79,7 +82,6 @@ const CtaWrapper = React.memo<CtaProps>(({
     id
 }) => {
     const ContentRenderer = ContentRendererWithAnimation(animation, contentClassName, id);
-    const ImageRenderer = ImageRendererWithAnimation(animation, imageBoxClassName);
 
     const contentWrapper = (
         <ContentRenderer>
@@ -90,7 +92,16 @@ const CtaWrapper = React.memo<CtaProps>(({
     )
 
     const imageWrapper = (
-        <ImageRenderer />
+        <div className={imageBoxClassName}>
+            {images.map((image, index) => (
+                <Image
+                    key={index}
+                    src={image.src}
+                    alt={image.alt}
+                    className={image.className || `image-${index + 1}`}
+                />
+            ))}
+        </div>
     )
 
     return (

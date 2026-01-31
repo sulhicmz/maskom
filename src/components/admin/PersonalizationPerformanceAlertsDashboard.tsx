@@ -108,7 +108,7 @@ const PersonalizationPerformanceAlertsDashboard = () => {
     loadData();
     const interval = setInterval(loadData, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [loadData]);
 
   const filteredAlerts = useMemo(() => {
     return alerts.filter(alert => {

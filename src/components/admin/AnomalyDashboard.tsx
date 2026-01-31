@@ -151,7 +151,7 @@ const AnomalyDashboard: React.FC = () => {
 
   useEffect(() => {
     loadDashboardData();
-  }, [filterType, filterSeverity, filterStatus]);
+  }, [loadDashboardData]);
 
   return (
     <ProtectedRoute requiredPermission={Permission.MANAGE_CONTENT}>

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { StorageConfig, StorageOperationResult, IStorage } from '@/types/storage';
-import type { Migration, MigrationResult } from '@/types/storageMigration';
+import type { MigrationResult } from '@/types/storageMigration';
 import { StorageValidator, ValidationResult } from './storageValidator';
 import { StorageMigration } from './storageMigration';
 

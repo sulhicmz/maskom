@@ -14,7 +14,7 @@ import type {
 } from '@/types/securityAudit';
 
 const SecurityAuditDashboard = () => {
-  const { theme } = useTheme();
+  const { theme: _theme } = useTheme();
   const [activeTab, setActiveTab] = useState<'overview' | 'vulnerabilities' | 'compliance' | 'policies' | 'history'>('overview');
   const [isScanning, setIsScanning] = useState(false);
   const [latestAudit, setLatestAudit] = useState<SecurityAudit | null>(null);
