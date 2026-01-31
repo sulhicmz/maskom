@@ -49,6 +49,9 @@ export * from './backup';
 // Audit types (ActivityLog, ActivityAction, etc.)
 export * from './audit';
 
+// Collaboration types (UserPresence, DocumentOperation, etc.)
+export * from './collaboration';
+
 // Auth types (User, LoginCredentials, etc.)
 export type { User } from '../services/auth/types';
 
