@@ -1,30 +1,4 @@
-export interface Migration<T = unknown, U = unknown> {
-  version: string;
-  description: string;
-  up: (data: T) => U;
-  down?: (data: U) => T;
-}
-
-export interface MigrationHistory {
-  storageKey: string;
-  migrations: string[];
-  lastMigratedAt: string;
-}
-
-export interface MigrationResult {
-  success: boolean;
-  migrated: boolean;
-  fromVersion?: string;
-  toVersion?: string;
-  error?: string;
-}
-
-export interface MigrationOptions {
-  storageKey: string;
-  currentVersion: string;
-  migrations: Migration[];
-  logMigrations?: boolean;
-}
+import type { Migration, MigrationHistory, MigrationResult, MigrationOptions } from '@/types/storageMigration';
 
 const HISTORY_KEY = 'maskom_migration_history';
 
@@ -105,7 +79,7 @@ export class StorageMigration<T = unknown> {
   rollback(data: unknown, targetVersion?: string): MigrationResult {
     const history = this.loadHistory();
     const entry = history.find(h => h.storageKey === this.storageKey);
-    const currentVersion = entry?.migrations?.[entry.migrations.length - 1] || this.currentVersion;
+    const currentVersion = entry?.migrations?.[entry.migrations.length -1] || this.currentVersion;
     
     if (!targetVersion || targetVersion === currentVersion) {
       return {
@@ -253,10 +227,10 @@ export class StorageMigration<T = unknown> {
       if (this.compareVersions(version, fromVersion) <= 0) {
         break;
       }
-       }
-     
-     return path;
-   }
+    }
+    
+    return path;
+  }
 
   private getSortedVersions(): string[] {
     return Array.from(this.migrations.keys()).sort((a, b) =>
