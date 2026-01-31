@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { 
-  addOfflineAction, 
-  removeOfflineAction, 
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import {
+  addOfflineAction,
+  removeOfflineAction,
   updateOfflineActionStatus,
   incrementOfflineActionRetries,
   clearOfflineActions,
@@ -12,14 +12,11 @@ import {
   updateSyncConfig,
 } from '../backgroundSync';
 
-vi.mock('@/types/pwa', async () => {
-  const actual = await vi.importActual('@/types/pwa');
-  return {
-    ...actual,
-    OFFLINE_ACTIONS_KEY: 'test_offline_actions',
-    BACKGROUND_SYNC_CONFIG_KEY: 'test_background_sync_config',
-  };
-});
+jest.mock('@/types/pwa', () => ({
+  ...jest.requireActual('@/types/pwa'),
+  OFFLINE_ACTIONS_KEY: 'test_offline_actions',
+  BACKGROUND_SYNC_CONFIG_KEY: 'test_background_sync_config',
+}));
 
 describe('backgroundSync', () => {
   beforeEach(() => {
@@ -43,7 +40,7 @@ describe('backgroundSync', () => {
       expect(action.url).toBe('/api/contact');
       expect(action.status).toBe('pending');
       expect(action.retries).toBe(0);
-      expect(action.timestamp).toBeTypeOf('number');
+      expect(typeof action.timestamp).toBe('number');
     });
 
     it('should persist action to localStorage', () => {
@@ -143,11 +140,15 @@ describe('backgroundSync', () => {
 
   describe('syncOfflineActions', () => {
     it('should sync pending actions when online', async () => {
-      vi.stubGlobal('navigator', {
-        onLine: true,
+      Object.defineProperty(navigator, 'onLine', {
+        value: true,
+        writable: true,
+        configurable: true,
       });
 
-      global.fetch = vi.fn().mockResolvedValue({
+      updateSyncConfig({ retryDelay: 0 });
+
+      global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => ({}),
       }) as unknown as typeof fetch;
@@ -161,21 +162,18 @@ describe('backgroundSync', () => {
       const result = await syncOfflineActions();
       expect(result.succeeded).toBeGreaterThan(0);
       expect(result.failed).toBe(0);
-
-      vi.unstubAllGlobals();
-      vi.unmock('globalThis.fetch');
     });
 
     it('should not sync when offline', async () => {
-      vi.stubGlobal('navigator', {
-        onLine: false,
+      Object.defineProperty(navigator, 'onLine', {
+        value: false,
+        writable: true,
+        configurable: true,
       });
 
       const result = await syncOfflineActions();
       expect(result.succeeded).toBe(0);
       expect(result.failed).toBe(0);
-
-      vi.unstubAllGlobals();
     });
   });
 

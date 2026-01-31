@@ -21,7 +21,7 @@ function saveSyncConfig() {
   }
 }
 
-function getOfflineActions(): OfflineAction[] {
+export function getOfflineActions(): OfflineAction[] {
   try {
     const stored = localStorage?.getItem(OFFLINE_ACTIONS_KEY);
     return stored ? JSON.parse(stored) : [];

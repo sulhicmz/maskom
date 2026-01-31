@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, useRef } from "@jest/globals";
+import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { I18nProvider, useTranslation, isValidLanguage } from "@/contexts/I18nContext";
 
@@ -64,15 +64,13 @@ describe("I18nContext", () => {
     });
 
     it("should handle language switching", async () => {
-      let capturedSetLanguage: (lang: "en" | "id") => void = () => {};
-
       const TestComponent = () => {
         const { language, setLanguage, t } = useTranslation();
-        capturedSetLanguage = setLanguage;
         return (
           <div>
             <span data-testid="language">{language}</span>
             <span data-testid="translation">{t("common.loading")}</span>
+            <button onClick={() => setLanguage("en")}>Switch to English</button>
           </div>
         );
       };
@@ -84,26 +82,10 @@ describe("I18nContext", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId("language")).toHaveTextContent("en");
-        expect(capturedSetLanguage).toHaveBeenCalledWith("en");
-      });
-    });
-
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
-      );
-
-      await waitFor(() => {
         expect(screen.getByTestId("language")).toHaveTextContent("id");
       });
 
-      toggleFnRef.current();
-
-      await waitFor(() => {
-        expect(screen.getByTestId("language")).toHaveTextContent("en");
-      });
+      fireEvent.click(screen.getByText("Switch to English"));
 
       await waitFor(() => {
         expect(screen.getByTestId("language")).toHaveTextContent("en");
@@ -263,6 +245,6 @@ describe("I18nContext", () => {
       expect(isValidLanguage("es")).toBe(false);
       expect(isValidLanguage("")).toBe(false);
       expect(isValidLanguage("invalid")).toBe(false);
-      });
     });
-
+  });
+});
