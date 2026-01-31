@@ -108,7 +108,7 @@ const PersonalizationPerformanceAlertsDashboard = () => {
     loadData();
     const interval = setInterval(loadData, 10000);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, []);
 
   const filteredAlerts = useMemo(() => {
     return alerts.filter(alert => {
@@ -122,28 +122,114 @@ const PersonalizationPerformanceAlertsDashboard = () => {
   const handleAcknowledgeAlert = useCallback((alertId: string) => {
     const success = performanceAlerts.acknowledgeAlert(alertId, 'admin');
     if (success) {
-      loadData();
+      const allAlerts = performanceAlerts.getAlerts();
+      setAlerts(allAlerts);
+
+      const stats = performanceAlerts.getStatistics();
+      setStatistics(stats);
+
+      const configs = new Map<PerformanceAlertType, PerformanceAlertConfig>();
+      const alertTypes: PerformanceAlertType[] = [
+        'conversion_drop',
+        'engagement_drop',
+        'lift_degradation',
+        'rule_underperforming',
+        'zero_lift',
+        'negative_lift',
+      ];
+
+      alertTypes.forEach(type => {
+        const config = performanceAlerts.getAlertConfig(type);
+        if (config) {
+          configs.set(type, config);
+        }
+      });
+
+      setAlertConfigs(configs);
     }
-  }, [loadData]);
+  }, []);
 
   const handleResolveAlert = useCallback((alertId: string, resolution: string) => {
     const notes = prompt('Masukkan catatan resolusi (opsional):');
     performanceAlerts.resolveAlert(alertId, resolution as any, notes || undefined);
-    loadData();
-  }, [loadData]);
+    const allAlerts = performanceAlerts.getAlerts();
+    setAlerts(allAlerts);
+
+    const stats = performanceAlerts.getStatistics();
+    setStatistics(stats);
+
+    const configs = new Map<PerformanceAlertType, PerformanceAlertConfig>();
+    const alertTypes: PerformanceAlertType[] = [
+      'conversion_drop',
+      'engagement_drop',
+      'lift_degradation',
+      'rule_underperforming',
+      'zero_lift',
+      'negative_lift',
+    ];
+
+    alertTypes.forEach(type => {
+      const config = performanceAlerts.getAlertConfig(type);
+      if (config) {
+        configs.set(type, config);
+      }
+    });
+
+    setAlertConfigs(configs);
+  }, []);
 
   const handleUpdateConfig = useCallback((alertType: PerformanceAlertType, updates: Partial<PerformanceAlertConfig>) => {
     performanceAlerts.updateAlertConfig(alertType, updates);
-    loadData();
-  }, [loadData]);
+    const configs = new Map<PerformanceAlertType, PerformanceAlertConfig>();
+    const alertTypes: PerformanceAlertType[] = [
+      'conversion_drop',
+      'engagement_drop',
+      'lift_degradation',
+      'rule_underperforming',
+      'zero_lift',
+      'negative_lift',
+    ];
+
+    alertTypes.forEach(type => {
+      const config = performanceAlerts.getAlertConfig(type);
+      if (config) {
+        configs.set(type, config);
+      }
+    });
+
+    setAlertConfigs(configs);
+  }, []);
 
   const handleClearResolvedAlerts = useCallback(() => {
     const days = prompt('Hapus peringatan yang diselesaikan sebelum berapa hari lalu? (default: 30)', '30');
     if (days && !isNaN(parseInt(days))) {
       performanceAlerts.clearResolvedAlerts(parseInt(days));
-      loadData();
+      const allAlerts = performanceAlerts.getAlerts();
+      setAlerts(allAlerts);
+
+      const stats = performanceAlerts.getStatistics();
+      setStatistics(stats);
+
+      const configs = new Map<PerformanceAlertType, PerformanceAlertConfig>();
+      const alertTypes: PerformanceAlertType[] = [
+        'conversion_drop',
+        'engagement_drop',
+        'lift_degradation',
+        'rule_underperforming',
+        'zero_lift',
+        'negative_lift',
+      ];
+
+      alertTypes.forEach(type => {
+        const config = performanceAlerts.getAlertConfig(type);
+        if (config) {
+          configs.set(type, config);
+        }
+      });
+
+      setAlertConfigs(configs);
     }
-  }, [loadData]);
+  }, []);
 
   const activeAlertsCount = alerts.filter(a => a.status === 'active').length;
   const criticalAlertsCount = alerts.filter(a => a.severity === 'critical' && a.status === 'active').length;

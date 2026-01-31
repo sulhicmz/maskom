@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
 

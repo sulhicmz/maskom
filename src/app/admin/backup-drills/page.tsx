@@ -1,13 +1,28 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { useTheme } from '@/contexts/ThemeContext'
-import DrillDashboard from '@/components/admin/DrillDashboard'
-import DrillList from '@/components/admin/DrillList'
-import DrillSchedule from '@/components/admin/DrillSchedule'
-import DrillResultsComponent from '@/components/admin/DrillResults'
+import dynamic from 'next/dynamic'
 import ProtectedRoute from '@/components/common/ProtectedRoute'
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Permission } from '@/types/permission'
+
+const DrillDashboard = dynamic(
+  () => import('@/components/admin/DrillDashboard'),
+  { loading: () => <LoadingSpinner /> }
+);
+const DrillList = dynamic(
+  () => import('@/components/admin/DrillList'),
+  { loading: () => <LoadingSpinner /> }
+);
+const DrillSchedule = dynamic(
+  () => import('@/components/admin/DrillSchedule'),
+  { loading: () => <LoadingSpinner /> }
+);
+const DrillResultsComponent = dynamic(
+  () => import('@/components/admin/DrillResults'),
+  { loading: () => <LoadingSpinner /> }
+);
 
 type TabType = 'dashboard' | 'list' | 'schedule'
 
@@ -81,24 +96,36 @@ export default function AdminBackupDrillsPage() {
 
       <div className="row">
         <div className="col-12">
-          {activeTab === 'dashboard' && <DrillDashboard />}
-          {activeTab === 'list' && (
-            <DrillList
-              key={refreshKey}
-              onRunDrill={handleRunDrill}
-              onCancelDrill={handleCancelDrill}
-              onViewResults={handleViewResults}
-            />
+          {activeTab === 'dashboard' && (
+            <Suspense fallback={<LoadingSpinner />}>
+              <DrillDashboard />
+            </Suspense>
           )}
-          {activeTab === 'schedule' && <DrillSchedule onScheduleCreated={handleScheduleCreated} />}
+          {activeTab === 'list' && (
+            <Suspense fallback={<LoadingSpinner />}>
+              <DrillList
+                key={refreshKey}
+                onRunDrill={handleRunDrill}
+                onCancelDrill={handleCancelDrill}
+                onViewResults={handleViewResults}
+              />
+            </Suspense>
+          )}
+          {activeTab === 'schedule' && (
+            <Suspense fallback={<LoadingSpinner />}>
+              <DrillSchedule onScheduleCreated={handleScheduleCreated} />
+            </Suspense>
+          )}
         </div>
       </div>
 
       {selectedDrillId && (
-        <DrillResultsComponent
-          drillId={selectedDrillId}
-          onClose={handleCloseResults}
-        />
+        <Suspense fallback={<LoadingSpinner />}>
+          <DrillResultsComponent
+            drillId={selectedDrillId}
+            onClose={handleCloseResults}
+          />
+        </Suspense>
       )}
       </div>
       </ProtectedRoute>

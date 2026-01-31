@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { NetworkStatus } from '@/types/pwa';
-import { getOfflineActions } from '@/utils/pwa/backgroundSync';
+import { getPendingActionCount, syncOfflineActions } from '@/utils/pwa/backgroundSync';
 
 export default function OfflineIndicator() {
   const { theme } = useTheme();
@@ -13,6 +13,20 @@ export default function OfflineIndicator() {
 
   const isDark = theme === 'dark';
 
+  const updatePendingCount = () => {
+    const pending = getPendingActionCount();
+    setPendingActions(pending);
+  };
+
+  const handleSync = async () => {
+    if (!syncing && networkStatus === 'online' && pendingActions > 0) {
+      setSyncing(true);
+      await syncOfflineActions();
+      setSyncing(false);
+      updatePendingCount();
+    }
+  };
+
   useEffect(() => {
     const updateNetworkStatus = () => {
       if (typeof navigator !== 'undefined') {
@@ -20,32 +34,22 @@ export default function OfflineIndicator() {
       }
     };
 
-    const updatePendingCount = () => {
-      const actions = getOfflineActions();
-      const pending = actions.filter(a => a.status === 'pending').length;
-      setPendingActions(pending);
-    };
-
     updateNetworkStatus();
     updatePendingCount();
-
-    window.addEventListener('online', updateNetworkStatus);
-    window.addEventListener('offline', updateNetworkStatus);
 
     const syncInterval = setInterval(() => {
       updatePendingCount();
     }, 5000);
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
 
     return () => {
       window.removeEventListener('online', updateNetworkStatus);
       window.removeEventListener('offline', updateNetworkStatus);
       clearInterval(syncInterval);
     };
-  }, []);
-
-  if (networkStatus === 'online' && pendingActions === 0) {
-    return null;
-  }
+  }, [networkStatus, syncing]);
 
   const isOffline = networkStatus === 'offline';
   const showPending = pendingActions > 0 && !isOffline;
@@ -84,10 +88,7 @@ export default function OfflineIndicator() {
             style={{ cursor: 'pointer', fontSize: '16px' }}
             role="button"
             aria-label="Sinkronkan sekarang"
-            onClick={() => {
-              setSyncing(true);
-              setTimeout(() => setSyncing(false), 1000);
-            }}
+            onClick={handleSync}
           >
             {syncing ? '⏳' : '▶️'}
           </span>

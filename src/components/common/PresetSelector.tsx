@@ -20,15 +20,15 @@ export default function PresetSelector({
   const [presets, setPresets] = useState<SearchPreset[]>([]);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    loadPresets();
-  }, []);
-
   const loadPresets = () => {
     const loadedPresets = getPresets();
     setPresets(loadedPresets);
   };
+
+  useEffect(() => {
+    setMounted(true);
+    loadPresets();
+  }, []);
 
   const handlePresetClick = (preset: SearchPreset) => {
     onPresetSelect({

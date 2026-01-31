@@ -1,25 +1,44 @@
 'use client';
 
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { Suspense, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import SecurityAuditDashboard from '@/components/admin/SecurityAuditDashboard';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { useAuthService } from '@/hooks/useAuthService';
+
+const SecurityAuditDashboard = dynamic(
+  () => import('@/components/admin/SecurityAuditDashboard'),
+  { loading: () => <LoadingSpinner /> }
+);
 
 const SecurityAuditsPage = () => {
-  const { user } = useAuth();
   const router = useRouter();
+  const { user, loading } = useAuthService();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   if (!user) {
-    router.push('/login');
     return null;
   }
 
-  if (user.role !== 'admin' && !user.permissions?.includes('MANAGE_ANALYTICS')) {
+  if (user.role !== 'admin') {
     router.push('/');
     return null;
   }
 
-  return <SecurityAuditDashboard />;
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SecurityAuditDashboard />
+    </Suspense>
+  );
 };
 
 export default SecurityAuditsPage;

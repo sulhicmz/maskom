@@ -1,7 +1,17 @@
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import CDNConfigForm from '@/components/admin/CDNConfigForm';
-import CDNHealthIndicator from '@/components/admin/CDNHealthIndicator';
+import dynamic from 'next/dynamic';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+
+const CDNConfigForm = dynamic(
+  () => import('@/components/admin/CDNConfigForm'),
+  { loading: () => <LoadingSpinner /> }
+);
+const CDNHealthIndicator = dynamic(
+  () => import('@/components/admin/CDNHealthIndicator'),
+  { loading: () => <LoadingSpinner /> }
+);
 
 export const metadata: Metadata = {
   title: 'Konfigurasi CDN - Admin',
@@ -25,12 +35,16 @@ export default function CDNConfigPage() {
       <div className="cdn-config-container">
         <div className="cdn-health-section">
           <h2>Status CDN</h2>
-          <CDNHealthIndicator />
+          <Suspense fallback={<LoadingSpinner />}>
+            <CDNHealthIndicator />
+          </Suspense>
         </div>
 
         <div className="cdn-form-section">
           <h2>Pengaturan CDN</h2>
-          <CDNConfigForm onSave={handleSave} />
+          <Suspense fallback={<LoadingSpinner />}>
+            <CDNConfigForm onSave={handleSave} />
+          </Suspense>
         </div>
       </div>
 

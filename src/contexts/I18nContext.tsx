@@ -60,19 +60,17 @@ function setStoredLanguage(language: Language): void {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [language, setLanguageState] = useState<Language>(() => {
+    const stored = getStoredLanguage();
+    return stored || DEFAULT_LANGUAGE;
+  });
   const [translations, setTranslations] = useState<Translations>({});
 
   useEffect(() => {
-    const stored = getStoredLanguage();
-    const initialLanguage = stored || DEFAULT_LANGUAGE;
-
-    setLanguageState(initialLanguage);
-
-    loadTranslations(initialLanguage).then((loadedTranslations) => {
+    loadTranslations(language).then((loadedTranslations) => {
       setTranslations(loadedTranslations);
     });
-  }, []);
+  }, [language]);
 
   const setLanguage = async (newLanguage: Language) => {
     setLanguageState(newLanguage);

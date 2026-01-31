@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { WiFiDevice } from "@/types/data";
 import { getOfflineDevices, getDeviceStats } from "@/utils/deviceFilters";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -10,15 +10,10 @@ interface WiFiMonitorProps {
 }
 
 const WiFiMonitor = ({ devices, ssid = "Maskom WiFi", isLoading = false }: WiFiMonitorProps) => {
-  const [isMounted, setIsMounted] = useState(false);
-  const offlineDevices = useMemo(() => getOfflineDevices(devices), [devices]);
-  const { onlineCount } = useMemo(() => getDeviceStats(devices), [devices]);
+   const offlineDevices = useMemo(() => getOfflineDevices(devices), [devices]);
+   const { onlineCount } = useMemo(() => getDeviceStats(devices), [devices]);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted || isLoading) {
+   if (isLoading) {
     return (
       <section className="wifi-monitor" aria-label="WiFi Network Monitor">
         <LoadingSpinner minHeight={300} color="primary" />

@@ -21,9 +21,13 @@ export const AuditReportGenerator: React.FC<AuditReportGeneratorProps> = ({
     generatedBy,
     onReportGenerated,
 }) => {
-    const [dateRange, setDateRange] = useState<DateRange>({
-        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        endDate: new Date().toISOString().split('T')[0],
+    const [dateRange, setDateRange] = useState<DateRange>(() => {
+        const now = Date.now();
+        const today = new Date();
+        return {
+            startDate: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            endDate: today.toISOString().split('T')[0],
+        };
     });
     
     const [userId, setUserId] = useState<string>('');

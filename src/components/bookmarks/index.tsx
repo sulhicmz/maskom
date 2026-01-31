@@ -10,16 +10,16 @@ export default function BookmarksPage() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadBookmarks();
-  }, []);
-
   const loadBookmarks = () => {
     setLoading(true);
     const savedBookmarks = getBookmarks();
     setBookmarks(savedBookmarks);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadBookmarks();
+  }, []);
 
   const handleRemoveBookmark = (postId: string) => {
     if (confirm('Are you sure you want to remove this bookmark?')) {

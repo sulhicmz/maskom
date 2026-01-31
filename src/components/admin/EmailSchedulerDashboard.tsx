@@ -94,13 +94,29 @@ const EmailSchedulerDashboard: React.FC = () => {
     const handleClearData = useCallback(() => {
         if (confirm('Apakah Anda yakin ingin menghapus semua data engagement?')) {
             emailScheduler.clearEngagementData();
-            handleRefresh();
+            setLoading(true);
+            setTimeout(() => {
+                const newInsights = emailScheduler.getSendTimeInsights(recipientId || undefined);
+                setInsights(newInsights);
+                setLoading(false);
+            }, 500);
         }
-    }, [handleRefresh]);
+    }, [recipientId]);
 
     useEffect(() => {
-        handleRefresh();
-    }, [handleRefresh]);
+        setLoading(true);
+        setTimeout(() => {
+            const newInsights = emailScheduler.getSendTimeInsights(recipientId || undefined);
+            setInsights(newInsights);
+
+            if (recipientId) {
+                const newRecommendation = emailScheduler.calculateOptimalSendTime(recipientId);
+                setRecommendation(newRecommendation);
+            }
+
+            setLoading(false);
+        }, 500);
+    }, [recipientId]);
 
     if (loading) {
         return <LoadingSpinner />;

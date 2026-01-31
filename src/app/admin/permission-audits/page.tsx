@@ -1,12 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Permission } from '@/types/permission';
-import { AuditReportGenerator } from '@/components/admin/AuditReportGenerator';
-import { AuditReportDashboard } from '@/components/admin/AuditReportDashboard';
-import { SuspiciousChangeAlerts } from '@/components/admin/SuspiciousChangeAlerts';
 import { PermissionAuditReport } from '@/types/audit';
+
+const AuditReportGenerator = dynamic(() => import('@/components/admin/AuditReportGenerator').then(m => m.AuditReportGenerator), {
+  loading: () => <LoadingSpinner />
+});
+const AuditReportDashboard = dynamic(() => import('@/components/admin/AuditReportDashboard').then(m => m.AuditReportDashboard), {
+  loading: () => <LoadingSpinner />
+});
+const SuspiciousChangeAlerts = dynamic(() => import('@/components/admin/SuspiciousChangeAlerts').then(m => m.SuspiciousChangeAlerts), {
+  loading: () => <LoadingSpinner />
+});
 
 const PermissionAuditsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'generate' | 'alerts'>('dashboard');
@@ -68,23 +77,31 @@ const PermissionAuditsPage: React.FC = () => {
                         {activeTab === 'dashboard' && (
                             <div className="row">
                                 <div className="col-12 mb-4">
-                                    <SuspiciousChangeAlerts />
+                                    <Suspense fallback={<LoadingSpinner />}>
+                                        <SuspiciousChangeAlerts />
+                                    </Suspense>
                                 </div>
                                 <div className="col-12">
-                                    <AuditReportDashboard onFilterChange={handleFilterChange} />
+                                    <Suspense fallback={<LoadingSpinner />}>
+                                        <AuditReportDashboard onFilterChange={handleFilterChange} />
+                                    </Suspense>
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'generate' && (
-                            <AuditReportGenerator
-                                generatedBy="admin"
-                                onReportGenerated={handleReportGenerated}
-                            />
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <AuditReportGenerator
+                                    generatedBy="admin"
+                                    onReportGenerated={handleReportGenerated}
+                                />
+                            </Suspense>
                         )}
 
                         {activeTab === 'alerts' && (
-                            <SuspiciousChangeAlerts />
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <SuspiciousChangeAlerts />
+                            </Suspense>
                         )}
                     </div>
                 </div>

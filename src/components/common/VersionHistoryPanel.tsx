@@ -30,10 +30,11 @@ const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
    }, [postId]);
 
    useEffect(() => {
-      if (isVisible) {
-         loadVersions();
-      }
-   }, [isVisible, loadVersions]);
+       if (isVisible) {
+          const loadedVersions = versionStorage.getPostVersions(postId);
+          setVersions(loadedVersions);
+       }
+    }, [isVisible, postId]);
 
     const handleRestore = useCallback((version: BlogPostVersion) => {
        onRestore(version);

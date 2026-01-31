@@ -18,6 +18,7 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const [localEditors, setLocalEditors] = useState<ActiveEditor[]>([])
+  const now = Date.now()
 
   useEffect(() => {
     setLocalEditors(editors)
@@ -52,8 +53,7 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
     return (words[0][0] + words[words.length - 1][0]).toUpperCase()
   }
 
-  const formatLastSeen = (timestamp: number): string => {
-    const now = Date.now()
+  const formatLastSeen = (timestamp: number, now: number): string => {
     const diff = now - timestamp
 
     if (diff < 60000) {
@@ -92,7 +92,7 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
             }}
             role="button"
             tabIndex={0}
-            aria-label={`Editor ${editor.username}, ${formatLastSeen(editor.lastSeen)}`}
+            aria-label={`Editor ${editor.username}, ${formatLastSeen(editor.lastSeen, now)}`}
           >
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${getAvatarColor(
@@ -106,7 +106,7 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
                 {editor.username}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                {formatLastSeen(editor.lastSeen)}
+                {formatLastSeen(editor.lastSeen, now)}
               </div>
             </div>
             {editor.cursorPosition && (

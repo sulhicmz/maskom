@@ -34,6 +34,59 @@ function PerformanceRegressionDashboard() {
   const [severityFilter, setSeverityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [loading, setLoading] = useState(true);
 
+  const groupSamplesByMetric = (entries: WebVitalsEntry[]): Map<WebVitalMetric, MetricSample[]> => {
+    const map = new Map<WebVitalMetric, MetricSample[]>();
+
+    for (const entry of entries) {
+      const metricName = entry.metric.toUpperCase() as WebVitalMetric;
+      if (!map.has(metricName)) {
+        map.set(metricName, []);
+      }
+      map.get(metricName)!.push({
+        metric: metricName,
+        value: entry.value,
+        timestamp: new Date(entry.timestamp).getTime()
+      });
+    }
+
+    return map;
+  };
+
+  const sendAPMAlert = (alert: RegressionAlert) => {
+    apmManager.captureError({
+      message: `Performance regression detected for ${alert.metric}`,
+      level: 'error',
+      tags: {
+        component: 'PerformanceRegressionDetection',
+        metric: alert.metric,
+        severity: alert.severity,
+        degradation: `${alert.degradation.toFixed(1)}%`
+      },
+      extra: {
+        alertId: alert.id,
+        currentValue: alert.currentValue,
+        baselineValue: alert.baselineValue
+      }
+    });
+  };
+
+  const saveAlerts = (alerts: RegressionAlert[]) => {
+    try {
+      localStorage.setItem(REGRESSION_ALERTS_KEY, JSON.stringify(alerts));
+    } catch (error) {
+      logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'save alerts', error });
+    }
+  };
+
+  const saveBaselines = (baselines: Map<WebVitalMetric, PerformanceBaseline>) => {
+    try {
+      const baselinesArray = Array.from(baselines.values());
+      localStorage.setItem(BASELINES_KEY, JSON.stringify(baselinesArray));
+    } catch (error) {
+      logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'save baselines', error });
+    }
+  };
+
   const loadData = useCallback(() => {
     setLoading(true);
     
@@ -98,59 +151,6 @@ function PerformanceRegressionDashboard() {
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  const groupSamplesByMetric = (entries: WebVitalsEntry[]): Map<WebVitalMetric, MetricSample[]> => {
-    const map = new Map<WebVitalMetric, MetricSample[]>();
-    
-    for (const entry of entries) {
-      const metricName = entry.metric.toUpperCase() as WebVitalMetric;
-      if (!map.has(metricName)) {
-        map.set(metricName, []);
-      }
-      map.get(metricName)!.push({
-        metric: metricName,
-        value: entry.value,
-        timestamp: new Date(entry.timestamp).getTime()
-      });
-    }
-    
-    return map;
-  };
-
-  const sendAPMAlert = (alert: RegressionAlert) => {
-    apmManager.captureError({
-      message: `Performance regression detected for ${alert.metric}`,
-      level: 'error',
-      tags: {
-        component: 'PerformanceRegressionDetection',
-        metric: alert.metric,
-        severity: alert.severity,
-        degradation: `${alert.degradation.toFixed(1)}%`
-      },
-      extra: {
-        alertId: alert.id,
-        currentValue: alert.currentValue,
-        baselineValue: alert.baselineValue
-      }
-    });
-  };
-
-  const saveAlerts = (alerts: RegressionAlert[]) => {
-    try {
-      localStorage.setItem(REGRESSION_ALERTS_KEY, JSON.stringify(alerts));
-    } catch (error) {
-      logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'save alerts', error });
-    }
-  };
-
-  const saveBaselines = (baselines: Map<WebVitalMetric, PerformanceBaseline>) => {
-    try {
-      const baselinesArray = Array.from(baselines.values());
-      localStorage.setItem(BASELINES_KEY, JSON.stringify(baselinesArray));
-    } catch (error) {
-      logComponentError({ componentName: 'PerformanceRegressionDashboard', operation: 'save baselines', error });
-    }
-  };
 
   const handleAcknowledge = (id: string) => {
     const updatedAlerts = alerts.map(alert =>

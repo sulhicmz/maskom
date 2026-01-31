@@ -15,7 +15,6 @@ import type {
 
 const SecurityAuditDashboard = () => {
   const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'overview' | 'vulnerabilities' | 'compliance' | 'policies' | 'history'>('overview');
   const [isScanning, setIsScanning] = useState(false);
   const [latestAudit, setLatestAudit] = useState<SecurityAudit | null>(null);
@@ -24,7 +23,6 @@ const SecurityAuditDashboard = () => {
   const [securityScore, setSecurityScore] = useState<SecurityScore | null>(null);
   const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
   const [selectedVulnerability, setSelectedVulnerability] = useState<SecurityVulnerability | null>(null);
-  const [selectedAudit, setSelectedAudit] = useState<SecurityAudit | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assignTo, setAssignTo] = useState('');
   const [showResolveModal, setShowResolveModal] = useState(false);

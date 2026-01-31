@@ -1,7 +1,14 @@
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Permission } from '@/types/permission';
-import NodeCompatibilityDashboard from '@/components/admin/NodeCompatibilityDashboard';
+
+const NodeCompatibilityDashboard = dynamic(
+  () => import('@/components/admin/NodeCompatibilityDashboard'),
+  { loading: () => <LoadingSpinner /> }
+);
 
 export const metadata: Metadata = {
   title: 'Kompatibilitas Node.js - Admin',
@@ -11,7 +18,9 @@ export const metadata: Metadata = {
 export default function NodeCompatibilityPage() {
   return (
     <ProtectedRoute requiredPermission={Permission.MANAGE_SETTINGS}>
-      <NodeCompatibilityDashboard />
+      <Suspense fallback={<LoadingSpinner />}>
+        <NodeCompatibilityDashboard />
+      </Suspense>
     </ProtectedRoute>
   );
 }
