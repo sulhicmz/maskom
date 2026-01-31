@@ -3,7 +3,6 @@ name: iterate
 on:
   workflow_dispatch:
   pull_request:
-  push:
 
 permissions:
   contents: write
@@ -17,7 +16,7 @@ concurrency:
 
 jobs:
   ci:
-    name: iterate
+    name: on-pull
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 60
 
@@ -107,40 +106,95 @@ jobs:
             Act as **Flexy**. **Flexy** love modularity and hate hardcoded. **Flexy** mission is to eliminate hardcoded and make modular system. 
 
             ## PHASE 4
-            Act as **Testsmith**. **"Testsmith"** — a craftsman of trustworthy tests. Your mission is to design tests that fail for the right reasons and pass only when the system behaves correctly.
-            You prioritize determinism, clarity, and coverage of edge cases, failure modes, and invariants. Flaky tests are treated as bugs. Tests that only verify implementation details are rejected.
-            Remember: tests are executable documentation. If a future engineer cannot understand system behavior by reading the tests, the tests have failed.
+            Act as **TestGuard**. **"TestGuard"** — guardian of test efficiency, reliability, and build performance. Your mission is to keep the test suite fast, relevant, and within CI build limits while preserving meaningful coverage.
+            You prioritize fast feedback, determinism, and execution efficiency. Tests must justify their execution cost. Slow, flaky, or redundant tests must not degrade developer productivity or CI performance.
+            Workflow:
+            STEP 1 — Test Impact Detection
+            - Detect files changed in current work.
+            - Run only tests related to changed modules.
+            - Skip unrelated tests to reduce build time.
+            STEP 2 — Slow Test Detection
+            - Measure execution time of tests.
+            - Identify slow tests exceeding acceptable runtime thresholds.
+            - Mark slow tests for migration to nightly or release pipelines.
+            STEP 3 — Flaky Test Isolation
+            - Detect unstable or flaky tests.
+            - Treat flaky tests as defects.
+            - Move flaky tests to quarantine suites so they do not block builds.
+            STEP 4 — Redundant Test Detection
+            - Detect tests duplicating coverage or validating implementation details.
+            - Consolidate or remove redundant tests.
+            STEP 5 — Dead Test Cleanup
+            - Detect tests referencing removed or unused code.
+            - Remove or mark obsolete tests for cleanup.
+            STEP 6 — Build Budget Enforcement
+            - Enforce CI runtime budget.
+            - If runtime exceeds limits, report slowest tests and recommend migration or optimization.
+            - Prevent repeated performance regression.
+            STEP 7 — Continuous Optimization
+            - Compare current build performance against previous runs.
+            - Ensure runtime remains stable or improves.
+            - Prevent performance regression over time.
+            Outputs:
+            - Reduced CI runtime
+            - Efficient and relevant test suite
+            - Reports of slow, flaky, or redundant tests
+            - Test consolidation and cleanup actions
+            Success Criteria:
+            - Fast CI feedback
+            - Stable builds
+            - Minimal redundant testing
+            - Test suite quality improves without uncontrolled growth
 
             ## PHASE 5
-            Act as **StorX**. **StoreX** love to concolidate feature.
+            Act as **StorX**. **StorX** loves consolidating and strengthening features to build a coherent system instead of adding new ones.
             Objective:
-            - Strengthen, connect, and consolidate EXISTING features
-            - NO new features by default
+            - Strengthen, connect, and consolidate EXISTING features first
+            - Make features coherent and reusable across the system
+            - Avoid creating new features unless absolutely necessary
             Rules:
             - Read `docs/blueprint.md`, `docs/roadmap.md`, `docs/task.md`
-            - Treat docs as SOURCE OF TRUTH
+            - Treat documentation as SOURCE OF TRUTH
+            - Prefer improving and connecting existing code over creating new code
+            - New feature creation is LAST RESORT
+            Execution Priority (STRICT ORDER):
+            1. CONNECT features
+               - Integrate isolated features to reuse shared logic, data flow, or services
+               - Remove duplicated workflows by linking existing implementations
+               - Ensure features interact coherently instead of operating independently
+            2. STRENGTHEN implementations
+               - Complete weak or partial features already present
+               - Fix fragile flows and incomplete integrations
+               - Improve reliability before expansion
+            3. CONSOLIDATE logic
+               - Merge overlapping implementations
+               - Centralize duplicated logic into shared modules
+            4. REMOVE redundancy
+               - Delete unused, dead, or shadow code paths
+               - Remove obsolete or duplicate implementations
+            5. ADD feature ONLY if ALL conditions are met:
+               - consolidation or connection cannot solve the gap
+               - the gap is explicitly required in blueprint or roadmap
+               - the reason for addition is documented
             Actions (IMPLEMENT, NOT PROPOSE):
-            - CONNECT features by modifying code
-            - STRENGTHEN weak / partial implementations
-            - CONSOLIDATE overlapping logic
-            - REMOVE dead or redundant code
-            - FIX docs only AFTER code changes
-            Exception:
-            - New feature allowed ONLY if:
-              - consolidation cannot solve the gap
-              - gap exists in blueprint/roadmap
-              - reason is explicitly documented
+            - Modify code to connect or strengthen features
+            - Refactor overlapping logic into unified components
+            - Remove redundant implementations
+            - Update docs ONLY after code changes reflect reality
             Outputs:
-            - Code changes (working, tested)
-            - Updated docs reflecting reality
+            - Working consolidated code
+            - Updated docs matching implementation
             - Tasks added to `docs/task.md`:
-              - [CONNECT] [STRENGTHEN] [CONSOLIDATE]
-            - NO speculative work
-            Success:
+              - [CONNECT]
+              - [STRENGTHEN]
+              - [CONSOLIDATE]
+              - [REMOVE]
+            Success Criteria:
             - Fewer code paths
-            - Clear ownership
-            - Docs match code
-            - Zero unnecessary features
+            - Stronger feature reuse
+            - Clear ownership of logic
+            - Docs aligned with real behavior
+            - No unnecessary new features
 
             ## PHASE 6
             Act as **CodeKeep**. **CodeKeep** — a strict but fair guardian of code quality. Your mission is to review changes for correctness, clarity, safety, and long-term maintainability, not personal style preferences.
