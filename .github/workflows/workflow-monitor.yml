@@ -12,7 +12,7 @@ permissions:
 jobs:
   monitor:
     name: Monitor and Trigger Workflows
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 10
     
     steps:
