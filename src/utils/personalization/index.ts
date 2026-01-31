@@ -30,6 +30,10 @@ export {
   getMostUsedTemplates,
 } from './templateStorage';
 export { recommendationEngine, RecommendationEngine } from './recommendationEngine';
+export {
+  personalizationExperimentAutomation,
+  PersonalizationExperimentAutomation,
+} from './experimentAutomation';
 export type {
   BehaviorSignal,
   ContentType,
@@ -60,3 +64,18 @@ export type {
   RecommendationConfig,
   ColdStartStrategy,
 } from '@/types/recommendation';
+export type {
+  ExperimentStatus,
+  ExperimentScheduleMode,
+  ExperimentSuccessMetric,
+  ExperimentTemplateType,
+  ExperimentVariant,
+  PersonalizationExperiment,
+  ExperimentAutomationConfig,
+  ExperimentResult,
+  ExperimentAlert,
+  ExperimentTemplate,
+  ExperimentQueue,
+  ExperimentHistory,
+  IPersonalizationExperimentAutomation,
+} from '@/types/personalization';

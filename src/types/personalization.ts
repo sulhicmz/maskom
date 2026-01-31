@@ -458,3 +458,187 @@ export interface IPersonalizationImpactAnalyzer {
   generateMultiSeriesChartData(data: Record<string, TimeSeriesData[]>): ChartData;
   exportToCSV(data: unknown[], filename: string): void;
 }
+
+// ============================================================================
+// EXPERIMENT AUTOMATION TYPES
+// ============================================================================
+
+/**
+ * Experiment automation status
+ */
+export type ExperimentStatus = 'draft' | 'scheduled' | 'running' | 'paused' | 'completed' | 'failed';
+
+/**
+ * Experiment automation configuration
+ */
+export type ExperimentScheduleMode = 'sequential' | 'parallel' | 'manual';
+
+/**
+ * Experiment success metric for auto-winner declaration
+ */
+export type ExperimentSuccessMetric = 'conversion_rate' | 'engagement_rate' | 'lift' | 'revenue';
+
+/**
+ * Experiment template type
+ */
+export type ExperimentTemplateType = 'headline_test' | 'cta_test' | 'layout_test' | 'content_test';
+
+/**
+ * Personalization experiment variant with automation tracking
+ */
+export interface ExperimentVariant {
+  id: string;
+  experimentId: string;
+  variantName: string;
+  ruleId: string;
+  weight: number;
+  isControl: boolean;
+  metrics: {
+    impressions: number;
+    conversions: number;
+    engagement: number;
+    revenue: number;
+  };
+  assignedUsers: string[];
+}
+
+/**
+ * Personalization experiment with automation support
+ */
+export interface PersonalizationExperiment {
+  id: string;
+  name: string;
+  description: string;
+  status: ExperimentStatus;
+  scheduleMode: ExperimentScheduleMode;
+  successMetric: ExperimentSuccessMetric;
+  variants: ExperimentVariant[];
+  rules: PersonalizationRule[];
+  automationConfig: ExperimentAutomationConfig;
+  createdAt: string;
+  scheduledAt?: string;
+  startedAt?: string;
+  completedAt?: string;
+  winner?: ExperimentResult;
+  alerts: ExperimentAlert[];
+}
+
+/**
+ * Experiment automation configuration
+ */
+export interface ExperimentAutomationConfig {
+  autoStart: boolean;
+  autoStop: boolean;
+  autoWinnerDeclaration: boolean;
+  minSampleSize: number;
+  minDuration: number;
+  maxDuration: number;
+  confidenceThreshold: number;
+  sampleSizeThreshold: number;
+  durationThreshold: number;
+  stopOnNegativeLift: boolean;
+  rollbackOnFailure: boolean;
+}
+
+/**
+ * Experiment result with statistical significance
+ */
+export interface ExperimentResult {
+  experimentId: string;
+  winnerId: string;
+  winnerName: string;
+  loserId: string;
+  loserName: string;
+  statisticalSignificance: boolean;
+  pValue: number;
+  confidenceLevel: number;
+  confidenceInterval: {
+    winner: { lower: number; upper: number };
+    loser: { lower: number; upper: number };
+  };
+  lift: number;
+  declaredAt: string;
+}
+
+/**
+ * Experiment alert for notifications
+ */
+export interface ExperimentAlert {
+  id: string;
+  experimentId: string;
+  type: 'info' | 'warning' | 'critical';
+  message: string;
+  createdAt: string;
+  acknowledged: boolean;
+}
+
+/**
+ * Experiment template for quick setup
+ */
+export interface ExperimentTemplate {
+  id: string;
+  name: string;
+  description: string;
+  type: ExperimentTemplateType;
+  category: 'engagement' | 'conversion' | 'retention';
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  config: ExperimentAutomationConfig;
+  variants: Omit<ExperimentVariant, 'experimentId' | 'id' | 'assignedUsers' | 'metrics'>[];
+  useCases: string[];
+  expectedDuration: number;
+  estimatedLift: number;
+}
+
+/**
+ * Experiment scheduling queue
+ */
+export interface ExperimentQueue {
+  experiments: PersonalizationExperiment[];
+  currentExperiment?: string;
+  mode: ExperimentScheduleMode;
+}
+
+/**
+ * Experiment history and statistics
+ */
+export interface ExperimentHistory {
+  experimentId: string;
+  statusChanges: {
+    from: ExperimentStatus;
+    to: ExperimentStatus;
+    timestamp: string;
+  }[];
+  metricsSnapshots: {
+    timestamp: string;
+    variantId: string;
+    metrics: ExperimentVariant['metrics'];
+  }[];
+  alerts: ExperimentAlert[];
+}
+
+/**
+ * Interface for personalization experiment automation engine
+ */
+export interface IPersonalizationExperimentAutomation {
+  createExperiment(config: Omit<PersonalizationExperiment, 'id' | 'createdAt' | 'alerts'>): PersonalizationExperiment;
+  startExperiment(experimentId: string): boolean;
+  stopExperiment(experimentId: string, reason?: string): boolean;
+  pauseExperiment(experimentId: string): boolean;
+  resumeExperiment(experimentId: string): boolean;
+  deleteExperiment(experimentId: string): boolean;
+  getExperiment(experimentId: string): PersonalizationExperiment | undefined;
+  getAllExperiments(): PersonalizationExperiment[];
+  getExperimentsByStatus(status: ExperimentStatus): PersonalizationExperiment[];
+  scheduleExperiment(experimentId: string, scheduledAt: string): boolean;
+  declareWinner(experimentId: string): ExperimentResult | null;
+  rollbackExperiment(experimentId: string): boolean;
+  getExperimentHistory(experimentId: string): ExperimentHistory | undefined;
+  getAvailableTemplates(): ExperimentTemplate[];
+  applyTemplate(templateId: string, config: Partial<ExperimentAutomationConfig>): PersonalizationExperiment;
+  trackMetric(experimentId: string, variantId: string, metric: keyof ExperimentVariant['metrics'], value: number): void;
+  processAutomationRules(): void;
+  checkAlerts(): ExperimentAlert[];
+  getExperimentQueue(): ExperimentQueue;
+  addExperimentToQueue(experimentId: string): void;
+  removeExperimentFromQueue(experimentId: string): void;
+}
