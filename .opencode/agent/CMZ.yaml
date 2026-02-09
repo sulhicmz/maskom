@@ -1,0 +1,125 @@
+# CMZ Agent Configuration
+# CMZ = Continuous Monitoring & Zero-downtime
+# 
+# Behavior: Self-heal, self-learning, self-evolve
+# Mission: Maximize potential through continuous improvement
+
+name: CMZ
+description: |
+  CMZ (Continuous Monitoring & Zero-downtime) is an advanced automation agent 
+  designed for self-healing, self-learning, and self-evolution capabilities.
+  
+  Core Behaviors:
+  - Self-Heal: Automatically detect and fix issues without human intervention
+  - Self-Learn: Analyze patterns from GitHub Actions, logs, and code changes to improve
+  - Self-Evolve: Continuously optimize workflows, configurations, and processes
+  
+  Capabilities:
+  - Monitor repository health and CI/CD pipelines
+  - Auto-fix common issues (lint, format, dependency updates)
+  - Learn from past failures to prevent future ones
+  - Evolve strategies based on project growth patterns
+
+triggers:
+  - type: schedule
+    cron: "0 */6 * * *"  # Run every 6 hours
+  - type: event
+    events:
+      - push
+      - pull_request
+      - workflow_run
+
+actions:
+  - name: health-check
+    description: "Perform comprehensive repository health check"
+    steps:
+      - check-dependencies
+      - run-security-audit
+      - verify-build
+      - run-tests
+      - check-lint
+      - check-format
+
+  - name: auto-fix
+    description: "Automatically fix detected issues"
+    conditions:
+      - health-check.failed == true
+    steps:
+      - fix-lint-issues
+      - fix-format-issues
+      - update-outdated-deps
+      - commit-changes
+
+  - name: learn
+    description: "Learn from recent changes and failures"
+    steps:
+      - analyze-github-actions-logs
+      - identify-failure-patterns
+      - update-prevention-strategies
+      - document-learnings
+
+  - name: evolve
+    description: "Evolve configurations and workflows"
+    steps:
+      - optimize-ci-cd-config
+      - update-agent-skills
+      - improve-error-handling
+      - enhance-monitoring
+
+skills:
+  - name: self-healing
+    description: "Automatically detect and fix common issues"
+    
+  - name: pattern-recognition
+    description: "Recognize patterns in failures and successes"
+    
+  - name: workflow-optimization
+    description: "Optimize CI/CD workflows based on learnings"
+    
+  - name: continuous-monitoring
+    description: "Monitor repository health continuously"
+
+repositories:
+  - https://github.com/code-yeongyu/oh-my-opencode.git
+  - https://github.com/NoeFabris/opencode-antigravity-auth.git
+  - https://github.com/vasilyu1983/AI-Agents-public
+  - https://github.com/obra/superpowers.git
+  - https://github.com/asgeirtj/system_prompts_leaks.git
+  - https://github.com/OpenBMB/UltraRAG.git
+
+# Supplements integration
+# These repositories provide additional capabilities to CMZ
+supplements:
+  oh-my-opencode:
+    url: https://github.com/code-yeongyu/oh-my-opencode.git
+    purpose: "Enhanced CLI capabilities and automation"
+    
+  opencode-antigravity-auth:
+    url: https://github.com/NoeFabris/opencode-antigravity-auth.git
+    purpose: "Advanced authentication and security"
+    
+  ai-agents-public:
+    url: https://github.com/vasilyu1983/AI-Agents-public
+    purpose: "Shared AI agent patterns and skills"
+    
+  superpowers:
+    url: https://github.com/obra/superpowers.git
+    purpose: "Extended agent capabilities and tools"
+    
+  system-prompts-leaks:
+    url: https://github.com/asgeirtj/system_prompts_leaks.git
+    purpose: "Learning from system prompt patterns"
+    
+  ultrarag:
+    url: https://github.com/OpenBMB/UltraRAG.git
+    purpose: "Advanced RAG (Retrieval-Augmented Generation) capabilities"
+
+# Evolution tracking
+evolution:
+  version: 1.0.0
+  last_updated: 2026-02-09
+  improvements:
+    - Initial creation of CMZ agent
+    - Configured self-healing capabilities
+    - Integrated 6 supplement repositories
+    - Setup continuous monitoring triggers

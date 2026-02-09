@@ -36,17 +36,17 @@ class DocumentEngine implements IDocumentEngine {
     };
   }
 
-  private applyInsert(content: DraftContent, operation: DocumentOperation): void {
+  private applyInsert(draftContent: DraftContent, operation: DocumentOperation): void {
     const { position, content } = operation;
     if (!content) return;
 
     if (position.column === 0 && position.line === 1) {
-      content.content = content + content.content;
+      draftContent.content = content + draftContent.content;
     } else if (position.line === 1) {
-      content.content =
-        content.content.slice(0, position.column) +
+      draftContent.content =
+        draftContent.content.slice(0, position.column) +
         content +
-        content.content.slice(position.column);
+        draftContent.content.slice(position.column);
     }
   }
 
@@ -62,14 +62,14 @@ class DocumentEngine implements IDocumentEngine {
   }
 
   private applyReplace(content: DraftContent, operation: DocumentOperation): void {
-    const { position, content, length } = operation;
-    if (!content) return;
+    const { position, content: newContent, length } = operation;
+    if (!newContent) return;
 
     const deleteLength = length || 0;
     if (position.line === 1) {
       content.content =
         content.content.slice(0, position.column) +
-        content +
+        newContent +
         content.content.slice(position.column + deleteLength);
     }
   }
@@ -219,7 +219,7 @@ class DocumentEngine implements IDocumentEngine {
           const combined = { ...last };
           
           if (last.type === 'insert' && current.type === 'insert') {
-            combined.content = last.content + current.content;
+            combined.content = (last.content || '') + (current.content || '');
             compressed[compressed.length - 1] = combined;
             continue;
           }

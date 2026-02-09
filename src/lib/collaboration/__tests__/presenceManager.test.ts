@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import PresenceManager, { presenceManager } from '../presenceManager';
 import { UserPresence, CursorPosition, SelectionRange } from '@/types/collaboration';
 
@@ -7,11 +7,11 @@ describe('PresenceManager', () => {
 
   beforeEach(() => {
     manager = new PresenceManager();
-    vi.useFakeTimers();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    jest.restoreAllMocks();
   });
 
   describe('updatePresence', () => {
@@ -176,7 +176,7 @@ describe('PresenceManager', () => {
       
       manager.removePresence('user1');
 
-      expect(vi.getTimerCount()).toBe(0);
+      expect(jest.getTimerCount()).toBe(0);
     });
   });
 
@@ -222,7 +222,7 @@ describe('PresenceManager', () => {
       manager.updatePresence('user1', presence);
       manager.setTypingStatus('user1', true);
 
-      vi.advanceTimersByTime(3000);
+      jest.advanceTimersByTime(3000);
 
       const result = manager.getPresence('user1');
       expect(result?.isTyping).toBe(false);
@@ -239,10 +239,10 @@ describe('PresenceManager', () => {
       manager.updatePresence('user1', presence);
       manager.setTypingStatus('user1', true);
       
-      vi.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(1000);
       manager.setTypingStatus('user1', true); // Reset timer
       
-      vi.advanceTimersByTime(2000); // Total 3000ms from first set
+      jest.advanceTimersByTime(2000); // Total 3000ms from first set
       
       const result = manager.getPresence('user1');
       expect(result?.isTyping).toBe(true); // Should still be true due to timer reset

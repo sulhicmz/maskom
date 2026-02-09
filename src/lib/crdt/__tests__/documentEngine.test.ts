@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import DocumentEngine, { documentEngine } from '../documentEngine';
 import { DocumentState, DocumentOperation, CursorPosition, DraftContent } from '@/types/collaboration';
 

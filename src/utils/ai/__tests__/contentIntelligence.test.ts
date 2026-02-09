@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 import { ContentIntelligenceEngine } from '../contentIntelligence';
 import { DEFAULT_CONTENT_INTELLIGENCE_CONFIG } from '@/types/contentIntelligence';
 
@@ -6,6 +6,7 @@ describe('ContentIntelligenceEngine', () => {
   let engine: ContentIntelligenceEngine;
 
   beforeEach(() => {
+    localStorage.clear();
     engine = new ContentIntelligenceEngine();
   });
 

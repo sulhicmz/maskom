@@ -6,6 +6,7 @@ import SkipToMainContent from "@/components/common/SkipToMainContent";
 import ErrorBoundary from "@/components/common/ErrorBoundary";
 import ServiceWorkerUpdate from "@/components/common/ServiceWorkerUpdate";
 import WebVitalsReporter from "@/components/common/WebVitalsReporter";
+import ScrollToTopButton from "@/components/common/ScrollToTopButton";
 import { OfflineIndicator } from "@/components/pwa";
 import { AddToHomeScreen } from "@/components/pwa";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
           <I18nProvider>
             <ErrorBoundary>
               {children}
+              <ScrollToTopButton />
               <OfflineIndicator />
               <AddToHomeScreen />
               <ServiceWorkerUpdate />

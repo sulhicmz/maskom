@@ -146,7 +146,7 @@ export type CollaborationRoom = {
 };
 
 export type DocumentOperation = {
-  type: 'insert' | 'delete' | 'retain' | 'format';
+  type: 'insert' | 'delete' | 'replace' | 'retain' | 'format';
   position: CursorPosition;
   content?: string;
   length?: number;
