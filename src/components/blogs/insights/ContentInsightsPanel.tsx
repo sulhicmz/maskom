@@ -20,6 +20,24 @@ interface ContentInsightsPanelProps {
     onClose: () => void;
 }
 
+// Helper function defined outside component to avoid hoisting issues
+function calculateFleschReadingEaseFromText(text: string): number {
+    const words = (text.match(/\b\w+\b/g) || []).length;
+    const sentences = (text.match(/[.!?]+/g) || []).length;
+
+    if (words === 0 || sentences === 0) return 0;
+
+    const syllableRegex = /[^aeiouy]*[aeiouy]+(?:e?|le)?[^aeiouy]*/gi;
+    const totalSyllables = text.match(syllableRegex)?.length || words;
+
+    const avgSentenceLength = words / sentences;
+    const avgSyllablesPerWord = totalSyllables / words;
+
+    const fleschScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord);
+
+    return Math.max(0, Math.min(100, fleschScore));
+}
+
 const ContentInsightsPanel: React.FC<ContentInsightsPanelProps> = ({
     title,
     description,
@@ -44,23 +62,6 @@ const ContentInsightsPanel: React.FC<ContentInsightsPanelProps> = ({
             qualityScore
         };
     }, [title, description, content]);
-
-    function calculateFleschReadingEaseFromText(text: string): number {
-        const words = (text.match(/\b\w+\b/g) || []).length;
-        const sentences = (text.match(/[.!?]+/g) || []).length;
-        
-        if (words === 0 || sentences === 0) return 0;
-        
-        const syllableRegex = /[^aeiouy]*[aeiouy]+(?:e?|le)?[^aeiouy]*/gi;
-        const totalSyllables = text.match(syllableRegex)?.length || words;
-        
-        const avgSentenceLength = words / sentences;
-        const avgSyllablesPerWord = totalSyllables / words;
-        
-        const fleschScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord);
-        
-        return Math.max(0, Math.min(100, fleschScore));
-    }
 
     if (!isVisible) return null;
 

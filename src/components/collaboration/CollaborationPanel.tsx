@@ -32,6 +32,105 @@ export default function CollaborationPanel({
   const [activeUsers, setActiveUsers] = useState<UserPresence[]>([]);
   const [sessionData, setSessionData] = useState<CollaborationRoom | null>(null);
   const [cursorPositions, setCursorPositions] = useState<Map<string, CursorPosition>>(new Map());
+  const [currentTime, setCurrentTime] = useState<number>(Date.now());
+
+  // Handler functions defined first to avoid hoisting issues
+  const handleUserJoined = useCallback((message: any) => {
+    const newPresence: UserPresence = {
+      userId: message.data.userId.toString(),
+      userName: message.data.userName,
+      status: 'online',
+      lastSeen: currentTime,
+      isTyping: false,
+    };
+
+    setActiveUsers((prev) => [...prev, newPresence]);
+  }, [currentTime]);
+
+  const handleUserLeft = useCallback((message: any) => {
+    setActiveUsers((prev) => prev.filter((u) => u.userId !== message.userId.toString()));
+    setCursorPositions((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(message.userId.toString());
+      return newMap;
+    });
+  }, []);
+
+  const handleCursorMoved = useCallback((message: any) => {
+    setCursorPositions((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(message.userId.toString(), message.data.cursorPosition);
+      return newMap;
+    });
+
+    if (message.data.activeEditors) {
+      setActiveUsers((prev) =>
+        message.data.activeEditors.map((editor: ActiveEditor) => ({
+          userId: editor.userId.toString(),
+          userName: editor.username,
+          status: 'online',
+          cursorPosition: editor.cursorPosition,
+          lastSeen: editor.lastSeen,
+          isTyping: false,
+        }))
+      );
+    }
+  }, []);
+
+  const handleEditApplied = useCallback((message: any) => {
+    window.dispatchEvent(
+      new CustomEvent('collaboration-edit', {
+        detail: message.data,
+      })
+    );
+  }, []);
+
+  const handleCommentAdded = useCallback((message: any) => {
+    window.dispatchEvent(
+      new CustomEvent('collaboration-comment', {
+        detail: message.data,
+      })
+    );
+  }, []);
+
+  const handleCommentResolved = useCallback((message: any) => {
+    window.dispatchEvent(
+      new CustomEvent('collaboration-comment-resolved', {
+        detail: message.data,
+      })
+    );
+  }, []);
+
+  // Update currentTime periodically to avoid calling Date.now() during render
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleCollaborationEvent = useCallback((message: any) => {
+    switch (message.type) {
+      case 'user_joined':
+        handleUserJoined(message);
+        break;
+      case 'user_left':
+        handleUserLeft(message);
+        break;
+      case 'cursor_moved':
+        handleCursorMoved(message);
+        break;
+      case 'edit_applied':
+        handleEditApplied(message);
+        break;
+      case 'comment_added':
+        handleCommentAdded(message);
+        break;
+      case 'comment_resolved':
+        handleCommentResolved(message);
+        break;
+    }
+  }, [handleUserJoined, handleUserLeft, handleCursorMoved, handleEditApplied, handleCommentAdded, handleCommentResolved]);
 
   useEffect(() => {
     if (!isActive) return;
@@ -74,96 +173,7 @@ export default function CollaborationPanel({
         cleanup.close();
       }
     };
-  }, [isActive, roomId, userId, userName]);
-
-  const handleCollaborationEvent = useCallback((message: any) => {
-    switch (message.type) {
-      case 'user_joined':
-        handleUserJoined(message);
-        break;
-      case 'user_left':
-        handleUserLeft(message);
-        break;
-      case 'cursor_moved':
-        handleCursorMoved(message);
-        break;
-      case 'edit_applied':
-        handleEditApplied(message);
-        break;
-      case 'comment_added':
-        handleCommentAdded(message);
-        break;
-      case 'comment_resolved':
-        handleCommentResolved(message);
-        break;
-    }
-  }, []);
-
-  const handleUserJoined = (message: any) => {
-    const newPresence: UserPresence = {
-      userId: message.data.userId.toString(),
-      userName: message.data.userName,
-      status: 'online',
-      lastSeen: Date.now(),
-      isTyping: false,
-    };
-
-    setActiveUsers((prev) => [...prev, newPresence]);
-  };
-
-  const handleUserLeft = (message: any) => {
-    setActiveUsers((prev) => prev.filter((u) => u.userId !== message.userId.toString()));
-    setCursorPositions((prev) => {
-      const newMap = new Map(prev);
-      newMap.delete(message.userId.toString());
-      return newMap;
-    });
-  };
-
-  const handleCursorMoved = (message: any) => {
-    setCursorPositions((prev) => {
-      const newMap = new Map(prev);
-      newMap.set(message.userId.toString(), message.data.cursorPosition);
-      return newMap;
-    });
-
-    if (message.data.activeEditors) {
-      setActiveUsers((prev) =>
-        message.data.activeEditors.map((editor: ActiveEditor) => ({
-          userId: editor.userId.toString(),
-          userName: editor.username,
-          status: 'online',
-          cursorPosition: editor.cursorPosition,
-          lastSeen: editor.lastSeen,
-          isTyping: false,
-        }))
-      );
-    }
-  };
-
-  const handleEditApplied = (message: any) => {
-    window.dispatchEvent(
-      new CustomEvent('collaboration-edit', {
-        detail: message.data,
-      })
-    );
-  };
-
-  const handleCommentAdded = (message: any) => {
-    window.dispatchEvent(
-      new CustomEvent('collaboration-comment', {
-        detail: message.data,
-      })
-    );
-  };
-
-  const handleCommentResolved = (message: any) => {
-    window.dispatchEvent(
-      new CustomEvent('collaboration-comment-resolved', {
-        detail: message.data,
-      })
-    );
-  };
+  }, [isActive, roomId, userId, userName, handleCollaborationEvent]);
 
   const getStatusBadge = () => {
     if (!isActive) {
@@ -201,94 +211,55 @@ export default function CollaborationPanel({
 
       {isActive && (
         <>
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Subtitle className="text-muted small mb-2">
-                Ruang
-              </Card.Subtitle>
-              <div className="d-flex align-items-center justify-content-between">
-                <div>
-                  <strong>ID Ruang:</strong> {roomId}
-                </div>
-                <div>
-                  <strong>Konten:</strong> #{contentId}
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Subtitle className="text-muted small mb-2">
-                Partisipan Aktif ({activeUsers.length})
-              </Card.Subtitle>
-              {activeUsers.length === 0 ? (
-                <p className="text-muted mb-0">Tidak ada partisipan aktif</p>
-              ) : (
-                <div className="d-flex flex-wrap gap-2">
-                  {activeUsers.map((user) => (
-                    <Badge
-                      key={user.userId}
-                      bg={isDark ? 'dark' : 'light'}
+          <div className="mb-3">
+            <h6>Pengguna Aktif ({activeUsers.length})</h6>
+            {activeUsers.length === 0 ? (
+              <p className="text-muted">Tidak ada pengguna aktif</p>
+            ) : (
+              <div className="d-flex flex-wrap gap-2">
+                {activeUsers.map((user) => (
+                  <Badge
+                    key={user.userId}
+                    bg={user.status === 'online' ? 'success' : 'warning'}
+                    className="d-flex align-items-center gap-1"
+                  >
+                    <span
+                      className="rounded-circle"
                       style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '6px 12px',
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: user.status === 'online' ? '#28a745' : '#ffc107',
                       }}
-                    >
-                      <span>{user.userName}</span>
-                      {user.isTyping && (
-                        <span className="text-warning">
-                          <span className="spinner-border spinner-border-sm" />
-                        </span>
-                      )}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </Card.Body>
-          </Card>
+                    />
+                    {user.userName}
+                    {user.isTyping && <span className="ms-1">(mengetik...)</span>}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
 
           {cursorPositions.size > 0 && (
-            <Card className="mb-3">
-              <Card.Body>
-                <Card.Subtitle className="text-muted small mb-2">
-                  Posisi Kursor
-                </Card.Subtitle>
-                <div className="small text-muted">
-                  {Array.from(cursorPositions.entries()).map(([userId, pos]) => (
-                    <div key={userId} className="mb-1">
-                      <strong>{userId}:</strong> Baris {pos.line}, Kolom {pos.column}
-                    </div>
-                  ))}
-                </div>
-              </Card.Body>
-            </Card>
+            <div className="mb-3">
+              <h6>Posisi Kursor</h6>
+              <div className="d-flex flex-wrap gap-2">
+                {Array.from(cursorPositions.entries()).map(([userId, position]) => (
+                  <Badge key={userId} bg="info" className="cursor-position">
+                    {userId}: Baris {position.line}, Kolom {position.column}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           )}
 
-          <Card>
-            <Card.Body>
-              <Card.Subtitle className="text-muted small mb-2">
-                Status Koneksi
-              </Card.Subtitle>
-              <div className="d-flex align-items-center gap-2">
-                <div
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    backgroundColor: isConnected ? '#28a745' : '#dc3545',
-                  }}
-                />
-                <span>
-                  {isConnected
-                    ? 'Terhubung ke server kolaborasi'
-                    : 'Terputus dari server kolaborasi'}
-                </span>
-              </div>
-            </Card.Body>
-          </Card>
+          <div className="text-muted small">
+            <p className="mb-1">
+              Ruang: <strong>{roomId}</strong>
+            </p>
+            <p className="mb-0">
+              Pengguna: <strong>{userName}</strong> (ID: {userId})
+            </p>
+          </div>
         </>
       )}
     </div>

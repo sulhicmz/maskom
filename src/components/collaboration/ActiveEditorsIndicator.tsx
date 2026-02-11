@@ -18,11 +18,18 @@ const ActiveEditorsIndicator: React.FC<ActiveEditorsIndicatorProps> = ({
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const [localEditors, setLocalEditors] = useState<ActiveEditor[]>([])
-  const now = Date.now()
+  const [now, setNow] = useState(Date.now())
 
   useEffect(() => {
     setLocalEditors(editors)
   }, [editors])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   const otherEditors = localEditors.filter(editor => editor.userId !== currentUserId)
 

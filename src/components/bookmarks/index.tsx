@@ -18,7 +18,13 @@ export default function BookmarksPage() {
   };
 
   useEffect(() => {
-    loadBookmarks();
+    const fetchBookmarks = () => {
+      setLoading(true);
+      const savedBookmarks = getBookmarks();
+      setBookmarks(savedBookmarks);
+      setLoading(false);
+    };
+    fetchBookmarks();
   }, []);
 
   const handleRemoveBookmark = (postId: string) => {
