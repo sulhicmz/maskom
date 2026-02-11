@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SuspiciousActivityAlert } from '@/types/audit';
 import { getSuspiciousAlerts, resolveAlert } from '@/utils/activityLogger';
 import Button from '@/components/ui/Button';
@@ -10,23 +10,23 @@ export const SuspiciousChangeAlerts: React.FC = () => {
     const [selectedAlert, setSelectedAlert] = useState<SuspiciousActivityAlert | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const loadAlerts = () => {
+    const loadAlerts = useCallback(() => {
         setIsLoading(true);
         try {
             const loadedAlerts = getSuspiciousAlerts();
             setAlerts(loadedAlerts.filter(a => !a.resolved));
-            setIsLoading(false);
         } catch (error) {
             console.error('Failed to load suspicious alerts:', error);
+        } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         loadAlerts();
         const interval = setInterval(loadAlerts, 60000);
         return () => clearInterval(interval);
-    }, []);
+    }, [loadAlerts]);
 
     const handleResolveAlert = (alertId: string) => {
         if (confirm('Apakah Anda yakin ingin menyelesaikan peringatan ini?')) {
