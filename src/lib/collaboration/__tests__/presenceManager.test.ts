@@ -103,6 +103,10 @@ describe('PresenceManager', () => {
 
   describe('getAllPresences', () => {
     beforeEach(() => {
+      // First update presence, then join room (joinRoom requires presence to exist)
+      manager.updatePresence('user1', { userName: 'User 1', status: 'online', lastSeen: Date.now(), isTyping: false });
+      manager.updatePresence('user2', { userName: 'User 2', status: 'online', lastSeen: Date.now(), isTyping: false });
+      manager.updatePresence('user3', { userName: 'User 3', status: 'online', lastSeen: Date.now(), isTyping: false });
       manager.joinRoom('user1', 'room1');
       manager.joinRoom('user2', 'room1');
       manager.joinRoom('user3', 'room2');

@@ -1,4 +1,5 @@
 import { ICollaborationAnalytics, CollaborationMetrics, DocumentOperation } from '@/types/collaboration';
+import { COLLABORATION_CONFIG } from './config';
 
 interface SessionData {
   roomId: string;
@@ -42,7 +43,7 @@ class CollaborationAnalytics implements ICollaborationAnalytics {
     this.updateUserMetrics(operation.userId, 1);
 
     const now = Date.now();
-    this.operations = this.operations.filter((op) => now - op.timestamp < 3600000); // Keep last hour
+    this.operations = this.operations.filter((op) => now - op.timestamp < COLLABORATION_CONFIG.analytics.operationRetention);
   }
 
   trackSession(roomId: string, userId: string, duration: number): void {
@@ -83,7 +84,7 @@ class CollaborationAnalytics implements ICollaborationAnalytics {
     const now = Date.now();
     this.conflicts = this.conflicts.filter((c) => {
       const latestOp = c[c.length - 1];
-      return latestOp && now - latestOp.timestamp < 3600000; // Keep last hour
+      return latestOp && now - latestOp.timestamp < COLLABORATION_CONFIG.analytics.operationRetention;
     });
   }
 
@@ -233,7 +234,7 @@ class CollaborationAnalytics implements ICollaborationAnalytics {
     let activeCount = 0;
 
     for (const roomMetrics of this.roomMetrics.values()) {
-      if (now - roomMetrics.lastActivity < 300000) { // Active in last 5 minutes
+      if (now - roomMetrics.lastActivity < COLLABORATION_CONFIG.analytics.activeSessionThreshold) {
         activeCount++;
       }
     }
@@ -245,7 +246,7 @@ class CollaborationAnalytics implements ICollaborationAnalytics {
     if (this.operations.length === 0) return 0;
 
     const now = Date.now();
-    const oneMinuteAgo = now - 60000;
+    const oneMinuteAgo = now - COLLABORATION_CONFIG.analytics.metricsAggregationInterval;
     const recentOperations = this.operations.filter((op) => op.timestamp >= oneMinuteAgo);
 
     return recentOperations.length;
@@ -257,7 +258,7 @@ class CollaborationAnalytics implements ICollaborationAnalytics {
     if (roomOps.length === 0) return 0;
 
     const now = Date.now();
-    const oneMinuteAgo = now - 60000;
+    const oneMinuteAgo = now - COLLABORATION_CONFIG.analytics.metricsAggregationInterval;
     const recentOps = roomOps.filter((op) => op.timestamp >= oneMinuteAgo);
 
     return recentOps.length;
@@ -269,7 +270,7 @@ class CollaborationAnalytics implements ICollaborationAnalytics {
     if (userOps.length === 0) return 0;
 
     const now = Date.now();
-    const oneMinuteAgo = now - 60000;
+    const oneMinuteAgo = now - COLLABORATION_CONFIG.analytics.metricsAggregationInterval;
     const recentOps = userOps.filter((op) => op.timestamp >= oneMinuteAgo);
 
     return recentOps.length;

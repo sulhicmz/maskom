@@ -123,14 +123,13 @@ class DocumentEngine implements IDocumentEngine {
         return operation1;
       } else {
         const shift = operation2.content ? operation2.content.length : 0;
-        const length = operation1.length || 0;
         return {
           ...operation1,
           position: {
             ...operation1.position,
             column: operation1.position.column + shift,
           },
-          length: length - shift,
+          // Keep the original length - we're just shifting position, not changing how much to delete
         };
       }
     }

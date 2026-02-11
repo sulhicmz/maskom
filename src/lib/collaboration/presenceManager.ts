@@ -4,11 +4,12 @@ import {
   CursorPosition,
   SelectionRange,
 } from '@/types/collaboration';
+import { COLLABORATION_CONFIG } from './config';
 
 class PresenceManager implements IPresenceManager {
   private presences: Map<string, UserPresence> = new Map();
   private roomPresences: Map<string, Set<string>> = new Map();
-  private presenceTimeout: number = 30000; // 30 seconds
+  private presenceTimeout: number = COLLABORATION_CONFIG.presence.timeout;
   private typingTimeout: Map<string, NodeJS.Timeout> = new Map();
 
   updatePresence(userId: string, presenceUpdate: Partial<UserPresence>): void {
@@ -82,7 +83,7 @@ class PresenceManager implements IPresenceManager {
     if (isTyping) {
       const timer = setTimeout(() => {
         this.setTypingStatus(userId, false);
-      }, 3000); // Reset typing status after 3 seconds
+      }, COLLABORATION_CONFIG.typing.resetDelay);
       this.typingTimeout.set(userId, timer);
     }
   }
@@ -177,7 +178,7 @@ class PresenceManager implements IPresenceManager {
     return this.presences.size;
   }
 
-  startCleanupInterval(intervalMs: number = 60000): void {
+  startCleanupInterval(intervalMs: number = COLLABORATION_CONFIG.presence.cleanupInterval): void {
     setInterval(() => {
       this.cleanupInactivePresences();
     }, intervalMs);

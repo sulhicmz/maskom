@@ -270,7 +270,7 @@ describe('DocumentEngine', () => {
         content: 'Hello',
         tags: [],
       };
-      const state1 = engine.createDocument(content);
+      let state1 = engine.createDocument(content);
       const state2 = engine.createDocument(content);
 
       const op1: DocumentOperation = {

@@ -24,13 +24,22 @@ const Button: React.FC<{
     large: "btn-lg",
   }
 
+  // UX Enhancement: Focus ring for keyboard navigation, active state feedback, and smooth transitions
+  const uxEnhancementClasses = `
+    transition-all duration-150 ease-in-out
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+    focus-visible:ring-primary focus-visible:ring-opacity-75
+    active:scale-[0.98] active:transform
+    disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
+  `
+
   return (
     <button
       type={type}
       onClick={onClick}
       aria-label={ariaLabel}
       disabled={disabled}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${uxEnhancementClasses} ${className}`}
     >
       {children}
     </button>

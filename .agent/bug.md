@@ -27,15 +27,21 @@
 
 ### Remaining Test Failures (Low Priority)
 
-#### 5. presenceManager.test.ts - 1 failing test
-- [ ] `getAllPresences` returning empty array instead of expected presences
+#### 5. presenceManager.test.ts - 1 failing test - FIXED ✅
+- [x] `getAllPresences` returning empty array instead of expected presences
 - Location: `src/lib/collaboration/__tests__/presenceManager.test.ts:114`
-- Status: Needs investigation of presenceManager implementation
+- **Root Cause**: Test called `joinRoom` before `updatePresence`, but `joinRoom` requires presence to exist
+- **Fix**: Added `updatePresence` calls before `joinRoom` in test beforeEach
 
-#### 6. documentEngine.test.ts - 2 failing tests  
-- [ ] Transform position test - expected 15, received 10
-- [ ] mergeStates test - "Assignment to constant variable"
-- Status: Test logic issues, not production code issues
+#### 6. documentEngine.test.ts - 2 failing tests - FIXED ✅
+- [x] Transform position test - expected 15, received 10
+- [x] mergeStates test - "Assignment to constant variable"
+- **Root Causes**: 
+  1. Implementation incorrectly subtracted shift from length in transformOperation
+  2. Test used `const` for `state1` but tried to reassign it
+- **Fixes**: 
+  1. Removed length subtraction in documentEngine.ts transformOperation (line 133)
+  2. Changed `const state1` to `let state1` in test
 
 ### Lint Warnings (33 warnings) - Non-blocking
 
