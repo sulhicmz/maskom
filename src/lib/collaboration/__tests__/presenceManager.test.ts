@@ -103,6 +103,9 @@ describe('PresenceManager', () => {
 
   describe('getAllPresences', () => {
     beforeEach(() => {
+      manager.updatePresence('user1', { userName: 'User 1', status: 'online' });
+      manager.updatePresence('user2', { userName: 'User 2', status: 'online' });
+      manager.updatePresence('user3', { userName: 'User 3', status: 'online' });
       manager.joinRoom('user1', 'room1');
       manager.joinRoom('user2', 'room1');
       manager.joinRoom('user3', 'room2');
