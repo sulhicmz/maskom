@@ -144,8 +144,7 @@ class CampaignManager implements ICampaignManager {
 
         if (!originalCampaign) return null;
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { id: originalId, createdAt, sentCount, openCount, clickCount, bounceCount, ...campaignData } = originalCampaign;
+        const { id: _originalId, createdAt: _createdAt, sentCount: _sentCount, openCount: _openCount, clickCount: _clickCount, bounceCount: _bounceCount, ...campaignData } = originalCampaign;
 
         const duplicatedCampaign = this.createCampaign({
             ...campaignData,
