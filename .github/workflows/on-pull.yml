@@ -322,5 +322,5 @@ jobs:
           END OF PROMPT
           PROMPT
           )" \
-            --model opencode/glm-4.7-free \
+            --model opencode/glm-5-free \
             --share false \
