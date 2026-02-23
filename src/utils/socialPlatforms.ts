@@ -12,7 +12,6 @@ export const SOCIAL_PLATFORMS: Record<SocialPlatform, SocialPlatformConfig> = {
        icon: "fab fa-facebook-f",
        ariaLabel: "Share on Facebook",
        title: "Share on Facebook",
-       // eslint-disable-next-line @typescript-eslint/no-unused-vars
        getShareUrl: (url: string, _: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     },
    twitter: {
@@ -26,7 +25,6 @@ export const SOCIAL_PLATFORMS: Record<SocialPlatform, SocialPlatformConfig> = {
        icon: "fab fa-linkedin-in",
        ariaLabel: "Share on LinkedIn",
        title: "Share on LinkedIn",
-       // eslint-disable-next-line @typescript-eslint/no-unused-vars
        getShareUrl: (url: string, _: string) =>
           `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
     },
@@ -34,7 +32,6 @@ export const SOCIAL_PLATFORMS: Record<SocialPlatform, SocialPlatformConfig> = {
        icon: "fab fa-instagram",
        ariaLabel: "Copy link for Instagram",
        title: "Copy link for Instagram",
-       // eslint-disable-next-line @typescript-eslint/no-unused-vars
        getShareUrl: (_: string, __: string) => null,
     },
 }

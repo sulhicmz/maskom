@@ -100,7 +100,6 @@ export function updateTemplateMetrics(templateId: string, update: Partial<Templa
 /**
  * Record template application
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function recordTemplateApplication(templateId: string, _ruleId: string): boolean {
   try {
     const metrics = getTemplateMetrics();
