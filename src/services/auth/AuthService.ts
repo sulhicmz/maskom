@@ -142,7 +142,7 @@ class AuthService implements IAuthService {
         };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     private handleAuthError(error: unknown, _operation: string): AuthResult {
         if (error instanceof RateLimitExceededError) {
             return createRateLimitErrorResult(error, MS_TO_SECONDS);
