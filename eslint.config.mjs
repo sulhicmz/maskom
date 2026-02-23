@@ -42,10 +42,8 @@ const eslintConfig = [
     },
   },
   {
-    files: ["**/*.test.ts", "**/*.test.tsx"],
+    files: ["**/*.ts", "**/*.tsx"],
     rules: {
-      "@next/next/no-img-element": "off",
-      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
@@ -54,6 +52,13 @@ const eslintConfig = [
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   {
