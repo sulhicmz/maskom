@@ -113,6 +113,17 @@ const SEOMonitoringDashboard: React.FC = () => {
     }
   }, []);
 
+  const handleCloseIssueDetail = useCallback(() => {
+    setShowIssueDetail(false);
+    setSelectedIssue(null);
+  }, []);
+
+  const handleModalKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && showIssueDetail) {
+      handleCloseIssueDetail();
+    }
+  }, [showIssueDetail, handleCloseIssueDetail]);
+
   const handleUpdateIssueStatus = useCallback((issueId: string, status: SEOIssueStatus) => {
     const success = updateSEOIssueStatus(issueId, status);
     if (success) {
@@ -561,17 +572,22 @@ const SEOMonitoringDashboard: React.FC = () => {
           <div
             className="modal fade show d-block"
             tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="seo-issue-modal-title"
             style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
             onClick={() => setShowIssueDetail(false)}
+            onKeyDown={handleModalKeyDown}
           >
             <div className="modal-dialog modal-lg" onClick={(e) => e.stopPropagation()}>
               <div className={`modal-content ${theme === 'dark' ? 'bg-dark text-white' : ''}`}>
                 <div className="modal-header">
-                  <h5 className="modal-title">{selectedIssue.title}</h5>
+                  <h5 className="modal-title" id="seo-issue-modal-title">{selectedIssue.title}</h5>
                   <button
                     type="button"
                     className="btn-close"
                     onClick={() => setShowIssueDetail(false)}
+                    aria-label="Tutup modal"
                   />
                 </div>
                 <div className="modal-body">
