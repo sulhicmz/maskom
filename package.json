@@ -1,6 +1,24 @@
 {
   "name": "maskom",
   "version": "0.1.0",
+  "description": "Production-ready marketing website for Maskom Network's connectivity and managed services",
+  "private": true,
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sulhicmz/maskom.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sulhicmz/maskom/issues"
+  },
+  "homepage": "http://maskom.sulhi.workers.dev/",
+  "keywords": [
+    "nextjs",
+    "marketing-website",
+    "maskom",
+    "cloudflare-workers",
+    "typescript"
+  ],
   "engines": {
     "node": ">=20.0.0"
   },
@@ -10,7 +28,6 @@
     "not dead",
     "not op_mini all"
   ],
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "verify-node-version": "tsx scripts/verifyNodeVersion.ts",
