@@ -16,15 +16,15 @@ Terima kasih atas minat Anda untuk berkontribusi pada proyek Maskom! Panduan ini
 Sebelum Anda mulai berkontribusi:
 
 1. Pastikan Anda telah membaca [README.md](../README.md) untuk memahami proyek ini
-2. Cari [issue yang sudah ada](https://github.com/username/maskom/issues) terkait dengan kontribusi yang ingin Anda buat
+2. Cari [issue yang sudah ada](https://github.com/sulhicmz/maskom/issues) terkait dengan kontribusi yang ingin Anda buat
 3. Jika belum ada issue, buat issue baru untuk membahas perubahan yang ingin Anda lakukan
 
 ## Persiapan Lingkungan Pengembangan
 
-1. Fork repository ini
-2. Clone repository ke lokal Anda
+1. Fork repository ini di [GitHub](https://github.com/sulhicmz/maskom)
+2. Clone fork Anda ke lokal
    ```bash
-   git clone https://github.com/your-username/maskom.git
+   git clone https://github.com/YOUR-USERNAME/maskom.git
    ```
 3. Buat branch baru untuk fitur Anda
    ```bash
