@@ -14,8 +14,7 @@ import {
 } from '../totp';
 import type { TOTPVerificationOptions } from '@/types/mfa';
 import { API_ENDPOINTS } from '@/constants';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { CircuitBreaker } from '@/utils/resilience/circuitBreaker';
+import { CircuitBreaker as _CircuitBreaker } from '@/utils/resilience/circuitBreaker';
 
 jest.mock('@/utils/resilience/circuitBreaker', () => ({
   CircuitBreaker: jest.fn().mockImplementation(() => ({
