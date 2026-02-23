@@ -97,7 +97,7 @@ export const campaign_data: EmailCampaign[] = [
                 updatedAt: '2026-01-19T00:00:00.000Z',
             },
         ],
-        scheduledFor: '2026-02-05T14:00:00.000Z',
+        scheduledFor: '2026-03-15T14:00:00.000Z',
         status: 'scheduled',
         sentCount: 0,
         openCount: 0,
