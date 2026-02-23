@@ -18,7 +18,7 @@ Get the project running locally in just 5 minutes.
 
 ### Prerequisites
 
-- **Node.js** 22.0.0 or higher
+- **Node.js** 20.0.0 or higher (22+ recommended, see `.nvmrc`)
 - **npm** or **yarn** package manager
 
 ### Installation
